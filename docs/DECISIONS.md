@@ -386,6 +386,93 @@ Codex занимается интеграцией и программной ча
 
 ---
 
+## DEC-018 — Каноническая цивилизационная модель Timeline #1
+
+**Status:** accepted  
+**Date:** 2026-09-15
+
+### Decision
+
+Для gameplay v1 в диапазоне примерно 46–108 минут каноническая модель использует:
+
+- Food / Materials / Knowledge / Population;
+- Power после City;
+- фазовые jobs из DS-01;
+- buildings/infrastructure из economy specification;
+- культурные и технологические branches T01–A06.
+
+Следующие ранние GDD-концепты не являются отдельными обязательными gameplay entities v1 без нового balance decision:
+
+- Merchant как отдельный job;
+- Wood / Stone / Metal как отдельные global currencies;
+- industrial Energy как отдельный ресурс вместо Power;
+- Radio и Computing precursor как обязательные tech prerequisites;
+- отдельная Global Civilization economy era;
+- отдельные pre-crisis Atomic Lab / Research Reactor buildings.
+
+Trade-lite представлен Market + Exchange. Ранние generic названия Power Plant / Motor маппятся на текущие Steam Plant / Grid Station / Mechanization / Electrical Grid.
+
+### Affected documents
+
+- `docs/gdd/04_CIVILIZATION_PROGRESSION.md`
+- `docs/gdd/05_BUILDINGS_AND_JOBS.md`
+- `docs/gdd/06_TECH_TREE.md`
+
+### Implementation consequence
+
+Codex не должен создавать перечисленные deferred entities как обязательные runtime systems без обновления GDD и balance model.
+
+---
+
+## DEC-019 — Профессии сменяются по фазам, а не накапливаются
+
+**Status:** accepted  
+**Date:** 2026-09-15
+
+### Decision
+
+Каждая цивилизационная фаза имеет один активный displayed job set:
+
+- Tribe;
+- Settlement;
+- City;
+- Industry.
+
+После перехода в следующую фазу устаревшие job labels не продолжают существовать как параллельные способы производить тот же ресурс. Точный алгоритм переноса назначенной Population определяется в DS-03/DS-06.
+
+### Reason
+
+Это сохраняет читаемый People/Jobs UI и не создаёт параллельные production paths, которых нет в балансе.
+
+### Implementation consequence
+
+Data model должна поддерживать phase-aware job availability и безопасную migration/reassignment логику.
+
+---
+
+## DEC-020 — Tribe structures unique, поздняя infrastructure stackable
+
+**Status:** accepted  
+**Date:** 2026-09-15
+
+### Decision
+
+В Timeline #1:
+
+- Hearth, Shelter, Tool Bench, Hunting Ground, Story Circle и Clan Camp — unique phase structures;
+- Settlement / City / Industry infrastructure с заданным growth factor — stackable;
+- production count milestones 10/25/50 не применяются автоматически к unique Tribe structures.
+
+### Reason
+
+В economy specification tribal structures имеют фиксированную цену без growth, тогда как поздние buildings явно имеют Base cost + Growth.
+
+### Implementation consequence
+
+Building schema должна различать unique structures и stackable infrastructure.
+
+---
+
 # Open decisions
 
 Следующие вопросы пока требуют отдельного решения:

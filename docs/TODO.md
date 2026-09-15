@@ -10,45 +10,88 @@
 
 ## Documentation design
 
-Сейчас проектирование идёт блоками по `docs/production/DESIGN_SESSION_PLAN.md`.
-
 Формат работы:
 
 **одна design session -> один чат -> пакет связанных документов -> пользовательская проверка -> state/TODO update -> push -> новый чат.**
 
 ---
 
-# Current design session
+# Last completed design session
 
 ## DS-01 — Civilization gameplay contract
+
+**Status:** done
+
+Accepted documents:
+- [x] `docs/gdd/04_CIVILIZATION_PROGRESSION.md`
+- [x] `docs/gdd/05_BUILDINGS_AND_JOBS.md`
+- [x] `docs/gdd/06_TECH_TREE.md`
+
+Зафиксировано:
+- [x] canonical progression Sapience -> Tribe -> Agriculture -> Settlement -> City -> Industry -> Atomic Age;
+- [x] canonical jobs и buildings 46–108 минут;
+- [x] stable design IDs для tech/jobs/buildings;
+- [x] Merchant / Wood-Stone-Metal / Radio / Computing не являются обязательными runtime systems v1;
+- [x] industrial resource называется Power;
+- [x] Tribe structures unique, поздняя infrastructure stackable;
+- [x] phase job sets не накапливаются параллельно.
+
+Новые решения: `DEC-018` — `DEC-020`.
+
+---
+
+# Current design session
+
+## DS-02 — Goals, events and first ending contract
 
 **Status:** ready
 
 ### Goal
-Полностью формализовать цивилизационную часть первого Timeline примерно от Sapience до Atomic Age, не переходя пока к полному сценарию и UX.
+
+Сделать весь первый Timeline описываемым как data-driven последовательность целей, событий и кризисных состояний, не оставляя Codex необходимости самостоятельно придумывать gameplay-логику ending/reset.
 
 ### Inputs
 - `docs/PRD.md`
 - `docs/gdd/01_FIRST_120_MINUTES.md`
 - `docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md`
 - `docs/gdd/03_EVOLUTION_TREE.md`
+- `docs/gdd/04_CIVILIZATION_PROGRESSION.md`
+- `docs/gdd/05_BUILDINGS_AND_JOBS.md`
+- `docs/gdd/06_TECH_TREE.md`
+- `docs/scenario/00_NARRATIVE_BIBLE.md`
 - `docs/DECISIONS.md`
 
 ### Deliverables
-- [ ] `docs/gdd/04_CIVILIZATION_PROGRESSION.md`
-- [ ] `docs/gdd/05_BUILDINGS_AND_JOBS.md`
-- [ ] `docs/gdd/06_TECH_TREE.md`
+- [ ] `docs/gdd/07_GOALS_AND_MILESTONES.md`
+- [ ] `docs/gdd/08_EVENTS_AND_CHOICES.md`
+- [ ] `docs/gdd/09_ENDINGS_AND_RESET.md`
 
-### Review checklist
-- [ ] Tribe -> Settlement -> City -> Industry -> Atomic progression согласована с economy timing.
-- [ ] Все обязательные buildings имеют стабильные IDs, unlocks и функции.
-- [ ] Все jobs имеют стабильные IDs и понятные роли.
-- [ ] Tech tree не конфликтует с evolution tree.
-- [ ] Нет обязательной gameplay-сущности 46–108 минут, которую следующий блок должен будет придумывать заново.
-- [ ] Определены visual hooks для будущего UX/art, но не спроектирован сам UI.
-- [ ] Все новые продуктовые решения добавлены в `DECISIONS.md`.
+### Must decide
+- [ ] current/chapter/destiny goals на 0–120 минут;
+- [ ] stable goal IDs и completion conditions;
+- [ ] milestone sequencing;
+- [ ] обязательные meaningful choices первого Timeline;
+- [ ] government-lite choice и его mechanical flags;
+- [ ] energy-crisis choice и mapping к DS-01 tech branches;
+- [ ] `Следы до нас`;
+- [ ] `ERROR 17` как gameplay/story hook;
+- [ ] Atomic Age -> crisis handoff;
+- [ ] Stability / World Tension presentation contract на уровне gameplay;
+- [ ] crisis event chain;
+- [ ] Last Protocol;
+- [ ] Ash trigger/subtypes;
+- [ ] reset: что сбрасывается и что сохраняется;
+- [ ] какие значения передаются в Chronicle/meta layer.
 
-После approval перевести DS-01 в `done`, разблокировать DS-02 и обновить state.
+### Review gate
+- [ ] каждый обязательный event имеет trigger и stable ID;
+- [ ] каждый choice имеет механическое последствие или явно narrative-only flag;
+- [ ] crisis не может быть случайно пропущен;
+- [ ] Timeline #1 неизбежно приходит к Ash, но choices влияют на summary/reward/flags;
+- [ ] reset contract однозначен;
+- [ ] DS-03 получает полный gameplay state contract без необходимости придумывать goals/events/endings.
+
+После approval перевести DS-02 в `done`, разблокировать DS-03, DS-04 и DS-05; DS-06 станет ready после DS-02 вместе с уже завершённым DS-01.
 
 ---
 
@@ -71,59 +114,36 @@
 - [ ] Baseline startup measurement.
 - [ ] Решить/добавить smoke command/script.
 
-### Текущий gate
+### Gate
+
 Не начинать Iteration 1 до approval **DS-03 — Technical architecture and data contract**.
 
-Безопасные измерительные/baseline задачи Iteration 0 можно выполнить отдельно, но сейчас основной фокус — документация.
-
 ---
 
-# Immediately after DS-01
+# Current open decisions
 
-Следующий блок:
-
-## DS-02 — Goals, events and first ending contract
-
-Планируемые документы:
-- `gdd/07_GOALS_AND_MILESTONES.md`
-- `gdd/08_EVENTS_AND_CHOICES.md`
-- `gdd/09_ENDINGS_AND_RESET.md`
-
-После DS-02:
-
-## DS-03 — Technical architecture and data contract
-
-После его approval Codex можно запускать параллельно с дальнейшим design work.
-
----
-
-# Current blockers / open decisions
-
-Не блокируют DS-01, но должны быть закрыты до соответствующих этапов:
+Не блокируют DS-02, если не затрагиваются напрямую:
 
 - [ ] exact UI framework / степень reuse Vue 2;
 - [ ] canonical gameplay config format;
 - [ ] legacy save compatibility vs new versioned wrapper;
 - [ ] portal SDK abstraction details;
-- [ ] visible World Tension vs Stability + explanations;
-- [ ] user-facing name Archive permanent currency.
+- [ ] visible World Tension vs Stability + explanations — желательно закрыть в DS-02;
+- [ ] user-facing name Archive permanent currency — можно окончательно закрыть в DS-04.
 
 ---
 
 # Rules for this phase
 
-- [ ] Не писать код gameplay в текущей design session.
-- [ ] Не проектировать UX раньше gameplay contract.
-- [ ] Не генерировать финальные арты до art direction + asset manifest.
-- [ ] Не генерировать финальный audio pack до audio direction/cue map.
-- [ ] Не расширять scope первым Space/Bioseed.
-- [ ] Не закрывать session без пользовательского review.
+- [ ] Не писать gameplay implementation до DS-03 approval.
+- [ ] Не проектировать финальные wireframes в DS-02.
+- [ ] Не писать полный литературный сценарий вместо gameplay event contract.
+- [ ] Не менять DS-01 economy/tech prerequisites без возврата DS-01 в review.
+- [ ] Не расширять первый Timeline глубоким Space/Bioseed.
 - [ ] После approval обновлять `PROJECT_STATE.yaml` и этот TODO в одном push cycle.
 
 ---
 
 # Start command for next chat
-
-После завершения текущего блока достаточно написать:
 
 > Продолжаем Хроники Эволюции. Открой GitHub, прочитай `docs/PROJECT_STATE.yaml` и выполни текущую design session.
