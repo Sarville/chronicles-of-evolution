@@ -1,641 +1,354 @@
 # Хроники Эволюции — Testing Strategy
 
-**Документ:** DS-03 / 07_TESTING_STRATEGY  
-**Версия:** 1.0  
-**Статус:** accepted
+**Документ:** DS-03 / reconciliation revision 2.0  
+**Статус:** accepted testing architecture / reconciled gameplay cases.
 
 ---
 
-# 1. Цель
+# 1. Principle
 
-Тестовая стратегия должна сделать возможным безопасное развитие большого legacy-проекта без переписывания всего Evolve.
+Keep the accepted headless-first strategy.
 
-Главный принцип:
+New gameplay must be testable without production UI.
 
-> Новый gameplay сначала должен быть проверяем headless, и только потом зависеть от production UI.
-
----
-
-# 2. Текущий baseline
-
-В репозитории нет полноценного test suite.
-
-`package.json` содержит esbuild/build scripts, но не содержит test framework.
-
-Поэтому DS-03 не требует немедленного тяжёлого toolchain migration.
+Reconciliation changes test fixtures and assertions, not the testing architecture.
 
 ---
 
-# 3. Initial test runner recommendation
+# 2. Test layers
 
-Для Iteration 0/1 использовать минимальный zero-dependency harness:
+Keep:
 
-```text
-Node ESM scripts
-+ node:assert / assert/strict equivalent supported by baseline Node
-+ deterministic fakes
-```
+- L0 config validation;
+- L1 pure unit;
+- L2 domain integration;
+- L3 adapter contracts;
+- L4 save/migration;
+- L5 headless simulation;
+- L6 browser smoke/E2E.
 
-Пример scripts после Codex implementation:
-
-```json
-{
-  "test:config": "node tests/config/run.mjs",
-  "test:domain": "node tests/domain/run.mjs",
-  "test:save": "node tests/save/run.mjs",
-  "test:sim": "node tests/simulation/timeline1.mjs",
-  "test": "npm run test:config && npm run test:domain && npm run test:save"
-}
-```
-
-Если baseline Node/version делает это неудобным, Codex может выбрать другой **малый** runner, но не должен обновлять весь frontend stack ради тестов.
-
-Browser E2E framework выбирается позднее, когда DS-06 даст production UI.
+No large framework migration is required just because content changed.
 
 ---
 
-# 4. Test pyramid
+# 3. Config validation after reconciliation
 
-## L0 — Config validation
-
-Самые дешёвые проверки, запускаются всегда.
+Validate:
 
 - unique IDs;
 - references exist;
-- graph no cycles;
+- graph has no cycles;
 - branch groups valid;
+- optional nodes skippable;
 - effects whitelisted;
-- prices/rates finite and non-negative;
-- optional node invariant;
-- transition targets valid;
-- Goal/Event mappings valid.
+- costs/outputs finite/non-negative where present;
+- AP rewards/costs non-negative integers or accepted config type;
+- Cognition contributors valid;
+- condition-driven convergence valid;
+- Goal/Event mappings valid;
+- removed E/I content is not referenced by reconciled ruleset.
 
-## L1 — Pure unit
+Explicit negative checks for `timeline1-v2-reconciled`:
 
-- costs;
-- resource clamps;
-- payment atomicity;
-- production;
-- modifiers;
-- branch locking;
-- job allocation;
-- crisis drain;
-- AF formula.
-
-## L2 — Domain integration
-
-- command → state → domain events;
-- node purchase → goal → era transition;
-- event choice → flags/path;
-- crisis → Last Protocol → ending;
-- reset summary/meta/new run.
-
-## L3 — Adapter contract
-
-- fake clock;
-- real worker adapter sanity;
-- in-memory storage vs browser storage;
-- locale fallback;
-- platform no-op behavior.
-
-## L4 — Save/migration
-
-- serialization;
-- recovery;
-- version migrations;
-- interrupted reset;
-- stale writer.
-
-## L5 — Headless simulation
-
-Full 0–120 Timeline progression at accelerated virtual time.
-
-## L6 — Browser smoke/E2E
-
-After DS-06/UI implementation.
+```text
+no player-facing Information resource
+no Chemical Gradient producer
+no Catalytic Fold producer
+no Energy Pocket producer
+no old Stable Bond semantics
+```
 
 ---
 
-# 5. Test seams
+# 4. Early biological domain tests
 
-Every non-deterministic external dependency is injectable:
-
-```text
-clock
-rng
-storage
-platform
-locale
-analytics
-```
-
-Domain test uses:
+Minimum route:
 
 ```text
-FakeClock
-SeededRng
-MemoryStorage
-NoopPlatform
-TestLocale
-CaptureAnalytics
+M01 Stable RNA
+→ M02 Self Replication
+→ M03 DNA Synthesis
+→ M05 Membrane
+→ M06 Cell
 ```
-
-No unit test requires browser DOM.
-
----
-
-# 6. Determinism
-
-Legacy code uses both seeded and unseeded random.
-
-New Timeline domain must not call `Math.random()` directly.
-
-All random choice:
-
-```text
-RandomPort
-```
-
-Simulation records seed.
-
-Same:
-
-```text
-ruleset + initial state + command script + RNG seed
-```
-
-must produce same persisted gameplay state.
-
-Presentation timings/animation do not need deterministic replay.
-
----
-
-# 7. Time model tests
-
-Test `tick(deltaMs)` independently from real worker.
 
 Cases:
 
-- `tick(250)` ×4 equals `tick(1000)` within defined numeric tolerance;
-- timeScale 5x changes simulation delta, not production formulas;
-- paused active gameplay does not advance active time;
-- normal offline catch-up follows policy;
-- crisis first-run offline does not advance crisis clock/drain.
-
-Floating-point comparisons use explicit tolerance.
+- first manual process works;
+- passive RNA unlock works;
+- Self Replication changes process behavior;
+- DNA unavailable before M03;
+- DNA available after M03;
+- M04 Error Correction optional/skippable;
+- Membrane requires intended prerequisites;
+- Cell transition unlocks Biomass/cellular state;
+- no UI/DOM required.
 
 ---
 
-# 8. Resource/payment tests
+# 5. Manual-input tests
+
+Headless simulation should measure manual contribution share.
+
+Acceptance target after tuning:
+
+```text
+manual contribution <=5% competent optimal income after ~3 min
+```
+
+Test behavior rather than exact obsolete E/I cooldown constants.
+
+---
+
+# 6. First-branch tests
+
+Primary branch group:
+
+```text
+Absorption / Symbiosis / Shell
+```
+
+Validate:
+
+- exactly one primary selected in Timeline #1;
+- sibling is not buyable through generic `×2.5` rule;
+- all branches preserve core reachability;
+- branch flag/history persists in run save;
+- optional Photosynthesis/Chemosynthesis do not overwrite primary trait;
+- future meta hybridization has explicit separate permission seam.
+
+---
+
+# 7. Adaptation Points tests
 
 Minimum:
 
-1. add resource below cap;
-2. cap clamp;
-3. no negative stock;
-4. multi-resource payment success;
-5. one insufficient component => no component charged;
-6. current price growth exact;
-7. producer count milestones 10/25/50;
-8. modifier group order;
-9. temporary modifier expiry.
-
-Golden numeric values should come from config/source, not duplicate arbitrary constants across tests.
+- AP awarded by configured milestone/side objective exactly once;
+- no passive AP tick;
+- cannot spend below zero;
+- core node purchase never requires AP;
+- optional adaptation can spend AP atomically;
+- retained Archive optional adaptation can activate at zero AP cost only under valid meta rules;
+- reset clears run-local AP.
 
 ---
 
-# 9. Evolution/tech tests
+# 8. Cognition tests
 
 Minimum:
 
-- core route M01→N06 reachable;
-- core route N06→A06 reachable;
-- branch groups have expected members;
-- sibling selection blocked according to rules;
-- optional nodes skippable;
-- missing prerequisite blocks purchase;
-- affordability not equal unlock;
-- S08 triggers City only after full transition requirements;
-- I05 triggers Industry;
-- A06 initializes Atomic/Stability;
-- no UI call required.
+- Cognition clamped 0..100;
+- contributions come from valid nodes/events;
+- behavior choice contributes as configured;
+- flavor event reward cannot duplicate on reload;
+- Sapience unavailable below 100;
+- Sapience available at 100 only if core neural prerequisites are complete;
+- no direct generic resource payment completes Sapience;
+- optional AP route cannot soft-lock reaching 100.
 
 ---
 
-# 10. Buildings/jobs tests
+# 9. Civilization transition tests
 
-Jobs:
+On Sapience:
 
-- assignment sum ≤ Population;
-- negative workers impossible;
+- biological active resources leave main civilization selectors;
+- Population initializes around configured small-group value (~5);
+- F/M/K starting package applied exactly once;
+- no conversion from obsolete Information stock;
+- no farming biological stock to inflate starting Population;
+- early jobs/buildings available.
+
+---
+
+# 10. Population/jobs tests
+
+Keep existing invariants:
+
+- assignment sum <= Population;
+- negative assignments impossible;
 - unassigned allowed;
-- dual output correct;
-- era remap loses no Population;
-- unavailable old job produces nothing after replacement.
+- phase transition remap loses no Population;
+- unavailable old jobs produce nothing;
+- temporary Food deficit stops/slows growth according to rules without instant hard fail.
 
-Buildings:
-
-- unique max 1;
-- stackable growth;
-- atomic payment;
-- flat producer scales count;
-- support building applies correct modifier;
-- producer milestone only where tagged;
-- cap building affects derived Population cap.
-
-TBD stacking formula tests are added only after design value accepted.
+Retune golden values after new population model is frozen.
 
 ---
 
-# 11. Goal tests
+# 11. Power/Modern tests
 
-For all G001–G024:
+Validate:
+
+- Power is not required for City unlock;
+- Power becomes active through Industry/electrification path;
+- Industry reachable without old mandatory city specialization if config says optional;
+- Modern state/goal exists before Atomic;
+- communications/global/research conditions map correctly;
+- Error 17 triggers in Modern phase;
+- Atomic requires Scientific Method + Atomic Theory + reactor/lab project concept.
+
+---
+
+# 12. Goal tests
+
+All G001–G024:
 
 - unique ID;
-- prerequisite refs;
-- valid completion condition;
-- target time exists as telemetry only;
-- no hard completion from target time;
-- blocking event cannot be skipped;
-- completion emits exactly once;
-- archived goal never re-awards.
+- valid prerequisites;
+- valid completion conditions;
+- target time telemetry only;
+- completion emits/rewards exactly once;
+- archived goal never re-awards;
+- optional side goals do not block core.
 
-Stall:
-
-- threshold by phase;
-- 5pp progress resets stall clock;
-- relevant purchase resets/updates progress;
-- hint identifies one primary bottleneck.
-
----
-
-# 12. Event tests
-
-- priority ordering;
-- one blocking choice at a time;
-- soft event does not freeze unless configured;
-- exact branch/event mapping;
-- chosen flags written;
-- path score clamped;
-- Chronicle major event record created once;
-- persistent_open Error 17 survives ending/reset as designed;
-- Energy Crisis and A01 specialization remain separate.
-
----
-
-# 13. Crisis tests
-
-Required DS-02 cases:
-
-## Normal
-
-- Atomic near target in simulation scenario;
-- EV-CR-01/02;
-- Last Protocol;
-- Ash;
-- reward.
-
-## Fast stability collapse
-
-- Stability <=15 before 435 sec;
-- `ashPending=true`;
-- no early cinematic;
-- Last Protocol still shown at clamp.
-
-## High stability
-
-- Ash cannot be prevented past 480 sec Timeline #1.
-
-## Offline
-
-- clock/drain freeze.
-
-## Last Protocol
-
-Every variant:
+Specific corrected checks:
 
 ```text
-ENDING_ASH
-+ correct subtype
-+ flags
-+ Chronicle
+G001 Stable RNA
+G002 Self Replication
+G003 DNA
+G004 Membrane
+G005 Cell
+G013 Cognition-based Sapience
+G022 Modern Civilization
+G023 Atomic Age
 ```
 
-World Tension always equals:
+No early Goal copy/config may reference Information/Chemical Gradient/Catalytic Fold/Energy Pocket.
+
+---
+
+# 13. Event tests
+
+Validate:
+
+- first biological branch uses Absorption/Symbiosis/Shell;
+- body adaptations can combine according to AP rules;
+- Behavior strategy separate from first trait;
+- Danger/Other flavor events do not hard-block Sapience alone;
+- Traces Before Us persistent flags;
+- Energy Crisis distinct from optional preatomic specialization;
+- Error 17 persistent-open behavior;
+- Again anomaly;
+- crisis event ordering.
+
+---
+
+# 14. Crisis tests
+
+Keep accepted cases:
+
+- normal crisis flow;
+- fast Stability collapse with dramatic clamp;
+- high-Stability path cannot prevent first Ash;
+- offline crisis freeze;
+- all Last Protocol variants converge to `ENDING_ASH` with correct subtype/flags;
+- Archive reward/Chronicle applied once.
+
+Old exact 435/480 sec values remain regression starting points unless new balance changes them explicitly.
+
+---
+
+# 15. Save/migration tests
+
+Keep:
+
+- serialization;
+- primary/pending/backup recovery;
+- schema migration;
+- reset retry/idempotency;
+- corrupted-save recovery.
+
+Add reconciliation ruleset cases:
+
+- old `timeline1-v1` save is not silently interpreted as v2;
+- explicit restart/migration path behaves as specified;
+- meta/settings preservation verified if restarting pre-release run;
+- resource/node semantic aliases are deterministic where used;
+- no guessed conversion `energy→rna` or `information→dna` based on amounts.
+
+---
+
+# 16. Headless simulation profiles
+
+For 0–10 maintain:
+
+- competent;
+- optimized;
+- slower/non-optimal;
+- M04 optional.
+
+For 10–40 add variation by:
+
+- primary trait;
+- AP spending;
+- optional metabolism adaptation;
+- behavior strategy;
+- Cognition contribution pattern.
+
+For civilization keep representative job-allocation profiles.
+
+---
+
+# 17. Timing acceptance — initial reconciliation targets
+
+0–10:
 
 ```text
-100 - Stability
+first action <20 sec
+passive RNA <60 sec
+Self Replication ~2–3 min
+DNA ~4–6 min
+Cell ~9–11 min
 ```
 
----
-
-# 14. Reset/save tests
-
-Highest priority regression set:
-
-- Timeline Summary immutable;
-- AF formula target;
-- successful reset writes Chronicle + meta;
-- failed commit keeps old run;
-- retry does not duplicate AF;
-- retry does not duplicate Chronicle;
-- run-only state absent from Timeline #2;
-- persistent flags retained;
-- settings retained;
-- original `evolved` untouched.
-
----
-
-# 15. Config-source consistency tests
-
-To reduce specification drift, create explicit golden manifest for high-value canon:
+0–40:
 
 ```text
-milestone target windows
-node costs
-building base costs/growth
-job base outputs
-crisis constants
-AF formula
+Multicellularity ~24–28 min
+Nervous System ~31–35 min
+Sapience ~38–40 min
 ```
 
-Tests compare loaded config against the checked-in expected manifest/version.
-
-When design intentionally changes, manifest changes in same commit with decision/revision.
-
-This is not a second gameplay config; it is a compact regression snapshot.
-
----
-
-# 16. Headless simulation
-
-Required API:
-
-```js
-simulateTimeline({
-  ruleset,
-  seed,
-  policy,
-  timeScale,
-  maxSimulationMs
-})
-```
-
-Output:
-
-```json
-{
-  "milestones": {
-    "M02": 119,
-    "M06": 603,
-    "C09": 1562,
-    "N06": 2768,
-    "T05": 3375,
-    "T08": 3724,
-    "S08": 4815,
-    "I05": 5650,
-    "A06": 6492,
-    "ENDING_ASH": 6975
-  },
-  "ending": "ENDING_ASH",
-  "resetAvailableAtSec": 7180,
-  "errors": []
-}
-```
-
-Numbers above are illustrative output format, not canonical target replacements.
-
----
-
-# 17. Simulation policy
-
-A simulation needs a player policy.
-
-Create at least:
-
-## `baseline_active`
-
-- buys core progression when affordable;
-- maintains survival resource surplus;
-- uses recommended first-run branches;
-- builds recommended producers/jobs;
-- skips optional nodes unless required by defined policy;
-- responds to events immediately;
-- does not use ads/Archive Intervention.
-
-## `slow_reasonable`
-
-- delayed purchases;
-- non-optimal but valid allocations.
-
-## `branch_matrix`
-
-Runs representative alternatives to check no branch creates dead end.
-
-Policy is test tooling, not gameplay AI.
-
----
-
-# 18. Milestone timing gates
-
-Canonical targets:
+Late anchors:
 
 ```text
-Self Replication ~ 2m
-Proto-cell ~ 10m
-Multicellularity ~ 26m
-Sapience ~ 46m
-Tribe ~ 56m
-Agriculture ~ 62m
-City ~ 80m
-Industry ~ 94m
-Atomic ~ 108m
-Ash ~ 116m
-Reset ~ 120m
+City ~78–80
+Industry ~93–95
+Modern ~102–104
+Atomic ~107–108
+Ash ~116–118
+Reset ~120
 ```
 
-Simulation checks configurable acceptance windows.
-
-Recommended initial CI windows:
-
-```text
-early core goals: target ±15%
-major era milestones: target ±10%
-Ash/reset: DS-02 clamp + product window
-```
-
-Exact windows may be tightened after first simulation/playtest.
-
-A failing timing test is a signal for balance review, not permission for Codex to silently alter costs.
+These are simulation targets, not hard timers.
 
 ---
 
-# 19. Branch matrix tests
+# 18. Browser smoke
 
-At minimum one full viable run for:
+After early rework browser smoke must verify:
 
-- each metabolism branch;
-- each body branch;
-- each behavior branch;
-- each civilization branch group representative;
-- each Energy Crisis path;
-- each Last Protocol.
-
-Full Cartesian product is unnecessary for every commit.
-
-Nightly/manual deeper matrix can sample combinations by seeded simulation.
+- no obsolete E/I labels/cards in reconciled run;
+- Goal CTA routes correctly;
+- resource reveal order correct;
+- save/recovery UI still works;
+- dev tools hidden in production;
+- touch/mouse primary actions work.
 
 ---
 
-# 20. Fuzz/property-style checks without new framework
+# 19. Gate before Iteration 4
 
-Small deterministic loops can generate valid random commands and assert invariants:
+Required:
 
-```text
-no NaN
-no negative resource
-no negative building count
-no over-assigned population
-no two selected siblings
-stability 0..100
-path scores -10..10
-save always JSON serializable
-```
+- config tests pass;
+- domain tests pass;
+- save/migration tests pass;
+- UI smoke passes;
+- 0–10 headless profiles acceptable;
+- manual 0–10 playtest completed;
+- user approves corrected playable.
 
-Keep bounded seeds/count to avoid slow test suite.
-
----
-
-# 21. Legacy regression harness
-
-Before modifying legacy integration, keep fixtures:
-
-- fresh legacy save;
-- representative mid-game save if available;
-- corrupted save sample;
-- new Chronicles save.
-
-Smoke:
-
-- legacy page still boots while coexistence required;
-- Chronicles engine initializes;
-- one domain tick works;
-- new save write does not modify legacy `evolved`.
-
-No need to prove all original Evolve late-game content in every commit.
-
----
-
-# 22. Build/smoke gate
-
-Iteration DoD:
-
-```text
-npm build/debug build passes
-domain tests pass
-save tests pass
-config validation passes
-headless smoke passes
-no blocker console error in target page
-```
-
-Iteration 0 still must record:
-
-- baseline build;
-- bundle size;
-- startup measurement;
-- smoke script/command.
-
-DS-03 does not fabricate those measurements.
-
----
-
-# 23. Debug tools as test surface
-
-Dev API must be scriptable, not only clickable UI:
-
-```text
-setTimeScale
-grantResource
-setPopulation
-unlockNode
-setEra
-triggerEvent
-setStability
-simulate
-dumpState
-validateConfig
-```
-
-Debug UI calls this API; tests can call same methods where appropriate.
-
----
-
-# 24. Test data policy
-
-Tests never depend on localized labels.
-
-Use IDs only.
-
-Fixtures declare:
-
-```text
-schemaVersion
-rulesetVersion
-```
-
-When schema changes, migrate fixture or keep explicit old fixture for migration test.
-
----
-
-# 25. Failure diagnostics
-
-On failure, report:
-
-```text
-seed
-rulesetVersion
-simulationTime
-command
-last domain events
-relevant state slice
-modifier breakdown
-prerequisite trace
-```
-
-Do not dump megabytes of full state by default.
-
----
-
-# 26. CI recommendation
-
-If/when GitHub Actions is added:
-
-```text
-install
-config validation
-domain tests
-save tests
-headless simulation smoke
-build
-```
-
-Full 120-minute simulation uses virtual time and must finish quickly in CPU time.
-
-Browser matrix can be separate once UI is stable.
-
----
-
-# 27. Acceptance criteria
-
-Testing Strategy accepted if:
-
-- new domain tests run without browser;
-- RNG/clock/storage are injectable;
-- config validation catches broken refs;
-- save/reset failure cases automated;
-- headless Timeline can complete;
-- milestone windows are assertable;
-- branch dead ends detectable;
-- no test requires ads;
-- Codex cannot “fix” a red balance test by changing canonical values without doc/config revision.
+Only then corrected Iteration 4 may begin.
