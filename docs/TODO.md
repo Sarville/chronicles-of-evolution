@@ -1,237 +1,219 @@
 # Хроники Эволюции — TODO
 
-**Last update:** 2026-09-15
+**Last update:** 2026-09-16
 
-> `TODO.md` — короткое представление текущей работы. Канонический статус хранится в `docs/PROJECT_STATE.yaml`.
-
----
-
-# Last completed design session
-
-## DS-04 — Meta progression and balance rules
-
-**Status:** done / accepted
-
-Приняты документы:
-
-- [x] `docs/gdd/10_META_PROGRESSION.md`
-- [x] `docs/gdd/11_BALANCE_RULES.md`
-- [x] `docs/DECISIONS_DS04.md`
-
-Зафиксировано:
-
-- [x] first reset typical reward: 14–18 AF;
-- [x] Archive Recall автоматически включается после первого reset;
-- [x] familiar pre-Sapience CORE: cost ×0.75, production ×1.25;
-- [x] Timeline #2 Sapience p50 target: 20–28 мин;
-- [x] no-spend target: 24–28 мин; typical Tier 1: 20–25 мин;
-- [x] familiar CORE cost floor: 70%;
-- [x] pre-Sapience meta production cap: ×1.60;
-- [x] AR05 = retained OPTIONAL slot;
-- [x] AR06 = second cellular branch without ×2.5, но без dual numeric stacking;
-- [x] AR09 = one secondary biological trait at 65%;
-- [x] offline: T1 50%, AR04 60%, future hard cap 75%;
-- [x] Archive Intervention envelope: ×1.50, 120 sec base, <=180 sec, <=3 charges, no stacking;
-- [x] ads не входят в baseline balance и не увеличивают AF.
+`PROJECT_STATE.yaml` is the canonical status source. This file is the human-readable work queue.
 
 ---
 
-# Codex / implementation
+# Current phase — Design reconciliation
 
-## Iteration 0 — Repo baseline and code audit
+## Documentation
 
-**Status:** done
+- [x] Design reconciliation audit
+- [x] Restore original biological gameplay language in canonical GDD
+- [x] Reconcile 0–120 progression
+- [x] Restore Adaptation Points
+- [x] Restore Cognition 0–100 / condition-driven Sapience
+- [x] Restore first branch: Absorption / Symbiosis / Shell
+- [x] Preserve Photosynthesis / Chemosynthesis as optional metabolism adaptations
+- [x] Reconcile civilization timing and Power unlock
+- [x] Restore Modern bridge
+- [x] Reconcile Archive/meta rules with new biology
+- [x] Reconcile balance guardrails
+- [x] Update production/technical references
+- [x] Update PROJECT_STATE
+- [ ] **User approval: corrected 0–120 gameplay canon**
 
-- [x] static code audit;
-- [x] architecture/module map;
-- [x] baseline build confirmed;
-- [x] `npm run smoke` added;
-- [x] `docs/technical/01_EXISTING_CODE_AUDIT.md` created.
+---
+
+# Implementation status
+
+## Iteration 0 — Repo baseline / audit
+
+- [x] done
 
 ## Iteration 1 — Domain adapter and data foundation
 
-**Status:** done / gate passed
-
-Primary handoff:
-
-`docs/production/DS03_CODEX_HANDOFF.md`
-
-Основной scope:
-
-```text
-src/chronicles structure
--> serializable config registries
--> validators
--> canonical GameState
--> commands/domain events/selectors
--> Resource/Cost/Production services
--> clock/storage/RNG/localization/platform ports
--> save repository skeleton
--> tests
--> headless simulation shell
-```
-
-Реализовано в Iteration 1:
-
-- [x] isolated `src/chronicles/` structure;
-- [x] serializable config registries and runtime validators;
-- [x] canonical initial `GameState`;
-- [x] commands, immutable domain events and selectors;
-- [x] pure Resource / Cost / Production services;
-- [x] clock / RNG / storage / localization / platform ports;
-- [x] save repository skeleton with `chronicles_evolution` namespace;
-- [x] config/domain/save/simulation headless tests;
-- [x] minimal real entity flow using canonical early producer/node and `BLD_FIELD`;
-- [x] `npm test`, `npm run test:sim`, `npm run smoke`, `npm run build`.
-
-DS-04 можно использовать как дополнительный contract для meta config/schema, но Iteration 1 не реализует полный meta UX/rewarded flow.
-
-Не делать сейчас:
-
-- [ ] full UI rewrite;
-- [ ] Yandex/VK SDK;
-- [ ] cloud save;
-- [ ] mass legacy refactor;
-- [ ] глубокий Space/Bioseed scope.
-
----
+- [x] done
 
 ## Iteration 2 — Save v1 and dev tools
 
-**Status:** done / gate passed
+- [x] done
 
-Реализовано в Iteration 2:
+## Iteration 3 — Goal Engine + tutorial shell
 
-- [x] versioned save envelope v1;
-- [x] run/meta/settings/narrative flags save normalization;
-- [x] autosave controller for dirty periodic/flush saves;
-- [x] corrupt-save fallback through primary/pending/backup recovery;
-- [x] migration/normalization interface;
-- [x] reset transaction save coverage preserving meta state;
-- [x] dev-only time scale: 1x / 5x / 20x / 100x;
-- [x] dev resource grant;
-- [x] dev jump-to-era;
-- [x] dev trigger-event;
-- [x] dev dump-state;
-- [x] save/load equality, autosave, migration noop, invalid save recovery, reset/meta and dev tools tests;
-- [x] `npm test`, `npm run test:sim`, `npm run smoke`, `npm run build`.
+**Technical status:** passed.
 
-Correction pass:
+Keep:
 
-- [x] `manualDevReset()` preserves meta/settings and creates a clean dev-only run;
-- [x] `triggerEvent()` uses canonical `events.queue = [eventId]` and `events.states[eventId]`;
-- [x] reset transaction foundation supports prepared canonical transaction IDs and idempotent application;
-- [x] corrupt-all recovery returns explicit `RECOVERY_REQUIRED` instead of silently creating a new run;
-- [x] Iteration 3 not started.
+- [x] isolated Chronicles domain
+- [x] data-driven config/validation
+- [x] canonical GameState
+- [x] commands/events/selectors
+- [x] Goal Engine
+- [x] optional goals
+- [x] CTA/highlight/hint foundation
+- [x] save/autosave/recovery
+- [x] dev speed/tools
+- [x] telemetry hooks
+- [x] headless simulation
+- [x] UI technical prototype
+- [x] build/tests/smoke gates
 
-Micro-fix:
+Accepted implementation baseline:
 
-- [x] reset transaction ID is canonical and stable: `timeline_001_ending_ENDING_ASH`;
-- [x] `createdAtSimulationMs` is informational, not part of idempotency identity;
-- [x] `meta.appliedTransactions` is canonical array-of-IDs;
-- [x] regression test covers retry with different simulation timestamps.
+`32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb`
 
----
+### Superseded Iteration 3 content
 
-# Next implementation
+The following is no longer canonical gameplay content:
 
-## Iteration 3 — Goal engine + tutorial shell
+- [x] Energy / Information molecular economy — historical only
+- [x] Chemical Gradient — historical only
+- [x] Catalytic Fold — historical only
+- [x] Energy Pocket — historical only
+- [x] Stable Bond old semantics — historical only
+- [x] old M01–M06 effects/costs — historical only
+- [x] old 0–10 timing simulation — historical only
 
-**Status:** done / gate passed
-
-Выполнено как расширенная Iteration 3: goal engine + tutorial shell + early playable 0–10 min slice до Proto-cell.
-
-Основной scope:
-
-- [x] current goal state;
-- [x] goal prerequisites;
-- [x] completion conditions;
-- [x] reward application foundation;
-- [x] sequential chains;
-- [x] optional goals;
-- [x] hint timeout foundation;
-- [x] CTA/highlight target;
-- [x] chapter goal slot;
-- [x] side/optional goal slot;
-- [x] basic objective UI shell;
-- [x] goal analytics/domain events foundation.
-
-Early playable slice:
-
-- [x] `chronicles.html` technical prototype entry point;
-- [x] Energy / Information molecular resources;
-- [x] manual primordial process before M01;
-- [x] Chemical Gradient / Catalytic Fold / Energy Pocket generators;
-- [x] M01 / M02 / M03 / M05 / M06 playable;
-- [x] M04 optional and non-blocking;
-- [x] save/load and autosave connected to playable runtime;
-- [x] development-only speed/grant/reset/dump panel;
-- [x] production build hides dev tools;
-- [x] `npm test`, `npm run test:sim`, `npm run smoke`, `npm run build`.
-
-Known tuning note:
-
-- [x] 0–10 min balance pass completed. Competent simulation now reaches Proto-cell at ~09:20 without changing canonical node costs.
-- [x] Final balance correction moved Self Replication into range (~02:25 competent) and reduced post-M02 optimal manual contribution to ~4.44% of automatic Energy income.
-
-Correction pass:
-
-- [x] recovery mode does not auto-create temporary gameplay/autosave;
-- [x] explicit Start fresh required after corrupt save recovery;
-- [x] manual primordial process remains available after M01;
-- [x] M01 doubles manual reward;
-- [x] stalled lifecycle persists without duplicate `goal_started` / hints / rewards;
-- [x] objective CTA routes and focuses target entity;
-- [x] lightweight `npm run test:ui` added.
-
-## Iteration 4 — First content expansion after Proto-cell
-
-**Status:** ready / not started
-
-Не начинать без отдельного подтверждения. Следующий шаг — content expansion после M06, а не часть выполненной Iteration 3.
+Do **not** interpret this as Iteration 3 technical failure.
 
 ---
 
-# Next design session
+# Next implementation — Rework Iteration
 
-## DS-05 — Timeline #1 full narrative package
+## Biological gameplay reconciliation implementation
 
-**Status:** ready
+**Status:** blocked until user approves documentation.
 
-Нужно создать:
+After approval:
 
-- [ ] `docs/scenario/01_TIMELINE_01_SCRIPT.md`
-- [ ] `docs/scenario/04_STORY_EVENTS.md`
-- [ ] `docs/scenario/05_NARRATIVE_FLAGS.md`
-- [ ] `docs/scenario/06_ENDINGS_COPY.md`
-- [ ] `docs/scenario/07_COPY_GUIDE.md`
-
-Основные задачи:
-
-- [ ] полный narrative sequencing 0–120;
-- [ ] тексты Архива и milestones;
-- [ ] Error 17 / «Снова.» / anomaly thread;
-- [ ] crisis event chain;
-- [ ] Last Protocol / Ash / Archive Summary;
-- [ ] Timeline #2 teaser;
-- [ ] narrative flags и последствия;
-- [ ] meaning unknown/corrupted Archive records.
-
-DS-06 UX также ready и может идти после/параллельно, но следующий основной design block — DS-05.
-
----
-
-# Open decisions
-
-- [ ] production UI framework / степень reuse Vue 2 — DS-06;
-- [ ] Yandex/VK SDK mapping, cloud save conflicts, rewarded flow — DS-10;
-- [ ] remaining TBD/proposal balance values остаются configurable до telemetry/testing.
+- [ ] create ruleset `timeline1-v2-reconciled`
+- [ ] migrate early resource config to RNA / DNA / Biomass / metabolic Energy
+- [ ] remove Information from player-facing spendable resources
+- [ ] replace Chemical Gradient / Catalytic Fold / Energy Pocket content
+- [ ] change M01–M06 semantics to Stable RNA / Self Replication / DNA Synthesis / Error Correction / Membrane / Cell
+- [ ] update G001–G005 content
+- [ ] preserve Goal Engine architecture
+- [ ] preserve save/recovery architecture
+- [ ] add explicit pre-release migration/restart handling for obsolete early content
+- [ ] update config validation tests
+- [ ] update domain tests
+- [ ] update UI smoke tests
+- [ ] update headless simulation
+- [ ] rebalance 0–10 from scratch
+- [ ] competent / optimized / slower simulation profiles pass
+- [ ] optional M04 route remains skippable
+- [ ] first meaningful action <20 sec
+- [ ] passive/self-sustaining process <60 sec
+- [ ] Self Replication ~2–3 min
+- [ ] DNA visible ~4–6 min
+- [ ] Cell ~9–11 min
+- [ ] manual contribution <=5% after ~3 min
+- [ ] manual playtest 0–10
+- [ ] user approves corrected playable 0–10
 
 ---
 
-# Следующий шаг
+# Iteration 4 — corrected content after Cell
 
-Параллельно:
+**Status:** BLOCKED.
 
-1. **Codex:** остановиться после Iteration 3 correction pass; Iteration 4 запускать только по отдельному подтверждению.
-2. **ChatGPT/user:** DS-05 — Timeline #1 full narrative package.
+Do not start until Rework Iteration is accepted.
+
+Expected scope after unblock:
+
+- [ ] Metabolism
+- [ ] Biomass/Energy cellular economy
+- [ ] first primary branch: Absorption / Symbiosis / Shell
+- [ ] optional Photosynthesis / Chemosynthesis adaptations
+- [ ] Protein Synthesis / Ribosome
+- [ ] Organelles
+- [ ] corrected Cell → Multicellularity progression
+- [ ] first AP rewards/hooks
+- [ ] balance/simulation for 10–18
+
+---
+
+# Following biological work
+
+## Multicellularity / Adaptation Points
+
+- [ ] full AP reward table
+- [ ] Mobility
+- [ ] Sensory Cells
+- [ ] Digestion
+- [ ] Structural Tissue
+- [ ] Multicellularity target ~24–28 min
+
+## Nervous System / Cognition
+
+- [ ] Nervous System
+- [ ] Behavior choice
+- [ ] Cognition 0–100
+- [ ] Danger / Other micro-events
+- [ ] Sapience condition transition
+- [ ] biological 0–40 end-to-end simulation
+- [ ] target Sapience ~38–40 min
+
+---
+
+# Civilization rebalance after biology
+
+- [ ] set civilization starting package around Population 5
+- [ ] retune Population growth/thresholds
+- [ ] retune Tribe 38–50
+- [ ] retune Settlement 50–65
+- [ ] validate City ~78–80
+- [ ] validate Power unlock in Industry
+- [ ] validate Industry ~93–95
+- [ ] implement/validate Modern bridge ~95–104
+- [ ] validate Atomic ~107–108
+
+---
+
+# Crisis / Archive regression
+
+- [ ] regression Stability / World Tension
+- [ ] regression Error 17
+- [ ] regression `Снова.`
+- [ ] regression Last Protocol
+- [ ] regression inevitable first Ash
+- [ ] revalidate AF formula against new node/population counts
+- [ ] keep first reset ~14–18 AF
+- [ ] regression idempotent reset
+- [ ] retune Timeline #2 acceleration after Timeline #1 simulation
+
+---
+
+# Design sessions after reconciliation
+
+Do not continue narrative/UX/art as if old E/I gameplay were still canon.
+
+After reconciliation approval and updated playable 0–10:
+
+- [ ] DS-05 — Timeline #1 full narrative package
+- [ ] DS-06 — UX architecture and wireframes
+- [ ] DS-07 — Art direction
+- [ ] DS-08 — Asset manifest/prompts
+- [ ] DS-09 — Audio
+- [ ] DS-10 — Analytics/platform readiness
+- [ ] DS-11 — final cross-document consistency / design freeze v2
+
+---
+
+# Immediate gate
+
+Current order:
+
+```text
+Approve reconciled docs
+→ Biological gameplay code rework
+→ Rebalance 0–10
+→ Manual playtest 0–10
+→ approve playable
+→ only then Iteration 4
+```
+
+Iteration 4 must remain blocked until this gate is explicitly cleared.
