@@ -6,7 +6,7 @@
 
 ---
 
-# Current phase — Design reconciliation
+# Design reconciliation
 
 ## Documentation
 
@@ -23,7 +23,9 @@
 - [x] Reconcile balance guardrails
 - [x] Update production/technical references
 - [x] Update PROJECT_STATE
-- [ ] **User approval: corrected 0–120 gameplay canon**
+- [x] **Approve corrected 0–120 gameplay canon**
+
+Documentation reconciliation is accepted.
 
 ---
 
@@ -67,30 +69,28 @@ Accepted implementation baseline:
 
 ### Superseded Iteration 3 content
 
-The following is no longer canonical gameplay content:
+The following is historical only:
 
-- [x] Energy / Information molecular economy — historical only
-- [x] Chemical Gradient — historical only
-- [x] Catalytic Fold — historical only
-- [x] Energy Pocket — historical only
-- [x] Stable Bond old semantics — historical only
-- [x] old M01–M06 effects/costs — historical only
-- [x] old 0–10 timing simulation — historical only
+- [x] Energy / Information molecular economy
+- [x] Chemical Gradient
+- [x] Catalytic Fold
+- [x] Energy Pocket
+- [x] Stable Bond old semantics
+- [x] old M01–M06 effects/costs
+- [x] old 0–10 timing simulation
 
-Do **not** interpret this as Iteration 3 technical failure.
+Iteration 3 technical foundation remains successful.
 
 ---
 
-# Next implementation — Rework Iteration
+# NEXT — Biological gameplay reconciliation implementation
 
-## Biological gameplay reconciliation implementation
+**Status:** READY.
 
-**Status:** blocked until user approves documentation.
+Next Codex task:
 
-After approval:
-
-- [ ] create ruleset `timeline1-v2-reconciled`
-- [ ] migrate early resource config to RNA / DNA / Biomass / metabolic Energy
+- [ ] create/activate ruleset `timeline1-v2-reconciled`
+- [ ] migrate early resource config to RNA / DNA / Biomass hooks
 - [ ] remove Information from player-facing spendable resources
 - [ ] replace Chemical Gradient / Catalytic Fold / Energy Pocket content
 - [ ] change M01–M06 semantics to Stable RNA / Self Replication / DNA Synthesis / Error Correction / Membrane / Cell
@@ -106,7 +106,7 @@ After approval:
 - [ ] competent / optimized / slower simulation profiles pass
 - [ ] optional M04 route remains skippable
 - [ ] first meaningful action <20 sec
-- [ ] passive/self-sustaining process <60 sec
+- [ ] passive/self-sustaining RNA <60 sec
 - [ ] Self Replication ~2–3 min
 - [ ] DNA visible ~4–6 min
 - [ ] Cell ~9–11 min
@@ -118,9 +118,7 @@ After approval:
 
 # Iteration 4 — corrected content after Cell
 
-**Status:** BLOCKED.
-
-Do not start until Rework Iteration is accepted.
+**Status:** BLOCKED by Biological Rework.
 
 Expected scope after unblock:
 
@@ -187,11 +185,7 @@ Expected scope after unblock:
 
 ---
 
-# Design sessions after reconciliation
-
-Do not continue narrative/UX/art as if old E/I gameplay were still canon.
-
-After reconciliation approval and updated playable 0–10:
+# Design sessions after playable rework
 
 - [ ] DS-05 — Timeline #1 full narrative package
 - [ ] DS-06 — UX architecture and wireframes
@@ -203,17 +197,15 @@ After reconciliation approval and updated playable 0–10:
 
 ---
 
-# Immediate gate
-
-Current order:
+# Immediate order
 
 ```text
-Approve reconciled docs
-→ Biological gameplay code rework
+Prepare Codex rework prompt
+→ Biological gameplay code rework 0–10
 → Rebalance 0–10
 → Manual playtest 0–10
 → approve playable
 → only then Iteration 4
 ```
 
-Iteration 4 must remain blocked until this gate is explicitly cleared.
+Iteration 4 remains blocked until this gate is explicitly cleared.
