@@ -3,14 +3,17 @@ import { createFakeClock } from '../adapters/clock.js';
 import { createSeededRng } from '../adapters/rng.js';
 import { createChroniclesEngine } from '../domain/engine.js';
 import { selectNodeStatus, selectProducerPrice, selectProducerStatus, selectProductionRates } from '../domain/selectors.js';
+import { calculateManualReward, manualProcessCooldownMs } from '../domain/services/manualProcesses.js';
 
 const MAIN_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M06'];
-const OPTIONAL_NODE_ORDER = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06'];
+const OPTIONAL_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M04', 'M06'];
+const MANUAL_PROCESS_ID = 'MANUAL_PRIMORDIAL_PULSE';
 
 export const simulationProfiles = {
   optimized: {
     decisionIntervalMs: 1000,
-    manualUntilMs: 180000,
+    manualEfficiencyThreshold: 0.05,
+    manualSafetyUntilMs: 12 * 60 * 1000,
     maxActionsPerDecision: 12,
     phaseProducerTargets: {
       M01: { GEN_CHEMICAL_GRADIENT: 1, GEN_CATALYTIC_FOLD: 0, GEN_ENERGY_POCKET: 0 },
@@ -24,13 +27,14 @@ export const simulationProfiles = {
   },
   competent: {
     decisionIntervalMs: 5000,
-    manualUntilMs: 180000,
+    manualEfficiencyThreshold: 0.05,
+    manualSafetyUntilMs: 12 * 60 * 1000,
     maxActionsPerDecision: 3,
     phaseProducerTargets: {
       M01: { GEN_CHEMICAL_GRADIENT: 1, GEN_CATALYTIC_FOLD: 0, GEN_ENERGY_POCKET: 0 },
       M02: { GEN_CHEMICAL_GRADIENT: 5, GEN_CATALYTIC_FOLD: 2, GEN_ENERGY_POCKET: 0 },
       M03: { GEN_CHEMICAL_GRADIENT: 5, GEN_CATALYTIC_FOLD: 2, GEN_ENERGY_POCKET: 0 },
-      M05: { GEN_CHEMICAL_GRADIENT: 10, GEN_CATALYTIC_FOLD: 7, GEN_ENERGY_POCKET: 4 },
+      M05: { GEN_CHEMICAL_GRADIENT: 9, GEN_CATALYTIC_FOLD: 6, GEN_ENERGY_POCKET: 3 },
       M06: { GEN_CHEMICAL_GRADIENT: 13, GEN_CATALYTIC_FOLD: 10, GEN_ENERGY_POCKET: 7 },
     },
     informationOrder: ['GEN_CATALYTIC_FOLD', 'GEN_CHEMICAL_GRADIENT', 'GEN_ENERGY_POCKET'],
@@ -38,7 +42,8 @@ export const simulationProfiles = {
   },
   slow: {
     decisionIntervalMs: 9000,
-    manualUntilMs: 150000,
+    manualEfficiencyThreshold: 0.05,
+    manualSafetyUntilMs: 12 * 60 * 1000,
     maxActionsPerDecision: 2,
     phaseProducerTargets: {
       M01: { GEN_CHEMICAL_GRADIENT: 1, GEN_CATALYTIC_FOLD: 0, GEN_ENERGY_POCKET: 0 },
@@ -136,6 +141,39 @@ function tryBuyProducer(engine, nodeOrder, profile, spends, log) {
   return true;
 }
 
+export function calculateManualEconomics(state, sourceRuleset, processId = MANUAL_PROCESS_ID) {
+  const process = sourceRuleset.manualProcesses.find((candidate) => candidate.id === processId);
+  if (!process) {
+    return null;
+  }
+  const reward = calculateManualReward(state, sourceRuleset, process);
+  const cooldownMs = manualProcessCooldownMs(state, process);
+  const rates = selectProductionRates(state, sourceRuleset);
+  const resourceId = process.reward?.resourceId;
+  const manualPerSecond = cooldownMs > 0 ? (reward[resourceId] || 0) / (cooldownMs / 1000) : 0;
+  const automaticPerSecond = rates[resourceId] || 0;
+  return {
+    processId,
+    resourceId,
+    reward,
+    cooldownMs,
+    manualPerSecond,
+    automaticPerSecond,
+    contributionRatio: automaticPerSecond > 0 ? manualPerSecond / automaticPerSecond : Infinity,
+  };
+}
+
+function shouldUseManual(engine, sourceRuleset, profile, now) {
+  if (now > (profile.manualSafetyUntilMs ?? Infinity)) {
+    return false;
+  }
+  if (!engine.state.run.nodes.completed.M02) {
+    return true;
+  }
+  const economics = calculateManualEconomics(engine.state, sourceRuleset);
+  return economics && economics.contributionRatio >= (profile.manualEfficiencyThreshold ?? 0.05);
+}
+
 export function runHeadlessSimulation(options = {}) {
   const sourceRuleset = options.ruleset || ruleset;
   const profileName = options.profile || 'competent';
@@ -154,12 +192,13 @@ export function runHeadlessSimulation(options = {}) {
   let automaticIncomeAtMs = null;
   let nextDecisionAtMs = 0;
   let nextManualAtMs = 0;
+  let manualEconomicsAtThreeMinutes = null;
 
   while (engine.state.run.clock.simulationMs <= maxMs && !engine.state.run.nodes.completed.M06) {
     const now = engine.state.run.clock.simulationMs;
 
-    if (now >= nextManualAtMs && now <= profile.manualUntilMs) {
-      const manualResult = engine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
+    if (now >= nextManualAtMs && shouldUseManual(engine, sourceRuleset, profile, now)) {
+      const manualResult = engine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: MANUAL_PROCESS_ID });
       if (manualResult.ok) {
         const reward = manualResult.events.find((event) => event.type === 'manual_process_used')?.payload.reward || {};
         const energy = reward.energy || 0;
@@ -188,6 +227,9 @@ export function runHeadlessSimulation(options = {}) {
     }
 
     const rates = selectProductionRates(engine.state, sourceRuleset);
+    if (!manualEconomicsAtThreeMinutes && now >= 180000) {
+      manualEconomicsAtThreeMinutes = calculateManualEconomics(engine.state, sourceRuleset);
+    }
     if (automaticIncomeAtMs == null && Object.values(rates).some((rate) => rate > 0)) {
       automaticIncomeAtMs = now;
     }
@@ -211,7 +253,7 @@ export function runHeadlessSimulation(options = {}) {
     },
     producerCounts: producerCounts(engine.state, profile),
     finalRates: selectProductionRates(engine.state, sourceRuleset),
-    manual,
+    manual: { ...manual, economicsAtThreeMinutes: manualEconomicsAtThreeMinutes },
     spends,
     snapshots,
   };

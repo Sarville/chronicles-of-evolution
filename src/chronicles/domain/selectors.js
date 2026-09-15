@@ -2,7 +2,7 @@ import { createRulesetIndexes } from '../config/index.js';
 import { canAfford, multiplyCost, scaleCost } from './services/costs.js';
 import { branchAvailable, branchCostMultiplier, prerequisitesMet } from './services/evolution.js';
 import { getGoalState, goalConditionsMet } from './services/goals.js';
-import { calculateManualReward, manualProcessAvailable } from './services/manualProcesses.js';
+import { calculateManualReward, manualProcessAvailable, manualProcessCooldownMs } from './services/manualProcesses.js';
 import { calculateProductionRates } from './services/production.js';
 
 export function selectResourceAmounts(state) {
@@ -107,5 +107,6 @@ export function selectManualProcessView(state, ruleset, processId) {
     state: processState,
     available: manualProcessAvailable(state, process),
     reward: calculateManualReward(state, ruleset, process),
+    cooldownMs: manualProcessCooldownMs(state, process),
   };
 }

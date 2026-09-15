@@ -171,8 +171,8 @@ Early playable slice:
 
 Known tuning note:
 
-- [x] 0–10 min balance pass completed. Competent simulation now reaches Proto-cell at ~09:05 without changing canonical node costs.
-- [ ] Residual pacing note: Self Replication remains later than the ideal 02:00 target (~03:10 competent) and should be reviewed only if future playtests confirm it feels slow.
+- [x] 0–10 min balance pass completed. Competent simulation now reaches Proto-cell at ~09:20 without changing canonical node costs.
+- [x] Final balance correction moved Self Replication into range (~02:25 competent) and reduced post-M02 optimal manual contribution to ~4.44% of automatic Energy income.
 
 Correction pass:
 

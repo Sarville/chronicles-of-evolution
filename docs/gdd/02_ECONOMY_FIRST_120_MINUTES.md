@@ -190,14 +190,14 @@ manual_gain = max(1, 2 sec текущего базового production)
 
 **Status:** accepted implementation tuning pass, 2026-09-16.
 
-Node costs and molecular evolution multipliers remain unchanged from the canonical table above. The tuning pass adjusted molecular producer output and provisional manual cooldown only.
+Node costs and molecular evolution multipliers remain unchanged from the canonical table above. The tuning passes adjusted molecular producer output, Catalytic Fold early cost, and provisional manual cooldown only.
 
 ### Final molecular generator values
 
 | Объект | Base cost | Growth | Output одной копии |
 |---|---:|---:|---:|
 | Chemical Gradient | 10 E | 1.15 | +0.20 E/s |
-| Catalytic Fold | 24 E | 1.17 | +0.036 I/s |
+| Catalytic Fold | 14 E | 1.17 | +0.036 I/s |
 | Energy Pocket | 38 E | 1.15 | +0.38 E/s |
 
 ### Manual onboarding tuning
@@ -208,31 +208,32 @@ Manual gain formula remains:
 manual_gain = max(1, 2 sec current base production)
 ```
 
-Provisional cooldown tuning:
+Provisional node-stage cooldown tuning:
 
 - before `M01 Stable Bond`: **2.0 sec**;
-- after `M01 Stable Bond`: **6.5 sec**.
+- after `M01 Stable Bond` and before `M02 Self Replication`: **3.5 sec**;
+- after `M02 Self Replication`: **90.0 sec**.
 
-`M01` still applies `manual gain ×2` and unlocks auto-production. Reference competent simulation stops regular manual input by 03:00; manual contribution after 03:00 is **0 E** in that route.
+`M01` still applies `manual gain ×2` and unlocks auto-production. Around 03:00 in the competent route, optimal manual contribution is **4.44%** of automatic Energy income, so continuing to press the manual action is no longer economically dominant.
 
 ### Measured reference timings
 
 | Route | M01 | M02 | M03 | M05 | M06 |
 |---|---:|---:|---:|---:|---:|
-| Competent, no M04 | 00:45 | 03:10 | 04:35 | 07:25 | 09:05 |
-| Optimized, no M04 | 00:42 | 03:27 | 05:51 | 06:56 | 08:12 |
-| Slower, no M04 | 00:45 | 03:54 | 06:36 | 07:57 | 09:36 |
-| Competent + M04 | 00:45 | 03:10 | 04:35 | 08:35 | 09:15 |
+| Competent, no M04 | 00:45 | 02:25 | 03:55 | 07:30 | 09:20 |
+| Optimized scripted reference, no M04 | 00:42 | 02:44 | 05:28 | 06:28 | 07:39 |
+| Slower, no M04 | 00:45 | 03:00 | 04:57 | 06:18 | 07:57 |
+| Competent + M04 | 00:45 | 02:25 | 03:55 | 07:30 | 09:30 |
 
-`M02` remains slightly later than the ideal 02:00 target in the accepted simulation while preserving canonical node costs and avoiding clicker-dominant manual input.
+`M02` now lands inside the accepted correction range while preserving canonical node costs and avoiding clicker-dominant manual input after `M02`.
 
 ### M04 delta
 
 In the competent route, buying `M04 Error Correction`:
 
-- completes `M04` at **08:15**;
+- completes `M04` at **08:50** in the competent optional reference route;
 - increases final Information income from **1.728 I/s** to **2.419 I/s**;
-- reaches `M06 Proto-cell` at **09:15** instead of **09:05** because the optional cost is meaningful.
+- reaches `M06 Proto-cell` at **09:30** instead of **09:20** because the optional cost is meaningful.
 
 So `M04` is useful for Information throughput but is not mandatory and is not automatically the fastest route.
 
@@ -240,7 +241,7 @@ So `M04` is useful for Information throughput but is not mandatory and is not au
 
 - Producer counts: Chemical Gradient **13**, Catalytic Fold **10**, Energy Pocket **7**.
 - Final income: **12.733 E/s**, **1.728 I/s**.
-- Producer spend: **1,302 E**.
+- Producer spend: **1,077 E**.
 - Evolution node spend: **872 E + 121 I**.
 
 ---

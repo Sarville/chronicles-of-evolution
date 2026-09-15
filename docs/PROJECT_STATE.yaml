@@ -133,6 +133,26 @@ implementation:
       - "Canonical node costs and M02/M03/M05 evolution multipliers remain unchanged."
       - "Competent route reaches Proto-cell at ~09:05; optimized at ~08:12; competent+M04 at ~09:15."
       - "M02 remains later than ideal target (~03:10 competent) to avoid node-cost changes and clicker-dominant manual play."
+  iteration_3_final_balance_correction_0_10:
+    date: "2026-09-16"
+    base_commit: "401b493a8fc39c394b24505549ef4eaacadf9255"
+    status: "passed"
+    scope: "Final correction pass for Timeline #1 first 0-10 minute balance only; Iteration 4 not started"
+    changes:
+      - "Manual primordial cooldown is now config-driven by completed-node stages: 2.0s before M01, 3.5s from M01 to M02, 90.0s after M02."
+      - "Catalytic Fold base cost tuned from 20 E to 14 E to move Self Replication into the accepted window without changing node costs."
+      - "Competent scripted reference target before Lipid Shell adjusted to 9 Chemical Gradient / 6 Catalytic Fold / 3 Energy Pocket."
+      - "Optional M04 simulation route now evaluates M04 after Lipid Shell as a side choice before Proto-cell."
+    gates:
+      npm_test: passed
+      test_ui: passed
+      test_sim: passed
+      smoke: passed
+      build: passed
+    notes:
+      - "Competent route timings: M01 00:45, M02 02:25, M03 03:55, M05 07:30, M06 09:20."
+      - "Around 03:00, optimal manual contribution is ~4.44% of automatic Energy income."
+      - "Canonical node costs and M02/M03/M05 evolution multipliers remain unchanged."
   last_iteration_2_micro_fix:
     date: "2026-09-15"
     base_commit: "82c60bc86f88a27c9941d6153efecf93b6e15510"

@@ -15,7 +15,7 @@ export const producers = [
     labelKey: 'producer.catalytic_fold',
     requiresNodes: ['M01'],
     tags: ['information'],
-    baseCost: { energy: 24 },
+    baseCost: { energy: 14 },
     growth: 1.17,
     output: { information: 0.036 },
   },

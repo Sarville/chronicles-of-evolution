@@ -17,7 +17,13 @@ export function manualProcessAvailable(state, process) {
   return state.run.clock.simulationMs >= (selectManualProcessState(state, process.id)?.availableAtMs || 0);
 }
 
-function manualProcessCooldownMs(state, process) {
+export function manualProcessCooldownMs(state, process) {
+  const stage = (process.cooldownStages || [])
+    .filter((candidate) => candidate.afterNodeId && state.run.nodes.completed[candidate.afterNodeId])
+    .at(-1);
+  if (stage) {
+    return stage.cooldownMs;
+  }
   if (process.cooldownAfterNodeId && state.run.nodes.completed[process.cooldownAfterNodeId]) {
     return process.cooldownAfterMs ?? process.cooldownMs;
   }
