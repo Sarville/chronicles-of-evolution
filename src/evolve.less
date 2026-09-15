@@ -4722,6 +4722,190 @@ span.inline {
     }
 }
 
+@media only screen and (max-width: 48rem) {
+    html {
+        overflow-y: auto;
+    }
+
+    body {
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    .topBar,
+    .promoBar {
+        height: auto;
+        min-height: 1.75rem;
+        line-height: 1.25rem;
+    }
+
+    .topBar {
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .125rem .5rem;
+        padding: .125rem .5rem;
+
+        .planetWrap {
+            margin-left: 0;
+            max-width: ~"calc(100vw - 6rem)";
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            .universe,
+            .simulation,
+            .pet {
+                margin-left: .375rem;
+                padding-left: .375rem;
+            }
+        }
+
+        .calendar {
+            margin: 0;
+            margin-left: auto;
+        }
+
+        .version {
+            margin-right: .25rem;
+            margin-left: auto;
+        }
+    }
+
+    .main {
+        margin: 2.25rem .5rem 0;
+        padding-bottom: 5.25rem;
+        overflow-y: visible;
+
+        > .columns {
+            display: block;
+        }
+
+        > .columns > :first-child,
+        #mainColumn,
+        #queueColumn {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .leftColumn {
+            height: auto;
+            margin-bottom: .75rem;
+
+            .colHeader {
+                gap: .5rem;
+                flex-wrap: wrap;
+            }
+        }
+
+        #mainColumn {
+            .content {
+                overflow-x: hidden;
+            }
+        }
+
+        .msgQueue .head {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: .25rem .75rem;
+
+            h2,
+            .special,
+            .zero {
+                margin-right: 0;
+            }
+        }
+
+        .msgQueue .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .25rem .75rem;
+
+            span {
+                margin-right: 0;
+            }
+        }
+
+        .resources {
+            height: auto;
+            max-height: none;
+            overflow: visible;
+            padding-right: 0;
+
+            .resource {
+                gap: .25rem;
+                min-width: 0;
+
+                > :first-child {
+                    flex: 1 1 40%;
+                    min-width: 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                div {
+                    width: auto;
+                    flex: 1 1 52%;
+                    min-width: 0;
+                    gap: .5rem;
+                }
+
+                > :nth-child(2) {
+                    flex: 0 0 1.5rem;
+                    width: auto;
+                }
+            }
+        }
+    }
+
+    .promoBar {
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: .125rem .75rem;
+        padding: .25rem .5rem ~"calc(.35rem + env(safe-area-inset-bottom))";
+
+        .left,
+        .right {
+            position: static;
+            display: block;
+            width: auto;
+            margin: 0;
+            text-align: left;
+        }
+
+        .left {
+            flex: 0 0 auto;
+        }
+
+        .right {
+            flex: 1 1 12rem;
+            min-width: 0;
+
+            span {
+                margin: 0;
+            }
+
+            .external-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0 .5rem;
+
+                li {
+                    display: inline-block;
+                    white-space: nowrap;
+                }
+
+                li + li:before {
+                    content: none;
+                }
+            }
+        }
+    }
+}
+
 .arpaProject {
     display: inline-block;
     border: solid .0625rem;
