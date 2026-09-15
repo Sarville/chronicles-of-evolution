@@ -72,14 +72,14 @@ documentation:
   ux_package: ready
 
 implementation:
-  mode: "resumed_after_DS03"
+  mode: "iteration_1_completed"
   current_iteration: 1
-  resume_gate: "open"
+  resume_gate: "iteration_1_gate_passed_stop_before_iteration_2"
   iterations:
     0: { name: "Repo baseline and code audit", status: done }
     1:
       name: "Domain adapter and data foundation"
-      status: ready
+      status: done
       required_inputs:
         - "docs/production/DS03_CODEX_HANDOFF.md"
         - "docs/technical/00_TECHNICAL_OVERVIEW.md"
@@ -87,12 +87,12 @@ implementation:
         - "docs/technical/03_GAME_STATE.md"
         - "docs/technical/04_SAVE_ARCHITECTURE.md"
         - "docs/technical/07_TESTING_STRATEGY.md"
-    2: { name: "Save v1 and dev tools", status: blocked, depends_on: ["Implementation Iteration 1"] }
+    2: { name: "Save v1 and dev tools", status: ready_after_user_review, depends_on: ["Implementation Iteration 1"] }
 
 parallelization:
   now:
     design: "DS-05"
-    codex: "Implementation Iteration 1 using DS03_CODEX_HANDOFF"
+    codex: "Iteration 1 gate passed; stop before Iteration 2 until user approval"
   also_ready: ["DS-06"]
 
 open_decisions:
@@ -103,5 +103,5 @@ open_decisions:
 
 next_action:
   owner: "Codex + ChatGPT/user in parallel"
-  session: "Implementation Iteration 1 + DS-05"
-  description: "Codex continues headless Domain Adapter/data foundation using DS03_CODEX_HANDOFF; design proceeds with DS-05 Timeline #1 full narrative package."
+  session: "Post-Iteration 1 gate + DS-05"
+  description: "Codex stops after Implementation Iteration 1 gate; Iteration 2 starts only after user approval. Design proceeds with DS-05 Timeline #1 full narrative package."

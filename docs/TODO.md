@@ -50,7 +50,7 @@
 
 ## Iteration 1 — Domain adapter and data foundation
 
-**Status:** ready / may run in parallel
+**Status:** done / gate passed
 
 Primary handoff:
 
@@ -71,7 +71,20 @@ src/chronicles structure
 -> headless simulation shell
 ```
 
-DS-04 можно использовать как дополнительный contract для meta config/schema, но Iteration 1 не обязана реализовывать полный meta UX/rewarded flow.
+Реализовано в Iteration 1:
+
+- [x] isolated `src/chronicles/` structure;
+- [x] serializable config registries and runtime validators;
+- [x] canonical initial `GameState`;
+- [x] commands, immutable domain events and selectors;
+- [x] pure Resource / Cost / Production services;
+- [x] clock / RNG / storage / localization / platform ports;
+- [x] save repository skeleton with `chronicles_evolution` namespace;
+- [x] config/domain/save/simulation headless tests;
+- [x] minimal real entity flow using canonical early producer/node and `BLD_FIELD`;
+- [x] `npm test`, `npm run test:sim`, `npm run smoke`, `npm run build`.
+
+DS-04 можно использовать как дополнительный contract для meta config/schema, но Iteration 1 не реализует полный meta UX/rewarded flow.
 
 Не делать сейчас:
 
@@ -124,5 +137,5 @@ DS-06 UX также ready и может идти после/параллельн
 
 Параллельно:
 
-1. **Codex:** Iteration 1 по `DS03_CODEX_HANDOFF.md`.
+1. **Codex:** остановиться после Iteration 1 gate; Iteration 2 запускать только по отдельному подтверждению.
 2. **ChatGPT/user:** DS-05 — Timeline #1 full narrative package.
