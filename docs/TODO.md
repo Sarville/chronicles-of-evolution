@@ -59,6 +59,7 @@ Accepted documents:
 - `docs/gdd/05_BUILDINGS_AND_JOBS.md`
 - `docs/gdd/06_TECH_TREE.md`
 - `docs/scenario/00_NARRATIVE_BIBLE.md`
+- `docs/production/DS-02_PRODUCT_INPUTS.md`
 - `docs/DECISIONS.md`
 
 ### Deliverables
@@ -81,7 +82,13 @@ Accepted documents:
 - [ ] Last Protocol;
 - [ ] Ash trigger/subtypes;
 - [ ] reset: что сбрасывается и что сохраняется;
-- [ ] какие значения передаются в Chronicle/meta layer.
+- [ ] какие значения передаются в Chronicle/meta layer;
+- [ ] ранний Archive/discovery reveal: как игрок в первые минуты понимает масштаб ещё не открытого контента;
+- [ ] reveal hooks для неизвестных эволюционных ветвей, Chronicle, anomalies, outcomes и achievements без сюжетных спойлеров;
+- [ ] early manual interaction как запуск timed process/cycle, а не `+1 resource per click`;
+- [ ] момент перехода `manual process -> self replication/semi-auto -> full automation`;
+- [ ] возможность короткого manual catalytic/division interaction с visual payoff без clicker grind;
+- [ ] Archive Intervention как future gameplay hook: временный boost выбранного ресурса без включения рекламы в baseline economy.
 
 ### Review gate
 - [ ] каждый обязательный event имеет trigger и stable ID;
@@ -89,9 +96,39 @@ Accepted documents:
 - [ ] crisis не может быть случайно пропущен;
 - [ ] Timeline #1 неизбежно приходит к Ash, но choices влияют на summary/reward/flags;
 - [ ] reset contract однозначен;
+- [ ] первые минуты показывают масштаб будущих открытий без ложных обещаний и крупных спойлеров;
+- [ ] ручной onboarding не требует повторного линейного resource clicking;
 - [ ] DS-03 получает полный gameplay state contract без необходимости придумывать goals/events/endings.
 
 После approval перевести DS-02 в `done`, разблокировать DS-03, DS-04 и DS-05; DS-06 станет ready после DS-02 вместе с уже завершённым DS-01.
+
+---
+
+# Required downstream handoff
+
+## DS-06 — UX architecture and wireframes
+
+Обязательно оформить принятые в `DS-02_PRODUCT_INPUTS.md` принципы:
+
+- [ ] Archive/collection preview с ранним ощущением большого объёма контента;
+- [ ] locked / unknown / corrupted states;
+- [ ] fogged future evolution/tech branches;
+- [ ] hidden achievements / incomplete Chronicle states;
+- [ ] manual process button, busy/progress state и visual payoff;
+- [ ] UX перехода от ручного запуска к автоматизации;
+- [ ] Archive Intervention UI, resource target, timer, charges/cooldown.
+
+## DS-10 — Analytics, platform and production readiness
+
+Обязательно оформить:
+
+- [ ] rewarded-ad flow для Archive Intervention;
+- [ ] бесплатные charges / rewarded refill / cooldown rules;
+- [ ] fallback при недоступной/неуспешной рекламе;
+- [ ] analytics для boost/ad use;
+- [ ] platform SDK mapping;
+- [ ] ограничение monetization: baseline progression не зависит от рекламы;
+- [ ] balance limits для апгрейдов Archive Intervention.
 
 ---
 
@@ -140,6 +177,7 @@ Accepted documents:
 - [ ] Не писать полный литературный сценарий вместо gameplay event contract.
 - [ ] Не менять DS-01 economy/tech prerequisites без возврата DS-01 в review.
 - [ ] Не расширять первый Timeline глубоким Space/Bioseed.
+- [ ] `docs/production/DS-02_PRODUCT_INPUTS.md` является обязательным входом DS-02.
 - [ ] После approval обновлять `PROJECT_STATE.yaml` и этот TODO в одном push cycle.
 
 ---
