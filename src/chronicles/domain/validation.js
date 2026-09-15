@@ -172,6 +172,12 @@ export function validateRuleset(ruleset) {
     if (!Number.isFinite(process.cooldownMs) || process.cooldownMs < 0) {
       errors.push(`${process.id} has invalid cooldownMs`);
     }
+    if (process.cooldownAfterMs != null && (!Number.isFinite(process.cooldownAfterMs) || process.cooldownAfterMs < 0)) {
+      errors.push(`${process.id} has invalid cooldownAfterMs`);
+    }
+    if (process.cooldownAfterNodeId && !indexes.nodes[process.cooldownAfterNodeId]) {
+      errors.push(`${process.id} references unknown cooldownAfterNodeId ${process.cooldownAfterNodeId}`);
+    }
     if (process.reward?.type === 'manual_gain' && !indexes.resources[process.reward.resourceId]) {
       errors.push(`${process.id} rewards unknown resource ${process.reward.resourceId}`);
     }

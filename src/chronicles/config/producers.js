@@ -7,7 +7,7 @@ export const producers = [
     tags: ['energy'],
     baseCost: { energy: 10 },
     growth: 1.15,
-    output: { energy: 0.4 },
+    output: { energy: 0.2 },
   },
   {
     id: 'GEN_CATALYTIC_FOLD',
@@ -17,7 +17,7 @@ export const producers = [
     tags: ['information'],
     baseCost: { energy: 24 },
     growth: 1.17,
-    output: { information: 0.055 },
+    output: { information: 0.036 },
   },
   {
     id: 'GEN_ENERGY_POCKET',
@@ -27,6 +27,6 @@ export const producers = [
     tags: ['energy'],
     baseCost: { energy: 38 },
     growth: 1.15,
-    output: { energy: 0.75 },
+    output: { energy: 0.38 },
   },
 ];

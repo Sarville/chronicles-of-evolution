@@ -152,9 +152,9 @@ manual_gain = max(1, 2 sec текущего базового production)
 
 | Объект | Unlock | Base cost | Growth | Output одной копии |
 |---|---|---:|---:|---:|
-| Chemical Gradient | старт | 10 E | 1.15 | +0.40 E/s |
-| Catalytic Fold | цель 1 | 24 E | 1.17 | +0.055 I/s |
-| Energy Pocket | цель 2 | 38 E | 1.15 | +0.75 E/s |
+| Chemical Gradient | старт | 10 E | 1.15 | +0.20 E/s |
+| Catalytic Fold | цель 1 | 24 E | 1.17 | +0.036 I/s |
+| Energy Pocket | цель 2 | 38 E | 1.15 | +0.38 E/s |
 
 ### Первые цены Chemical Gradient
 
@@ -185,6 +185,63 @@ manual_gain = max(1, 2 sec текущего базового production)
 
 - Energy: **~12–16 E/s**;
 - Information: **~1.3–1.8 I/s**.
+
+## 4.3. 0–10 min tuning result
+
+**Status:** accepted implementation tuning pass, 2026-09-16.
+
+Node costs and molecular evolution multipliers remain unchanged from the canonical table above. The tuning pass adjusted molecular producer output and provisional manual cooldown only.
+
+### Final molecular generator values
+
+| Объект | Base cost | Growth | Output одной копии |
+|---|---:|---:|---:|
+| Chemical Gradient | 10 E | 1.15 | +0.20 E/s |
+| Catalytic Fold | 24 E | 1.17 | +0.036 I/s |
+| Energy Pocket | 38 E | 1.15 | +0.38 E/s |
+
+### Manual onboarding tuning
+
+Manual gain formula remains:
+
+```text
+manual_gain = max(1, 2 sec current base production)
+```
+
+Provisional cooldown tuning:
+
+- before `M01 Stable Bond`: **2.0 sec**;
+- after `M01 Stable Bond`: **6.5 sec**.
+
+`M01` still applies `manual gain ×2` and unlocks auto-production. Reference competent simulation stops regular manual input by 03:00; manual contribution after 03:00 is **0 E** in that route.
+
+### Measured reference timings
+
+| Route | M01 | M02 | M03 | M05 | M06 |
+|---|---:|---:|---:|---:|---:|
+| Competent, no M04 | 00:45 | 03:10 | 04:35 | 07:25 | 09:05 |
+| Optimized, no M04 | 00:42 | 03:27 | 05:51 | 06:56 | 08:12 |
+| Slower, no M04 | 00:45 | 03:54 | 06:36 | 07:57 | 09:36 |
+| Competent + M04 | 00:45 | 03:10 | 04:35 | 08:35 | 09:15 |
+
+`M02` remains slightly later than the ideal 02:00 target in the accepted simulation while preserving canonical node costs and avoiding clicker-dominant manual input.
+
+### M04 delta
+
+In the competent route, buying `M04 Error Correction`:
+
+- completes `M04` at **08:15**;
+- increases final Information income from **1.728 I/s** to **2.419 I/s**;
+- reaches `M06 Proto-cell` at **09:15** instead of **09:05** because the optional cost is meaningful.
+
+So `M04` is useful for Information throughput but is not mandatory and is not automatically the fastest route.
+
+### Competent route final state before Proto-cell
+
+- Producer counts: Chemical Gradient **13**, Catalytic Fold **10**, Energy Pocket **7**.
+- Final income: **12.733 E/s**, **1.728 I/s**.
+- Producer spend: **1,302 E**.
+- Evolution node spend: **872 E + 121 I**.
 
 ---
 

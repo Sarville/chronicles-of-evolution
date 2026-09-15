@@ -114,6 +114,25 @@ implementation:
     notes:
       - "No 0-10 balance rebalance was performed."
       - "Reference timings remain automatic income ~00:21, Self Replication ~02:52, Proto-cell ~04:53."
+  iteration_3_balance_pass_0_10:
+    date: "2026-09-16"
+    base_commit: "f17adde7bae2b8242b722c5153d2f4d3196d7ede"
+    status: "passed"
+    scope: "Balance pass for Timeline #1 first 0-10 minutes only; Iteration 4 not started"
+    changes:
+      - "Molecular producer outputs tuned: Chemical Gradient 0.20 E/s, Catalytic Fold 0.036 I/s, Energy Pocket 0.38 E/s."
+      - "Manual primordial cooldown tuned provisionally: 2.0s before M01, 6.5s after M01."
+      - "Headless simulation now has optimized, competent and slow profiles plus optional M04 route."
+    gates:
+      npm_test: passed
+      test_ui: passed
+      test_sim: passed
+      smoke: passed
+      build: passed
+    notes:
+      - "Canonical node costs and M02/M03/M05 evolution multipliers remain unchanged."
+      - "Competent route reaches Proto-cell at ~09:05; optimized at ~08:12; competent+M04 at ~09:15."
+      - "M02 remains later than ideal target (~03:10 competent) to avoid node-cost changes and clicker-dominant manual play."
   last_iteration_2_micro_fix:
     date: "2026-09-15"
     base_commit: "82c60bc86f88a27c9941d6153efecf93b6e15510"

@@ -171,7 +171,8 @@ Early playable slice:
 
 Known tuning note:
 
-- [ ] Reference simulation currently reaches Proto-cell faster than the 9–11 min target with current canonical values; rebalance should be handled explicitly in a future tuning pass.
+- [x] 0–10 min balance pass completed. Competent simulation now reaches Proto-cell at ~09:05 without changing canonical node costs.
+- [ ] Residual pacing note: Self Replication remains later than the ideal 02:00 target (~03:10 competent) and should be reviewed only if future playtests confirm it feels slow.
 
 Correction pass:
 

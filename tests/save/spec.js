@@ -145,9 +145,9 @@ for (let index = 0; index < 12; index += 1) {
   midSliceEngine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
   midSliceEngine.tick(1000);
 }
-midSliceEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'GEN_CHEMICAL_GRADIENT' });
 midSliceEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'energy', amount: 300 });
 midSliceEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'information', amount: 40 });
+midSliceEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'GEN_CHEMICAL_GRADIENT' });
 for (const nodeId of ['M01', 'M02', 'M03']) {
   const buy = midSliceEngine.dispatch({ type: 'BUY_NODE', nodeId });
   assert.equal(buy.ok, true);
@@ -160,7 +160,7 @@ assert.equal(midSliceLoaded.state.run.goals.states.G003.status, 'archived');
 assert.equal(midSliceLoaded.state.run.goals.side.activeIds.includes('G003_M04_OPTIONAL'), true);
 assert.equal(midSliceLoaded.state.run.producers.GEN_CHEMICAL_GRADIENT.count, 1);
 assert.equal(midSliceLoaded.state.run.nodes.completed.M03.completedAtMs >= 0, true);
-assert.equal(midSliceLoaded.state.run.manualProcesses.MANUAL_PRIMORDIAL_PULSE.uses, 12);
+assert.equal(midSliceLoaded.state.run.manualProcesses.MANUAL_PRIMORDIAL_PULSE.uses, 6);
 assert.equal(midSliceLoaded.state.run.modifiers.active['M01:auto_production'].type, 'unlock_auto_production');
 assert.equal(midSliceStorage.get('evolved'), 'legacy-save-must-survive');
 

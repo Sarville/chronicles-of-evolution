@@ -17,6 +17,13 @@ export function manualProcessAvailable(state, process) {
   return state.run.clock.simulationMs >= (selectManualProcessState(state, process.id)?.availableAtMs || 0);
 }
 
+function manualProcessCooldownMs(state, process) {
+  if (process.cooldownAfterNodeId && state.run.nodes.completed[process.cooldownAfterNodeId]) {
+    return process.cooldownAfterMs ?? process.cooldownMs;
+  }
+  return process.cooldownMs;
+}
+
 export function calculateManualReward(state, ruleset, process) {
   if (process.reward?.type !== 'manual_gain') {
     return {};
@@ -48,7 +55,7 @@ export function useManualProcess(state, ruleset, processId, ports = {}) {
   state.run.manualProcesses[processId] = {
     uses: previous.uses + 1,
     lastUsedAtMs: state.run.clock.simulationMs,
-    availableAtMs: state.run.clock.simulationMs + process.cooldownMs,
+    availableAtMs: state.run.clock.simulationMs + manualProcessCooldownMs(state, process),
   };
   events.push(createDomainEvent('manual_process_used', { processId, reward }, state, ports));
   return { ok: true, events, reward };

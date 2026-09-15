@@ -51,7 +51,7 @@ assert.equal(engine.state.run.manualProcesses.MANUAL_PRIMORDIAL_PULSE.uses, 1);
 result = engine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
 assert.equal(result.ok, false);
 assert.equal(result.reason, 'MANUAL_PROCESS_UNAVAILABLE');
-engine.tick(1000);
+engine.tick(2000);
 assert.equal(selectManualProcessView(engine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').available, true);
 
 result = engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'energy', amount: 99 });
@@ -85,8 +85,8 @@ assert.equal(result.events.some((event) => event.type === 'node_completed'), tru
 assert.equal(result.events.some((event) => event.type === 'goal_completed'), true);
 assert.equal(engine.state.run.modifiers.active['M01:auto_production'].type, 'unlock_auto_production');
 tick = engine.tick(1000);
-assert.equal(tick.rates.energy, 0.4);
-assert.equal(engine.state.run.resources.energy.amount, 78.4);
+assert.equal(tick.rates.energy, 0.2);
+assert.equal(engine.state.run.resources.energy.amount, 78.2);
 result = engine.dispatch({ type: 'BUY_PRODUCER', producerId: 'GEN_CATALYTIC_FOLD' });
 assert.equal(result.ok, true);
 
@@ -98,7 +98,7 @@ result = engine.dispatch({ type: 'BUY_NODE', nodeId: 'M02' });
 assert.equal(result.ok, true);
 assert.equal(engine.state.run.resources.energy.amount, beforeAtomicFailure.energy - 40);
 assert.equal(engine.state.run.resources.information.amount, beforeAtomicFailure.information - 3);
-assert.equal(Math.abs(selectProductionRates(engine.state, ruleset).information - 0.088) < 0.000001, true);
+assert.equal(Math.abs(selectProductionRates(engine.state, ruleset).information - 0.0576) < 0.000001, true);
 
 engine.state.run.nodes.completed.T08 = { completedAtMs: 0 };
 engine.state.run.eraId = 'SETTLEMENT_EARLY';
@@ -188,7 +188,7 @@ assert.deepEqual(selectManualProcessView(manualRewardEngine.state, ruleset, 'MAN
 result = manualRewardEngine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
 assert.equal(result.ok, true);
 assert.deepEqual(result.events.find((event) => event.type === 'manual_process_used').payload.reward, { energy: 2 });
-manualRewardEngine.tick(1000);
+manualRewardEngine.tick(6500);
 assert.equal(selectManualProcessView(manualRewardEngine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').available, true);
 
 const stalledEngine = createChroniclesEngine({ ruleset });
