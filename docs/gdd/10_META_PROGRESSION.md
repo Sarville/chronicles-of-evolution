@@ -1,837 +1,335 @@
 # Хроники Эволюции — Meta progression
 
-**Документ:** DS-04 / 10_META_PROGRESSION  
-**Версия:** 1.0  
-**Область:** первый reset, Память Архива, Archive Fragments, ускорение Timeline #2 и правила гибридизации  
-**Статус:** accepted
+**Документ:** DS-04 / reconciliation revision 2.0  
+**Статус:** canonical meta semantics / numeric early bonuses provisional.
 
 ---
 
-# 1. Назначение
+# 1. Meta principles
 
-Этот документ задаёт мета-прогрессию после первого завершения Timeline #1.
+Archive remains a major accepted improvement.
 
-Главная продуктовая задача meta loop:
+Meta progression must:
 
-> Следующая Timeline должна ощущаться не как повтор тех же двух часов, а как знакомый мир, который игрок проходит быстрее, глубже и с новыми возможностями выбора.
+- make Timeline #2 feel meaningfully faster and more flexible;
+- preserve familiar gameplay rather than skip it automatically;
+- allow retained traits/hybridization later;
+- never invalidate first-run balance;
+- never require ads;
+- never multiply Archive Fragment rewards.
 
-Meta progression не должна:
-
-- заменять обычный gameplay постоянными множителями;
-- превращать первый run в «неполноценную версию»;
-- требовать рекламы;
-- давать бесконечно растущие глобальные multipliers;
-- позволять купить Archive Fragments за Archive Fragments;
-- автоматически отменять Великий фильтр или ending `ENDING_ASH` в Timeline #1.
+The corrected biological canon is RNA/DNA/Cell/AP/Cognition. Meta must adapt to that vocabulary.
 
 ---
 
-# 2. Термины
+# 2. Permanent system
 
-## 2.1. Память Архива
+**Archive Memory** includes:
 
-**Память Архива** — вся permanent/meta-система проекта.
-
-Она включает:
-
-- Archive Fragments;
+- Archive Fragments (AF);
 - Archive Tree;
 - persistent discovery;
 - Chronicle;
-- endings collection;
+- ending history;
 - achievements;
 - persistent narrative flags;
 - retained traits;
 - hybridization permissions;
 - future Archive Intervention upgrades.
 
-## 2.2. Archive Fragments
-
-**Фрагменты Архива (`AF`)** — единственная spendable meta currency первого prestige-loop.
-
-До отдельного решения запрещено вводить вторую параллельную spendable meta currency.
-
-## 2.3. Archive node
-
-Permanent unlock, купленный за AF.
-
-Archive node:
-
-- сохраняется между timelines;
-- не сбрасывается обычным reset;
-- имеет stable ID `ARxx`;
-- не может напрямую увеличивать будущий AF reward.
+AF remains the only spendable prestige currency of the first meta loop.
 
 ---
 
-# 3. Первый reset reward
+# 3. First reset reward
 
-Каноническая формула DS-02 сохраняется без изменений:
-
-```text
-AF = 8
-   + floor(unique_evolution_nodes / 5)
-   + floor(peak_population / 75)
-   + crisis_bonus
-```
-
-где:
+Canonical envelope remains:
 
 ```text
-crisis_bonus = 0..4
+14–18 AF typical
 ```
 
-Целевой результат первого reset:
+Hard rules remain:
 
-```text
-14–18 AF
-```
+- idempotent grant;
+- ads do not multiply AF;
+- meta does not increase AF multiplier;
+- AF survives reset.
 
-Это reward за завершение Timeline #1, а не за просмотр рекламы.
-
-## Hard rules
-
-- AF начисляется до уничтожения run state.
-- Reward transaction idempotent.
-- Повторная загрузка ending не может выдать AF повторно.
-- Rewarded ad не умножает mandatory first-reset AF.
-- Meta upgrades не увеличивают AF multiplier.
-- AF не теряется при обычном reset.
+The old exact formula must be revalidated because evolution node count and Population scale changed in reconciliation.
 
 ---
 
-# 4. First-reset spending experience
+# 4. Archive Recall
 
-После первого reset игрок:
+Archive Recall remains automatic after first reset.
 
-1. получает Archive Summary;
-2. видит `+14..18 AF`;
-3. открывает Archive Tree;
-4. может купить узлы;
-5. может ничего не покупать;
-6. создаёт Timeline #2.
+Semantic contract:
 
-Игра не заставляет делать первую покупку.
+- acts only on familiar pre-Sapience core progression;
+- never completes core milestones automatically;
+- does not auto-select branches;
+- does not unlock unknown optional adaptations;
+- ends at Sapience.
 
-## Первый бюджет
+Old wording based on `Energy production` / `Information` is superseded.
 
-Tier 1 целиком стоит:
+Recommended reconciled effects for tuning:
 
 ```text
-AR01 2
-AR02 2
-AR03 3
-AR04 3
----------
-total 10 AF
+familiar core biological costs/process requirements reduced
+familiar early biological production/process speed increased
 ```
 
-Поэтому первый reset позволяет:
+Initial numeric reference may remain around the old envelope:
 
-- купить несколько понятных ранних upgrades;
-- купить весь Tier 1 и сохранить часть AF;
-- либо накопить на более дорогой Tier 2.
+```text
+cost factor ~0.75
+production/process factor ~1.25
+```
 
-Это намеренно создаёт первый meta-choice.
+but exact application to RNA/DNA/Biomass/Energy must be confirmed after corrected Timeline #1 balance exists.
 
 ---
 
-# 5. Archive Tree — канонические узлы
+# 5. Tier 1 Archive nodes
 
-Идентичность и базовые цены `AR01–AR12` берутся из `03_EVOLUTION_TREE.md`.
+Keep the **concepts**, rewrite obsolete resource-specific effects.
 
-DS-04 уточняет activation/stacking semantics.
+## AR01 — Эхо молекулы
 
-## Tier 1
+Old: starting Energy production ×1.25.
 
-| ID | Узел | Цена | Канонический эффект | DS-04 semantics |
-|---|---|---:|---|---|
-| AR01 | Эхо молекулы | 2 AF | старт E production ×1.25 | входит в `meta_early_production` group |
-| AR02 | Стабильная память | 2 AF | старт Information +10 | one-time grant в начале Timeline |
-| AR03 | Быстрый онтогенез | 3 AF | goals 1–5 требуют на 8% меньше ресурсов | применяется к breakthrough costs, не к generators |
-| AR04 | Спящий метаболизм | 3 AF | offline efficiency 50% → 60% | не меняет offline cap и event rules |
+Reconciled meaning:
 
-## Tier 2
+- improves familiar early RNA/replication process;
+- belongs to early biological production group.
 
-| ID | Узел | Цена | Канонический эффект | DS-04 semantics |
-|---|---|---:|---|---|
-| AR05 | Сохранённая адаптация | 5 AF | сохранить 1 OPTIONAL biological node бесплатно | один retained slot |
-| AR06 | Перекрёстная эволюция | 6 AF | второй cellular branch без ×2.5 penalty | второй branch покупается по base cost; не даёт dual-active multiplier сам по себе |
-| AR07 | Наследие культуры | 5 AF | цивилизация: +20 K и +10% pop | one-time civilization transition grant |
-| AR08 | Память катастрофы | 7 AF | скрытые параметры crisis видимы в Timeline #2 | informational power, не Stability bonus |
+Exact effect TBD after 0–10 rebalance.
 
-## Tier 3
+## AR02 — Стабильная память
 
-| ID | Узел | Цена | Канонический эффект | DS-04 semantics |
-|---|---|---:|---|---|
-| AR09 | Двойная специализация | 10 AF | 2 branch traits одного biological tier | primary 100%, secondary 65% numerical effect |
-| AR10 | Ускоренная история | 9 AF | ранние narrative locks −50% | не пропускает обязательные choices |
-| AR11 | Глубокий архив | 12 AF | альтернативные записи Великого фильтра | content unlock, не economy multiplier |
-| AR12 | За пределом Пепла | 12 AF | путь к post-atomic / space progression | требует special condition; не отменяет Timeline #1 Ash |
+Old: starting Information +10.
 
----
+Reconciled meaning:
 
-# 6. Automatic Archive Recall
+- one-time familiar genetic/replication starting advantage;
+- may grant starting RNA/DNA progress or reduce first DNA requirement;
+- must not skip Self Replication entirely.
 
-После первого reset каждый новый run получает базовый permanent эффект:
+Exact effect TBD.
 
-```text
-meta.archive.first_reset == true
-=> Archive Recall enabled
-```
+## AR03 — Быстрый онтогенез
 
-Это не покупаемый node и не тратит AF.
+Keep concept:
 
-Причина: игрок может сознательно копить AF, но Timeline #2 всё равно должен ощущаться как следующий цикл, а не повтор первого onboarding.
+- reduces requirements of familiar early core breakthroughs;
+- no effect on unknown/new branch content;
+- obeys cost floor.
 
-## 6.1. Область действия
+## AR04 — Спящий метаболизм
 
-Archive Recall действует только:
+Keep offline efficiency improvement concept.
 
-- на уже завершённые ранее `CORE` nodes;
-- только до `N06 Разум`;
-- только если node присутствует в persistent discovery/Chronicle;
-- только на знакомую часть progression.
-
-Не действует на:
-
-- новые branch nodes;
-- OPTIONAL nodes, которые игрок раньше не открывал;
-- civilization after Sapience;
-- crisis;
-- AF reward;
-- Stability;
-- future route-specific content.
-
-## 6.2. Known-core cost factor
-
-Для familiar CORE breakthrough до Sapience:
-
-```text
-archive_recall_cost_factor = 0.75
-```
-
-То есть familiar CORE cost уменьшается на 25%.
-
-## 6.3. Known-era production factor
-
-Пока игрок находится в знакомой pre-Sapience era:
-
-```text
-archive_recall_production_factor = 1.25
-```
-
-Этот multiplier входит в meta multiplier group и исчезает после `N06`.
-
-## 6.4. Почему не skip
-
-Archive Recall не помечает CORE nodes автоматически completed.
-
-Игрок всё ещё:
-
-- проживает эволюционную последовательность;
-- видит визуальные переходы;
-- делает branch choices;
-- производит ресурсы;
-- покупает ключевые breakthroughs.
-
-Ускоряется знакомый путь, а не удаляется gameplay.
+Offline hard cap remains 75%.
 
 ---
 
-# 7. Timeline #2 acceleration target
+# 6. Tier 2
 
-Timeline #1:
+## AR05 — Сохранённая адаптация
 
-```text
-Sapience target ≈ 46:00
-```
+Keep unchanged conceptually.
 
-Timeline #2 familiar early phase:
+Player may retain one discovered **OPTIONAL biological node**.
 
-```text
-target = 40–60% от Timeline #1
-```
+Activation remains dormant until original prerequisites are reached.
 
-То есть:
+Strong fit with restored Adaptation Points: retained optional body adaptation becomes free on activation and does not consume AP in the new run.
 
-```text
-Sapience p50 target ≈ 20–28 min
-```
+## AR06 — Перекрёстная эволюция
 
-## Без покупки AF
+Old semantics `second cellular branch without ×2.5 penalty` are superseded because Timeline #1 no longer allows buying siblings for ×2.5.
 
-Archive Recall сам должен держать median знакомого пути около верхней границы:
+New semantics:
 
-```text
-~26–28 min
-```
+> Allows unlocking one **secondary primary biological trait** from the original Absorption / Symbiosis / Shell tier after reaching the original branch prerequisites.
 
-## С типичным первым spend
+AR06 alone does not provide full double numerical stacking.
 
-Покупка 2–4 Tier 1 nodes должна сдвигать median примерно в:
+The secondary trait may initially be dormant/profile-only until a later hybridization upgrade enables numerical coexistence.
 
-```text
-~20–25 min
-```
+## AR07 — Наследие культуры
 
-Это tuning target, а не жёсткий таймер.
+Keep civilization starting advantage concept, but exact `+20 K / +10% pop` values must be retuned because civilization now starts around Population 5.
 
-## Важно
+## AR08 — Память катастрофы
 
-Timeline #2 не получает blanket `×2` ко всей экономике.
+Keep unchanged:
 
-После Sapience автоматический Archive Recall выключается. Дальнейшее ускорение приходит только из конкретных permanent upgrades, retained traits и знакомых automation paths.
+- reveals hidden Great Filter/Stability causes in later timelines;
+- informational power, not a direct Stability bonus.
 
 ---
 
-# 8. Meta stacking rules
+# 7. Tier 3
 
-Meta bonuses группируются отдельно от ordinary run bonuses.
+## AR09 — Двойная специализация
 
-Рекомендуемые groups:
+Keep hybridization concept.
 
-```text
-meta_early_production
-meta_breakthrough_cost
-meta_starting_grant
-meta_offline_efficiency
-meta_retained_trait
-meta_hybridization
-```
+Reconciled semantics:
 
-## 8.1. Early production cap
+- allows one secondary biological trait to become numerically active;
+- primary = 100% effect;
+- secondary target effect around 65%, subject to regression balance.
 
-До Sapience:
+## AR10 — Ускоренная история
 
-```text
-total meta production multiplier <= 1.60
-```
+Keep narrative lock reduction without skipping mandatory choices.
 
-Пример:
+## AR11 — Глубокий архив
 
-```text
-Archive Recall 1.25
-× AR01 1.25
-= 1.5625
-```
+Keep lore/content unlock.
 
-Дополнительный meta bonus не может поднять эту группу выше `1.60`.
+## AR12 — За пределом Пепла
 
-Обычные run upgrades/branch effects считаются отдельно.
-
-## 8.2. Familiar breakthrough cost cap
-
-После всех meta reductions:
-
-```text
-effective familiar CORE cost >= 70% canonical cost
-```
-
-Пример:
-
-```text
-Archive Recall 0.75
-AR03 0.92
-raw = 0.69
-clamped = 0.70
-```
-
-## 8.3. Late-era meta cap
-
-Archive nodes не должны создавать большой blanket bonus в поздней игре.
-
-Для meta-only production multipliers:
-
-```text
-pre-Sapience: <= 1.60
-Tribe/Settlement: <= 1.35
-City: <= 1.25
-Industry/Atomic: <= 1.15
-```
-
-Это guardrail для будущих nodes.
+Keep post-Ash route unlock concept; does not alter first Timeline ending.
 
 ---
 
-# 9. Retained traits — AR05
+# 8. Timeline #2 pacing
 
-`AR05 Сохранённая адаптация` создаёт один retained slot.
+Old accepted target `Sapience 20–28 min` was based on Timeline #1 Sapience ~46 min and is superseded as a fixed number.
 
-Перед стартом новой Timeline игрок может выбрать:
-
-```text
-1 ранее discovered OPTIONAL biological node
-```
-
-Запрещены:
-
-- CORE;
-- CONVERGENCE;
-- BRANCH;
-- crisis/civilization nodes;
-- Archive nodes.
-
-## Activation
-
-Retained node не действует с первой секунды.
-
-Он находится в состоянии:
+New principle:
 
 ```text
-dormant_retained
+Timeline #2 familiar pre-Sapience path ≈ 50–65% of corrected Timeline #1 time
 ```
 
-Когда новый run достигает исходных prerequisites узла:
+With corrected first-run Sapience ~38–40 min, initial tuning target is:
 
 ```text
-dormant_retained -> completed_retained
+no-spend: ~22–25 min
+typical Tier1: ~18–22 min
+readability floor: ~16–18 min
 ```
 
-Стоимость в текущей Timeline:
+Final values require simulation after corrected Timeline #1 exists.
 
-```text
-0
-```
+Timeline #2 must still show:
 
-Так сохраняется логика мира и не появляется эффект сложного организма до соответствующей эры.
+- RNA;
+- replication;
+- DNA;
+- Cell;
+- first branch;
+- organism;
+- Cognition;
+- Sapience.
 
-## Slot rules
-
-- один node на один retained slot;
-- один и тот же node нельзя дублировать;
-- сменить retained node можно только между timelines;
-- смена loadout бесплатна;
-- сама покупка AR05 permanent.
+It accelerates familiar progression rather than replacing it.
 
 ---
 
-# 10. Cross evolution — AR06
+# 9. Meta caps
 
-В Timeline #1 первый cellular branch:
+Keep anti-snowball philosophy.
 
-```text
-C01A / C01B / C01C
-```
-
-обычно делает альтернативы дорогими ×2.5.
-
-После AR06:
+Recommended ceilings remain starting guardrails:
 
 ```text
-second_cellular_branch_cost = canonical_base_cost
+pre-Sapience meta production/process multiplier <= 1.60
+Tribe/Settlement <= 1.35
+City <= 1.25
+Industry/Atomic <= 1.15
+offline efficiency <= 0.75
 ```
 
-Игрок может приобрести второй cellular branch.
-
-## Ограничение до AR09
-
-AR06 сам по себе не разрешает full dual-active stat stacking.
-
-Состояние:
+Familiar core effective requirement/cost floor remains around:
 
 ```text
-primary cellular branch = full numerical effect
-secondary purchased branch = discovered/hybrid available
+>= 70% canonical
 ```
 
-Secondary branch может:
-
-- считаться discovered;
-- открывать соответствующие narrative/event hooks;
-- участвовать в будущих hybrid requirements.
-
-Но его основной production multiplier не складывается одновременно с primary.
-
-Это делает AR06 расширением вариантов, а не ранним глобальным multiplier.
+Exact interpretation for non-price condition milestones (for example Cognition) must use explicit per-system rules rather than a fake universal cost multiplier.
 
 ---
 
-# 11. Dual specialization — AR09
+# 10. Cognition and meta
 
-После AR09 игрок получает один `secondary_trait_slot` для одного biological tier.
+Archive must not simply grant `+100 Cognition`.
 
-Допустимые tier groups:
+Allowed meta effects:
 
-```text
-metabolism
-body
-behavior
-```
+- earlier access to familiar Cognition contributors;
+- modest contribution bonus from retained sensory/social/tool traits;
+- faster familiar neural-development requirements.
 
-Для выбранного tier:
+Guardrail:
 
-```text
-primary trait = 100% numerical effect
-secondary trait = 65% numerical effect
-```
-
-Unique/non-numeric unlocks secondary trait разрешены полностью, если отдельная spec не запрещает их.
-
-## Hard rules
-
-- одновременно только один secondary trait slot;
-- два одинаковых trait не допускаются;
-- multiplicative effect одной и той же stat проходит обычные caps;
-- AR09 не позволяет dual civilization specialization автоматически;
-- AR09 не увеличивает AF earnings.
+> Sapience still requires the player to pass through the Cognition phase and make at least one meaningful behavioral/evolutionary choice.
 
 ---
 
-# 12. Timeline loadout
+# 11. Adaptation Points and meta
 
-Перед созданием Timeline #2+ Archive может сформировать meta loadout:
+AP remain run-local.
 
-```json
-{
-  "retainedOptionalNodeId": "M04",
-  "secondaryTraitTier": "metabolism",
-  "preferredPrimaryBranch": null
-}
-```
+Archive may:
 
-Loadout:
+- retain an OPTIONAL adaptation (AR05);
+- later increase flexibility of AP loadout;
+- unlock hybrid combinations.
 
-- меняется только до старта новой Timeline;
-- сохраняется в meta;
-- копируется в run как immutable start parameters;
-- изменение meta loadout после старта не ретроактивно меняет текущий run.
+Archive must not create passive AP generation or permanent AP farming.
 
 ---
 
-# 13. Catch-up / anti-snowball principles
+# 12. Archive Intervention
 
-Meta loop single-player, поэтому catch-up — это не PvP rubber-banding.
+Keep accepted envelope:
 
-Цель: не допустить, чтобы ранние permanent bonuses экспоненциально ускоряли все следующие timelines.
+- optional temporary acceleration;
+- one eligible resource/process target;
+- no stacking;
+- base around 120 sec;
+- hard duration <=180 sec;
+- <=3 stored charges;
+- multiplier <=1.50.
 
-## Hard rules
+Cannot target:
 
-1. Ни один Archive node не увеличивает AF multiplier.
-2. Нет `global production ×N` на всю Timeline.
-3. Сильные bonuses привязаны к ранним знакомым фазам.
-4. Стоимость familiar CORE имеет hard floor.
-5. Meta production имеет phase caps.
-6. Hybridization ограничена slots.
-7. Tier 3 требует минимум 2 resets.
-8. AR12 требует special condition.
-9. Новые/неизвестные ветви всегда проходят по нормальному balance.
-10. Ads не дают permanent economy multiplier.
+- AF;
+- Population directly;
+- Stability/World Tension;
+- crisis timer;
+- Cognition directly.
 
-## Result
-
-Игрок быстро проходит знакомое, но новый контент снова становится содержательной частью игры.
-
----
-
-# 14. AF economy after first reset
-
-DS-04 фиксирует только первый reward как полностью числовой contract.
-
-Для последующих timelines до появления их ending specs действует принцип:
-
-```text
-AF reward = completion value + discovery value + outcome value
-```
-
-Запрещено заранее хардкодить одну универсальную формулу для всех будущих endings.
-
-## Permanent constraints
-
-Будущие formulas:
-
-- не должны зависеть от ads;
-- не должны иметь meta multiplier;
-- должны вознаграждать новое открытие;
-- могут учитывать глубину Timeline и outcome;
-- должны логироваться с breakdown;
-- должны быть idempotent.
+For restored early biology, eligible targets may include RNA/DNA/Biomass/Energy production processes where appropriate.
 
 ---
 
-# 15. Offline progression
-
-## Timeline #1 — unchanged
-
-```text
-offline_gain =
-online_rate_at_exit
-× min(offline_time, 2h)
-× 0.50
-```
-
-Дополнительно:
-
-- breakthrough не завершается offline;
-- Ash не запускается offline;
-- crisis clock freeze;
-- Stability drain freeze;
-- Population offline growth <= +35% значения при выходе.
-
-## Timeline #2+
-
-Без AR04:
-
-```text
-offline efficiency = 50%
-```
-
-С AR04:
-
-```text
-offline efficiency = 60%
-```
-
-Hard cap для текущего meta design:
-
-```text
-offline efficiency <= 75%
-```
-
-Future upgrades могут двигать 60% к 75%, но не выше без нового decision record.
-
-## Никогда offline
-
-Offline progression не может:
-
-- выбирать branch;
-- подтверждать event choice;
-- запускать ending;
-- выполнять reset;
-- начислять AF;
-- активировать Archive Intervention;
-- автоматически принимать narrative decision.
-
----
-
-# 16. Archive Intervention — meta balance envelope
-
-Archive Intervention остаётся optional acceleration hook.
-
-Точный rewarded/platform flow — DS-10.
-
-DS-04 фиксирует только безопасные balance limits.
-
-## Target
-
-Archive Intervention может временно усиливать:
-
-```text
-energy
-information
-biomass
-food
-materials
-knowledge
-power
-```
-
-Нельзя выбирать:
-
-```text
-Archive Fragments
-Population
-Stability
-World Tension
-crisis timer
-```
-
-## Baseline envelope
-
-```text
-one resource target
-multiplier = 1.50
-base duration = 120 sec
-one active intervention at a time
-no stacking
-```
-
-## Meta upgrade caps
-
-Future Archive upgrades могут улучшать:
-
-- duration;
-- stored free charges;
-- target flexibility.
-
-Hard maximums без нового balance decision:
-
-```text
-multiplier <= 1.50
-duration <= 180 sec
-stored charges <= 3
-```
-
-То есть meta progression не усиливает multiplier выше ×1.50 — она улучшает удобство и частоту.
-
-## Safety
-
-Archive Intervention:
-
-- не участвует в target timings baseline;
-- не обязателен для goal completion;
-- не умножает AF;
-- не ускоряет crisis clock;
-- не отменяет Ash;
-- не работает offline;
-- не стакается сам с собой.
-
-DS-10 определяет free charge cadence, rewarded refill, cooldown и unavailable-ad fallback.
-
----
-
-# 17. Save/state additions
-
-DS-03 `meta` расширяется без нарушения run/meta separation.
-
-Recommended additions:
-
-```json
-{
-  "archiveFragments": 18,
-  "archiveNodes": {
-    "AR01": { "purchasedAtTimeline": 1 },
-    "AR05": { "purchasedAtTimeline": 1 }
-  },
-  "archiveRecall": {
-    "enabled": true
-  },
-  "loadout": {
-    "retainedOptionalNodeId": "M04",
-    "secondaryTraitTier": null
-  },
-  "intervention": {
-    "maxStoredCharges": 1
-  }
-}
-```
-
-Derived multipliers не сохраняются как source of truth.
-
-Они вычисляются из:
-
-```text
-meta
-+ current run era
-+ config
-```
-
----
-
-# 18. Commands / domain hooks
-
-Минимальные meta commands:
-
-```text
-purchase_archive_node(nodeId)
-set_meta_loadout(loadout)
-start_new_timeline()
-activate_archive_intervention(resourceId)
-```
-
-`start_new_timeline()` обязан:
-
-1. проверить, что previous reset transaction завершён;
-2. зафиксировать meta loadout snapshot;
-3. назначить `timelineId = meta.nextTimelineId`;
-4. создать clean run state;
-5. включить Archive Recall, если доступен;
-6. применить стартовые grants;
-7. сохранить run до начала simulation.
-
----
-
-# 19. Telemetry
-
-Минимальные события DS-04:
-
-```text
-archive_node_viewed
-archive_node_purchased
-archive_fragments_balance_changed
-meta_loadout_changed
-timeline_started
-archive_recall_applied
-retained_trait_activated
-secondary_branch_purchased
-dual_trait_activated
-offline_progress_claimed
-archive_intervention_activated
-```
-
-Required properties:
-
-```text
-timeline_id
-ruleset_version
-archive_nodes_owned
-af_before
-af_after
-node_id
-goal_id / era_id
-elapsed_seconds
-```
-
----
-
-# 20. Acceptance tests
-
-## First reset
-
-- 14–18 AF typical first reward.
-- AF cannot be granted twice by reload/retry.
-- player can start Timeline #2 with 0 AF spent.
-
-## Archive Recall
-
-- applies only after first reset;
-- applies only to familiar pre-Sapience CORE nodes;
-- stops at Sapience;
-- never affects AF/Stability.
-
-## Meta caps
-
-- AR01 + Archive Recall <= 1.60 meta early production;
-- AR03 + Recall cannot reduce familiar CORE below 70% canonical cost.
-
-## Retained trait
-
-- OPTIONAL only;
-- dormant until original prerequisites;
-- zero current-run cost;
-- one slot.
-
-## Hybridization
-
-- AR06 removes second-cellular-branch ×2.5 penalty;
-- AR06 alone does not stack both branch numeric effects;
-- AR09 allows one secondary biological trait at 65%.
-
-## Offline
-
-- Timeline #1 rules unchanged;
-- AR04 = 60%;
-- no ending/event choice/reset/AF offline.
-
-## Intervention
-
-- cannot target AF/Stability/Population;
-- multiplier <=1.50;
-- duration <=180 sec;
-- stored charges <=3;
-- no stacking.
-
----
-
-# 21. Review decisions
-
-DS-04 считается принятым, если согласованы следующие product decisions:
-
-1. Archive Recall — automatic baseline reward первого reset.
-2. Timeline #2 Sapience target — 20–28 минут.
-3. familiar CORE: cost ×0.75 + pre-Sapience production ×1.25.
-4. AR05 retained OPTIONAL slot semantics.
-5. AR06 purchase-breadth without dual numeric stacking.
-6. AR09 secondary trait = 65%.
-7. meta multipliers/cost reductions имеют hard caps.
-8. Archive Intervention multiplier остаётся fixed ×1.50; upgrades улучшают duration/charges/flexibility.
+# 13. What remains accepted from DS-04
+
+Keep:
+
+- automatic Archive Recall;
+- anti-snowball caps;
+- retained optional node;
+- hybridization progression;
+- crisis foresight;
+- ads outside baseline;
+- offline caps;
+- Archive Intervention envelope;
+- no AF multiplier;
+- Timeline #2 must feel different, not just globally ×2.
+
+Reconciled:
+
+- removed Information-specific effects;
+- removed Energy-at-start assumption;
+- replaced AR06 ×2.5-penalty semantics;
+- recalibrated Timeline #2 target around ~38–40 min first-run Sapience;
+- integrated AP/Cognition.
