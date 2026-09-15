@@ -3,6 +3,7 @@
 Этот каталог — каноническая проектная документация **Хроник Эволюции**.
 
 Он используется как контракт между:
+
 - пользователем/продакт-оунером;
 - ChatGPT как design/content агентом;
 - Codex как implementation агентом;
@@ -15,50 +16,52 @@
 ## 1. Операционные файлы
 
 ### `PROJECT_STATE.yaml`
-Единственный source of truth для текущего статуса проекта:
-- текущая design session;
-- зависимости;
-- готовность документов;
-- статус implementation iterations;
-- gates для параллельной работы;
-- open decisions;
-- next action.
+
+Единственный source of truth для текущего статуса проекта.
 
 ### `TODO.md`
-Короткое человекочитаемое представление ближайших действий.
+
+Человекочитаемый work queue.
 
 Если `TODO.md` расходится с `PROJECT_STATE.yaml`, верен `PROJECT_STATE.yaml`.
 
 ### `DECISIONS.md`
-Канонические продуктовые/архитектурные решения, которые разрешают противоречия между более ранними документами.
+
+Основной исторический реестр решений.
+
+### `DECISIONS_RECONCILIATION.md`
+
+Текущий authoritative addendum для design reconciliation.
+
+Для вопросов biological progression, resources, first branch, Adaptation Points, Cognition/Sapience, Power timing, Modern phase и implementation order он имеет приоритет над более ранними решениями.
 
 ### `GLOSSARY.md`
-Единые термины, пользовательские названия и технические IDs/conventions.
+
+Единые канонические термины.
 
 ### `production/DESIGN_SESSION_PLAN.md`
-Разбивает проектирование на блоки формата:
 
-**одна сессия/чат -> один связанный пакет -> review -> state update -> push -> новый чат.**
-
-### `production/STATE_WORKFLOW.md`
-Правила синхронизации state/TODO, параллельной работы и review gates.
+Порядок design sessions и review gates.
 
 ### `production/IMPLEMENTATION_ITERATION_PLAN.md`
-Roadmap Codex. Не является статус-файлом; фактический implementation status находится в `PROJECT_STATE.yaml`.
+
+Roadmap Codex. Фактический статус всегда берётся из `PROJECT_STATE.yaml`.
 
 ---
 
-## 2. Структура
+## 2. Каноническая структура
 
 ```text
 docs/
 ├─ README.md
 ├─ PROJECT_STATE.yaml
 ├─ DECISIONS.md
+├─ DECISIONS_DS03.md
+├─ DECISIONS_DS04.md
+├─ DECISIONS_RECONCILIATION.md
 ├─ GLOSSARY.md
 ├─ TODO.md
 ├─ PRD.md
-├─ 00_DOCS_STRUCTURE_AND_GENERATION_PLAN.md
 │
 ├─ gdd/
 │  ├─ 01_FIRST_120_MINUTES.md
@@ -74,225 +77,182 @@ docs/
 │  └─ 11_BALANCE_RULES.md
 │
 ├─ scenario/
-│  ├─ 00_NARRATIVE_BIBLE.md
-│  ├─ 01_TIMELINE_01_SCRIPT.md
-│  ├─ 02_TIMELINE_02_SCRIPT.md
-│  ├─ 03_ARCHIVE_STORY_ARC.md
-│  ├─ 04_STORY_EVENTS.md
-│  ├─ 05_NARRATIVE_FLAGS.md
-│  ├─ 06_ENDINGS_COPY.md
-│  └─ 07_COPY_GUIDE.md
-│
 ├─ ux/
-│  ├─ README.md
-│  ├─ 00_UX_PRINCIPLES.md
-│  ├─ 01_SCREEN_MAP.md
-│  ├─ 02_MOBILE_WIREFRAMES.md
-│  ├─ 03_DESKTOP_WIREFRAMES.md
-│  ├─ 04_COMPONENT_STATES.md
-│  └─ 05_TUTORIAL_AND_HINTS.md
-│
 ├─ art/
-│  ├─ README.md
-│  ├─ 00_ART_DIRECTION.md
-│  ├─ 01_LOCATIONS_AND_DIORAMAS.md
-│  ├─ 02_ERA_TRANSITIONS.md
-│  ├─ 03_BUILDINGS_AND_PROPS.md
-│  ├─ 04_ASSET_MANIFEST.md
-│  └─ 05_GENERATION_PROMPTS.md
-│
 ├─ audio/
-│  ├─ README.md
-│  ├─ 00_AUDIO_DIRECTION.md
-│  ├─ 01_MUSIC_CUES.md
-│  ├─ 02_AMBIENCE.md
-│  ├─ 03_SFX_LIBRARY.md
-│  ├─ 04_STINGERS.md
-│  └─ 05_GENERATION_PROMPTS.md
-│
 ├─ technical/
-│  ├─ 00_TECHNICAL_OVERVIEW.md
-│  ├─ 01_EXISTING_CODE_AUDIT.md
-│  ├─ 02_DOMAIN_ADAPTER.md
-│  ├─ 03_GAME_STATE.md
-│  ├─ 04_SAVE_ARCHITECTURE.md
-│  ├─ 05_ANALYTICS_SCHEMA.md
-│  ├─ 06_PLATFORM_INTEGRATION.md
-│  └─ 07_TESTING_STRATEGY.md
-│
 └─ production/
-   ├─ DESIGN_SESSION_PLAN.md
-   ├─ STATE_WORKFLOW.md
-   ├─ IMPLEMENTATION_ITERATION_PLAN.md
-   ├─ CONTENT_PIPELINE.md
-   └─ RELEASE_CHECKLIST.md
 ```
 
-Файл в дереве может ещё не существовать, если его design session не завершена. Git не хранит пустые папки, поэтому разделы `ux/`, `art/`, `audio/` содержат собственные README до появления спецификаций.
-
 ---
 
-## 3. Уже существующая база
+## 3. Source-of-truth hierarchy after reconciliation
 
-Сейчас приняты как исходные:
+When documents conflict, use this order.
 
-- `PRD.md`;
-- `gdd/01_FIRST_120_MINUTES.md`;
-- `gdd/02_ECONOMY_FIRST_120_MINUTES.md`;
-- `gdd/03_EVOLUTION_TREE.md`;
-- `scenario/00_NARRATIVE_BIBLE.md`;
-- `technical/01_EXISTING_CODE_AUDIT.md`;
-- `00_DOCS_STRUCTURE_AND_GENERATION_PLAN.md`;
-- `production/IMPLEMENTATION_ITERATION_PLAN.md`.
+### Current project status
 
-Актуальный список статусов всегда смотреть в `PROJECT_STATE.yaml`.
-
----
-
-## 4. Иерархия источников истины
-
-При конфликте сначала проверяется `DECISIONS.md`.
-
-После него действует специализация документа.
-
-### Статус проекта
 1. `PROJECT_STATE.yaml`
 2. `TODO.md`
-3. roadmap/session plan
+3. production roadmap/session docs
 
-### Числа, production, цены, pacing
-1. `DECISIONS.md`
+### Cross-document design decisions
+
+1. `DECISIONS_RECONCILIATION.md` for topics it explicitly supersedes
+2. later accepted decision addenda relevant to the topic
+3. `DECISIONS.md`
+
+### Gameplay progression / phase meaning
+
+1. `DECISIONS_RECONCILIATION.md`
+2. `gdd/01_FIRST_120_MINUTES.md`
+3. `gdd/03_EVOLUTION_TREE.md`
+4. specialized GDD
+5. PRD
+
+### Numbers / production / pacing
+
+1. reconciliation decisions and gameplay semantics
 2. `gdd/02_ECONOMY_FIRST_120_MINUTES.md`
-3. `gdd/11_BALANCE_RULES.md` после его принятия для общих tuning rules
-4. специализированные GDD
-5. `gdd/01_FIRST_120_MINUTES.md`
-6. PRD
+3. `gdd/11_BALANCE_RULES.md`
+4. specialized GDD
+5. PRD
 
-### Evolution/tech/building/job graph
-1. `DECISIONS.md`
-2. `gdd/03_EVOLUTION_TREE.md` для биологического дерева
+Important:
+
+> Economy is a tuning source for approved gameplay. It cannot invent a new resource/generator/progression model solely for simulation convenience.
+
+### Evolution / tech / buildings / jobs
+
+1. reconciliation decisions
+2. `gdd/03_EVOLUTION_TREE.md`
 3. `gdd/04_CIVILIZATION_PROGRESSION.md`
 4. `gdd/05_BUILDINGS_AND_JOBS.md`
 5. `gdd/06_TECH_TREE.md`
-6. ранний GDD
 
-### Сюжет и тексты
-1. `DECISIONS.md`
-2. документы `scenario/`
+### Goals / events / ending
+
+1. reconciliation decisions
+2. `gdd/07_GOALS_AND_MILESTONES.md`
 3. `gdd/08_EVENTS_AND_CHOICES.md`
-4. PRD/GDD
+4. `gdd/09_ENDINGS_AND_RESET.md`
+5. scenario docs
 
-### UX
-1. `DECISIONS.md`
-2. документы `ux/`
-3. GDD
-4. PRD
+### Meta / balance
 
-### Арт/аудио
-1. `DECISIONS.md`
-2. `art/` и `audio/`
-3. UX/scenario requirements
-4. GDD
-5. PRD
+1. reconciliation decisions
+2. `gdd/10_META_PROGRESSION.md`
+3. `gdd/11_BALANCE_RULES.md`
 
-### Техническая реализация
-1. `DECISIONS.md`
-2. accepted `technical/` documents
-3. code audit
-4. implementation plan
-5. дизайн-документы как requirements
+### Technical implementation
 
-Код сам по себе не переписывает продуктовую спецификацию.
+1. reconciliation decisions for gameplay content
+2. accepted `technical/` architecture docs
+3. `production/IMPLEMENTATION_ITERATION_PLAN.md`
+4. code audit
+5. implementation code
+
+Code never silently overrides product specification.
 
 ---
 
-## 5. Design-session workflow
+## 4. Reconciled gameplay shorthand
 
-Полные правила: `production/STATE_WORKFLOW.md`.
+Canonical first Timeline now follows:
 
-Коротко:
+```text
+RNA
+→ Self Replication
+→ DNA
+→ Membrane
+→ Cell
+→ Metabolism
+→ Absorption / Symbiosis / Shell
+→ Multicellularity + Adaptation Points
+→ Nervous System
+→ Cognition
+→ Sapience
+→ Tribe
+→ Settlement
+→ City
+→ Industry
+→ Modern
+→ Atomic
+→ Great Filter
+→ Ash
+→ Archive
+```
 
-1. открыть `PROJECT_STATE.yaml`;
-2. взять только текущую `design.current_session`;
-3. прочитать её inputs;
-4. сделать весь связанный пакет в одном чате;
-5. пользователь проверяет;
-6. после approval документы становятся accepted;
-7. обновляются state/TODO/decisions/glossary;
-8. push;
-9. следующий блок начинается в новом чате.
+The following late-design improvements remain canonical:
 
-Не начинать следующий design block автоматически до review текущего.
-
----
-
-## 6. Роли
-
-### ChatGPT
-Отвечает за:
-- PRD/GDD;
-- сценарий и copy;
-- UX specifications;
-- балансные спецификации;
-- art direction и asset manifests;
-- generation prompts и производство артов;
-- audio direction и prompts;
-- согласованность документации;
-- обновление design state после approval.
-
-### Codex
-Отвечает за:
-- code audit;
-- архитектуру реализации в рамках accepted technical contract;
-- gameplay implementation;
-- UI implementation;
-- save/load;
-- тесты;
-- analytics hooks;
-- platform integrations;
-- performance/builds.
-
-Codex не должен самостоятельно придумывать missing gameplay rules или переводить design session в done.
+- generic Goal Engine;
+- data-driven config/branching;
+- save v1/recovery/autosave;
+- dev simulation/time scale;
+- telemetry;
+- Stability/World Tension;
+- Error 17;
+- `Снова.`;
+- Ash;
+- Chronicle/Archive;
+- idempotent reset;
+- Timeline #2 meta progression.
 
 ---
 
-## 7. Параллельная работа
+## 5. Superseded early content
 
-Текущий gate определяется `PROJECT_STATE.yaml`.
+The following may exist in git history or implementation baseline, but are not current reconciled player-facing canon:
 
-До принятия DS-03 implementation Codex в основном паузится, кроме безопасных baseline/research задач.
+- starting Energy / Information wallet;
+- Chemical Gradient;
+- Catalytic Fold;
+- Energy Pocket;
+- Stable Bond old economic semantics;
+- Sapience as a normal expensive E/B/I node at ~46 min;
+- first branch Photosynthesis/Chemosynthesis/Absorption;
+- second sibling branch purchase at ×2.5 in Timeline #1.
 
-После DS-03 разрешается параллельно:
-- продолжать narrative/UX/meta/art/audio design;
-- завершать Codex Iteration 0 baseline;
-- начинать Codex Iteration 1 после review technical contract.
-
-Если два потока реально работают одновременно, использовать отдельные branches согласно `STATE_WORKFLOW.md`.
-
----
-
-## 8. Scope текущего проекта
-
-Главная цель — первый Timeline:
-
-**Жизнь -> Разум -> Цивилизация -> Индустрия -> Атом -> Великий фильтр -> Пепел -> Архив -> Timeline #2 teaser.**
-
-Глубокий космос, Bioseed, universes и поздний контент не должны расширять scope текущего vertical slice.
+Historical references must be explicitly labelled `superseded`.
 
 ---
 
-## 9. Data-driven правило
+## 6. Implementation baseline
 
-Баланс, evolution/tech nodes, buildings, jobs, goals, events, rewards, narrative flags, endings и visual/audio IDs должны быть data-driven там, где это разумно для текущей legacy architecture.
+Accepted technical implementation baseline before content reconciliation:
 
-Не зашивать продуктовые данные в presentation layer без необходимости.
+`32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb`
+
+Meaning:
+
+```text
+KEEP architecture
+KEEP Goal Engine
+KEEP save/recovery
+KEEP dev tools/simulation
+REWORK early content/config
+REBALANCE early gameplay
+```
+
+Iteration 4 is blocked until the dedicated biological 0–10 reconciliation implementation passes simulation + manual playtest.
 
 ---
 
-## 10. Именование
+## 7. Workflow
 
-Основное название проекта во всех новых документах:
+Current order:
 
-# Хроники Эволюции
+```text
+document reconciliation
+→ approval
+→ biological 0–10 code rework
+→ rebalance
+→ manual playtest
+→ corrected Iteration 4
+→ further design sessions
+→ final design freeze v2
+```
 
-`Evolve` используется только для обозначения исходного open-source проекта/legacy engine.
+Before any Codex task, read `PROJECT_STATE.yaml` and the current iteration inputs.
+
+Do not use old git revisions as design authority when active docs explicitly mark them superseded.
