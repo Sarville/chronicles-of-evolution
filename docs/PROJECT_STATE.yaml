@@ -10,22 +10,14 @@ authority:
   project_status: "docs/PROJECT_STATE.yaml"
   human_todo_view: "docs/TODO.md"
   decisions: "docs/DECISIONS.md"
-  decisions_addendum: "docs/DECISIONS_DS03.md"
+  decisions_addenda:
+    - "docs/DECISIONS_DS03.md"
+    - "docs/DECISIONS_DS04.md"
   technical_contract: "docs/technical/00_TECHNICAL_OVERVIEW.md"
   glossary: "docs/GLOSSARY.md"
   design_session_plan: "docs/production/DESIGN_SESSION_PLAN.md"
   implementation_plan: "docs/production/IMPLEMENTATION_ITERATION_PLAN.md"
   implementation_handoff: "docs/production/DS03_CODEX_HANDOFF.md"
-
-status_values:
-  - todo
-  - ready
-  - active
-  - review
-  - done
-  - blocked
-  - paused
-  - partial
 
 workflow:
   user_review_required_before_session_done: true
@@ -36,247 +28,80 @@ workflow:
   push_after_approval: true
 
 design:
-  current_session: "DS-04"
-  last_completed_session: "DS-03"
+  current_session: "DS-05"
+  last_completed_session: "DS-04"
   sessions:
-    DS-00:
-      name: "Documentation orchestration and repository structure"
-      status: done
-      outputs:
-        - "docs/README.md"
-        - "docs/DECISIONS.md"
-        - "docs/GLOSSARY.md"
-        - "docs/TODO.md"
-        - "docs/PROJECT_STATE.yaml"
-        - "docs/production/DESIGN_SESSION_PLAN.md"
-        - "docs/production/STATE_WORKFLOW.md"
-    DS-01:
-      name: "Civilization gameplay contract"
-      status: done
-      depends_on: [DS-00]
-      outputs:
-        - "docs/gdd/04_CIVILIZATION_PROGRESSION.md"
-        - "docs/gdd/05_BUILDINGS_AND_JOBS.md"
-        - "docs/gdd/06_TECH_TREE.md"
-      notes:
-        - "2026-09-15: revision 1.1 pushed; entity roles, stable IDs, Goal/Event integration and implementation-facing contracts clarified without changing canonical economy values."
-    DS-02:
-      name: "Goals, events and first ending contract"
-      status: done
-      depends_on: [DS-01]
-      required_inputs:
-        - "docs/production/DS-02_PRODUCT_INPUTS.md"
-      required_principles:
-        - "future content discoverability: show scale of Archive/unknown content early without spoilers or false collection totals"
-        - "manual involvement without clicker grind: click starts a process/cycle, never linear +1 resource spam"
-        - "early manual process must evolve into self-replication and automation"
-        - "Archive Intervention exists as a future temporary resource boost hook; ads are not part of baseline balance"
-      outputs:
-        - "docs/gdd/07_GOALS_AND_MILESTONES.md"
-        - "docs/gdd/08_EVENTS_AND_CHOICES.md"
-        - "docs/gdd/09_ENDINGS_AND_RESET.md"
-      accepted_contracts:
-        - "G001-G024 define the first Timeline core-goal sequence"
-        - "World Tension is UI presentation of 100 - Stability, not a second independent meter"
-        - "Timeline #1 always converges to ENDING_ASH; choices affect subtype, Chronicle, flags and reward evaluation"
-        - "Archive Fragments (AF) are the spendable first-reset currency; Archive Memory is the meta-system name"
-        - "first reset target is 14-18 AF using the economy formula"
-        - "reset writes Chronicle/meta state before replacing run state and must be idempotent"
-    DS-03:
-      name: "Technical architecture and data contract"
-      status: done
-      depends_on: [DS-01, DS-02]
-      outputs:
-        - "docs/technical/00_TECHNICAL_OVERVIEW.md"
-        - "docs/technical/02_DOMAIN_ADAPTER.md"
-        - "docs/technical/03_GAME_STATE.md"
-        - "docs/technical/04_SAVE_ARCHITECTURE.md"
-        - "docs/technical/07_TESTING_STRATEGY.md"
-      accepted_contracts:
-        - "Strangler / anti-corruption architecture; no full Evolve rewrite"
-        - "Chronicles GameState is canonical authority for new Timeline gameplay"
-        - "gameplay config is serializable ESM under src/chronicles/config"
-        - "presentation mutates gameplay only through commands; domain emits immutable events and exposes selectors"
-        - "legacy global, jQuery, Vue/Buefy and DOM-coupled helpers are not public domain APIs"
-        - "new save namespace chronicles_evolution is versioned and separate from legacy evolved"
-        - "arbitrary legacy Evolve progress is not automatically migrated into Timeline #1"
-        - "run/meta/settings are persisted separately; derived prices/rates/World Tension are recalculated"
-        - "first reset uses recoverable pending/backup write and idempotent transaction IDs"
-        - "Iteration 1 is headless/domain-first and requires config/domain/save/simulation tests"
-        - "PlatformPort seam exists now; Yandex/VK SDK details remain DS-10"
-        - "production UI framework remains deferred to DS-06 / UI implementation"
+    DS-00: { name: "Documentation orchestration and repository structure", status: done }
+    DS-01: { name: "Civilization gameplay contract", status: done, depends_on: [DS-00] }
+    DS-02: { name: "Goals, events and first ending contract", status: done, depends_on: [DS-01] }
+    DS-03: { name: "Technical architecture and data contract", status: done, depends_on: [DS-01, DS-02] }
     DS-04:
       name: "Meta progression and balance rules"
-      status: ready
+      status: done
       depends_on: [DS-02, DS-03]
       outputs:
         - "docs/gdd/10_META_PROGRESSION.md"
         - "docs/gdd/11_BALANCE_RULES.md"
-    DS-05:
-      name: "Timeline #1 full narrative package"
-      status: ready
-      depends_on: [DS-02]
-      required_handoffs:
-        - "give narrative meaning to unknown/corrupted Archive records introduced by DS-02"
-      outputs:
-        - "docs/scenario/01_TIMELINE_01_SCRIPT.md"
-        - "docs/scenario/04_STORY_EVENTS.md"
-        - "docs/scenario/05_NARRATIVE_FLAGS.md"
-        - "docs/scenario/06_ENDINGS_COPY.md"
-        - "docs/scenario/07_COPY_GUIDE.md"
-    DS-06:
-      name: "UX architecture and wireframes"
-      status: ready
-      depends_on: [DS-01, DS-02, DS-03]
-      required_handoffs:
-        - "Archive/collection preview and visible scale of future content"
-        - "locked/unknown/corrupted content states and fogged future branches"
-        - "hidden achievements and incomplete Chronicle/Timeline states"
-        - "manual process-start interaction with busy/progress/visual payoff states"
-        - "UX transition from manual cycles to automation"
-        - "Archive Intervention UI: target resource, timer, charges and cooldown"
-      outputs:
-        - "docs/ux/00_UX_PRINCIPLES.md"
-        - "docs/ux/01_SCREEN_MAP.md"
-        - "docs/ux/02_MOBILE_WIREFRAMES.md"
-        - "docs/ux/03_DESKTOP_WIREFRAMES.md"
-        - "docs/ux/04_COMPONENT_STATES.md"
-        - "docs/ux/05_TUTORIAL_AND_HINTS.md"
-    DS-07:
-      name: "Art direction, locations and era transitions"
-      status: blocked
-      depends_on: [DS-05, DS-06]
-      outputs:
-        - "docs/art/00_ART_DIRECTION.md"
-        - "docs/art/01_LOCATIONS_AND_DIORAMAS.md"
-        - "docs/art/02_ERA_TRANSITIONS.md"
-    DS-08:
-      name: "Art production manifest and generation prompts"
-      status: blocked
-      depends_on: [DS-07]
-      outputs:
-        - "docs/art/03_BUILDINGS_AND_PROPS.md"
-        - "docs/art/04_ASSET_MANIFEST.md"
-        - "docs/art/05_GENERATION_PROMPTS.md"
-    DS-09:
-      name: "Audio design and generation package"
-      status: blocked
-      depends_on: [DS-05, DS-07]
-      outputs:
-        - "docs/audio/00_AUDIO_DIRECTION.md"
-        - "docs/audio/01_MUSIC_CUES.md"
-        - "docs/audio/02_AMBIENCE.md"
-        - "docs/audio/03_SFX_LIBRARY.md"
-        - "docs/audio/04_STINGERS.md"
-        - "docs/audio/05_GENERATION_PROMPTS.md"
-    DS-10:
-      name: "Analytics, platform and production readiness"
-      status: blocked
-      depends_on: [DS-03, DS-06]
-      required_handoffs:
-        - "rewarded-ad flow for Archive Intervention"
-        - "free charges, rewarded refill and cooldown/frequency rules"
-        - "ad unavailable/failure fallback"
-        - "Archive Intervention analytics and platform SDK mapping"
-        - "baseline progression must remain completable without ads"
-        - "balance limits for Archive Intervention upgrades"
-      outputs:
-        - "docs/technical/05_ANALYTICS_SCHEMA.md"
-        - "docs/technical/06_PLATFORM_INTEGRATION.md"
-        - "docs/production/CONTENT_PIPELINE.md"
-        - "docs/production/RELEASE_CHECKLIST.md"
-    DS-11:
-      name: "Cross-document consistency pass and design freeze v1"
-      status: blocked
-      depends_on: [DS-04, DS-05, DS-06, DS-08, DS-09, DS-10]
-      outputs:
-        - "accepted first-Timeline design baseline v1.0"
+        - "docs/DECISIONS_DS04.md"
+      accepted_contracts:
+        - "first reset target remains 14-18 AF; AF reward is idempotent and not multiplied by ads/meta"
+        - "Archive Recall is automatic after first reset for familiar pre-Sapience CORE: cost x0.75, production x1.25"
+        - "Timeline #2 Sapience p50 target is 20-28 minutes; no-spend 24-28, typical Tier1 20-25"
+        - "familiar CORE effective cost floor is 70%; pre-Sapience meta production cap is x1.60"
+        - "AR05 retains one OPTIONAL biological node after original prerequisites"
+        - "AR06 removes second cellular branch x2.5 penalty without dual numeric stacking"
+        - "AR09 allows one secondary biological trait at 65% numerical effect"
+        - "offline: Timeline #1 50%, AR04 60%, future hard cap 75%"
+        - "Archive Intervention balance envelope: x1.50, 120s base, <=180s, <=3 charges, no stacking"
+    DS-05: { name: "Timeline #1 full narrative package", status: ready, depends_on: [DS-02] }
+    DS-06: { name: "UX architecture and wireframes", status: ready, depends_on: [DS-01, DS-02, DS-03] }
+    DS-07: { name: "Art direction, locations and era transitions", status: blocked, depends_on: [DS-05, DS-06] }
+    DS-08: { name: "Art production manifest and generation prompts", status: blocked, depends_on: [DS-07] }
+    DS-09: { name: "Audio design and generation package", status: blocked, depends_on: [DS-05, DS-07] }
+    DS-10: { name: "Analytics, platform and production readiness", status: blocked, depends_on: [DS-03, DS-06] }
+    DS-11: { name: "Cross-document consistency pass and design freeze v1", status: blocked, depends_on: [DS-04, DS-05, DS-06, DS-08, DS-09, DS-10] }
 
 documentation:
-  foundation:
-    prd: done
-    first_120_gdd: done
-    economy_first_120: done
-    evolution_tree: done
-    narrative_bible: done
-    code_audit: done
-    docs_structure_plan: done
-    implementation_iteration_plan: done
-    decisions: done
-    glossary: done
-    project_state: done
-    state_workflow: done
-    design_session_plan: done
-    ds02_product_inputs: done
-  design_docs:
-    civilization_progression: done
-    buildings_and_jobs: done
-    tech_tree: done
-    goals_and_milestones: done
-    events_and_choices: done
-    endings_and_reset: done
-    technical_overview: done
-    domain_adapter: done
-    game_state: done
-    save_architecture: done
-    testing_strategy: done
+  foundation: done
+  ds01_gameplay_contract: done
+  ds02_goals_events_ending: done
+  ds03_technical_contract: done
+  meta_progression: done
+  balance_rules: done
+  narrative_package: ready
+  ux_package: ready
 
 implementation:
-  mode: resumed_after_DS03
+  mode: "resumed_after_DS03"
   current_iteration: 1
   resume_gate: "open"
   iterations:
-    0:
-      name: "Repo baseline and code audit"
-      status: done
-      completed:
-        - "static code audit"
-        - "architecture/module map"
-        - "game loop/resource/save/UI/platform reconnaissance"
-        - "baseline build confirmation (npm run build)"
-        - "baseline bundle size recorded"
-        - "baseline startup measurement recorded"
-        - "smoke command added (npm run smoke)"
+    0: { name: "Repo baseline and code audit", status: done }
     1:
       name: "Domain adapter and data foundation"
       status: ready
-      depends_on:
-        - "DS-03 approved"
-        - "Iteration 0 baseline tasks complete"
       required_inputs:
+        - "docs/production/DS03_CODEX_HANDOFF.md"
         - "docs/technical/00_TECHNICAL_OVERVIEW.md"
         - "docs/technical/02_DOMAIN_ADAPTER.md"
         - "docs/technical/03_GAME_STATE.md"
         - "docs/technical/04_SAVE_ARCHITECTURE.md"
         - "docs/technical/07_TESTING_STRATEGY.md"
-    2:
-      name: "Save v1 and dev tools"
-      status: blocked
-      depends_on: ["Implementation Iteration 1"]
+    2: { name: "Save v1 and dev tools", status: blocked, depends_on: ["Implementation Iteration 1"] }
 
 parallelization:
   now:
-    design: "DS-04"
-    codex: "start Iteration 1 using DS03_CODEX_HANDOFF"
-  after_DS_03:
-    design_can_continue_with:
-      - "DS-04"
-      - "DS-05"
-      - "DS-06"
-    codex_can_resume_with:
-      - "start Iteration 1 after DS-03 review and Iteration 0 baseline gate"
-  after_DS_05_and_DS_06:
-    parallel_design_tracks:
-      - "DS-07 art"
-      - "DS-09 audio after DS-07 direction is accepted"
+    design: "DS-05"
+    codex: "Implementation Iteration 1 using DS03_CODEX_HANDOFF"
+  also_ready: ["DS-06"]
 
 open_decisions:
-  - "Exact production UI framework / degree of Vue 2 reuse; resolve with DS-06 / UI implementation"
+  - "Exact production UI framework / degree of Vue 2 reuse; resolve in DS-06 / UI implementation"
   - "Exact Yandex/VK SDK mapping, cloud conflict policy and rewarded flow; resolve in DS-10"
-  - "TBD balance values explicitly marked in DS-01/DS-02 remain configurable until balance/meta review"
+  - "Remaining TBD/proposal balance values stay configurable until telemetry/testing"
   - "Visual branch scope / alternative endings / early Space-Bioseed remain future design decisions"
 
 next_action:
   owner: "Codex + ChatGPT/user in parallel"
-  session: "Implementation Iteration 1 + DS-04"
-  description: "Codex starts headless Domain Adapter/data foundation using DS03_CODEX_HANDOFF. In parallel, design proceeds with DS-04 meta progression and balance rules."
+  session: "Implementation Iteration 1 + DS-05"
+  description: "Codex continues headless Domain Adapter/data foundation using DS03_CODEX_HANDOFF; design proceeds with DS-05 Timeline #1 full narrative package."
