@@ -33,8 +33,8 @@ workflow:
   push_after_approval: true
 
 design:
-  current_session: "DS-02"
-  last_completed_session: "DS-01"
+  current_session: "DS-03"
+  last_completed_session: "DS-02"
   sessions:
     DS-00:
       name: "Documentation orchestration and repository structure"
@@ -55,9 +55,11 @@ design:
         - "docs/gdd/04_CIVILIZATION_PROGRESSION.md"
         - "docs/gdd/05_BUILDINGS_AND_JOBS.md"
         - "docs/gdd/06_TECH_TREE.md"
+      notes:
+        - "2026-09-15: revision 1.1 pushed; entity roles, stable IDs, Goal/Event integration and implementation-facing contracts clarified without changing canonical economy values."
     DS-02:
       name: "Goals, events and first ending contract"
-      status: ready
+      status: done
       depends_on: [DS-01]
       required_inputs:
         - "docs/production/DS-02_PRODUCT_INPUTS.md"
@@ -70,9 +72,16 @@ design:
         - "docs/gdd/07_GOALS_AND_MILESTONES.md"
         - "docs/gdd/08_EVENTS_AND_CHOICES.md"
         - "docs/gdd/09_ENDINGS_AND_RESET.md"
+      accepted_contracts:
+        - "G001-G024 define the first Timeline core-goal sequence"
+        - "World Tension is UI presentation of 100 - Stability, not a second independent meter"
+        - "Timeline #1 always converges to ENDING_ASH; choices affect subtype, Chronicle, flags and reward evaluation"
+        - "Archive Fragments (AF) are the spendable first-reset currency; Archive Memory is the meta-system name"
+        - "first reset target is 14-18 AF using the economy formula"
+        - "reset writes Chronicle/meta state before replacing run state and must be idempotent"
     DS-03:
       name: "Technical architecture and data contract"
-      status: blocked
+      status: ready
       depends_on: [DS-01, DS-02]
       outputs:
         - "docs/technical/00_TECHNICAL_OVERVIEW.md"
@@ -82,14 +91,14 @@ design:
         - "docs/technical/07_TESTING_STRATEGY.md"
     DS-04:
       name: "Meta progression and balance rules"
-      status: blocked
+      status: ready
       depends_on: [DS-02]
       outputs:
         - "docs/gdd/10_META_PROGRESSION.md"
         - "docs/gdd/11_BALANCE_RULES.md"
     DS-05:
       name: "Timeline #1 full narrative package"
-      status: blocked
+      status: ready
       depends_on: [DS-02]
       required_handoffs:
         - "give narrative meaning to unknown/corrupted Archive records introduced by DS-02"
@@ -101,7 +110,7 @@ design:
         - "docs/scenario/07_COPY_GUIDE.md"
     DS-06:
       name: "UX architecture and wireframes"
-      status: blocked
+      status: ready
       depends_on: [DS-01, DS-02]
       required_handoffs:
         - "Archive/collection preview and visible scale of future content"
@@ -187,9 +196,9 @@ documentation:
     civilization_progression: done
     buildings_and_jobs: done
     tech_tree: done
-    goals_and_milestones: todo
-    events_and_choices: todo
-    endings_and_reset: todo
+    goals_and_milestones: done
+    events_and_choices: done
+    endings_and_reset: done
 
 implementation:
   mode: paused_for_design_contract
@@ -221,7 +230,7 @@ implementation:
 
 parallelization:
   now:
-    design: "DS-02"
+    design: "DS-03"
     codex: "paused"
   after_DS_03:
     design_can_continue_with:
@@ -241,10 +250,8 @@ open_decisions:
   - "Canonical gameplay config format"
   - "Legacy save compatibility strategy versus clean new save wrapper"
   - "Portal SDK abstraction details"
-  - "Visible World Tension versus Stability + risk explanation"
-  - "User-facing name of Archive permanent currency"
 
 next_action:
   owner: "ChatGPT + user review"
-  session: "DS-02"
-  description: "Design goals/milestones, discoverability/reveal hooks, early manual-process onboarding, meaningful events/choices, crisis flow, Ash ending and reset contract for Timeline #1."
+  session: "DS-03"
+  description: "Define technical architecture, legacy/new-domain boundary, normalized game state, stable entity schemas, save/migration contract and test seams so Codex can resume implementation without inventing domain rules."
