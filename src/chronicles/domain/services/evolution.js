@@ -14,15 +14,16 @@ export function prerequisitesMet(state, entity) {
   return true;
 }
 
-export function branchAvailable(state, node) {
+export function branchAvailable(state, ruleset, node) {
   if (!node.branchGroup) {
     return true;
   }
   const selected = state.run.nodes.selectedBranchByGroup[node.branchGroup];
-  if (node.branchGroup === 'metabolism_1') {
+  if (!selected || selected === node.id) {
     return true;
   }
-  return !selected || selected === node.id;
+  const rule = ruleset.branchCostRules?.[node.branchGroup];
+  return rule?.allowAdditionalBranches === true;
 }
 
 export function branchCostMultiplier(state, ruleset, node) {

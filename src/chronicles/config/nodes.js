@@ -5,6 +5,7 @@ export const branchGroups = {
 
 export const branchCostRules = {
   metabolism_1: {
+    allowAdditionalBranches: true,
     additionalBranchCostMultiplier: 2.5,
     waiveWithArchiveNodeId: 'AR06',
   },

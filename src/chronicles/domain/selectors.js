@@ -20,7 +20,7 @@ export function selectNodeStatus(state, ruleset, nodeId) {
   if (state.run.nodes.completed[nodeId]) {
     return 'completed';
   }
-  if (!prerequisitesMet(state, node) || !branchAvailable(state, node)) {
+  if (!prerequisitesMet(state, node) || !branchAvailable(state, ruleset, node)) {
     return 'locked';
   }
   const cost = selectNodeCost(state, ruleset, nodeId);

@@ -27,6 +27,15 @@ const invalidCap = validateRuleset(invalidCapRuleset);
 assert.equal(invalidCap.ok, false);
 assert.equal(invalidCap.errors.some((error) => error.includes('invalid baseCap')), true);
 
+const invalidBranchRuleRuleset = clone(ruleset);
+invalidBranchRuleRuleset.branchCostRules.metabolism_1.allowAdditionalBranches = 'true';
+const invalidBranchRule = validateRuleset(invalidBranchRuleRuleset);
+assert.equal(invalidBranchRule.ok, false);
+assert.equal(
+  invalidBranchRule.errors.includes('metabolism_1 has non-boolean allowAdditionalBranches'),
+  true
+);
+
 const unmarkedDeferredRuleset = clone(ruleset);
 unmarkedDeferredRuleset.nodes[0].effects[0] = { type: 'manual_gain_multiplier', value: 2 };
 const unmarkedDeferred = validateRuleset(unmarkedDeferredRuleset);

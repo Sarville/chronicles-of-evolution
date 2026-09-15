@@ -146,6 +146,9 @@ export function validateRuleset(ruleset) {
     if (!ruleset.branchGroups[groupId]) {
       errors.push(`${groupId} has branch cost rule without branch group`);
     }
+    if (rule.allowAdditionalBranches != null && typeof rule.allowAdditionalBranches !== 'boolean') {
+      errors.push(`${groupId} has non-boolean allowAdditionalBranches`);
+    }
     if (
       rule.additionalBranchCostMultiplier != null &&
       (!Number.isFinite(rule.additionalBranchCostMultiplier) || rule.additionalBranchCostMultiplier < 1)

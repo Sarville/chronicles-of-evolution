@@ -149,6 +149,17 @@ assert.equal(Boolean(branchEngine.state.run.nodes.completed.C01B), true);
 assert.equal(branchEngine.state.run.nodes.selectedBranchByGroup.metabolism_1, 'C01B');
 assert.equal(selectProducerPrice(branchEngine.state, ruleset, 'GEN_ENERGY_POCKET').energy, 33);
 
+const cultureBranchEngine = createChroniclesEngine({ ruleset });
+cultureBranchEngine.state.run.eraId = 'EARLY_CIV';
+cultureBranchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'food', amount: 1000 });
+cultureBranchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'materials', amount: 1000 });
+cultureBranchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'knowledge', amount: 1000 });
+result = cultureBranchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'T01A' });
+assert.equal(result.ok, true);
+assert.equal(cultureBranchEngine.state.run.nodes.selectedBranchByGroup.culture_1, 'T01A');
+assert.equal(selectNodeStatus(cultureBranchEngine.state, ruleset, 'T01B'), 'locked');
+assert.equal(selectNodeStatus(cultureBranchEngine.state, ruleset, 'T01C'), 'locked');
+
 assert.equal(producerMilestoneMultiplier(9), 1);
 assert.equal(producerMilestoneMultiplier(10), 2);
 assert.equal(producerMilestoneMultiplier(25), 4);

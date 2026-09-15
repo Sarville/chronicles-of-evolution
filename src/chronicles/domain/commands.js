@@ -82,7 +82,7 @@ function buyNode(state, ruleset, nodeId, ports) {
   if (state.run.nodes.completed[nodeId]) {
     return rejected('NODE_ALREADY_COMPLETED', { nodeId });
   }
-  if (!prerequisitesMet(state, node) || !branchAvailable(state, node)) {
+  if (!prerequisitesMet(state, node) || !branchAvailable(state, ruleset, node)) {
     return rejected('PREREQUISITES_NOT_MET', { nodeId });
   }
   const populationCheck = assertPopulationRequirement(state, node);
