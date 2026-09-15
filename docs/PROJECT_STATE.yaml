@@ -33,8 +33,8 @@ workflow:
   push_after_approval: true
 
 design:
-  current_session: "DS-01"
-  last_completed_session: "DS-00"
+  current_session: "DS-02"
+  last_completed_session: "DS-01"
   sessions:
     DS-00:
       name: "Documentation orchestration and repository structure"
@@ -49,7 +49,7 @@ design:
         - "docs/production/STATE_WORKFLOW.md"
     DS-01:
       name: "Civilization gameplay contract"
-      status: ready
+      status: done
       depends_on: [DS-00]
       outputs:
         - "docs/gdd/04_CIVILIZATION_PROGRESSION.md"
@@ -57,7 +57,7 @@ design:
         - "docs/gdd/06_TECH_TREE.md"
     DS-02:
       name: "Goals, events and first ending contract"
-      status: blocked
+      status: ready
       depends_on: [DS-01]
       outputs:
         - "docs/gdd/07_GOALS_AND_MILESTONES.md"
@@ -159,10 +159,13 @@ documentation:
     project_state: done
     state_workflow: done
     design_session_plan: done
-  current_block:
-    civilization_progression: todo
-    buildings_and_jobs: todo
-    tech_tree: todo
+  design_docs:
+    civilization_progression: done
+    buildings_and_jobs: done
+    tech_tree: done
+    goals_and_milestones: todo
+    events_and_choices: todo
+    endings_and_reset: todo
 
 implementation:
   mode: paused_for_design_contract
@@ -194,7 +197,7 @@ implementation:
 
 parallelization:
   now:
-    design: "DS-01"
+    design: "DS-02"
     codex: "paused"
   after_DS_03:
     design_can_continue_with:
@@ -219,5 +222,5 @@ open_decisions:
 
 next_action:
   owner: "ChatGPT + user review"
-  session: "DS-01"
-  description: "Design civilization progression, buildings/jobs and technology tree as one coherent gameplay contract for 46-108 minutes."
+  session: "DS-02"
+  description: "Design goals/milestones, meaningful events/choices, crisis flow, Ash ending and reset contract for Timeline #1."
