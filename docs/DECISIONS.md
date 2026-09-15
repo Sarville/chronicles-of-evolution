@@ -1,123 +1,549 @@
 # Хроники Эволюции — Decisions
 
-**Consolidated:** 2026-09-15 after DS-03 approval.  
-Этот файл фиксирует принятые решения, имеющие приоритет над более ранними общими формулировками. Консолидация сокращает формулировки, но не меняет смысл ранее принятых DEC-001–DEC-022.
+Этот файл фиксирует решения, которые имеют приоритет над более ранними или общими формулировками в других документах.
+
+Каждое новое решение добавляется отдельной записью.
+
+---
+
+## Формат записи
+
+```text
+## DEC-XXX — Название
+
+Status: accepted / proposed / superseded
+Date: YYYY-MM-DD
+
+Decision:
+...
+
+Reason:
+...
+
+Affected documents:
+...
+
+Implementation consequence:
+...
+```
 
 ---
 
 ## DEC-001 — Название проекта
-**Status:** accepted  
-Основное название во всей новой документации и новом UI: **Хроники Эволюции**. Legacy Evolve допускается только как название исходного кода/истории миграции.
 
-## DEC-002 — Первый релизуемый vertical slice
 **Status:** accepted  
-Timeline #1: жизнь → разум → цивилизация → индустрия → атом → кризис → Пепел → reset → teaser Timeline #2. Цель первого run ≈120 минут.
+**Date:** 2026-09-15
+
+### Decision
+
+Основное название проекта во всей новой документации:
+
+**Хроники Эволюции**
+
+Старое рабочее название может упоминаться только при описании исходного проекта Evolve или истории миграции.
+
+### Implementation consequence
+
+- UI copy и новые документы используют «Хроники Эволюции».
+- Имена внутренних legacy-модулей не требуется массово переименовывать без причины.
+- Ребрендинг исходного кода выполняется отдельно от domain refactor.
+
+---
+
+## DEC-002 — Первый релизуемый вертикальный срез
+
+**Status:** accepted  
+**Date:** 2026-09-15
+
+### Decision
+
+Первый обязательный playable slice покрывает Timeline #1:
+
+**возникновение жизни → разум → цивилизация → индустрия → атом → кризис → Пепел → первый reset → teaser Timeline #2.**
+
+Целевое время первого полного прохождения — примерно 120 минут.
+
+### Reason
+
+Это минимальный объём, который показывает основную продуктовую формулу: progression, meaningful choice, визуальную эволюцию, ending и prestige/reset.
+
+---
 
 ## DEC-003 — Числовой source of truth
-**Status:** accepted  
-`docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md` — authority по production values, prices, rates и milestone timings.
 
-## DEC-004 — Milestone times Timeline #1
 **Status:** accepted  
-Self Replication 2m; Proto-cell 10m; Multicellularity 26m; Sapience 46m; Tribe 56m; Agriculture 62m; City 80m; Industry 94m; Atomic 108m; Ash ~116m; reset ~120m. Это target windows, кроме явно заданных crisis clamps.
+**Date:** 2026-09-15
 
-## DEC-005 — Ресурсы ранней биологии
+### Decision
+
+Для production values, breakthrough prices, production rates, milestone timings и crisis timing главным источником является:
+
+`docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md`
+
+Если ранний GDD содержит другие числа или времена, он трактуется как концептуальный документ, а экономика — как актуальная tuning specification.
+
+### Consequence
+
+Codex не должен брать цены и тайминги из ранних разделов GDD, если соответствующее значение уже определено в economy document.
+
+---
+
+## DEC-004 — Канонические milestone times Timeline #1
+
 **Status:** accepted  
-Основные runtime currencies: Energy, Information, Biomass. RNA/DNA остаются thematic/content concepts до отдельного решения.
+**Date:** 2026-09-15
+
+### Decision
+
+Для реализации и telemetry используются следующие целевые точки:
+
+| Milestone | Target |
+|---|---:|
+| Self Replication | 02:00 |
+| Proto-cell | 10:00 |
+| Multicellularity | 26:00 |
+| Sapience | 46:00 |
+| Tribe | 56:00 |
+| Agriculture | 62:00 |
+| City | 80:00 |
+| Industry | 94:00 |
+| Atomic Age | 108:00 |
+| Ash | ~116:00 |
+| Reset | ~120:00 |
+
+Это target windows, а не жёсткие таймеры, кроме сюжетных clamps кризиса.
+
+---
+
+## DEC-005 — Ресурсная модель ранней биологии
+
+**Status:** accepted  
+**Date:** 2026-09-15
+
+### Decision
+
+Для текущей implementation specification основными числовыми ресурсами биологической части являются:
+
+- `Energy`;
+- `Information`;
+- `Biomass`.
+
+RNA/DNA остаются частью тематики, текста, технологий и визуального языка, но не обязаны существовать как отдельные глобальные runtime currencies в первом вертикальном срезе.
+
+### Reason
+
+Числовая экономика и дерево эволюции уже согласованы вокруг Energy / Information / Biomass.
+
+### Consequence
+
+Если позднее решено вернуть RNA/DNA как отдельные currencies, это оформляется новым decision record и отдельным rebalance pass.
+
+---
 
 ## DEC-006 — Resource visibility
+
 **Status:** accepted  
-UI показывает контекстные ресурсы текущей эры, а не весь список валют одновременно.
+**Date:** 2026-09-15
+
+### Decision
+
+Игрок не должен видеть все существующие ресурсы одновременно.
+
+Целевые наборы:
+
+- molecular: Energy / Information;
+- cellular: Energy / Information / Biomass;
+- civilization: Food / Materials / Knowledge / Population;
+- industry: Food / Materials / Knowledge / Power / Population;
+- crisis: Materials / Knowledge / Power / Stability.
+
+UI показывает главным образом контекстные ресурсы текущей эры.
+
+---
 
 ## DEC-007 — Первый ending неизбежен
+
 **Status:** accepted  
-Timeline #1 всегда приводит к `ENDING_ASH`. Выборы меняют путь, subtype, Chronicle, flags и reward evaluation, но не отменяют первый Ash.
+**Date:** 2026-09-15
+
+### Decision
+
+В Timeline #1 ending **«Пепел»** сюжетно неизбежен.
+
+Игрок может влиять на:
+
+- путь к кризису;
+- Stability;
+- варианты финального события;
+- Chronicle;
+- награду;
+- narrative flags.
+
+Но идеальная экономика не должна позволять отменить первый ending.
+
+### Reason
+
+Первый ending является обучением prestige/reset и главным сюжетным reveal.
+
+---
 
 ## DEC-008 — Reset не является поражением
+
 **Status:** accepted  
-Reset — завершение истории и перенос Памяти Архива. Run resources/buildings/jobs/normal tech reset; Archive/Chronicle/achievements/persistent flags сохраняются по contract.
+**Date:** 2026-09-15
+
+### Decision
+
+Reset представляется как завершённая история цивилизации и перенос Памяти Архива.
+
+Перед подтверждением reset игроку явно показывается:
+
+### Сохраняется
+- Archive progression;
+- Chronicle;
+- achievements;
+- открытые записи и flags;
+- предусмотренные permanent rewards.
+
+### Сбрасывается
+- ресурсы run;
+- population;
+- buildings;
+- обычные technologies текущего Timeline.
+
+---
 
 ## DEC-009 — Data-driven gameplay
+
 **Status:** accepted  
-Evolution nodes, technologies, buildings, jobs, goals, events, costs/effects, narrative flags и endings должны быть data-driven настолько, насколько позволяет архитектура.
+**Date:** 2026-09-15
+
+### Decision
+
+Следующие сущности должны быть data-driven настолько, насколько это позволяет существующая архитектура:
+
+- evolution nodes;
+- technologies;
+- buildings;
+- jobs;
+- goals;
+- quests;
+- events;
+- costs;
+- effects;
+- narrative flags;
+- endings.
+
+UI не должен быть источником gameplay state.
+
+---
 
 ## DEC-010 — Не переписывать engine без доказанной необходимости
+
 **Status:** accepted  
-Legacy subsystems адаптируются/переиспользуются, если это безопаснее полного rewrite. Mass cleanup/rewrite запрещён без отдельного доказательства.
+**Date:** 2026-09-15
+
+### Decision
+
+Существующую логику Evolve нужно переиспользовать, если она соответствует новой модели или может быть адаптирована через domain/presentation adapter.
+
+Полный rewrite допустим только для подсистемы, если code audit показывает, что адаптация:
+
+- сложнее;
+- рискованнее;
+- хуже тестируется;
+- сильнее связывает новый UI с legacy DOM.
+
+---
 
 ## DEC-011 — Новый UI поверх normalized state
+
 **Status:** accepted  
-Между gameplay и presentation существует normalized state; UI не зависит от множества legacy DOM selectors/side effects.
+**Date:** 2026-09-15
+
+### Decision
+
+Между legacy logic и новым интерфейсом должен существовать слой нормализованного состояния.
+
+Он должен предоставлять UI:
+
+- current resources;
+- production;
+- milestone;
+- goals;
+- evolution state;
+- civilization state;
+- story flags;
+- visual state;
+- crisis state;
+- meta state.
+
+Новый UI не должен напрямую зависеть от большого количества legacy DOM selectors или внутренних side effects.
+
+---
 
 ## DEC-012 — Mobile-first
+
 **Status:** accepted  
-Основной UX mobile-first; primary interactions без hover; touch targets ≥44 px; диорама остаётся главным визуальным элементом.
+**Date:** 2026-09-15
+
+### Decision
+
+Основной UX проектируется mobile-first.
+
+Главные interactions не требуют hover.
+
+Основные touch targets — не менее 44 px.
+
+Диорама остаётся главным визуальным элементом экрана.
+
+---
 
 ## DEC-013 — Итерационная реализация
+
 **Status:** accepted  
-Codex реализует последовательные playable/testable slices. Нельзя сначала построить все systems в полурабочем состоянии.
+**Date:** 2026-09-15
+
+### Decision
+
+Codex реализует проект последовательными playable slices.
+
+Запрещён подход:
+
+> «сначала реализовать все системы, потом собрать игру».
+
+Каждая крупная итерация должна заканчиваться работающим участком progression и проверяемым Definition of Done.
+
+---
 
 ## DEC-014 — Dev time acceleration
+
 **Status:** accepted  
-Debug time scale минимум: 1× / 5× / 20× / 100×. Production UI его не показывает.
+**Date:** 2026-09-15
+
+### Decision
+
+Для разработки и QA обязательно предусмотреть debug time scale.
+
+Минимальные режимы:
+
+- 1×;
+- 5×;
+- 20×;
+- 100×.
+
+Debug acceleration не попадает в production UI.
+
+---
 
 ## DEC-015 — Реклама не участвует в базовом балансе
+
 **Status:** accepted  
-Timeline #1 полностью проходим без ads. Rewarded может ускорять, но не является обязательным.
+**Date:** 2026-09-15
+
+### Decision
+
+Первый Timeline должен укладываться в целевой balance window без rewarded/interstitial ads.
+
+Rewarded может ускорять прогресс, но не должен быть необходим для прохождения.
+
+---
 
 ## DEC-016 — Арт как layered diorama
-**Status:** accepted  
-Мир собирается слоями и thresholds, а не симулируется как полноценный city builder.
 
-## DEC-017 — Контент отделён от implementation
 **Status:** accepted  
-Canonical scenario/copy/art/audio specs формируются документацией; Codex интегрирует, а не самостоятельно придумывает канонический контент.
+**Date:** 2026-09-15
+
+### Decision
+
+Главный мир не реализуется как полноценный city builder.
+
+Визуальный state собирается слоями:
+
+- background;
+- terrain;
+- settlement;
+- landmarks;
+- production overlays;
+- moving props;
+- environment;
+- VFX.
+
+Это позволяет менять эпоху и ветвление без симуляции тысяч индивидуальных объектов.
+
+---
+
+## DEC-017 — Контент создаётся отдельно от имплементации
+
+**Status:** accepted  
+**Date:** 2026-09-15
+
+### Decision
+
+Сценарные тексты, арт-спецификации, asset manifests, generation prompts и audio specs создаются в документации до или параллельно implementation.
+
+Codex занимается интеграцией и программной частью, а не самостоятельно формирует канонический контент проекта.
+
+---
 
 ## DEC-018 — Каноническая цивилизационная модель Timeline #1
-**Status:** accepted  
-Food/Materials/Knowledge/Population, Power после City; DS-01 jobs/buildings/T-S-I-A nodes. Deferred ранние концепты не становятся обязательными runtime entities без нового решения.
 
-## DEC-019 — Профессии сменяются по фазам
 **Status:** accepted  
-Displayed job set заменяется на актуальный по эпохе; старые профессии не остаются параллельными production paths.
+**Date:** 2026-09-15
+
+### Decision
+
+Для gameplay v1 в диапазоне примерно 46–108 минут каноническая модель использует:
+
+- Food / Materials / Knowledge / Population;
+- Power после City;
+- фазовые jobs из DS-01;
+- buildings/infrastructure из economy specification;
+- культурные и технологические branches T01–A06.
+
+Следующие ранние GDD-концепты не являются отдельными обязательными gameplay entities v1 без нового balance decision:
+
+- Merchant как отдельный job;
+- Wood / Stone / Metal как отдельные global currencies;
+- industrial Energy как отдельный ресурс вместо Power;
+- Radio и Computing precursor как обязательные tech prerequisites;
+- отдельная Global Civilization economy era;
+- отдельные pre-crisis Atomic Lab / Research Reactor buildings.
+
+Trade-lite представлен Market + Exchange. Ранние generic названия Power Plant / Motor маппятся на текущие Steam Plant / Grid Station / Mechanization / Electrical Grid.
+
+### Affected documents
+
+- `docs/gdd/04_CIVILIZATION_PROGRESSION.md`
+- `docs/gdd/05_BUILDINGS_AND_JOBS.md`
+- `docs/gdd/06_TECH_TREE.md`
+
+### Implementation consequence
+
+Codex не должен создавать перечисленные deferred entities как обязательные runtime systems без обновления GDD и balance model.
+
+---
+
+## DEC-019 — Профессии сменяются по фазам, а не накапливаются
+
+**Status:** accepted  
+**Date:** 2026-09-15
+
+### Decision
+
+Каждая цивилизационная фаза имеет один активный displayed job set:
+
+- Tribe;
+- Settlement;
+- City;
+- Industry.
+
+После перехода в следующую фазу устаревшие job labels не продолжают существовать как параллельные способы производить тот же ресурс. Точный алгоритм переноса назначенной Population определяется в DS-03/DS-06.
+
+### Reason
+
+Это сохраняет читаемый People/Jobs UI и не создаёт параллельные production paths, которых нет в балансе.
+
+### Implementation consequence
+
+Data model должна поддерживать phase-aware job availability и безопасную migration/reassignment логику.
+
+---
 
 ## DEC-020 — Tribe structures unique, поздняя infrastructure stackable
-**Status:** accepted  
-Tribal structures из DS-01 — unique phase structures; более поздняя infrastructure с growth — stackable. Producer milestones применяются только к явно tagged producers.
 
-## DEC-021 — Ранний интерфейс показывает масштаб неизвестного контента
 **Status:** accepted  
-Использовать known/locked/unknown/corrupted/discovered states, silhouettes/fogged branches/Archive language; не показывать ложные collection totals.
+**Date:** 2026-09-15
 
-## DEC-022 — Ручной input запускает процесс
-**Status:** accepted  
-Manual input запускает timed process/cycle, а не линейный `+1`. Progression: manual → self-replication/semi-auto → automation. Archive Intervention — отдельный будущий temporary boost hook.
+### Decision
 
-## DEC-023 — Strangler architecture для нового gameplay
-**Status:** accepted  
-**Date:** 2026-09-15  
-Timeline #1 реализуется в новом isolated domain (`src/chronicles`) поверх anti-corruption adapters. Legacy Evolve не является каноническим state нового gameplay и не переписывается целиком.
+В Timeline #1:
 
-## DEC-024 — Canonical GameState, commands/events/selectors и ESM config
-**Status:** accepted  
-**Date:** 2026-09-15  
-Новый `Chronicles GameState` — единственный runtime authority. Presentation посылает commands, domain применяет validation/mutations, эмитит immutable domain events и отдаёт selectors/view models. Canonical config — plain serializable ESM `.js` без DOM, arbitrary functions и `global` dependencies.
+- Hearth, Shelter, Tool Bench, Hunting Ground, Story Circle и Clan Camp — unique phase structures;
+- Settlement / City / Industry infrastructure с заданным growth factor — stackable;
+- production count milestones 10/25/50 не применяются автоматически к unique Tribe structures.
 
-## DEC-025 — Новый save namespace и migration policy
-**Status:** accepted  
-**Date:** 2026-09-15  
-Новый save использует versioned `chronicles_evolution` + backup/pending. Legacy `localStorage['evolved']` сохраняется нетронутым и не конвертируется автоматически в Timeline #1. Save разделяет schemaVersion/rulesetVersion и использует recoverable writes.
+### Reason
 
-## DEC-026 — Reset transaction и headless test contract
+В economy specification tribal structures имеют фиксированную цену без growth, тогда как поздние buildings явно имеют Base cost + Growth.
+
+### Implementation consequence
+
+Building schema должна различать unique structures и stackable infrastructure.
+
+---
+
+## DEC-021 — Ранний интерфейс должен показывать масштаб неизвестного контента
+
 **Status:** accepted  
-**Date:** 2026-09-15  
-Ending/reset формируется как idempotent transaction: immutable Timeline Summary + meta rewards + transaction ID + новый run коммитятся единым recoverable candidate. До расширения gameplay обязательны headless domain/config/save tests и ускоренная simulation. Clock/RNG/storage/platform/localization — injectable ports.
+**Date:** 2026-09-15
+
+### Decision
+
+Уже в первые минуты игрок должен понимать, что текущая стадия — малая часть большого Архива. Игра заранее показывает существование будущих ветвей, Chronicle/Timeline records, anomalies, outcomes, achievements и других областей, но скрывает содержание и сюжетные спойлеры.
+
+Locked content подаётся через язык Архива (`???`, повреждённые/неизвестные записи, silhouettes, fogged branches, incomplete collections), а не только через однообразные серые замки.
+
+Фиксированные collection totals нельзя показывать для контента, который ещё не существует или не гарантирован release scope.
+
+### Reason
+
+Первый Timeline должен продавать не только следующий upgrade, но и долгосрочное чувство исследования, коллекционирования историй и открытия неизвестных слоёв игры.
+
+### Affected documents
+
+- `docs/production/DS-02_PRODUCT_INPUTS.md`
+- DS-02 goals/reveal hooks;
+- DS-05 narrative package;
+- DS-06 UX/locked states.
+
+### Implementation consequence
+
+Domain/presentation state должен уметь различать как минимум known/open, known/locked, unknown/corrupted и discovered content states там, где это требуется UX contract.
+
+---
+
+## DEC-022 — Ручной input запускает процесс, а не даёт +1 ресурс
+
+**Status:** accepted  
+**Date:** 2026-09-15
+
+### Decision
+
+В ранней игре ручной клик сохраняется для ощущения причастности, но означает запуск timed process/cycle: реакции, каталитического процесса, клеточного деления или аналогичного действия. Один клик не должен линейно выдавать `+1 ресурс`, а постоянный spam clicking не является оптимальной стратегией.
+
+С progression ручная зависимость должна естественно исчезать:
+
+**manual process → self-replication / semi-auto → automation.**
+
+После автоматизации активное вмешательство может вернуться как редкая способность `Archive Intervention`: временный boost выбранного ресурса. Позднее эта способность может быть связана с rewarded ad, но baseline pacing обязан оставаться полностью проходимым без рекламы.
+
+### Reason
+
+Это сохраняет tactile involvement и зрелищность раннего зарождения жизни, не превращая игру в clicker grind и не создавая autoclicker abuse.
+
+### Affected documents
+
+- `docs/production/DS-02_PRODUCT_INPUTS.md`;
+- DS-02 onboarding/goals;
+- DS-04 возможные meta-upgrades;
+- DS-06 UX states;
+- DS-10 rewarded/platform/analytics contract.
+
+### Implementation consequence
+
+Early manual actions требуют duration/busy/progress state и пакетного результата. DS-06 обязан определить interaction/feedback, DS-10 — rewarded flow, charges/cooldowns/fallback/analytics и monetization limits Archive Intervention.
 
 ---
 
 # Open decisions
 
-- production UI framework / точная степень reuse Vue 2 — закрыть в DS-06 / UI implementation;
-- точная Yandex/VK SDK mapping, rewarded flow и cloud conflict policy — DS-10;
-- явно помеченные TBD/proposal balance values DS-01/DS-02 — отдельный balance/meta review, не скрытые constants;
-- scope альтернативных endings и позднего Space/Bioseed за пределами первого vertical slice — отдельные будущие решения.
+Следующие вопросы пока требуют отдельного решения:
+
+- точный framework нового UI после code audit;
+- формат gameplay configs;
+- использовать ли текущий save format или вводить новый versioned wrapper;
+- точная архитектура portal SDK abstraction;
+- набор визуальных ветвей для первого публичного билда;
+- какие альтернативные endings войдут в Release 1 помимо «Пепла»;
+- точный scope раннего Space/Bioseed в Release 1.
