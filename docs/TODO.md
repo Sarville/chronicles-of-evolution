@@ -124,6 +124,13 @@ Correction pass:
 - [x] corrupt-all recovery returns explicit `RECOVERY_REQUIRED` instead of silently creating a new run;
 - [x] Iteration 3 not started.
 
+Micro-fix:
+
+- [x] reset transaction ID is canonical and stable: `timeline_001_ending_ENDING_ASH`;
+- [x] `createdAtSimulationMs` is informational, not part of idempotency identity;
+- [x] `meta.appliedTransactions` is canonical array-of-IDs;
+- [x] regression test covers retry with different simulation timestamps.
+
 ---
 
 # Next implementation
@@ -192,5 +199,5 @@ DS-06 UX также ready и может идти после/параллельн
 
 Параллельно:
 
-1. **Codex:** остановиться после Iteration 2 correction pass gate; Iteration 3 запускать только по отдельному подтверждению.
+1. **Codex:** остановиться после Iteration 2 micro-fix gate; Iteration 3 запускать только по отдельному подтверждению.
 2. **ChatGPT/user:** DS-05 — Timeline #1 full narrative package.

@@ -167,7 +167,7 @@ const preparedTransaction = prepareResetTransaction(preparedResetSource, {
 });
 const generatedTransaction = createResetTransaction(preparedResetSource);
 assert.equal(generatedTransaction.status, 'prepared');
-assert.equal(generatedTransaction.id.startsWith('reset:1:run_fixture_reset:ENDING_ASH:'), true);
+assert.equal(generatedTransaction.id, 'timeline_001_ending_ENDING_ASH');
 assert.equal(preparedTransaction.id, 'reset_tx_fixture');
 assert.equal(preparedTransaction.status, 'prepared');
 assert.deepEqual(preparedTransaction.source, {
@@ -186,7 +186,7 @@ assert.equal(firstApply.state.meta.persistentFlags.keepMe, true);
 assert.equal(firstApply.state.settings.locale, 'en');
 assert.equal(firstApply.state.meta.chronicle.length, 1);
 assert.equal(firstApply.state.meta.chronicle[0].transactionId, 'reset_tx_fixture');
-assert.equal(firstApply.state.meta.appliedTransactions.reset_tx_fixture.status, 'applied');
+assert.deepEqual(firstApply.state.meta.appliedTransactions, ['reset_tx_fixture']);
 const retryApply = applyPreparedResetTransaction(firstApply.state, preparedTransaction, { nextRunId: 'run_after_retry' });
 assert.equal(retryApply.ok, true);
 assert.equal(retryApply.alreadyApplied, true);
@@ -194,6 +194,33 @@ assert.equal(retryApply.state.meta.archiveFragments, 7);
 assert.equal(retryApply.state.meta.chronicle.length, 1);
 assert.equal(retryApply.state.run.id, 'run_after_retry');
 assert.equal(retryApply.state.run.resources.energy.amount, 0);
+
+const resetAt100 = createInitialGameState({ runId: 'run_time_100' });
+resetAt100.run.clock.simulationMs = 100;
+resetAt100.meta.archiveFragments = 1;
+const transactionAt100 = prepareResetTransaction(resetAt100, {
+  endingId: 'ENDING_ASH',
+  reward: { archiveFragments: 3 },
+  chronicleRecord: { endingId: 'ENDING_ASH', summaryId: 'time_regression' },
+});
+const resetAt500 = createInitialGameState({ runId: 'run_time_500' });
+resetAt500.run.clock.simulationMs = 500;
+const transactionAt500 = prepareResetTransaction(resetAt500, {
+  endingId: 'ENDING_ASH',
+  reward: { archiveFragments: 3 },
+  chronicleRecord: { endingId: 'ENDING_ASH', summaryId: 'time_regression_retry' },
+});
+assert.equal(transactionAt100.id, 'timeline_001_ending_ENDING_ASH');
+assert.equal(transactionAt500.id, transactionAt100.id);
+assert.equal(transactionAt100.createdAtSimulationMs, 100);
+assert.equal(transactionAt500.createdAtSimulationMs, 500);
+const applyAt100 = applyPreparedResetTransaction(resetAt100, transactionAt100, { nextRunId: 'run_after_time_100' });
+const applyAt500 = applyPreparedResetTransaction(applyAt100.state, transactionAt500, { nextRunId: 'run_after_time_500' });
+assert.equal(applyAt100.state.meta.archiveFragments, 4);
+assert.equal(applyAt500.alreadyApplied, true);
+assert.equal(applyAt500.state.meta.archiveFragments, 4);
+assert.equal(applyAt500.state.meta.chronicle.length, 1);
+assert.deepEqual(applyAt500.state.meta.appliedTransactions, ['timeline_001_ending_ENDING_ASH']);
 
 const devClock = createFakeClock(0);
 const devApi = createDebugApi({ ports: { clock: devClock } });

@@ -6,8 +6,12 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-export function createCanonicalResetTransactionId({ sourceRunId, timelineId, endingId, createdAtSimulationMs }) {
-  return `reset:${timelineId}:${sourceRunId}:${endingId}:${createdAtSimulationMs}`;
+function formatTimelineId(timelineId) {
+  return String(timelineId).padStart(3, '0');
+}
+
+export function createCanonicalResetTransactionId({ timelineId, endingId }) {
+  return `timeline_${formatTimelineId(timelineId)}_ending_${endingId}`;
 }
 
 export function prepareResetTransaction(state, input = {}) {
@@ -17,10 +21,8 @@ export function prepareResetTransaction(state, input = {}) {
     input.id ||
     input.transactionId ||
     createCanonicalResetTransactionId({
-      sourceRunId: state.run.id,
       timelineId: state.run.timelineId,
       endingId,
-      createdAtSimulationMs,
     });
 
   return {
@@ -57,8 +59,8 @@ export function applyPreparedResetTransaction(state, transaction, options = {}) 
 
   const meta = clone(state.meta);
   const settings = clone(state.settings);
-  meta.appliedTransactions = meta.appliedTransactions || {};
-  const alreadyApplied = Boolean(meta.appliedTransactions[transaction.id]);
+  meta.appliedTransactions = Array.isArray(meta.appliedTransactions) ? meta.appliedTransactions : [];
+  const alreadyApplied = meta.appliedTransactions.includes(transaction.id);
 
   if (!alreadyApplied) {
     if (Number.isFinite(transaction.reward?.archiveFragments)) {
@@ -71,11 +73,7 @@ export function applyPreparedResetTransaction(state, transaction, options = {}) 
       }
       meta.chronicle = chronicle;
     }
-    meta.appliedTransactions[transaction.id] = {
-      status: 'applied',
-      source: clone(transaction.source),
-      appliedAtSimulationMs: state.run.clock.simulationMs,
-    };
+    meta.appliedTransactions.push(transaction.id);
   }
 
   const nextState = createInitialGameState({
