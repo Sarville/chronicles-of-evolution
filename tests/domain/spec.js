@@ -4,6 +4,8 @@ import { createFakeClock } from '../../src/chronicles/adapters/clock.js';
 import { createSeededRng } from '../../src/chronicles/adapters/rng.js';
 import { createChroniclesEngine } from '../../src/chronicles/domain/engine.js';
 import {
+  selectCurrentGoal,
+  selectManualProcessView,
   selectNodeCost,
   selectNodeStatus,
   selectProducerPrice,
@@ -20,7 +22,9 @@ const engine = createChroniclesEngine({ ruleset, ports: { clock, rng } });
 
 assert.equal(engine.state.run.eraId, 'MOLECULAR');
 assert.deepEqual(selectResourceAmounts(engine.state), { energy: 0, information: 0 });
-assert.deepEqual(engine.state.run.goals, { currentId: null, states: {}, side: { activeIds: [] } });
+assert.equal(engine.state.run.goals.currentId, 'G001');
+assert.equal(engine.state.run.goals.chapter.activeId, 'G001');
+assert.equal(engine.state.run.goals.states.G001.status, 'active');
 assert.deepEqual(engine.state.run.events, { queue: [], states: {} });
 assert.deepEqual(engine.state.run.modifiers, { active: {} });
 assert.deepEqual(engine.state.run.pathScores, {
@@ -36,8 +40,21 @@ assert.deepEqual(engine.state.run.pathScores, {
   expansion: 0,
 });
 assert.equal(calculateCap(engine.state, 'energy', ruleset), Infinity);
+assert.equal(selectCurrentGoal(engine.state, ruleset).id, 'G001');
+assert.equal(selectManualProcessView(engine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').available, true);
 
-let result = engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'energy', amount: 100 });
+let result = engine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
+assert.equal(result.ok, true);
+assert.equal(result.events.some((event) => event.type === 'manual_process_used'), true);
+assert.equal(engine.state.run.resources.energy.amount, 1);
+assert.equal(engine.state.run.manualProcesses.MANUAL_PRIMORDIAL_PULSE.uses, 1);
+result = engine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
+assert.equal(result.ok, false);
+assert.equal(result.reason, 'MANUAL_PROCESS_UNAVAILABLE');
+engine.tick(1000);
+assert.equal(selectManualProcessView(engine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').available, true);
+
+result = engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'energy', amount: 99 });
 assert.equal(result.ok, true);
 assert.equal(result.events[0].type, 'resource_changed');
 assert.equal(engine.state.run.resources.energy.amount, 100);

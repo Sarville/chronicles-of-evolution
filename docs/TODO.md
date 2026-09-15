@@ -137,24 +137,47 @@ Micro-fix:
 
 ## Iteration 3 — Goal engine + tutorial shell
 
-**Status:** ready after user approval
+**Status:** done / gate passed
 
-Не начинать без отдельного подтверждения.
+Выполнено как расширенная Iteration 3: goal engine + tutorial shell + early playable 0–10 min slice до Proto-cell.
 
 Основной scope:
 
-- [ ] current goal state;
-- [ ] goal prerequisites;
-- [ ] completion conditions;
-- [ ] reward application;
-- [ ] sequential chains;
-- [ ] optional goals;
-- [ ] hint timeout;
-- [ ] CTA/highlight target;
-- [ ] chapter goal slot;
-- [ ] destiny goal slot;
-- [ ] basic objective UI shell;
-- [ ] goal analytics.
+- [x] current goal state;
+- [x] goal prerequisites;
+- [x] completion conditions;
+- [x] reward application foundation;
+- [x] sequential chains;
+- [x] optional goals;
+- [x] hint timeout foundation;
+- [x] CTA/highlight target;
+- [x] chapter goal slot;
+- [x] side/optional goal slot;
+- [x] basic objective UI shell;
+- [x] goal analytics/domain events foundation.
+
+Early playable slice:
+
+- [x] `chronicles.html` technical prototype entry point;
+- [x] Energy / Information molecular resources;
+- [x] manual primordial process before M01;
+- [x] Chemical Gradient / Catalytic Fold / Energy Pocket generators;
+- [x] M01 / M02 / M03 / M05 / M06 playable;
+- [x] M04 optional and non-blocking;
+- [x] save/load and autosave connected to playable runtime;
+- [x] development-only speed/grant/reset/dump panel;
+- [x] production build hides dev tools;
+- [x] `npm test`, `npm run test:sim`, `npm run smoke`, `npm run build`.
+
+Known tuning note:
+
+- [ ] Reference simulation currently reaches Proto-cell faster than the 9–11 min target with current canonical values; rebalance should be handled explicitly in a future tuning pass.
+
+## Iteration 4 — First content expansion after Proto-cell
+
+**Status:** ready / not started
+
+Не начинать без отдельного подтверждения. Следующий шаг — content expansion после M06, а не часть выполненной Iteration 3.
 
 ---
 

@@ -75,6 +75,7 @@ export function validateRuleset(ruleset) {
     ['buildings', ruleset.buildings],
     ['jobs', ruleset.jobs],
     ['goals', ruleset.goals],
+    ['manualProcesses', ruleset.manualProcesses || []],
     ['events', ruleset.events],
   ];
 
@@ -157,9 +158,56 @@ export function validateRuleset(ruleset) {
     }
   }
 
+  const conditionTypes = new Set([
+    'resource_amount',
+    'producer_count',
+    'node_completed',
+    'manual_process_completed',
+    'era_reached',
+    'flag_set',
+  ]);
+  const rewardTypes = new Set(['grant_resource', 'reveal_entity', 'set_flag']);
+
+  for (const process of ruleset.manualProcesses || []) {
+    if (!Number.isFinite(process.cooldownMs) || process.cooldownMs < 0) {
+      errors.push(`${process.id} has invalid cooldownMs`);
+    }
+    if (process.reward?.type === 'manual_gain' && !indexes.resources[process.reward.resourceId]) {
+      errors.push(`${process.id} rewards unknown resource ${process.reward.resourceId}`);
+    }
+  }
+
   for (const goal of ruleset.goals) {
-    if (!indexes.nodes[goal.nodeId]) {
+    if (goal.nodeId && !indexes.nodes[goal.nodeId]) {
       errors.push(`${goal.id} references unknown node ${goal.nodeId}`);
+    }
+    for (const condition of [...(goal.prerequisites || []), ...(goal.conditions || [])]) {
+      if (!conditionTypes.has(condition.type)) {
+        errors.push(`${goal.id} uses unknown condition type ${condition.type}`);
+      }
+      if (condition.resourceId && !indexes.resources[condition.resourceId]) {
+        errors.push(`${goal.id} condition references unknown resource ${condition.resourceId}`);
+      }
+      if (condition.producerId && !indexes.producers[condition.producerId]) {
+        errors.push(`${goal.id} condition references unknown producer ${condition.producerId}`);
+      }
+      if (condition.nodeId && !indexes.nodes[condition.nodeId]) {
+        errors.push(`${goal.id} condition references unknown node ${condition.nodeId}`);
+      }
+      if (condition.processId && !indexes.manualProcesses[condition.processId]) {
+        errors.push(`${goal.id} condition references unknown manual process ${condition.processId}`);
+      }
+      if (condition.eraId && !indexes.eras[condition.eraId]) {
+        errors.push(`${goal.id} condition references unknown era ${condition.eraId}`);
+      }
+    }
+    for (const reward of goal.rewards || []) {
+      if (!rewardTypes.has(reward.type)) {
+        errors.push(`${goal.id} uses unknown reward type ${reward.type}`);
+      }
+      if (reward.resourceId && !indexes.resources[reward.resourceId]) {
+        errors.push(`${goal.id} reward references unknown resource ${reward.resourceId}`);
+      }
     }
   }
 

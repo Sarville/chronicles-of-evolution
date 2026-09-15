@@ -5,6 +5,7 @@ import { nodes, branchGroups, branchCostRules } from './nodes.js';
 import { buildings } from './buildings.js';
 import { jobs } from './jobs.js';
 import { goals } from './goals.js';
+import { manualProcesses } from './manualProcesses.js';
 import { events } from './events.js';
 import { milestones } from './milestones.js';
 import { endings } from './endings.js';
@@ -23,6 +24,7 @@ export const ruleset = {
   buildings,
   jobs,
   goals,
+  manualProcesses,
   events,
   milestones,
   endings,
@@ -43,6 +45,7 @@ export function createRulesetIndexes(source = ruleset) {
     buildings: indexById(source.buildings),
     jobs: indexById(source.jobs),
     goals: indexById(source.goals),
+    manualProcesses: indexById(source.manualProcesses || []),
     events: indexById(source.events),
   };
 }

@@ -21,7 +21,7 @@ export const nodes = [
     cost: { energy: 12 },
     requiresNodes: [],
     effects: [
-      { type: 'manual_gain_multiplier', value: 2, deferred: true, deferredUntil: 'manual_process_system' },
+      { type: 'manual_gain_multiplier', value: 2 },
       { type: 'unlock_auto_production' },
     ],
     goalId: 'G001',

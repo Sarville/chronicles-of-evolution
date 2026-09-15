@@ -6,7 +6,7 @@ import { createInitialGameState } from '../domain/state.js';
 const DEV_TIME_SCALES = Object.freeze([1, 5, 20, 100]);
 
 export function createDebugApi(options = {}) {
-  const engine = createChroniclesEngine(options);
+  const engine = options.engine || createChroniclesEngine(options);
   const devEnabled = options.dev !== false && options.environment !== 'production';
   const indexes = createRulesetIndexes(engine.ruleset);
 

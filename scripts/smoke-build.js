@@ -10,6 +10,8 @@ const requiredFiles = [
   'wiki.html',
   'wiki/wiki.js',
   'wiki/wiki.css',
+  'chronicles.html',
+  'evolve/chronicles.js',
 ];
 
 let failed = false;
@@ -27,11 +29,13 @@ for (const relativePath of requiredFiles) {
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const wiki = fs.readFileSync(path.join(root, 'wiki.html'), 'utf8');
+const chronicles = fs.readFileSync(path.join(root, 'chronicles.html'), 'utf8');
 for (const [documentName, document, reference] of [
   ['index.html', index, 'evolve/main.js'],
   ['index.html', index, 'evolve/evolve.css'],
   ['wiki.html', wiki, 'wiki/wiki.js'],
   ['wiki.html', wiki, 'wiki/wiki.css'],
+  ['chronicles.html', chronicles, 'evolve/chronicles.js'],
 ]) {
   if (!document.includes(reference)) {
     console.error(`${documentName} does not reference ${reference}`);

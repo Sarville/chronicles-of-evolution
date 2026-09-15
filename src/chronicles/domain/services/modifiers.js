@@ -16,6 +16,9 @@ export function applyEffects(state, effects = [], source = {}) {
     if (effect.type === 'unlock_auto_production') {
       state.run.modifiers.active[`${sourceKey}:auto_production`] = effect;
     }
+    if (effect.type === 'manual_gain_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:manual_gain`] = effect;
+    }
     if (effect.type === 'unlock_resource') {
       if (!state.run.resources[effect.resourceId]) {
         state.run.resources[effect.resourceId] = { amount: 0 };

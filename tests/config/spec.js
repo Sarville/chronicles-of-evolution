@@ -6,9 +6,9 @@ const result = validateRuleset(ruleset);
 assert.deepEqual(result.errors, []);
 assert.equal(result.ok, true);
 assert.equal(JSON.parse(JSON.stringify(ruleset)).version, 'timeline1-v1');
-assert.equal(ruleset.allowedEffectTypes.includes('manual_gain_multiplier'), false);
+assert.equal(ruleset.allowedEffectTypes.includes('manual_gain_multiplier'), true);
 assert.equal(ruleset.allowedEffectTypes.includes('job_output_multiplier'), false);
-assert.equal(ruleset.effectSupport.manual_gain_multiplier.status, 'deferred');
+assert.equal(ruleset.effectSupport.manual_gain_multiplier.status, 'supported');
 assert.equal(ruleset.effectSupport.unlock_auto_production.status, 'supported');
 
 function clone(value) {
@@ -36,12 +36,12 @@ assert.equal(
   true
 );
 
-const unmarkedDeferredRuleset = clone(ruleset);
-unmarkedDeferredRuleset.nodes[0].effects[0] = { type: 'manual_gain_multiplier', value: 2 };
-const unmarkedDeferred = validateRuleset(unmarkedDeferredRuleset);
-assert.equal(unmarkedDeferred.ok, false);
+const invalidGoalConditionRuleset = clone(ruleset);
+invalidGoalConditionRuleset.goals[0].conditions = [{ type: 'node_completed', nodeId: 'MISSING_NODE' }];
+const invalidGoalCondition = validateRuleset(invalidGoalConditionRuleset);
+assert.equal(invalidGoalCondition.ok, false);
 assert.equal(
-  unmarkedDeferred.errors.some((error) => error.includes('deferred effect manual_gain_multiplier')),
+  invalidGoalCondition.errors.some((error) => error.includes('condition references unknown node MISSING_NODE')),
   true
 );
 

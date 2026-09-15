@@ -5,7 +5,8 @@ import { payCost, scaleCost } from './services/costs.js';
 import { applyEraTransition } from './services/eras.js';
 import { branchAvailable, prerequisitesMet } from './services/evolution.js';
 import { queueEventsForGoal } from './services/events.js';
-import { completeGoalForNode } from './services/goals.js';
+import { evaluateGoals } from './services/goals.js';
+import { useManualProcess } from './services/manualProcesses.js';
 import { applyEffects } from './services/modifiers.js';
 import { assertPopulationRequirement } from './services/population.js';
 import { addResource } from './services/resources.js';
@@ -14,6 +15,17 @@ function ok(state, events) {
   state.session.dirty = true;
   state.session.lastEvents = events;
   return { ok: true, events };
+}
+
+function withGoalEvaluation(state, ruleset, events, ports) {
+  const goalEvents = evaluateGoals(state, ruleset, ports);
+  const queuedEvents = goalEvents.flatMap((event) => {
+    if (event.type === 'goal_completed') {
+      return queueEventsForGoal(state, ruleset, event.payload.goalId, ports);
+    }
+    return [];
+  });
+  return [...events, ...goalEvents, ...queuedEvents];
 }
 
 function rejected(reason, details = {}) {
@@ -31,8 +43,10 @@ export function dispatchCommand(state, ruleset, command, ports = {}) {
   switch (command.type) {
     case 'ADD_RESOURCE': {
       const events = addResource(state, command.resourceId, command.amount, ruleset, ports);
-      return ok(state, events);
+      return ok(state, withGoalEvaluation(state, ruleset, events, ports));
     }
+    case 'USE_MANUAL_PROCESS':
+      return manualProcess(state, ruleset, command.processId, ports);
     case 'BUY_PRODUCER':
       return buyProducer(state, ruleset, command.producerId, ports);
     case 'BUY_NODE':
@@ -42,11 +56,20 @@ export function dispatchCommand(state, ruleset, command, ports = {}) {
     case 'TICK': {
       state.run.clock.simulationMs += command.deltaMs;
       state.run.clock.activeMs += command.deltaMs;
-      return ok(state, [createDomainEvent('tick', { deltaMs: command.deltaMs }, state, ports)]);
+      const events = [createDomainEvent('tick', { deltaMs: command.deltaMs }, state, ports)];
+      return ok(state, withGoalEvaluation(state, ruleset, events, ports));
     }
     default:
       return rejected('UNKNOWN_COMMAND', { type: command.type });
   }
+}
+
+function manualProcess(state, ruleset, processId, ports) {
+  const result = useManualProcess(state, ruleset, processId, ports);
+  if (!result.ok) {
+    return result;
+  }
+  return ok(state, withGoalEvaluation(state, ruleset, result.events, ports));
 }
 
 function buyProducer(state, ruleset, producerId, ports) {
@@ -67,10 +90,11 @@ function buyProducer(state, ruleset, producerId, ports) {
   }
 
   state.run.producers[producerId] = { count: currentCount + 1 };
-  return ok(state, [
+  const events = [
     ...payment.events,
     createDomainEvent('producer_bought', { producerId, newCount: currentCount + 1, cost }, state, ports),
-  ]);
+  ];
+  return ok(state, withGoalEvaluation(state, ruleset, events, ports));
 }
 
 function buyNode(state, ruleset, nodeId, ports) {
@@ -102,21 +126,16 @@ function buyNode(state, ruleset, nodeId, ports) {
   }
   applyEffects(state, node.effects, { sourceType: 'node', sourceId: nodeId });
 
-  const goalEvents = completeGoalForNode(state, ruleset, nodeId, ports);
-  const queuedEvents = goalEvents.flatMap((event) => {
-    if (event.type === 'goal_completed') {
-      return queueEventsForGoal(state, ruleset, event.payload.goalId, ports);
-    }
-    return [];
-  });
   const eraEvents = applyEraTransition(state, node.transition, ruleset, ports);
-  return ok(state, [
+  const events = [
     ...payment.events,
     createDomainEvent('node_completed', { nodeId, cost }, state, ports),
-    ...goalEvents,
-    ...queuedEvents,
     ...eraEvents,
-  ]);
+  ];
+  if (nodeId === 'M06') {
+    events.push(createDomainEvent('proto_cell_reached', { nodeId }, state, ports));
+  }
+  return ok(state, withGoalEvaluation(state, ruleset, events, ports));
 }
 
 function buyBuilding(state, ruleset, buildingId, ports) {
@@ -141,8 +160,9 @@ function buyBuilding(state, ruleset, buildingId, ports) {
 
   state.run.buildings[buildingId] = { count: currentCount + 1 };
   applyEffects(state, building.effects, { sourceType: 'building', sourceId: buildingId });
-  return ok(state, [
+  const events = [
     ...payment.events,
     createDomainEvent('building_bought', { buildingId, newCount: currentCount + 1, cost }, state, ports),
-  ]);
+  ];
+  return ok(state, withGoalEvaluation(state, ruleset, events, ports));
 }

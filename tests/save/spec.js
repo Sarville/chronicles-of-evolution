@@ -5,6 +5,7 @@ import { ruleset } from '../../src/chronicles/config/index.js';
 import { createInitialGameState } from '../../src/chronicles/domain/state.js';
 import { validateGameState } from '../../src/chronicles/domain/validation.js';
 import { createDebugApi } from '../../src/chronicles/dev/debugApi.js';
+import { createChroniclesEngine } from '../../src/chronicles/domain/engine.js';
 import { createAutosaveController } from '../../src/chronicles/save/autosave.js';
 import { CURRENT_SCHEMA_VERSION, migrateEnvelope } from '../../src/chronicles/save/migrations.js';
 import { createSaveEnvelope, createSaveRepository, SAVE_KEYS } from '../../src/chronicles/save/repository.js';
@@ -136,6 +137,32 @@ assert.equal(autosaveRepository.loadOrCreate().state.run.resources.energy.amount
 autosaveDebug.grant('energy', 3);
 assert.equal(autosave.flush('visibility').ok, true);
 assert.equal(autosaveRepository.loadOrCreate().state.run.resources.energy.amount, 8);
+
+const midSliceStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
+const midSliceRepository = createSaveRepository({ storage: midSliceStorage, clock });
+const midSliceEngine = createChroniclesEngine({ ruleset, ports: { clock } });
+for (let index = 0; index < 12; index += 1) {
+  midSliceEngine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
+  midSliceEngine.tick(1000);
+}
+midSliceEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'GEN_CHEMICAL_GRADIENT' });
+midSliceEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'energy', amount: 300 });
+midSliceEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'information', amount: 40 });
+for (const nodeId of ['M01', 'M02', 'M03']) {
+  const buy = midSliceEngine.dispatch({ type: 'BUY_NODE', nodeId });
+  assert.equal(buy.ok, true);
+}
+assert.equal(midSliceRepository.save(midSliceEngine.state).ok, true);
+const midSliceLoaded = midSliceRepository.loadOrCreate();
+assert.equal(midSliceLoaded.ok, true);
+assert.equal(midSliceLoaded.state.run.goals.currentId, 'G004');
+assert.equal(midSliceLoaded.state.run.goals.states.G003.status, 'archived');
+assert.equal(midSliceLoaded.state.run.goals.side.activeIds.includes('G003_M04_OPTIONAL'), true);
+assert.equal(midSliceLoaded.state.run.producers.GEN_CHEMICAL_GRADIENT.count, 1);
+assert.equal(midSliceLoaded.state.run.nodes.completed.M03.completedAtMs >= 0, true);
+assert.equal(midSliceLoaded.state.run.manualProcesses.MANUAL_PRIMORDIAL_PULSE.uses, 12);
+assert.equal(midSliceLoaded.state.run.modifiers.active['M01:auto_production'].type, 'unlock_auto_production');
+assert.equal(midSliceStorage.get('evolved'), 'legacy-save-must-survive');
 
 const resetStorage = createMemoryStorage();
 const resetRepository = createSaveRepository({ storage: resetStorage, clock });

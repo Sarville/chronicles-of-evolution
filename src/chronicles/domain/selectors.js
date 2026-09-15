@@ -1,6 +1,8 @@
 import { createRulesetIndexes } from '../config/index.js';
 import { canAfford, multiplyCost, scaleCost } from './services/costs.js';
 import { branchAvailable, branchCostMultiplier, prerequisitesMet } from './services/evolution.js';
+import { getGoalState, goalConditionsMet } from './services/goals.js';
+import { calculateManualReward, manualProcessAvailable } from './services/manualProcesses.js';
 import { calculateProductionRates } from './services/production.js';
 
 export function selectResourceAmounts(state) {
@@ -9,6 +11,19 @@ export function selectResourceAmounts(state) {
 
 export function selectProductionRates(state, ruleset) {
   return calculateProductionRates(state, ruleset);
+}
+
+export function selectVisibleResources(state, ruleset) {
+  const indexes = createRulesetIndexes(ruleset);
+  const active = indexes.eras[state.run.eraId]?.activeResources || Object.keys(state.run.resources);
+  return active
+    .filter((resourceId) => state.run.resources[resourceId])
+    .map((resourceId) => ({
+      id: resourceId,
+      label: indexes.resources[resourceId]?.label || indexes.resources[resourceId]?.labelKey || resourceId,
+      amount: state.run.resources[resourceId].amount,
+      perSecond: calculateProductionRates(state, ruleset)[resourceId] || 0,
+    }));
 }
 
 export function selectNodeStatus(state, ruleset, nodeId) {
@@ -43,8 +58,54 @@ export function selectProducerPrice(state, ruleset, producerId) {
   return cost;
 }
 
+export function selectProducerStatus(state, ruleset, producerId) {
+  const producer = createRulesetIndexes(ruleset).producers[producerId];
+  if (!producer) {
+    return 'unknown';
+  }
+  if (!producer.unlocksAtStart && !prerequisitesMet(state, producer)) {
+    return 'locked';
+  }
+  return canAfford(state, selectProducerPrice(state, ruleset, producerId)).ok ? 'available_affordable' : 'available_unaffordable';
+}
+
 export function selectNodeCost(state, ruleset, nodeId) {
   const indexes = createRulesetIndexes(ruleset);
   const node = indexes.nodes[nodeId];
   return multiplyCost(node.cost, branchCostMultiplier(state, ruleset, node));
+}
+
+export function selectCurrentGoal(state, ruleset) {
+  const indexes = createRulesetIndexes(ruleset);
+  const goal = indexes.goals[state.run.goals.currentId];
+  if (!goal) {
+    return null;
+  }
+  return {
+    ...goal,
+    state: getGoalState(state, goal.id),
+    completed: goalConditionsMet(state, goal),
+  };
+}
+
+export function selectSideGoals(state, ruleset) {
+  const indexes = createRulesetIndexes(ruleset);
+  return state.run.goals.side.activeIds
+    .map((goalId) => indexes.goals[goalId])
+    .filter(Boolean)
+    .map((goal) => ({ ...goal, state: getGoalState(state, goal.id), completed: goalConditionsMet(state, goal) }));
+}
+
+export function selectManualProcessView(state, ruleset, processId) {
+  const process = createRulesetIndexes(ruleset).manualProcesses[processId];
+  if (!process) {
+    return null;
+  }
+  const processState = state.run.manualProcesses[processId] || { uses: 0, availableAtMs: 0 };
+  return {
+    ...process,
+    state: processState,
+    available: manualProcessAvailable(state, process),
+    reward: calculateManualReward(state, ruleset, process),
+  };
 }

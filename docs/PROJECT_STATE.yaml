@@ -72,9 +72,29 @@ documentation:
   ux_package: ready
 
 implementation:
-  mode: "iteration_2_micro_fix_completed"
-  current_iteration: 2
-  resume_gate: "iteration_2_gate_passed_stop_before_iteration_3"
+  mode: "iteration_3_goal_engine_and_early_playable_slice_completed"
+  current_iteration: 3
+  resume_gate: "iteration_3_gate_passed_stop_before_iteration_4"
+  last_iteration_3:
+    date: "2026-09-15"
+    base_commit: "331a5c83425fad67ac429c3aed70c1d7d1c007f6"
+    status: "passed"
+    scope: "Expanded Iteration 3: Goal Engine + tutorial shell + early playable 0-10 min molecular slice through Proto-cell; Iteration 4 not started"
+    delivered:
+      - "Data-driven Goal Engine with lifecycle, prerequisites, conditions, rewards, timestamps, CTA/highlight, hint timeout foundation, chapter and side slots."
+      - "Manual primordial process using canonical manual gain formula and explicit provisional cooldown tuning."
+      - "Playable Timeline #1 molecular path from new run through M01/M02/M03/M05/M06 with M04 optional."
+      - "Technical Chronicles UI at chronicles.html with World/Evolution views, resources, objective panel, generators, evolution nodes and production-only dev tool exclusion."
+      - "Autosave/save-load integration for playable runtime and mid-slice persistence coverage."
+      - "Domain telemetry events for goals, hints, manual process, producers, nodes and Proto-cell."
+    gates:
+      npm_test: passed
+      test_sim: passed
+      smoke: passed
+      build: passed
+    notes:
+      - "Early playable 0-10 min slice is included in Iteration 3 as requested; Iteration 4 remains the next content expansion step."
+      - "Reference simulation reaches automatic income at ~00:21, Self Replication at ~02:52 and Proto-cell at ~04:53; Proto-cell is faster than the 9-11 min target with current canonical economy and recommended pre-Proto producer counts."
   last_iteration_2_micro_fix:
     date: "2026-09-15"
     base_commit: "82c60bc86f88a27c9941d6153efecf93b6e15510"
@@ -152,11 +172,26 @@ implementation:
         test_sim: passed
         smoke: passed
         build: passed
+    3:
+      name: "Goal engine + tutorial shell"
+      status: done
+      delivered:
+        - "generic data-driven goal engine"
+        - "early playable 0-10 min molecular slice through Proto-cell"
+      gates:
+        npm_test: passed
+        test_sim: passed
+        smoke: passed
+        build: passed
+    4:
+      name: "First content expansion after Proto-cell"
+      status: ready
+      note: "Not started by expanded Iteration 3 work."
 
 parallelization:
   now:
     design: "DS-05"
-    codex: "Iteration 2 micro-fix gate passed; stop before Iteration 3 until user approval"
+    codex: "Expanded Iteration 3 passed with early playable 0-10 min slice; stop before Iteration 4 until user approval"
   also_ready: ["DS-06"]
 
 open_decisions:
@@ -167,5 +202,5 @@ open_decisions:
 
 next_action:
   owner: "Codex + ChatGPT/user in parallel"
-  session: "Post-Iteration 2 gate + DS-05"
-  description: "Codex stops after Implementation Iteration 2 micro-fix gate; Iteration 3 starts only after user approval. Design proceeds with DS-05 Timeline #1 full narrative package."
+  session: "Post-Iteration 3 gate + DS-05"
+  description: "Codex stops after expanded Implementation Iteration 3; Iteration 4 starts only after user approval. Design proceeds with DS-05 Timeline #1 full narrative package."
