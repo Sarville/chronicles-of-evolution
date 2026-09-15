@@ -6,7 +6,7 @@
 
 ---
 
-## Проект
+# Проект
 
 ### Хроники Эволюции
 
@@ -14,7 +14,7 @@
 
 ### Evolve
 
-Исходный open-source проект, логика которого используется как база для новой игры.
+Исходный open-source проект, логика которого используется как база.
 
 Не использовать `Evolve` как пользовательское название нового продукта.
 
@@ -26,15 +26,9 @@
 
 Один полный цикл существования отдельной цивилизации от возникновения жизни до ending/reset.
 
-Пример:
-
-`Timeline #1`
-
 ### Run
 
-Технический/дизайнерский синоним Timeline, когда речь идёт о gameplay loop.
-
-В пользовательских текстах предпочтительно использовать Timeline/цивилизация, а не «run».
+Технический/дизайнерский синоним Timeline.
 
 ### Reset
 
@@ -44,9 +38,7 @@
 
 ### Prestige
 
-Общий жанровый термин для reset-механики.
-
-В пользовательской подаче заменяется системой Архива и Памяти.
+Жанровый термин для reset-механики. В пользовательской подаче заменяется Архивом/Памятью.
 
 ---
 
@@ -54,14 +46,7 @@
 
 ### Архив Жизни
 
-Древняя система, через которую игрок наблюдает и направляет развитие жизни.
-
-Архив одновременно является:
-
-- narrative framework;
-- meta-progression interface;
-- хранилищем Chronicle;
-- источником загадки всей игры.
+Narrative framework + meta-progression interface + Chronicle storage.
 
 ### Оператор Архива
 
@@ -69,67 +54,122 @@
 
 ### Память Архива
 
-Главная концепция permanent progression.
-
-Конкретная implementation currency должна использовать единое имя после финального решения.
+Permanent/meta-система проекта.
 
 ### Archive Fragments / AF
 
-Текущая числовая meta currency в economy/evolution specifications.
-
-До отдельного решения считать техническим названием валюты Памяти Архива.
+Единственная spendable meta currency первого prestige-loop.
 
 ### Хроника
 
-Коллекционный журнал завершённых timelines, видов, milestones, выборов, планет, событий и endings.
+Журнал завершённых timelines, видов, milestones, решений, событий и endings.
 
 ---
 
 # Биологическая progression
 
-### Energy / E
+### RNA / РНК
 
-Базовый энергетический ресурс ранней биологической стадии.
+Первый player-facing biological resource Timeline #1.
 
-### Information / I
+Используется в molecular progression и ведёт к Self Replication / DNA.
 
-Ресурс информационного/эволюционного прогресса.
+### Self Replication / Саморепликация
 
-Связан тематически с RNA, DNA, наследственностью и сложностью.
+Переход от ручного primordial process к self-sustaining molecular production.
 
-### Biomass / B
+### DNA / ДНК
 
-Ресурс клеточной и многоклеточной биологии.
+Второй player-facing genetic resource, открываемый через DNA Synthesis.
 
-### RNA
+### Membrane / Мембрана
 
-Сценарное и визуальное понятие ранней жизни.
+Core biological milestone перед Cell.
 
-В текущей числовой модели не является обязательной отдельной глобальной currency.
-
-### DNA
-
-Сценарное и технологическое понятие генетики.
-
-В текущей числовой модели может представляться через Information/evolution nodes.
-
-### Proto-cell / Протоклетка
+### Cell / Клетка
 
 Первый крупный biological convergence milestone.
 
-Target: около 10 минуты Timeline #1.
+Target: примерно 9–11 мин после нового balance pass.
+
+### Biomass / B
+
+Ресурс клеточной и многоклеточной биологии, открываемый с Cell.
+
+### Energy / E
+
+Метаболический ресурс, который появляется **после Cell/Metabolism**.
+
+Не является стартовой molecular currency reconciled Timeline #1.
+
+### Information / I
+
+Не является player-facing spendable currency reconciled Timeline #1.
+
+Может использоваться только как внутреннее/концептуальное понятие информации, наследственности или complexity, если конкретная система этого требует.
+
+### Adaptation Points / AP
+
+Run-local discrete reward currency for optional biological adaptations.
+
+- не производится `/sec`;
+- выдаётся за milestones/side objectives;
+- не нужна для core breakthroughs;
+- сбрасывается с Timeline, кроме explicit Archive retention semantics.
+
+### Metabolism / Метаболизм
+
+Cell-stage system that introduces real Energy economy.
+
+### Primary biological trait
+
+Первая meaningful branch Timeline #1:
+
+- Absorption / Поглощение;
+- Symbiosis / Симбиоз;
+- Shell / Панцирь.
+
+Timeline #1 выбирает один primary trait.
+
+### Photosynthesis / Фотосинтез
+
+Optional metabolic adaptation, не primary first branch.
+
+### Chemosynthesis / Хемосинтез
+
+Optional metabolic adaptation, не primary first branch.
 
 ### Multicellularity / Многоклеточность
 
-Переход от клеточной экономики к специализированным тканям.
+Переход от cell-level progression к организму и body systems.
 
-Target: около 26 минуты.
+Target: примерно 24–28 мин.
+
+### Nervous System / Нервная система
+
+Core transition that unlocks Behavior + Cognition.
+
+### Cognition / Когниция
+
+Meter `0..100`.
+
+Получается через sensory/neural/social/tool-use development и отдельные events.
+
+Не является spendable resource.
 
 ### Sapience / Разум
 
-Переход от биологической progression к цивилизационной.
+Condition-driven convergence from biological to civilization gameplay.
 
-Target: около 46 минуты.
+Requirement concept:
+
+```text
+core nervous-system prerequisites + Cognition >= 100
+```
+
+Target: примерно 38–40 мин.
+
+Не покупается как обычный дорогой node за несколько currencies.
 
 ---
 
@@ -137,11 +177,11 @@ Target: около 46 минуты.
 
 ### CORE
 
-Обязательный узел ствола progression.
+Обязательный узел progression.
 
 ### BRANCH
 
-Выбор специализации.
+Meaningful specialization/path choice.
 
 ### OPTIONAL
 
@@ -149,11 +189,11 @@ Target: около 46 минуты.
 
 ### CONVERGENCE
 
-Крупный milestone, в котором несколько возможных путей снова сходятся.
+Качественный milestone/transition. Может быть condition-driven, а не обязательно обычной покупкой.
 
 ### ARCHIVE node
 
-Permanent meta upgrade, открываемый после reset.
+Permanent meta upgrade после reset.
 
 ---
 
@@ -163,37 +203,41 @@ Permanent meta upgrade, открываемый после reset.
 
 Количество представителей цивилизации, доступных для jobs.
 
-Не является обычной расходной валютой.
+Не является обычной spendable currency.
+
+После first Sapience civilization начинает с маленькой группы около 5 Population.
 
 ### Food / F
 
-Пища.
-
-Главный ресурс ранней цивилизации.
+Главный early-civilization resource.
 
 ### Materials / M
 
-Материалы и инфраструктурное производство.
+Aggregate infrastructure/materials resource.
+
+Wood/Stone/Metal не являются обязательными top-level currencies Timeline #1.
 
 ### Knowledge / K
 
-Знание, исследования, science progression.
-
-Планируется как основной soft bottleneck многих цивилизационных фаз.
+Knowledge/research resource.
 
 ### Power / PWR
 
-Энергетика индустриальной и атомной эпох.
+Industrial/electrical resource.
+
+Становится полноценным active resource в Industry/electrification layer, а не сразу при City.
 
 ### Stability / ST
 
-Шкала устойчивости мира во время Великого фильтра.
+Internal crisis state `0..100`.
 
-Диапазон:
+### World Tension / Напряжение мира
 
-`0–100`.
+Player-facing crisis meter:
 
-Не является обычной накопительной валютой.
+```text
+World Tension = 100 - Stability
+```
 
 ---
 
@@ -201,309 +245,88 @@ Permanent meta upgrade, открываемый после reset.
 
 ### Molecular era
 
-Ранняя химическая жизнь.
+RNA → Self Replication → DNA.
 
 ### Cellular era
 
-Клетка и базовая биология.
+Membrane → Cell → Biomass → Metabolism → first primary trait.
 
 ### Multicellular era
 
-Многоклеточный организм, ткани, нервная система.
+Organism, AP adaptations, tissues/body systems.
 
-### Sapience transition
+### Cognition phase
 
-Переход к разумному виду.
+Nervous System → Behavior → Cognition → Sapience.
 
 ### Tribe
 
-Ранняя социальная организация.
+Маленькая sapient group, first jobs, Food/basic structures.
 
 ### Settlement
 
-Постоянное поселение и земледелие.
+Agriculture, houses, workshop, permanent infrastructure.
 
 ### City
 
-Городская экономика.
+Writing, research, market/trade-lite, governance profile.
 
-### Industry / Industrial era
+### Industry
 
-Механизация, Power, массовое производство.
+Mechanization, steam, factories, electrification, Power.
 
-### Atomic Age
+### Modern
 
-Атомная технология и начало кризиса.
+Grid, research institutions, communications/global connection, Error 17.
 
-### Crisis
+### Atomic
 
-Финальная фаза Timeline #1.
+Atomic Theory, reactor/lab program, Atomic Age, `Снова.`.
+
+### Crisis / Great Filter
+
+World Tension, crisis events, Last Protocol, inevitable first Ash.
+
+---
+
+# Финал / meta
 
 ### Ash / Пепел
 
-Первый ending.
+Canonical first Timeline ending `ENDING_ASH`.
+
+### Last Protocol / Последний протокол
+
+Final crisis choice whose variants converge to Ash in Timeline #1.
+
+### Error 17
+
+Persistent Archive anomaly introduced during Modern phase.
+
+### Archive Recall
+
+Automatic post-first-reset familiar-path acceleration before Sapience.
+
+### Retained adaptation
+
+OPTIONAL biological node preserved by Archive semantics and activated only after original prerequisites.
+
+### Hybridization
+
+Future meta ability to combine primary/secondary biological traits across timelines.
 
 ---
 
-# Великий фильтр
-
-### Великий фильтр
-
-Главная narrative/gameplay проблема разумных цивилизаций.
-
-В Timeline #1 выражается через мировой кризис после атомной эпохи.
-
-### Filter Risk
-
-Общее обозначение факторов, увеличивающих риск кризиса.
-
-### World Tension
-
-Раннее UI-название шкалы угрозы в GDD.
-
-Для runtime нужно отдельно решить, является ли она самостоятельным параметром или presentation слоя Stability/risk factors.
-
-### atomic_load
-
-Технический параметр экономики кризиса, увеличивающий скорость падения Stability.
-
----
-
-# Gameplay objectives
-
-### Current Objective
-
-Короткая цель примерно на 30 секунд – 5 минут.
-
-### Chapter Objective
-
-Цель главы примерно на 10–30 минут.
-
-### Destiny Objective
-
-Крупная цель Timeline.
-
-### Milestone
-
-Значимый переход progression, обычно с сильным визуальным или сюжетным payoff.
-
-### Side Quest
-
-Необязательная задача, обучающая механике или меняющая стиль игры.
-
-### Story Quest
-
-Сюжетная цепочка, связанная с загадкой Архива.
-
-Не является daily/временным квестом.
-
----
-
-# Визуальные понятия
-
-### Diorama / Диорама
-
-Главная визуальная сцена мира.
-
-Не является полноценной физической симуляцией города.
-
-### Visual State
-
-Композиционное состояние диорамы, определяемое текущей эпохой и решениями игрока.
-
-Базовые states первого Timeline:
-
-- V0 Primordial;
-- V1 Cellular;
-- V2 Creature;
-- V3 Tribe;
-- V4 Settlement;
-- V5 City;
-- V6 Industrial;
-- V7 Atomic;
-- V8 Ash.
-
-### Era Transition
-
-Полноэкранный визуальный milestone при переходе между важными эпохами.
-
-### Landmark
-
-Крупный визуальный объект, показывающий конкретную технологию или состояние мира.
-
----
-
-# Narrative
-
-### Narrative Flag
-
-Именованный постоянный или run-level marker, записывающий решение/событие.
-
-Примеры:
-
-- `atomic_mastery`;
-- `grid_resilience`;
-- `shared_science`;
-- `foresight`;
-- `deterrence`;
-- `coordination`.
-
-### Reveal
-
-Сюжетное открытие о природе Архива, Великого фильтра или timelines.
-
-### Archive anomaly
-
-Событие или объект, который не должен существовать в текущем Timeline и указывает на связь между циклами.
-
----
-
-# Ending
-
-### Ending
-
-Исторический результат Timeline.
-
-### Пепел
-
-Первый обязательный ending, связанный с саморазрушением цивилизации.
-
-### Исход
-
-Bioseed/покидание родного мира.
-
-### Хранители
-
-Путь устойчивой цивилизации, ориентированный на биосферу.
-
-### Сингулярность
-
-Переход к машинной форме существования.
-
-### Разрыв цикла
-
-Поздний meta ending, связанный с основной тайной Архива.
-
----
-
-# Технические термины
-
-### Domain Adapter
-
-Слой между существующей логикой Evolve и новым UI.
-
-Его задача — преобразовать legacy state в стабильную модель нового продукта.
-
-### Normalized Game State
-
-Нормализованное состояние, которое потребляет новый UI.
-
-### Presentation Layer
-
-Новый UI, визуальные состояния, animations и presentation logic.
-
-### Legacy Layer
-
-Переиспользуемая часть исходного Evolve.
-
-### Debug Time Scale
-
-Режим ускорения игрового времени для разработки и тестирования.
-
-Целевые значения:
-
-`1× / 5× / 20× / 100×`.
-
-### Headless Balance Simulator
-
-Инструмент, который способен прогонять экономику без UI и проверять время достижения milestones.
-
----
-
-# Analytics
-
-### Target time
-
-Ожидаемое время milestone.
-
-Не является жёстким условием, если отдельно не указано обратное.
-
-### Target window
-
-Допустимый диапазон достижения milestone.
-
-### Bottleneck
-
-Ресурс или условие, которое ограничивает текущий прогресс.
-
-### Catch-up
-
-Механизм мягкой помощи отстающему игроку.
-
-### Anti-snowball
-
-Механизмы, не позволяющие сильному раннему преимуществу пропустить важный контент, без скрытого nerf производства.
-
----
-
-# Контентный pipeline
-
-### Asset Manifest
-
-Единая таблица всех required assets с постоянными IDs.
-
-### Music Cue
-
-Музыкальное состояние или трек для определённой эпохи/события.
-
-### Ambience
-
-Фоновый environmental sound layer.
-
-### Stinger
-
-Короткая музыкальная фраза для milestone/unlock/ending.
-
-### SFX
-
-Короткий игровой sound effect.
-
----
-
-# Naming rules
-
-## В документации
-
-Использовать русский термин, если он является пользовательским.
-
-При первом упоминании технического понятия допустимо указывать английский эквивалент.
-
-## В коде
-
-Предпочтительно стабильное английское имя:
-
-```text
-energy
-information
-biomass
-food
-materials
-knowledge
-power
-stability
-timeline
-archive
-```
-
-## IDs
-
-IDs должны быть стабильными и не зависеть от локализованного названия.
-
-Пример:
-
-```text
-evolution.cell.mitochondrial_symbiosis
-milestone.sapience
-ending.ash
-event.archive.error_17
-```
+# Superseded terminology
+
+The following terms may appear in git history or historical reconciliation notes, but are **not current canonical player-facing early gameplay**:
+
+- Chemical Gradient;
+- Catalytic Fold;
+- Energy Pocket;
+- Stable Bond old economic semantics;
+- Energy/Information as starting molecular wallet;
+- Proto-cell as the old M06 name if referring to the superseded E/I ruleset;
+- Sapience ~46 min as fixed first-run target.
+
+Historical mentions must be marked as superseded when present in active docs.
