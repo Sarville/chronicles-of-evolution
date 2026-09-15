@@ -1,34 +1,50 @@
 # Хроники Эволюции — документация проекта
 
-Этот каталог содержит продуктовую, игровую, сценарную, визуальную, аудио- и техническую документацию проекта **Хроники Эволюции**.
+Этот каталог — каноническая проектная документация **Хроник Эволюции**.
 
-Главная цель структуры — разделить:
-- продуктовые решения;
-- игровой дизайн;
-- сценарий;
-- UX/UI;
-- арт;
-- звук;
-- техническую архитектуру;
-- план реализации.
+Он используется как контракт между:
+- пользователем/продакт-оунером;
+- ChatGPT как design/content агентом;
+- Codex как implementation агентом;
+- репозиторием как долговременной памятью проекта.
 
-Документация используется как контракт между:
-- дизайнером/продуктовым агентом;
-- агентом, который формирует сценарии, арт и аудио-спецификации;
-- Codex, который выполняет имплементацию.
+Главный принцип: важное решение не должно существовать только в чате или только в коде.
 
 ---
 
-## 1. Главный принцип
+## 1. Операционные файлы
 
-Codex не должен самостоятельно придумывать или усреднять противоречащие друг другу продуктовые решения.
+### `PROJECT_STATE.yaml`
+Единственный source of truth для текущего статуса проекта:
+- текущая design session;
+- зависимости;
+- готовность документов;
+- статус implementation iterations;
+- gates для параллельной работы;
+- open decisions;
+- next action.
 
-Если документы расходятся:
+### `TODO.md`
+Короткое человекочитаемое представление ближайших действий.
 
-1. проверить `DECISIONS.md`;
-2. использовать более специализированный документ;
-3. если решение не зафиксировано — добавить вопрос в `TODO.md`;
-4. не менять продуктовую логику без отдельного решения.
+Если `TODO.md` расходится с `PROJECT_STATE.yaml`, верен `PROJECT_STATE.yaml`.
+
+### `DECISIONS.md`
+Канонические продуктовые/архитектурные решения, которые разрешают противоречия между более ранними документами.
+
+### `GLOSSARY.md`
+Единые термины, пользовательские названия и технические IDs/conventions.
+
+### `production/DESIGN_SESSION_PLAN.md`
+Разбивает проектирование на блоки формата:
+
+**одна сессия/чат -> один связанный пакет -> review -> state update -> push -> новый чат.**
+
+### `production/STATE_WORKFLOW.md`
+Правила синхронизации state/TODO, параллельной работы и review gates.
+
+### `production/IMPLEMENTATION_ITERATION_PLAN.md`
+Roadmap Codex. Не является статус-файлом; фактический implementation status находится в `PROJECT_STATE.yaml`.
 
 ---
 
@@ -37,13 +53,14 @@ Codex не должен самостоятельно придумывать ил
 ```text
 docs/
 ├─ README.md
+├─ PROJECT_STATE.yaml
 ├─ DECISIONS.md
 ├─ GLOSSARY.md
 ├─ TODO.md
+├─ PRD.md
 ├─ 00_DOCS_STRUCTURE_AND_GENERATION_PLAN.md
 │
 ├─ gdd/
-│  ├─ 00_GAME_DESIGN_OVERVIEW.md
 │  ├─ 01_FIRST_120_MINUTES.md
 │  ├─ 02_ECONOMY_FIRST_120_MINUTES.md
 │  ├─ 03_EVOLUTION_TREE.md
@@ -67,6 +84,7 @@ docs/
 │  └─ 07_COPY_GUIDE.md
 │
 ├─ ux/
+│  ├─ README.md
 │  ├─ 00_UX_PRINCIPLES.md
 │  ├─ 01_SCREEN_MAP.md
 │  ├─ 02_MOBILE_WIREFRAMES.md
@@ -75,6 +93,7 @@ docs/
 │  └─ 05_TUTORIAL_AND_HINTS.md
 │
 ├─ art/
+│  ├─ README.md
 │  ├─ 00_ART_DIRECTION.md
 │  ├─ 01_LOCATIONS_AND_DIORAMAS.md
 │  ├─ 02_ERA_TRANSITIONS.md
@@ -83,6 +102,7 @@ docs/
 │  └─ 05_GENERATION_PROMPTS.md
 │
 ├─ audio/
+│  ├─ README.md
 │  ├─ 00_AUDIO_DIRECTION.md
 │  ├─ 01_MUSIC_CUES.md
 │  ├─ 02_AMBIENCE.md
@@ -101,145 +121,178 @@ docs/
 │  └─ 07_TESTING_STRATEGY.md
 │
 └─ production/
+   ├─ DESIGN_SESSION_PLAN.md
+   ├─ STATE_WORKFLOW.md
    ├─ IMPLEMENTATION_ITERATION_PLAN.md
-   ├─ RELEASE_CHECKLIST.md
-   └─ CONTENT_PIPELINE.md
+   ├─ CONTENT_PIPELINE.md
+   └─ RELEASE_CHECKLIST.md
 ```
+
+Файл в дереве может ещё не существовать, если его design session не завершена. Git не хранит пустые папки, поэтому разделы `ux/`, `art/`, `audio/` содержат собственные README до появления спецификаций.
 
 ---
 
-## 3. Текущие исходные документы
+## 3. Уже существующая база
 
-Следующие документы являются исходной базой проекта и должны быть разложены по новой структуре:
+Сейчас приняты как исходные:
 
-| Текущий документ | Новое место |
-|---|---|
-| PRD проекта | `docs/PRD.md` |
-| GDD первых 120 минут | `docs/gdd/01_FIRST_120_MINUTES.md` |
-| Экономика первых 120 минут | `docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md` |
-| Дерево эволюции | `docs/gdd/03_EVOLUTION_TREE.md` |
-| План сценария | `docs/scenario/00_NARRATIVE_BIBLE.md` |
-| План структуры документации | `docs/00_DOCS_STRUCTURE_AND_GENERATION_PLAN.md` |
-| План реализации | `docs/production/IMPLEMENTATION_ITERATION_PLAN.md` |
+- `PRD.md`;
+- `gdd/01_FIRST_120_MINUTES.md`;
+- `gdd/02_ECONOMY_FIRST_120_MINUTES.md`;
+- `gdd/03_EVOLUTION_TREE.md`;
+- `scenario/00_NARRATIVE_BIBLE.md`;
+- `technical/01_EXISTING_CODE_AUDIT.md`;
+- `00_DOCS_STRUCTURE_AND_GENERATION_PLAN.md`;
+- `production/IMPLEMENTATION_ITERATION_PLAN.md`.
+
+Актуальный список статусов всегда смотреть в `PROJECT_STATE.yaml`.
 
 ---
 
 ## 4. Иерархия источников истины
 
-При конфликте документов используется следующий порядок.
+При конфликте сначала проверяется `DECISIONS.md`.
+
+После него действует специализация документа.
+
+### Статус проекта
+1. `PROJECT_STATE.yaml`
+2. `TODO.md`
+3. roadmap/session plan
 
 ### Числа, production, цены, pacing
-1. `gdd/02_ECONOMY_FIRST_120_MINUTES.md`
-2. специализированные balance-документы
-3. `gdd/01_FIRST_120_MINUTES.md`
+1. `DECISIONS.md`
+2. `gdd/02_ECONOMY_FIRST_120_MINUTES.md`
+3. `gdd/11_BALANCE_RULES.md` после его принятия для общих tuning rules
+4. специализированные GDD
+5. `gdd/01_FIRST_120_MINUTES.md`
+6. PRD
+
+### Evolution/tech/building/job graph
+1. `DECISIONS.md`
+2. `gdd/03_EVOLUTION_TREE.md` для биологического дерева
+3. `gdd/04_CIVILIZATION_PROGRESSION.md`
+4. `gdd/05_BUILDINGS_AND_JOBS.md`
+5. `gdd/06_TECH_TREE.md`
+6. ранний GDD
+
+### Сюжет и тексты
+1. `DECISIONS.md`
+2. документы `scenario/`
+3. `gdd/08_EVENTS_AND_CHOICES.md`
+4. PRD/GDD
+
+### UX
+1. `DECISIONS.md`
+2. документы `ux/`
+3. GDD
 4. PRD
 
-### Узлы развития, ID, prerequisites
-1. `gdd/03_EVOLUTION_TREE.md`
-2. специализированный tech/evolution document
-3. GDD первых 120 минут
-
-### Сюжет, тексты, narrative flags
-1. документы `scenario/`
-2. `gdd/08_EVENTS_AND_CHOICES.md`
-3. PRD/GDD
-
-### UX и представление
-1. документы `ux/`
-2. GDD первых 120 минут
-3. PRD
-
-### Арт и аудио
-1. `art/` и `audio/`
-2. GDD
-3. PRD
+### Арт/аудио
+1. `DECISIONS.md`
+2. `art/` и `audio/`
+3. UX/scenario requirements
+4. GDD
+5. PRD
 
 ### Техническая реализация
-1. `technical/`
-2. `DECISIONS.md`
-3. production roadmap
-4. остальные документы как требования
+1. `DECISIONS.md`
+2. accepted `technical/` documents
+3. code audit
+4. implementation plan
+5. дизайн-документы как requirements
+
+Код сам по себе не переписывает продуктовую спецификацию.
 
 ---
 
-## 5. Рабочий процесс
+## 5. Design-session workflow
 
-### Дизайн и контент
+Полные правила: `production/STATE_WORKFLOW.md`.
 
-1. Создать или обновить спецификацию.
-2. Зафиксировать новые продуктовые решения в `DECISIONS.md`.
-3. При необходимости обновить `GLOSSARY.md`.
-4. Обновить `TODO.md`.
-5. Только после этого передавать задачу Codex.
+Коротко:
+
+1. открыть `PROJECT_STATE.yaml`;
+2. взять только текущую `design.current_session`;
+3. прочитать её inputs;
+4. сделать весь связанный пакет в одном чате;
+5. пользователь проверяет;
+6. после approval документы становятся accepted;
+7. обновляются state/TODO/decisions/glossary;
+8. push;
+9. следующий блок начинается в новом чате.
+
+Не начинать следующий design block автоматически до review текущего.
+
+---
+
+## 6. Роли
+
+### ChatGPT
+Отвечает за:
+- PRD/GDD;
+- сценарий и copy;
+- UX specifications;
+- балансные спецификации;
+- art direction и asset manifests;
+- generation prompts и производство артов;
+- audio direction и prompts;
+- согласованность документации;
+- обновление design state после approval.
 
 ### Codex
+Отвечает за:
+- code audit;
+- архитектуру реализации в рамках accepted technical contract;
+- gameplay implementation;
+- UI implementation;
+- save/load;
+- тесты;
+- analytics hooks;
+- platform integrations;
+- performance/builds.
 
-Перед каждой итерацией Codex должен прочитать:
-
-- `README.md`;
-- `DECISIONS.md`;
-- `GLOSSARY.md`;
-- `TODO.md`;
-- `production/IMPLEMENTATION_ITERATION_PLAN.md`;
-- документы, перечисленные во входах текущей итерации.
-
-После каждой итерации:
-
-- выполнить тесты;
-- проверить Definition of Done;
-- обновить checklist;
-- обновить `TODO.md`;
-- перечислить изменённые файлы;
-- записать выявленные противоречия;
-- не начинать следующую итерацию автоматически.
+Codex не должен самостоятельно придумывать missing gameplay rules или переводить design session в done.
 
 ---
 
-## 6. Правило scope
+## 7. Параллельная работа
 
-Текущая главная цель — полностью реализовать первый Timeline:
+Текущий gate определяется `PROJECT_STATE.yaml`.
 
-**Жизнь → Разум → Цивилизация → Индустрия → Атом → Великий фильтр → Пепел → Архив → Timeline #2 teaser.**
+До принятия DS-03 implementation Codex в основном паузится, кроме безопасных baseline/research задач.
 
-Не реализовывать глубокий космос, Bioseed и поздние системы до завершения, тестирования и балансировки первого Timeline, если отдельное решение не говорит обратного.
+После DS-03 разрешается параллельно:
+- продолжать narrative/UX/meta/art/audio design;
+- завершать Codex Iteration 0 baseline;
+- начинать Codex Iteration 1 после review technical contract.
 
----
-
-## 7. Правило data-driven реализации
-
-Баланс, дерево развития, цели, события и narrative flags должны храниться в данных/конфигурациях там, где это разумно.
-
-Не зашивать в UI:
-
-- цены;
-- времена;
-- branch prerequisites;
-- тексты событий;
-- награды;
-- условия milestones;
-- narrative flags.
-
-UI должен отображать состояние доменной модели.
+Если два потока реально работают одновременно, использовать отдельные branches согласно `STATE_WORKFLOW.md`.
 
 ---
 
-## 8. Именование
+## 8. Scope текущего проекта
 
-Рабочее и пользовательское название проекта:
+Главная цель — первый Timeline:
+
+**Жизнь -> Разум -> Цивилизация -> Индустрия -> Атом -> Великий фильтр -> Пепел -> Архив -> Timeline #2 teaser.**
+
+Глубокий космос, Bioseed, universes и поздний контент не должны расширять scope текущего vertical slice.
+
+---
+
+## 9. Data-driven правило
+
+Баланс, evolution/tech nodes, buildings, jobs, goals, events, rewards, narrative flags, endings и visual/audio IDs должны быть data-driven там, где это разумно для текущей legacy architecture.
+
+Не зашивать продуктовые данные в presentation layer без необходимости.
+
+---
+
+## 10. Именование
+
+Основное название проекта во всех новых документах:
 
 # Хроники Эволюции
 
-В новых документах не использовать старое рабочее название как основное название продукта.
-
-Ссылки на Evolve допустимы только когда речь идёт об исходном open-source проекте или наследуемой технической логике.
-
----
-
-## 9. Когда обновлять этот файл
-
-Обновлять `README.md`, если:
-
-- появилась новая крупная папка;
-- изменился source-of-truth;
-- появился новый обязательный тип документа;
-- изменился процесс работы между контентом и реализацией.
+`Evolve` используется только для обозначения исходного open-source проекта/legacy engine.

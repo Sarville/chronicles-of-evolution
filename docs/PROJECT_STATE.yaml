@@ -1,0 +1,223 @@
+schema_version: 1
+project:
+  name: "Хроники Эволюции"
+  repository: "Sarville/chronicles-of-evolution"
+  scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
+  work_mode: "documentation_design"
+  last_updated: "2026-09-15"
+
+authority:
+  project_status: "docs/PROJECT_STATE.yaml"
+  human_todo_view: "docs/TODO.md"
+  decisions: "docs/DECISIONS.md"
+  glossary: "docs/GLOSSARY.md"
+  design_session_plan: "docs/production/DESIGN_SESSION_PLAN.md"
+  implementation_plan: "docs/production/IMPLEMENTATION_ITERATION_PLAN.md"
+
+status_values:
+  - todo
+  - ready
+  - active
+  - review
+  - done
+  - blocked
+  - paused
+  - partial
+
+workflow:
+  user_review_required_before_session_done: true
+  one_primary_design_block_per_chat: true
+  state_update_required_at_session_end: true
+  todo_update_required_at_session_end: true
+  decisions_update_when_needed: true
+  push_after_approval: true
+
+design:
+  current_session: "DS-01"
+  last_completed_session: "DS-00"
+  sessions:
+    DS-00:
+      name: "Documentation orchestration and repository structure"
+      status: done
+      outputs:
+        - "docs/README.md"
+        - "docs/DECISIONS.md"
+        - "docs/GLOSSARY.md"
+        - "docs/TODO.md"
+        - "docs/PROJECT_STATE.yaml"
+        - "docs/production/DESIGN_SESSION_PLAN.md"
+        - "docs/production/STATE_WORKFLOW.md"
+    DS-01:
+      name: "Civilization gameplay contract"
+      status: ready
+      depends_on: [DS-00]
+      outputs:
+        - "docs/gdd/04_CIVILIZATION_PROGRESSION.md"
+        - "docs/gdd/05_BUILDINGS_AND_JOBS.md"
+        - "docs/gdd/06_TECH_TREE.md"
+    DS-02:
+      name: "Goals, events and first ending contract"
+      status: blocked
+      depends_on: [DS-01]
+      outputs:
+        - "docs/gdd/07_GOALS_AND_MILESTONES.md"
+        - "docs/gdd/08_EVENTS_AND_CHOICES.md"
+        - "docs/gdd/09_ENDINGS_AND_RESET.md"
+    DS-03:
+      name: "Technical architecture and data contract"
+      status: blocked
+      depends_on: [DS-01, DS-02]
+      outputs:
+        - "docs/technical/00_TECHNICAL_OVERVIEW.md"
+        - "docs/technical/02_DOMAIN_ADAPTER.md"
+        - "docs/technical/03_GAME_STATE.md"
+        - "docs/technical/04_SAVE_ARCHITECTURE.md"
+        - "docs/technical/07_TESTING_STRATEGY.md"
+    DS-04:
+      name: "Meta progression and balance rules"
+      status: blocked
+      depends_on: [DS-02]
+      outputs:
+        - "docs/gdd/10_META_PROGRESSION.md"
+        - "docs/gdd/11_BALANCE_RULES.md"
+    DS-05:
+      name: "Timeline #1 full narrative package"
+      status: blocked
+      depends_on: [DS-02]
+      outputs:
+        - "docs/scenario/01_TIMELINE_01_SCRIPT.md"
+        - "docs/scenario/04_STORY_EVENTS.md"
+        - "docs/scenario/05_NARRATIVE_FLAGS.md"
+        - "docs/scenario/06_ENDINGS_COPY.md"
+        - "docs/scenario/07_COPY_GUIDE.md"
+    DS-06:
+      name: "UX architecture and wireframes"
+      status: blocked
+      depends_on: [DS-01, DS-02]
+      outputs:
+        - "docs/ux/00_UX_PRINCIPLES.md"
+        - "docs/ux/01_SCREEN_MAP.md"
+        - "docs/ux/02_MOBILE_WIREFRAMES.md"
+        - "docs/ux/03_DESKTOP_WIREFRAMES.md"
+        - "docs/ux/04_COMPONENT_STATES.md"
+        - "docs/ux/05_TUTORIAL_AND_HINTS.md"
+    DS-07:
+      name: "Art direction, locations and era transitions"
+      status: blocked
+      depends_on: [DS-05, DS-06]
+      outputs:
+        - "docs/art/00_ART_DIRECTION.md"
+        - "docs/art/01_LOCATIONS_AND_DIORAMAS.md"
+        - "docs/art/02_ERA_TRANSITIONS.md"
+    DS-08:
+      name: "Art production manifest and generation prompts"
+      status: blocked
+      depends_on: [DS-07]
+      outputs:
+        - "docs/art/03_BUILDINGS_AND_PROPS.md"
+        - "docs/art/04_ASSET_MANIFEST.md"
+        - "docs/art/05_GENERATION_PROMPTS.md"
+    DS-09:
+      name: "Audio design and generation package"
+      status: blocked
+      depends_on: [DS-05, DS-07]
+      outputs:
+        - "docs/audio/00_AUDIO_DIRECTION.md"
+        - "docs/audio/01_MUSIC_CUES.md"
+        - "docs/audio/02_AMBIENCE.md"
+        - "docs/audio/03_SFX_LIBRARY.md"
+        - "docs/audio/04_STINGERS.md"
+        - "docs/audio/05_GENERATION_PROMPTS.md"
+    DS-10:
+      name: "Analytics, platform and production readiness"
+      status: blocked
+      depends_on: [DS-03, DS-06]
+      outputs:
+        - "docs/technical/05_ANALYTICS_SCHEMA.md"
+        - "docs/technical/06_PLATFORM_INTEGRATION.md"
+        - "docs/production/CONTENT_PIPELINE.md"
+        - "docs/production/RELEASE_CHECKLIST.md"
+    DS-11:
+      name: "Cross-document consistency pass and design freeze v1"
+      status: blocked
+      depends_on: [DS-04, DS-05, DS-06, DS-08, DS-09, DS-10]
+      outputs:
+        - "accepted first-Timeline design baseline v1.0"
+
+documentation:
+  foundation:
+    prd: done
+    first_120_gdd: done
+    economy_first_120: done
+    evolution_tree: done
+    narrative_bible: done
+    code_audit: done
+    docs_structure_plan: done
+    implementation_iteration_plan: done
+    decisions: done
+    glossary: done
+    project_state: done
+    state_workflow: done
+    design_session_plan: done
+  current_block:
+    civilization_progression: todo
+    buildings_and_jobs: todo
+    tech_tree: todo
+
+implementation:
+  mode: paused_for_design_contract
+  current_iteration: 0
+  resume_gate: "DS-03 approved"
+  iterations:
+    0:
+      name: "Repo baseline and code audit"
+      status: partial
+      completed:
+        - "static code audit"
+        - "architecture/module map"
+        - "game loop/resource/save/UI/platform reconnaissance"
+      pending:
+        - "baseline build confirmation"
+        - "baseline bundle size"
+        - "baseline startup measurement"
+        - "smoke command/script decision"
+    1:
+      name: "Domain adapter and data foundation"
+      status: blocked
+      depends_on:
+        - "DS-03 approved"
+        - "Iteration 0 pending baseline tasks complete"
+    2:
+      name: "Save v1 and dev tools"
+      status: blocked
+      depends_on: ["Implementation Iteration 1"]
+
+parallelization:
+  now:
+    design: "DS-01"
+    codex: "paused"
+  after_DS_03:
+    design_can_continue_with:
+      - "DS-04"
+      - "DS-05"
+      - "DS-06"
+    codex_can_resume_with:
+      - "complete Iteration 0 baseline tasks"
+      - "start Iteration 1 after review"
+  after_DS_05_and_DS_06:
+    parallel_design_tracks:
+      - "DS-07 art"
+      - "DS-09 audio after DS-07 direction is accepted"
+
+open_decisions:
+  - "Exact new UI framework / degree of Vue 2 reuse"
+  - "Canonical gameplay config format"
+  - "Legacy save compatibility strategy versus clean new save wrapper"
+  - "Portal SDK abstraction details"
+  - "Visible World Tension versus Stability + risk explanation"
+  - "User-facing name of Archive permanent currency"
+
+next_action:
+  owner: "ChatGPT + user review"
+  session: "DS-01"
+  description: "Design civilization progression, buildings/jobs and technology tree as one coherent gameplay contract for 46-108 minutes."
