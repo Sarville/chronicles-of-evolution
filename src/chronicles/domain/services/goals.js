@@ -150,7 +150,7 @@ export function evaluateGoals(state, ruleset, ports = {}) {
     }
     const canActivate =
       goalPrerequisitesMet(state, goal) && (goal.optional || goal.slot === 'side' || canActivateMainGoal(state, goal));
-    if (canActivate && ['hidden', 'revealed', 'stalled'].includes(goalState.status)) {
+    if (canActivate && ['hidden', 'revealed'].includes(goalState.status)) {
       events.push(...activateGoal(state, goal, ports));
     }
   }

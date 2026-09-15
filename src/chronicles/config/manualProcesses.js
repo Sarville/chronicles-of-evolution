@@ -8,7 +8,6 @@ export const manualProcesses = [
     label: 'Primordial pulse',
     description: 'Onboarding process for the first Energy before Stable Bond unlocks auto-production.',
     availableFromStart: true,
-    obsoleteAfterNodeId: 'M01',
     cooldownMs: DEV_TUNING.manualPrimordialPulseCooldownMs,
     provisional: true,
     reward: {

@@ -1,6 +1,5 @@
 import { createBrowserStorage } from '../adapters/storageAdapter.js';
 import { ruleset, createRulesetIndexes } from '../config/index.js';
-import { createChroniclesEngine } from '../domain/engine.js';
 import {
   selectCurrentGoal,
   selectManualProcessView,
@@ -12,9 +11,8 @@ import {
   selectSideGoals,
   selectVisibleResources,
 } from '../domain/selectors.js';
-import { createDebugApi } from '../dev/debugApi.js';
-import { createAutosaveController } from '../save/autosave.js';
 import { createSaveRepository } from '../save/repository.js';
+import { createPlayableRuntime, routeCtaFocus } from './runtime.js';
 
 const DEV = __CHRONICLES_DEV__;
 const ROOT_ID = 'chronicles-root';
@@ -40,15 +38,25 @@ const PRODUCER_NAMES = {
 
 const storage = createBrowserStorage();
 const repository = createSaveRepository({ storage });
-const loaded = repository.loadOrCreate();
-const engine = createChroniclesEngine({ ruleset, state: loaded.ok ? loaded.state : undefined });
-const debugApi = DEV ? createDebugApi({ dev: true, engine }) : null;
-const autosave = createAutosaveController({ repository, engine, intervalMs: 5000 });
+let runtime = createPlayableRuntime({ repository, ruleset, dev: DEV });
 const indexes = createRulesetIndexes(ruleset);
 let activeView = 'world';
+let focusedEntityId = null;
 let lastTickAt = performance.now();
-let lastRates = {};
-let lastSaveMessage = loaded.ok ? (loaded.created ? 'New run created' : 'Save loaded') : 'Recovery required; started temporary run';
+let lastSaveMessage =
+  runtime.mode === 'playable' ? (runtime.loaded.created ? 'New run created' : 'Save loaded') : 'Recovery required';
+
+function engine() {
+  return runtime.engine;
+}
+
+function autosave() {
+  return runtime.autosave;
+}
+
+function debugApi() {
+  return runtime.debugApi;
+}
 
 function formatNumber(value) {
   if (!Number.isFinite(value)) {
@@ -70,9 +78,9 @@ function formatCost(cost) {
 }
 
 function phaseLabel() {
-  if (engine.state.run.nodes.completed.M06) return 'Proto-cell';
-  if (engine.state.run.nodes.completed.M02) return 'Self replication';
-  if (engine.state.run.nodes.completed.M01) return 'Stable structures';
+  if (engine().state.run.nodes.completed.M06) return 'Proto-cell';
+  if (engine().state.run.nodes.completed.M02) return 'Self replication';
+  if (engine().state.run.nodes.completed.M01) return 'Stable structures';
   return 'Primordial';
 }
 
@@ -80,9 +88,9 @@ function goalProgress(goal) {
   if (!goal) return '';
   if (goal.nodeId) {
     const node = indexes.nodes[goal.nodeId];
-    return Object.entries(selectNodeCost(engine.state, ruleset, goal.nodeId))
+    return Object.entries(selectNodeCost(engine().state, ruleset, goal.nodeId))
       .map(([resourceId, amount]) => {
-        const current = engine.state.run.resources[resourceId]?.amount || 0;
+        const current = engine().state.run.resources[resourceId]?.amount || 0;
         return `${RESOURCE_NAMES[resourceId] || resourceId}: ${formatNumber(Math.min(current, amount))} / ${formatNumber(amount)}`;
       })
       .join('<br>');
@@ -91,7 +99,7 @@ function goalProgress(goal) {
 }
 
 function renderResources() {
-  return selectVisibleResources(engine.state, ruleset)
+  return selectVisibleResources(engine().state, ruleset)
     .map(
       (resource) => `<div class="resource-row">
         <span>${RESOURCE_NAMES[resource.id] || resource.id}</span>
@@ -103,8 +111,8 @@ function renderResources() {
 }
 
 function renderObjective() {
-  const goal = selectCurrentGoal(engine.state, ruleset);
-  const sideGoals = selectSideGoals(engine.state, ruleset);
+  const goal = selectCurrentGoal(engine().state, ruleset);
+  const sideGoals = selectSideGoals(engine().state, ruleset);
   if (!goal) {
     return '<section class="panel objective"><h2>Objective</h2><p>No active objective.</p></section>';
   }
@@ -125,13 +133,13 @@ function renderObjective() {
 }
 
 function renderManualAction() {
-  const process = selectManualProcessView(engine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE');
-  if (!process || (process.obsoleteAfterNodeId && engine.state.run.nodes.completed[process.obsoleteAfterNodeId])) {
+  const process = selectManualProcessView(engine().state, ruleset, 'MANUAL_PRIMORDIAL_PULSE');
+  if (!process || (process.obsoleteAfterNodeId && engine().state.run.nodes.completed[process.obsoleteAfterNodeId])) {
     return '';
   }
   const reward = formatCost(process.reward);
-  const remaining = Math.max(0, (process.state.availableAtMs || 0) - engine.state.run.clock.simulationMs);
-  return `<button class="wide primary" data-action="manual" ${process.available ? '' : 'disabled'}>
+  const remaining = Math.max(0, (process.state.availableAtMs || 0) - engine().state.run.clock.simulationMs);
+  return `<button class="wide primary ${focusedEntityId === process.id ? 'focused' : ''}" data-entity-id="${process.id}" data-action="manual" ${process.available ? '' : 'disabled'}>
     Primordial pulse
     <small>${process.available ? `Gain ${reward}` : `${Math.ceil(remaining / 1000)}s`}</small>
   </button>`;
@@ -140,13 +148,13 @@ function renderManualAction() {
 function renderProducers() {
   const rows = ruleset.producers
     .map((producer) => {
-      const status = selectProducerStatus(engine.state, ruleset, producer.id);
+      const status = selectProducerStatus(engine().state, ruleset, producer.id);
       if (status === 'locked') return '';
-      const count = engine.state.run.producers[producer.id]?.count || 0;
+      const count = engine().state.run.producers[producer.id]?.count || 0;
       const output = formatCost(producer.output);
-      return `<button class="entity ${status}" data-action="producer" data-id="${producer.id}" ${status === 'available_affordable' ? '' : 'disabled'}>
+      return `<button class="entity ${status} ${focusedEntityId === producer.id ? 'focused' : ''}" data-entity-id="${producer.id}" data-action="producer" data-id="${producer.id}" ${status === 'available_affordable' ? '' : 'disabled'}>
         <span><strong>${PRODUCER_NAMES[producer.id] || producer.id}</strong><small>Owned ${count}</small></span>
-        <span><small>Cost</small>${formatCost(selectProducerPrice(engine.state, ruleset, producer.id))}</span>
+        <span><small>Cost</small>${formatCost(selectProducerPrice(engine().state, ruleset, producer.id))}</span>
         <span><small>Output</small>${output}/s</span>
       </button>`;
     })
@@ -157,12 +165,12 @@ function renderProducers() {
 function renderEvolution() {
   const rows = MOLECULAR_NODES.map((nodeId) => {
     const node = indexes.nodes[nodeId];
-    const status = selectNodeStatus(engine.state, ruleset, nodeId);
+    const status = selectNodeStatus(engine().state, ruleset, nodeId);
     const optional = node.type === 'OPTIONAL' ? '<small class="optional">OPTIONAL</small>' : '';
-    return `<button class="node ${status}" data-action="node" data-id="${nodeId}" ${status === 'available_affordable' ? '' : 'disabled'}>
+    return `<button class="node ${status} ${focusedEntityId === nodeId ? 'focused' : ''}" data-entity-id="${nodeId}" data-action="node" data-id="${nodeId}" ${status === 'available_affordable' ? '' : 'disabled'}>
       <span><strong>${nodeId} — ${NODE_NAMES[nodeId]}</strong>${optional}</span>
       <span>${status.replaceAll('_', ' ')}</span>
-      <small>${formatCost(selectNodeCost(engine.state, ruleset, nodeId))}</small>
+      <small>${formatCost(selectNodeCost(engine().state, ruleset, nodeId))}</small>
     </button>`;
   }).join('');
   return `<section class="panel evolution-panel"><h2>Evolution</h2><div class="node-grid">${rows}</div></section>`;
@@ -172,11 +180,11 @@ function renderDiorama() {
   return `<section class="diorama" aria-label="World state">
     <div class="orbital orbital-a"></div>
     <div class="orbital orbital-b"></div>
-    <div class="molecule ${engine.state.run.nodes.completed.M06 ? 'proto' : ''}"></div>
+    <div class="molecule ${engine().state.run.nodes.completed.M06 ? 'proto' : ''}"></div>
     <div>
       <p>World</p>
       <h1>${phaseLabel()}</h1>
-      <span>Timeline #1 · ${Math.floor(engine.state.run.clock.simulationMs / 1000)}s</span>
+      <span>Timeline #1 · ${Math.floor(engine().state.run.clock.simulationMs / 1000)}s</span>
     </div>
   </section>`;
 }
@@ -186,7 +194,7 @@ const renderDevPanel = DEV
       return `<details class="panel dev-panel">
     <summary>Development</summary>
     <div class="dev-grid">
-      ${debugApi.timeScales.map((scale) => `<button data-action="speed" data-scale="${scale}">${scale}x</button>`).join('')}
+      ${debugApi().timeScales.map((scale) => `<button data-action="speed" data-scale="${scale}">${scale}x</button>`).join('')}
       <button data-action="grant" data-resource="energy">+100 Energy</button>
       <button data-action="grant" data-resource="information">+25 Information</button>
       <button data-action="dev-reset">Dev reset</button>
@@ -201,6 +209,23 @@ const renderDevPanel = DEV
 
 function render() {
   const root = document.getElementById(ROOT_ID);
+  if (runtime.mode !== 'playable') {
+    root.innerHTML = `<main class="app recovery">
+      <section class="panel recovery-panel">
+        <h1>Save recovery required</h1>
+        <p>Primary / pending / backup contain invalid data.</p>
+        ${
+          runtime.diagnostics?.length
+            ? `<ul>${runtime.diagnostics
+                .map((slot) => `<li><strong>${slot.key}</strong>: ${slot.reason}${slot.errors?.length ? ` (${slot.errors.join(', ')})` : ''}</li>`)
+                .join('')}</ul>`
+            : ''
+        }
+        <button class="primary" data-action="start-fresh">Start fresh</button>
+      </section>
+    </main>`;
+    return;
+  }
   root.innerHTML = `<main class="app">
     <header>
       <div><strong>Хроники Эволюции</strong><small>Early playable 0-10 min slice</small></div>
@@ -228,17 +253,36 @@ function handleAction(target) {
   const button = target.closest('button');
   if (!button) return;
   const action = button.dataset.action;
+  if (action === 'start-fresh') {
+    const fresh = runtime.startFreshAfterCorruption();
+    if (fresh.ok) {
+      runtime = fresh.runtime;
+      lastSaveMessage = 'New run created';
+      lastTickAt = performance.now();
+      requestAnimationFrame(loop);
+    } else {
+      lastSaveMessage = `Recovery failed: ${fresh.loaded.reason}`;
+    }
+    render();
+    return;
+  }
+  if (runtime.mode !== 'playable') return;
   if (action === 'view') activeView = button.dataset.view;
-  if (action === 'manual') engine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
-  if (action === 'producer') engine.dispatch({ type: 'BUY_PRODUCER', producerId: button.dataset.id });
+  if (action === 'focus') {
+    const routed = routeCtaFocus({ targetId: button.dataset.target }, indexes);
+    activeView = routed.activeView;
+    focusedEntityId = routed.focusedEntityId;
+  }
+  if (action === 'manual') engine().dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
+  if (action === 'producer') engine().dispatch({ type: 'BUY_PRODUCER', producerId: button.dataset.id });
   if (action === 'node') {
-    const result = engine.dispatch({ type: 'BUY_NODE', nodeId: button.dataset.id });
+    const result = engine().dispatch({ type: 'BUY_NODE', nodeId: button.dataset.id });
     if (result.ok && result.events.some((event) => event.type === 'proto_cell_reached' || event.payload?.nodeId === 'M06')) {
-      autosave.flush('proto_cell_reached');
+      autosave().flush('proto_cell_reached');
     }
   }
   if (action === 'save') {
-    const saved = autosave.flush('manual');
+    const saved = autosave().flush('manual');
     lastSaveMessage = saved.ok ? 'Saved' : `Save failed: ${saved.reason}`;
   }
   if (action === 'new-run') {
@@ -247,11 +291,15 @@ function handleAction(target) {
     storage.remove('chronicles_evolution.pending');
     window.location.reload();
   }
-  if (DEV && action === 'speed') debugApi.setTimeScale(Number(button.dataset.scale));
-  if (DEV && action === 'grant') debugApi.grant(button.dataset.resource, button.dataset.resource === 'energy' ? 100 : 25);
-  if (DEV && action === 'dev-reset') debugApi.manualDevReset({ runId: `run_dev_${Date.now()}` });
-  if (DEV && action === 'dump') document.getElementById('dev-dump').textContent = JSON.stringify(debugApi.dumpState(), null, 2);
+  if (DEV && action === 'speed') debugApi().setTimeScale(Number(button.dataset.scale));
+  if (DEV && action === 'grant') debugApi().grant(button.dataset.resource, button.dataset.resource === 'energy' ? 100 : 25);
+  if (DEV && action === 'dev-reset') debugApi().manualDevReset({ runId: `run_dev_${Date.now()}` });
+  if (DEV && action === 'dump') document.getElementById('dev-dump').textContent = JSON.stringify(debugApi().dumpState(), null, 2);
   render();
+  if (focusedEntityId) {
+    document.querySelector(`[data-entity-id="${focusedEntityId}"]`)?.focus();
+    document.querySelector(`[data-entity-id="${focusedEntityId}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
 }
 
 function installStyles() {
@@ -262,6 +310,7 @@ function installStyles() {
     button { min-height: 44px; border: 1px solid #3d4b50; background: #20272a; color: #f3f0e8; border-radius: 6px; padding: 10px 12px; cursor: pointer; text-align: left; }
     button:disabled { opacity: .45; cursor: not-allowed; }
     button.active, button.primary, button.available_affordable { border-color: #66d0a5; background: #1e3732; }
+    button.focused { outline: 3px solid #f0c36a; outline-offset: 2px; }
     .app { min-height: 100vh; padding: 18px; }
     header { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 12px; }
     header small, small { display: block; color: #aab7b5; margin-top: 2px; }
@@ -294,6 +343,9 @@ function installStyles() {
     .side-goal { border-top: 1px solid #2d383c; padding-top: 10px; margin-top: 10px; }
     .side-goal span { display: block; color: #c0cbc8; margin-top: 3px; }
     .status button { width: 100%; margin-top: 8px; text-align: center; }
+    .recovery { display: grid; min-height: 100vh; place-items: center; }
+    .recovery-panel { width: min(680px, calc(100vw - 32px)); }
+    .recovery-panel h1 { margin: 0 0 10px; font-size: 28px; letter-spacing: 0; }
     #dev-dump { max-height: 260px; overflow: auto; font-size: 11px; color: #cdd6d2; }
     @media (max-width: 820px) {
       .layout { grid-template-columns: 1fr; }
@@ -307,12 +359,14 @@ function installStyles() {
 }
 
 function loop(now) {
+  if (runtime.mode !== 'playable') {
+    return;
+  }
   const deltaMs = Math.min(1000, now - lastTickAt);
   lastTickAt = now;
-  const scaled = deltaMs * (DEV ? engine.state.settings.devTimeScale || 1 : 1);
-  const tick = engine.tick(scaled);
-  lastRates = tick.rates;
-  const saved = autosave.tick(scaled);
+  const scaled = deltaMs * (DEV ? engine().state.settings.devTimeScale || 1 : 1);
+  engine().tick(scaled);
+  const saved = autosave().tick(scaled);
   if (saved.ok && !saved.skipped) {
     lastSaveMessage = 'Autosaved';
   }
@@ -324,10 +378,16 @@ document.addEventListener('DOMContentLoaded', () => {
   installStyles();
   document.getElementById(ROOT_ID).addEventListener('click', (event) => handleAction(event.target));
   window.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') autosave.flush('visibility');
+    if (document.visibilityState === 'hidden' && runtime.mode === 'playable') autosave().flush('visibility');
   });
-  window.addEventListener('beforeunload', () => autosave.flush('beforeunload'));
-  lastRates = selectProductionRates(engine.state, ruleset);
+  window.addEventListener('beforeunload', () => {
+    if (runtime.mode === 'playable') autosave().flush('beforeunload');
+  });
+  if (runtime.mode === 'playable') {
+    selectProductionRates(engine().state, ruleset);
+  }
   render();
-  requestAnimationFrame(loop);
+  if (runtime.mode === 'playable') {
+    requestAnimationFrame(loop);
+  }
 });

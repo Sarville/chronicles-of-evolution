@@ -177,6 +177,44 @@ assert.equal(cultureBranchEngine.state.run.nodes.selectedBranchByGroup.culture_1
 assert.equal(selectNodeStatus(cultureBranchEngine.state, ruleset, 'T01B'), 'locked');
 assert.equal(selectNodeStatus(cultureBranchEngine.state, ruleset, 'T01C'), 'locked');
 
+const manualRewardEngine = createChroniclesEngine({ ruleset });
+assert.deepEqual(selectManualProcessView(manualRewardEngine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').reward, { energy: 1 });
+result = manualRewardEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'energy', amount: 12 });
+assert.equal(result.ok, true);
+result = manualRewardEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M01' });
+assert.equal(result.ok, true);
+assert.equal(selectManualProcessView(manualRewardEngine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').available, true);
+assert.deepEqual(selectManualProcessView(manualRewardEngine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').reward, { energy: 2 });
+result = manualRewardEngine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
+assert.equal(result.ok, true);
+assert.deepEqual(result.events.find((event) => event.type === 'manual_process_used').payload.reward, { energy: 2 });
+manualRewardEngine.tick(1000);
+assert.equal(selectManualProcessView(manualRewardEngine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').available, true);
+
+const stalledEngine = createChroniclesEngine({ ruleset });
+let initialStartedEvents = stalledEngine.state.session.lastEvents.filter((event) => event.type === 'goal_started');
+assert.equal(initialStartedEvents.length, 1);
+assert.equal(initialStartedEvents[0].payload.goalId, 'G001');
+tick = stalledEngine.tick(20000);
+assert.equal(stalledEngine.state.run.goals.states.G001.status, 'stalled');
+assert.equal(tick.events.filter((event) => event.type === 'goal_hint_shown').length, 1);
+assert.equal(tick.events.filter((event) => event.type === 'goal_started').length, 0);
+tick = stalledEngine.tick(1000);
+assert.equal(stalledEngine.state.run.goals.states.G001.status, 'stalled');
+assert.equal(tick.events.filter((event) => event.type === 'goal_hint_shown').length, 0);
+assert.equal(tick.events.filter((event) => event.type === 'goal_started').length, 0);
+result = stalledEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'energy', amount: 12 });
+assert.equal(result.events.filter((event) => event.type === 'goal_started').length, 0);
+result = stalledEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M01' });
+assert.equal(result.ok, true);
+assert.equal(result.events.filter((event) => event.type === 'goal_completed' && event.payload.goalId === 'G001').length, 1);
+assert.equal(stalledEngine.state.run.goals.states.G001.status, 'archived');
+assert.equal(stalledEngine.state.run.goals.states.G001.rewardAppliedAtMs, stalledEngine.state.run.clock.simulationMs);
+const rewardAppliedAtMs = stalledEngine.state.run.goals.states.G001.rewardAppliedAtMs;
+tick = stalledEngine.tick(1000);
+assert.equal(stalledEngine.state.run.goals.states.G001.rewardAppliedAtMs, rewardAppliedAtMs);
+assert.equal(tick.events.filter((event) => event.type === 'goal_completed' && event.payload.goalId === 'G001').length, 0);
+
 assert.equal(producerMilestoneMultiplier(9), 1);
 assert.equal(producerMilestoneMultiplier(10), 2);
 assert.equal(producerMilestoneMultiplier(25), 4);

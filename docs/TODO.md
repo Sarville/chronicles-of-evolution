@@ -173,6 +173,16 @@ Known tuning note:
 
 - [ ] Reference simulation currently reaches Proto-cell faster than the 9–11 min target with current canonical values; rebalance should be handled explicitly in a future tuning pass.
 
+Correction pass:
+
+- [x] recovery mode does not auto-create temporary gameplay/autosave;
+- [x] explicit Start fresh required after corrupt save recovery;
+- [x] manual primordial process remains available after M01;
+- [x] M01 doubles manual reward;
+- [x] stalled lifecycle persists without duplicate `goal_started` / hints / rewards;
+- [x] objective CTA routes and focuses target entity;
+- [x] lightweight `npm run test:ui` added.
+
 ## Iteration 4 — First content expansion after Proto-cell
 
 **Status:** ready / not started
@@ -222,5 +232,5 @@ DS-06 UX также ready и может идти после/параллельн
 
 Параллельно:
 
-1. **Codex:** остановиться после Iteration 2 micro-fix gate; Iteration 3 запускать только по отдельному подтверждению.
+1. **Codex:** остановиться после Iteration 3 correction pass; Iteration 4 запускать только по отдельному подтверждению.
 2. **ChatGPT/user:** DS-05 — Timeline #1 full narrative package.

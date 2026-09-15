@@ -95,6 +95,25 @@ implementation:
     notes:
       - "Early playable 0-10 min slice is included in Iteration 3 as requested; Iteration 4 remains the next content expansion step."
       - "Reference simulation reaches automatic income at ~00:21, Self Replication at ~02:52 and Proto-cell at ~04:53; Proto-cell is faster than the 9-11 min target with current canonical economy and recommended pre-Proto producer counts."
+  iteration_3_correction_pass:
+    date: "2026-09-15"
+    base_commit: "69f81a782cdf63c0b9ef7445235eed634cc74609"
+    status: "passed"
+    scope: "Correction pass for Iteration 3 Goal Engine + early playable 0-10 min slice; Iteration 4 not started"
+    fixes:
+      - "RECOVERY_REQUIRED UI no longer creates a temporary playable run, starts loop/autosave or writes save slots before explicit Start fresh."
+      - "Manual primordial process remains available after M01 and M01 manual_gain_multiplier now remains meaningful."
+      - "stalled goal lifecycle no longer reactivates/re-emits goal_started; tick performs one goal evaluation pass after production."
+      - "Objective CTA routes to World/Evolution and focuses the target entity; UI runtime smoke coverage added."
+    gates:
+      npm_test: passed
+      test_ui: passed
+      test_sim: passed
+      smoke: passed
+      build: passed
+    notes:
+      - "No 0-10 balance rebalance was performed."
+      - "Reference timings remain automatic income ~00:21, Self Replication ~02:52, Proto-cell ~04:53."
   last_iteration_2_micro_fix:
     date: "2026-09-15"
     base_commit: "82c60bc86f88a27c9941d6153efecf93b6e15510"

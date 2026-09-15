@@ -57,7 +57,7 @@ export function dispatchCommand(state, ruleset, command, ports = {}) {
       state.run.clock.simulationMs += command.deltaMs;
       state.run.clock.activeMs += command.deltaMs;
       const events = [createDomainEvent('tick', { deltaMs: command.deltaMs }, state, ports)];
-      return ok(state, withGoalEvaluation(state, ruleset, events, ports));
+      return ok(state, events);
     }
     default:
       return rejected('UNKNOWN_COMMAND', { type: command.type });
