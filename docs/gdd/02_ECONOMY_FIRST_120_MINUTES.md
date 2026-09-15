@@ -1,729 +1,394 @@
 # Хроники Эволюции — экономика первых 120 минут
 
-**Версия:** balance draft v1.0  
-**Назначение:** рабочая спецификация для реализации и дальнейшего telemetry-баланса первого прохождения.  
-**Область:** Timeline #1, от первой РНК до события «Пепел» и первого reset.
+**Версия:** reconciliation balance spec v2.0  
+**Статус:** canonical structure / biological numbers pending re-balance  
+**Authority:** `DECISIONS_RECONCILIATION.md` + `01_FIRST_120_MINUTES.md`.
 
-> Важно: это не восстановление старых чисел из GDD. В доступной сводке сохранилась последовательность RNA → клетка → ветвление → разум → племя → город → индустрия → атом → кризис → «Пепел» → reset, но не числовой баланс. Поэтому все значения ниже — согласованная v1.0 модель, рассчитанная специально под 120-минутный первый цикл.
-
----
-
-## 1. Цели баланса
-
-Первый цикл должен:
-
-1. дать первый автоматический income не позднее 45–60 секунд;
-2. не требовать спама кликами: ручное действие полезно только первые 2–3 минуты;
-3. менять экономическую модель несколько раз, чтобы игрок ощущал переход масштаба;
-4. давать значимое решение или unlock каждые 2–6 минут;
-5. приводить среднего активного игрока к «Пеплу» примерно на 116-й минуте;
-6. отдавать первый reset около 120-й минуты;
-7. допускать разброс примерно ±10 минут без разрушения сценария;
-8. не использовать рекламу как обязательную часть расчёта экономики.
-
-### Контрольные стадии
-
-| Стадия | Целевое время | Главный смысл |
-|---|---:|---|
-| Первая саморепликация | 02:00 | игрок понимает цикл Energy → Information |
-| Протоклетка | 10:00 | появляется Biomass, начинается клеточная экономика |
-| Многоклеточность | 26:00 | производство распределяется по тканям |
-| Разум | 46:00 | биологическая экономика завершается |
-| Племя | 56:00 | population/jobs становятся главным инструментом |
-| Земледелие | 62:00 | появляется устойчивый Food surplus |
-| Город | 80:00 | экономика становится инфраструктурной |
-| Индустрия | 94:00 | появляется Power и массовое производство |
-| Атомный век | 108:00 | Science/Power быстро растут, Stability начинает падать |
-| «Пепел» | 116:00 | экономика ломается сюжетным кризисом |
-| Первый reset | 120:00 | открывается Архив Жизни |
+> Economy описывает **как сбалансировать утверждённый gameplay**. Она больше не может вводить новые visible resources, generators или progression nodes ради удобства симуляции.
 
 ---
 
-# 2. Общая модель
+# 1. Balance goals
 
-## 2.1. Эры и активные ресурсы
+Timeline #1 должен:
 
-Чтобы интерфейс не превращался в панель из десяти валют, одновременно показываем не более 3–4 производимых ресурсов.
+1. дать первое осмысленное действие <20 sec;
+2. дать passive/self-sustaining process <60 sec;
+3. убрать clicker dominance после первых 2–3 минут;
+4. давать понятный payoff каждые 2–6 минут;
+5. доводить до Sapience примерно к 38–40 минуте;
+6. сохранить City около 80, Industry около 94–95, Atomic около 108;
+7. приводить к Ash около 116–118 и reset около 120;
+8. не требовать ads/offline/meta для первого прохождения.
 
-| Период | Ресурсы |
+---
+
+# 2. Canonical milestone windows
+
+| Milestone | Design target |
+|---|---:|
+| First passive RNA | <01:00 |
+| Self Replication | ~02:00–03:00 |
+| DNA unlocked | ~04:00–06:00 |
+| Membrane / Cell | ~09:00–11:00 |
+| First biological branch | ~11:00–14:00 |
+| Multicellularity | ~24:00–28:00 |
+| Nervous System | ~31:00–35:00 |
+| Sapience | ~38:00–40:00 |
+| Tribe established | ~48:00–50:00 |
+| Permanent Settlement | ~62:00–65:00 |
+| City | ~78:00–80:00 |
+| Industry | ~93:00–95:00 |
+| Modern bridge complete | ~103:00–104:00 |
+| Atomic Age | ~107:00–108:00 |
+| Ash | ~116:00–118:00 |
+| Reset | ~120:00 |
+
+These are telemetry targets, not hard timers except explicit crisis clamps.
+
+---
+
+# 3. Active resources
+
+| Phase | Player-facing resources |
 |---|---|
-| 0–10 мин, молекулярная жизнь | **Energy (E)**, **Information (I)** |
-| 10–46 мин, клетка → разум | **Energy (E)**, **Biomass (B)**, **Information (I)** |
-| 46–80 мин, племя → город | **Food (F)**, **Materials (M)**, **Knowledge (K)**, Population |
-| 80–108 мин, город → атом | **Food (F)**, **Materials (M)**, **Knowledge (K)**, **Power (PWR)**, Population |
-| 108–120 мин, кризис | **Materials (M)**, **Knowledge (K)**, **Power (PWR)**, **Stability (ST)** |
+| 0–7 molecular | RNA |
+| 7–12 cell formation | RNA / DNA |
+| 10–18 cell/metabolism | RNA or DNA contextually / Biomass / Energy |
+| 18–38 organism | DNA / Biomass / Energy + AP indicator |
+| 38–80 civilization | Food / Materials / Knowledge / Population |
+| 80–108 industry/modern | Food supporting / Materials / Knowledge / Power / Population |
+| 108–120 crisis | Materials / Knowledge / Power + World Tension UI |
 
-`Population` — не расходная валюта. Это ёмкость для jobs.  
-`Stability` — шкала 0–100, а не накопительный ресурс.
+`Information` is not a spendable visible resource.
 
-## 2.2. Стоимость следующей копии производящего объекта
+`Adaptation Points`:
+
+- no passive income;
+- no generator;
+- no exponential producer curve;
+- earned only from milestone/side-objective rewards.
+
+`Population` is job capacity, not spendable currency.
+
+`Stability` is internal 0–100 state; UI displays inverse World Tension.
+
+---
+
+# 4. Generic economy formulas kept
+
+## Repeatable producer/building cost
 
 ```text
 cost(n) = round_3sig(base_cost × growth^(n-1))
 ```
 
-где `n` — номер покупаемой копии, начиная с 1.
+Use only where an entity is intentionally repeatable. Do not force every biological process into a repeatable-generator pattern.
 
-### Общие growth-факторы
-
-- дешёвый генератор: **1.15**;
-- стандартный генератор: **1.17**;
-- мощная инфраструктура: **1.20**;
-- late-game объект: **1.22**.
-
-## 2.3. Производство
+## Production
 
 ```text
-production/sec = count × base_output × local_mult × era_mult × event_mult
+production/sec = base × local_mult × era_mult × event_mult
 ```
 
-`local_mult` — апгрейды конкретного объекта.  
-`era_mult` — глобальные эволюционные бонусы.  
-`event_mult` — кризис, сюжетный эффект, временный buff/debuff.
+Count is included only for actual repeatable entities.
 
-Множители **перемножаются**, а бонусы внутри одной группы **складываются**.
+## Manual onboarding
 
-Пример:
+Manual action starts or accelerates a biological process; it is not balanced as permanent `+resource/click` gameplay.
 
-```text
-10 Assimilators × 0.18 B/s × 1.50 local × 1.25 era = 3.375 B/s
-```
-
-## 2.4. Милестоуны количества
-
-Для всех покупаемых генераторов:
-
-- 10 копий → output этого типа × **2.0**;
-- 25 копий → ещё × **2.0**;
-- 50 копий → ещё × **2.5**.
-
-В первом 120-минутном цикле большинство линий доходит только до 10–25.
-
-## 2.5. Ручное действие
-
-Тап/клик существует только как onboarding:
+After ~3 min:
 
 ```text
-manual_gain = max(1, 2 sec текущего базового production)
-```
-
-После 3-й минуты ручной input не должен давать больше **5%** оптимального дохода. Игра не балансируется вокруг автокликера.
-
----
-
-# 3. Первые 24 цели
-
-Это основной pacing первого прохождения. Цель считается выполненной при покупке/разблокировке указанного узла.
-
-| № | Target | Цель | Ключевая цена / условие |
-|---:|---:|---|---|
-| 1 | 00:45 | Стабилизировать энергетический градиент | 12 E |
-| 2 | 02:00 | Саморепликация | 40 E + 3 I |
-| 3 | 04:00 | Каталитическая РНК | 90 E + 10 I |
-| 4 | 07:00 | Липидная оболочка | 210 E + 28 I |
-| 5 | 10:00 | **Протоклетка** | 520 E + 80 I |
-| 6 | 13:30 | Мембранный транспорт | 650 E + 60 B + 90 I |
-| 7 | 17:00 | Геном | 1,050 E + 130 B + 180 I |
-| 8 | 21:00 | Митохондриальный симбиоз | 1,850 E + 260 B + 300 I |
-| 9 | 26:00 | **Многоклеточность** | 3,600 E + 650 B + 720 I |
-| 10 | 31:00 | Специализация тканей | 4,400 E + 1,000 B + 850 I |
-| 11 | 36:00 | Сенсорные клетки | 5,800 E + 1,350 B + 1,250 I |
-| 12 | 41:00 | Нервная сеть | 8,200 E + 1,800 B + 1,750 I |
-| 13 | 46:00 | **Разум** | 12,500 E + 2,800 B + 3,200 I |
-| 14 | 51:00 | Огонь и совместная добыча | 420 F + 240 M + 60 K + pop 24 |
-| 15 | 56:00 | **Племя** | 900 F + 520 M + 145 K + pop 32 |
-| 16 | 62:00 | Земледелие | 1,650 F + 900 M + 300 K + pop 42 |
-| 17 | 68:00 | Постоянное поселение | 2,800 F + 1,700 M + 520 K + pop 58 |
-| 18 | 74:00 | Письменность | 3,700 F + 2,400 M + 920 K + pop 78 |
-| 19 | 80:00 | **Город** | 5,500 F + 4,000 M + 1,600 K + pop 105 |
-| 20 | 87:00 | Механизация | 8,500 M + 2,800 K + 1,100 PWR + pop 135 |
-| 21 | 94:00 | **Индустрия** | 14,000 M + 5,200 K + 3,200 PWR + pop 170 |
-| 22 | 101:00 | Электросеть и лаборатории | 23,000 M + 9,500 K + 7,500 PWR + pop 215 |
-| 23 | 108:00 | **Атомный век** | 36,000 M + 17,500 K + 15,000 PWR + pop 260 |
-| 24 | 116:00 | **«Пепел»** | сюжетный кризис; ST ≤ 15 или таймер crisis = 8 мин |
-
-После цели №24 открывается 4-минутная crisis/resolution-сцена, после которой в районе **120:00** доступен первый reset.
-
----
-
-# 4. 0–10 минут — молекулярная эра
-
-## 4.1. Генераторы
-
-| Объект | Unlock | Base cost | Growth | Output одной копии |
-|---|---|---:|---:|---:|
-| Chemical Gradient | старт | 10 E | 1.15 | +0.20 E/s |
-| Catalytic Fold | цель 1 | 24 E | 1.17 | +0.036 I/s |
-| Energy Pocket | цель 2 | 38 E | 1.15 | +0.38 E/s |
-
-### Первые цены Chemical Gradient
-
-`10, 12, 13, 15, 17, 20, 23, 27, 31, 35, 40, 46, 54, 62, 71`
-
-### Первые цены Catalytic Fold
-
-`24, 28, 33, 38, 45, 53, 62, 72, 85, 99, 116, 136`
-
-## 4.2. Апгрейды
-
-| Upgrade | Цена | Эффект |
-|---|---:|---|
-| Stable Bond | 12 E | ручной gain ×2; открывает авто-production |
-| Self Replication | 40 E + 3 I | I production ×1.60 |
-| Catalytic RNA | 90 E + 10 I | E production ×1.35; I ×1.25 |
-| Error Correction I | 145 E + 18 I | I ×1.40 |
-| Lipid Shell | 210 E + 28 I | все production ×1.20 |
-| Proto-cell | 520 E + 80 I | переход в клеточную эру; открывает Biomass |
-
-### Рекомендуемые counts к 10:00
-
-- Chemical Gradient: **12–14**;
-- Catalytic Fold: **8–10**;
-- Energy Pocket: **6–8**.
-
-Ожидаемый income перед Proto-cell:
-
-- Energy: **~12–16 E/s**;
-- Information: **~1.3–1.8 I/s**.
-
-## 4.3. 0–10 min tuning result
-
-**Status:** accepted implementation tuning pass, 2026-09-16.
-
-Node costs and molecular evolution multipliers remain unchanged from the canonical table above. The tuning passes adjusted molecular producer output, Catalytic Fold early cost, and provisional manual cooldown only.
-
-### Final molecular generator values
-
-| Объект | Base cost | Growth | Output одной копии |
-|---|---:|---:|---:|
-| Chemical Gradient | 10 E | 1.15 | +0.20 E/s |
-| Catalytic Fold | 14 E | 1.17 | +0.036 I/s |
-| Energy Pocket | 38 E | 1.15 | +0.38 E/s |
-
-### Manual onboarding tuning
-
-Manual gain formula remains:
-
-```text
-manual_gain = max(1, 2 sec current base production)
-```
-
-Provisional node-stage cooldown tuning:
-
-- before `M01 Stable Bond`: **2.0 sec**;
-- after `M01 Stable Bond` and before `M02 Self Replication`: **3.5 sec**;
-- after `M02 Self Replication`: **90.0 sec**.
-
-`M01` still applies `manual gain ×2` and unlocks auto-production. Around 03:00 in the competent route, optimal manual contribution is **4.44%** of automatic Energy income, so continuing to press the manual action is no longer economically dominant.
-
-### Measured reference timings
-
-| Route | M01 | M02 | M03 | M05 | M06 |
-|---|---:|---:|---:|---:|---:|
-| Competent, no M04 | 00:45 | 02:25 | 03:55 | 07:30 | 09:20 |
-| Optimized scripted reference, no M04 | 00:42 | 02:44 | 05:28 | 06:28 | 07:39 |
-| Slower, no M04 | 00:45 | 03:00 | 04:57 | 06:18 | 07:57 |
-| Competent + M04 | 00:45 | 02:25 | 03:55 | 07:30 | 09:30 |
-
-`M02` now lands inside the accepted correction range while preserving canonical node costs and avoiding clicker-dominant manual input after `M02`.
-
-### M04 delta
-
-In the competent route, buying `M04 Error Correction`:
-
-- completes `M04` at **08:50** in the competent optional reference route;
-- increases final Information income from **1.728 I/s** to **2.419 I/s**;
-- reaches `M06 Proto-cell` at **09:30** instead of **09:20** because the optional cost is meaningful.
-
-So `M04` is useful for Information throughput but is not mandatory and is not automatically the fastest route.
-
-### Competent route final state before Proto-cell
-
-- Producer counts: Chemical Gradient **13**, Catalytic Fold **10**, Energy Pocket **7**.
-- Final income: **12.733 E/s**, **1.728 I/s**.
-- Producer spend: **1,077 E**.
-- Evolution node spend: **872 E + 121 I**.
-
----
-
-# 5. 10–26 минут — клетка
-
-При переходе в клеточную эру старые молекулярные генераторы остаются визуально внутри клетки и продолжают работать. Открывается Biomass.
-
-## 5.1. Генераторы
-
-| Объект | Base cost | Growth | Output |
-|---|---:|---:|---:|
-| Membrane Pump | 65 E + 8 B | 1.16 | +1.40 E/s |
-| Assimilator | 70 E | 1.17 | +0.18 B/s |
-| Genome Copier | 90 E + 10 B | 1.17 | +0.16 I/s |
-| Mitochondrial Unit | 260 E + 35 B + 20 I | 1.20 | +4.50 E/s |
-
-## 5.2. Апгрейды
-
-| Upgrade | Цена | Эффект |
-|---|---:|---|
-| Membrane Transport | 650 E + 60 B + 90 I | Membrane Pump ×1.75 |
-| Genome | 1,050 E + 130 B + 180 I | Genome Copier ×1.80; открывает mutations |
-| Protein Synthesis | 1,250 E + 190 B + 150 I | Biomass production ×1.50 |
-| Mitochondrial Symbiosis | 1,850 E + 260 B + 300 I | все Energy ×1.60 |
-| Cell Coordination | 2,200 E + 420 B + 400 I | B и I ×1.30 |
-| Multicellularity | 3,600 E + 650 B + 720 I | переход в многоклеточную эру |
-
-### Ожидаемый income к 26:00
-
-- Energy: **65–85 E/s**;
-- Biomass: **9–13 B/s**;
-- Information: **7–10 I/s**.
-
----
-
-# 6. 26–46 минут — многоклеточность → разум
-
-Здесь генераторы интерпретируются уже как ткани. Игрок не покупает «100 клеток», а усиливает специализированные системы организма.
-
-## 6.1. Биосистемы
-
-| Система | Base cost | Growth | Output |
-|---|---:|---:|---:|
-| Digestive Tissue | 180 E + 120 B | 1.17 | +0.90 B/s |
-| Muscle Bundle | 260 E + 170 B | 1.18 | +7.0 E/s |
-| Neural Cluster | 300 E + 140 B + 55 I | 1.18 | +0.75 I/s |
-| Sensory Organ | 650 E + 310 B + 160 I | 1.20 | Neural Cluster output +8% per organ |
-
-## 6.2. Апгрейды
-
-| Upgrade | Цена | Эффект |
-|---|---:|---|
-| Tissue Specialization | 4,400 E + 1,000 B + 850 I | все tissues ×1.35 |
-| Bilateral Coordination | 4,900 E + 1,100 B + 900 I | Energy ×1.25; I ×1.15 |
-| Sensory Cells | 5,800 E + 1,350 B + 1,250 I | Neural output ×1.55 |
-| Predator/Prey Modeling | 6,700 E + 1,500 B + 1,420 I | Information ×1.25; открывает behavior slots |
-| Nervous Network | 8,200 E + 1,800 B + 1,750 I | Information ×1.60 |
-| Social Signaling | 9,300 E + 2,100 B + 2,100 I | все production ×1.15 |
-| Proto-language | 10,800 E + 2,350 B + 2,550 I | I ×1.35 |
-| Sapience | 12,500 E + 2,800 B + 3,200 I | переход к цивилизации |
-
-### Ожидаемый income к 46:00
-
-- Energy: **260–330 E/s**;
-- Biomass: **42–58 B/s**;
-- Information: **45–60 I/s**.
-
----
-
-# 7. Переход «Разум → цивилизация»
-
-На 46-й минуте биологические ресурсы перестают быть активной валютой. Они **не обнуляются бессмысленно**: итог первой биологической фазы рассчитывает стартовый пакет цивилизации.
-
-```text
-start_population = 18 + floor(log10(total_biomass_earned + 1) × 3)
-start_food       = 120 + floor(B_stock × 0.05)
-start_materials  = 70 + floor(E_stock × 0.003)
-start_knowledge  = 15 + floor(I_stock × 0.02)
-```
-
-Ограничения первого цикла:
-
-- Population: **18–24**;
-- Food: максимум стартового бонуса **+120**;
-- Materials: максимум **+100**;
-- Knowledge: максимум **+35**.
-
-Это даёт ощущение преемственности, но не позволяет фармить биологическую эру ради поломки цивилизационной.
-
----
-
-# 8. 46–62 минуты — племя
-
-## 8.1. Jobs
-
-| Job | Производство / 1 pop | Примечание |
-|---|---:|---|
-| Forager | +0.65 F/s | базовый Food |
-| Gatherer | +0.30 M/s | дерево/камень/сырьё |
-| Thinker | +0.085 K/s | базовый Knowledge |
-| Caregiver | +12% birth-rate на 1 pop, max +60% | сам ресурс не производит |
-
-### Consumption
-
-```text
-food_consumption = population × 0.105 F/s
-```
-
-## 8.2. Рост population
-
-При Food surplus ≥ 20%:
-
-```text
-birth_rate/sec = population × 0.0010 × fertility_mult × era_fertility_mult
-```
-
-При surplus 0–20% множитель линейно падает от 1.0 до 0.0.  
-При отрицательном Food balance рост = 0.
-
-`era_fertility_mult` в первом цикле:
-
-- Tribe 46–62 мин: **1.00**;
-- Settlement 62–80 мин: **0.75**;
-- City 80–94 мин: **0.45**;
-- Industry 94–108 мин: **0.45**;
-- Crisis: **0.00**.
-
-Базовые 0.0010/s соответствуют примерно **6.2% в минуту** до era-множителя. Это намеренно сильно ускоренная игровая модель, а не демографическая симуляция.
-
-## 8.3. Buildings
-
-| Building | Цена | Эффект |
-|---|---:|---|
-| Hearth | 80 F + 35 M | pop cap +10; Knowledge ×1.10 |
-| Shelter | 55 M | pop cap +8 |
-| Tool Bench | 140 M + 35 K | Gatherer ×1.35 |
-| Hunting Ground | 180 F + 80 M | Forager ×1.30 |
-| Story Circle | 220 F + 75 M + 55 K | Thinker ×1.50 |
-| Clan Camp | 520 F + 330 M + 100 K | pop cap +30; birth ×1.15 |
-
-## 8.4. Ключевые upgrades
-
-| Upgrade | Цена | Эффект |
-|---|---:|---|
-| Fire | 420 F + 240 M + 60 K | Food production ×1.20 |
-| Cooperative Hunt | 610 F + 330 M + 95 K | Forager ×1.25 |
-| Tribe | 900 F + 520 M + 145 K | unlock job presets; pop cap +25 |
-| Seed Selection | 1,150 F + 620 M + 210 K | открывает Farming |
-| Agriculture | 1,650 F + 900 M + 300 K | переход к settlement economy |
-
----
-
-# 9. 62–80 минут — поселение → город
-
-После Agriculture часть jobs обновляется.
-
-## 9.1. Jobs
-
-| Job | Output / 1 pop |
-|---|---:|
-| Farmer | +1.55 F/s |
-| Builder | +0.72 M/s |
-| Scholar | +0.235 K/s |
-| Artisan | +0.42 M/s и +0.055 K/s |
-
-Базовое потребление остаётся `0.105 F/s/pop`.
-
-## 9.2. Buildings
-
-| Building | Base cost | Growth | Эффект |
-|---|---:|---:|---|
-| Field | 260 M + 180 F | 1.18 | Farmer ×1.10 за поле |
-| House | 220 M | 1.17 | pop cap +14 |
-| Workshop | 520 M + 160 K | 1.20 | Builder/Artisan ×1.18 |
-| Granary | 650 M + 350 F | 1.20 | Food ×1.15; consumption −3% |
-| School | 900 M + 420 K | 1.20 | Scholar ×1.25 |
-| Market | 1,250 M + 600 F + 250 K | 1.22 | F/M production ×1.12 |
-
-## 9.3. Upgrades
-
-| Upgrade | Цена | Эффект |
-|---|---:|---|
-| Permanent Settlement | 2,800 F + 1,700 M + 520 K | pop cap +40; birth ×1.10 |
-| Pottery & Storage | 2,200 F + 2,000 M + 540 K | Food storage / production ×1.20 |
-| Writing | 3,700 F + 2,400 M + 920 K | Knowledge ×1.50 |
-| Division of Labor | 4,000 F + 3,100 M + 1,100 K | все jobs ×1.18 |
-| Urban Planning | 4,800 F + 3,600 M + 1,350 K | buildings cost growth −0.01 |
-| City | 5,500 F + 4,000 M + 1,600 K + pop 105 | открывает Power |
-
-### Рекомендуемое распределение jobs перед City
-
-- 42% Farmer;
-- 30% Builder/Artisan;
-- 23% Scholar;
-- 5% Care/utility.
-
----
-
-# 10. 80–94 минуты — город → индустрия
-
-Открывается **Power (PWR)**. Food остаётся поддерживающим ресурсом и больше не является главным bottleneck.
-
-## 10.1. Jobs
-
-| Job | Output / pop |
-|---|---:|
-| Industrial Farmer | +2.60 F/s |
-| Miner | +1.35 M/s |
-| Engineer | +0.75 M/s + 0.26 PWR/s |
-| Researcher | +0.62 K/s |
-
-## 10.2. Infrastructure
-
-| Building | Base cost | Growth | Output / effect |
-|---|---:|---:|---|
-| Mine | 1,100 M | 1.19 | Miner ×1.16 |
-| Foundry | 1,800 M + 500 K | 1.20 | +10 M/s |
-| Steam Plant | 2,200 M + 650 K | 1.20 | +7.5 PWR/s |
-| Rail Hub | 2,800 M + 900 K | 1.22 | M/F ×1.12 |
-| Laboratory | 3,200 M + 1,100 K | 1.22 | +4.0 K/s |
-
-## 10.3. Upgrades
-
-| Upgrade | Цена | Эффект |
-|---|---:|---|
-| Mechanization | 8,500 M + 2,800 K + 1,100 PWR | M/F ×1.35 |
-| Steam Network | 9,500 M + 3,200 K + 1,800 PWR | PWR ×1.50 |
-| Standard Parts | 11,000 M + 3,900 K + 2,100 PWR | building growth factor −0.01 |
-| Mass Education | 12,500 M + 4,500 K + 2,400 PWR | K ×1.40 |
-| Industry | 14,000 M + 5,200 K + 3,200 PWR + pop 170 | переход в industrial era |
-
----
-
-# 11. 94–108 минут — индустрия → атом
-
-## 11.1. Jobs
-
-| Job | Output / pop |
-|---|---:|
-| Mechanized Farmer | +4.0 F/s |
-| Industrial Worker | +2.45 M/s |
-| Power Engineer | +0.95 PWR/s |
-| Scientist | +1.15 K/s |
-
-## 11.2. Infrastructure
-
-| Building | Base cost | Growth | Output |
-|---|---:|---:|---|
-| Steelworks | 4,600 M + 900 PWR | 1.20 | +30 M/s |
-| Grid Station | 5,200 M + 1,300 K | 1.20 | +24 PWR/s |
-| Research Institute | 6,500 M + 2,200 K + 1,200 PWR | 1.22 | +18 K/s |
-| Chemical Complex | 8,000 M + 2,600 K + 1,500 PWR | 1.22 | M ×1.08, K ×1.05 |
-
-## 11.3. Upgrades
-
-| Upgrade | Цена | Эффект |
-|---|---:|---|
-| Electrical Grid | 23,000 M + 9,500 K + 7,500 PWR | PWR ×1.45 |
-| Scientific Method | 25,000 M + 11,000 K + 8,000 PWR | K ×1.50 |
-| Combustion & Logistics | 28,000 M + 12,500 K + 9,500 PWR | M ×1.35 |
-| Atomic Theory | 31,000 M + 14,500 K + 11,500 PWR | открывает Reactor Project |
-| Atomic Age | 36,000 M + 17,500 K + 15,000 PWR + pop 260 | запускает crisis clock |
-
----
-
-# 12. 108–120 минут — атом, кризис, «Пепел»
-
-При покупке `Atomic Age`:
-
-- Stability создаётся со значением **100**;
-- начинается 8-минутный crisis clock;
-- все производственные множители × **1.35** — последняя «эйфория роста»;
-- каждая крупная атомная технология ускоряет падение Stability.
-
-## 12.1. Stability
-
-```text
-stability_drain/sec = 0.08 + atomic_load × 0.025 + unresolved_crises × 0.045
-```
-
-`atomic_load` начинается с 1.  
-Каждый выбранный risky upgrade добавляет +1.  
-Без вмешательства ST падает примерно к 15–20 за 8 минут.
-
-## 12.2. Atomic upgrades
-
-| Upgrade | Цена | Эффект | Risk |
-|---|---:|---|---:|
-| Reactor Prototype | 18,000 M + 9,000 K + 12,000 PWR | PWR ×1.65 | atomic_load +1 |
-| Strategic Atom | 20,000 M + 11,000 K + 13,500 PWR | K/M ×1.15 | atomic_load +1 |
-| Automated Grid | 24,000 M + 12,500 K + 16,000 PWR | PWR ×1.35 | 0 |
-| Global Research Net | 26,000 M + 15,000 K + 17,500 PWR | K ×1.35 | 0 |
-| Emergency Coordination | 12,000 M + 8,000 K + 7,000 PWR | ST +18 один раз | 0 |
-
-Первый цикл **не позволяет полностью предотвратить «Пепел»**. Даже идеальная игра только меняет детали сцены и объём мета-награды. Это важно, чтобы первый reset был сюжетным открытием, а не наказанием за ошибку.
-
-## 12.3. «Пепел»
-
-Триггер:
-
-```text
-if time_since_atomic >= 480 sec OR stability <= 15:
-    trigger_ash()
-```
-
-В Timeline #1 минимальное время до события — **7:15** после Atomic Age, чтобы игрок не мог случайно проскочить всю кризисную часть за минуту.
-
-## 12.4. Reset
-
-После «Пепла» игрок получает **Archive Fragments (AF)**:
-
-```text
-AF = 8
-   + floor(unique_evolution_nodes / 5)
-   + floor(peak_population / 75)
-   + crisis_bonus
-```
-
-`crisis_bonus`: 0–4.  
-Ожидаемый первый reset: **14–18 AF**.
-
-Первый reset открывает:
-
-- Timeline #2;
-- постоянные Archive nodes;
-- просмотр ранее выбранных эволюционных ветвей;
-- ускоренный replay ранних стадий;
-- первые альтернативные исходы.
-
----
-
-# 13. Проверка темпа
-
-Для v1.0 используется не «идеальный AFK», а модель среднего активного игрока:
-
-- покупает рекомендованный upgrade в течение 15 секунд после affordability;
-- поддерживает 80–85% эффективного uptime;
-- не смотрит rewarded ads;
-- не тратит ресурсы на косметические/необязательные узлы до первого reset;
-- перестраивает jobs с задержкой до 30 секунд после смены цели.
-
-| Milestone | Target | Расчётный коридор v1.0 | Допуск |
-|---|---:|---:|---:|
-| Proto-cell | 10:00 | 09:20–10:40 | ±1:00 |
-| Multicellularity | 26:00 | 24:50–27:30 | ±1:30 |
-| Sapience | 46:00 | 44:00–48:30 | ±2:30 |
-| Agriculture | 62:00 | 59:30–64:30 | ±2:30 |
-| City | 80:00 | 76:30–83:30 | ±3:30 |
-| Industry | 94:00 | 90:30–97:30 | ±3:30 |
-| Atomic Age | 108:00 | 104:00–111:30 | ±4:00 |
-| Ash | 116:00 | 112:00–119:00 | сюжетный clamp |
-| Reset | 120:00 | 116:00–123:00 | сюжетный clamp |
-
-### Почему здесь есть коридор, а не одна «магическая» секунда
-
-Даже при точных формулах игрок меняет jobs, покупает необязательные объекты, читает события и делает разные branch choices. Поэтому правильная задача баланса — не заставить всех получить City ровно в `80:00`, а сделать так, чтобы экономика естественно сводилась к нужному диапазону без искусственного таймера.
-
----
-
-
-# 13.1. Баланс-паспорт по фазам
-
-Ниже — арифметическая sanity-check оценка доступного gross/net бюджета при средних rates внутри фазы. Она нужна, чтобы breakthrough-цены не существовали отдельно от production. В production budget уже предполагается постепенный разгон генераторов; часть бюджета обязательно уходит на сами generators/buildings.
-
-| Фаза | Оценка production budget за окно | Core/breakthrough spend | Остаток на generators/buildings |
-|---|---|---|---|
-| 0–10, RNA | ~3.6k E, ~0.48k I | ~0.87k E, 0.12k I | ~2.7k E, 0.36k I |
-| 10–26, Cell | ~38k E, ~5.8k B, ~4.8k I | ~10.5k E, 1.7k B, 1.8k I | ~27.5k E, 4.1k B, 3.0k I |
-| 26–46, Multicell | ~216k E, ~30k B, ~36k I | ~62k E, 13k B, 15k I | ~154k E, 17k B, 21k I |
-| 46–62, Tribe | ~4.6k net F, ~2.6k M, ~0.49k K | ~3.1k F, 1.6k M, 0.30k K | ~1.5k F, 1.0k M, 0.19k K |
-| 62–80, Settlement | ~47k net F, ~18.7k M, ~4.6k K | ~16.7k F, 13.8k M, 5.0k K | Food surplus + building budget; K intentionally tight |
-| 80–94, City | ~70–80k M, ~17–20k K, ~16–20k PWR | ~55k M, 16.4k K, 10.6k PWR | ~15–25k M, 1–4k K, 5–9k PWR |
-| 94–108, Industry | ~200–220k M, ~95–105k K, ~85–95k PWR | ~143k M, 65k K, 51.5k PWR | ~60–80k M, 30–40k K, 35–45k PWR |
-
-Ключевой вывод sanity-check: **Knowledge должен быть главным soft-bottleneck почти во всех цивилизационных фазах**, а Food после City уходит в поддерживающий ресурс. Это удерживает игрока от стратегии «всех в производство» и заставляет реально пользоваться jobs.
-
-# 14. Catch-up и anti-snowball
-
-Чтобы небольшая ошибка на 20-й минуте не превращалась в отставание на 40 минут:
-
-## 14.1. Catch-up
-
-Если игрок отстаёт от stage target более чем на 12%:
-
-```text
-catchup_mult = min(1.18, 1 + delay_ratio × 0.50)
-```
-
-Применяется только к **base production**, визуально не показывается как «помощь» и плавно исчезает за 90 секунд после возвращения в коридор.
-
-## 14.2. Anti-snowball
-
-Если игрок опережает target более чем на 15%, никакого скрытого nerf нет. Вместо этого дорогие breakthrough-узлы имеют:
-
-- prerequisite по population/эволюционному узлу;
-- короткие narrative locks 20–45 секунд;
-- обязательные события выбора.
-
-То есть хорошая игра награждается, но не позволяет вырезать половину контента.
-
----
-
-# 15. Offline progress первого цикла
-
-До первого reset:
-
-```text
-offline_gain = online_rate_at_exit × min(offline_time, 2h) × 0.50
-```
-
-Ограничения:
-
-- offline не завершает breakthrough автоматически;
-- offline не запускает «Пепел» без возвращения игрока;
-- population растёт offline максимум на 35% от значения при выходе;
-- кризисный таймер замораживается offline в Timeline #1.
-
-После первого reset Archive может улучшать эти ограничения.
-
----
-
-# 16. Что логировать для реального баланса
-
-Минимальные telemetry events:
-
-- `goal_started`, `goal_completed` + goal_id + elapsed_seconds;
-- `generator_bought` + id + new_count;
-- `upgrade_bought`;
-- `job_allocation_changed`;
-- `resource_cap_hit`;
-- `resource_starved`;
-- `population_changed`;
-- `branch_selected`;
-- `atomic_age_started`;
-- `ash_triggered` + stability + elapsed;
-- `reset_completed` + AF;
-
-Ключевые метрики первого релиза:
-
-- median / p25 / p75 времени каждой из 24 целей;
-- доля игроков, дошедших до 10 / 26 / 46 / 80 / 108 / 120 минуты;
-- среднее число ручных taps после 5-й минуты;
-- число перестановок jobs;
-- доля игроков, упирающихся в Food / Materials / Knowledge / Power;
-- разброс first-reset reward.
-
----
-
-# 17. Баланс-константы для реализации
-
-```text
-TICK_RATE                    = 10 Hz
-MANUAL_ACTION_SOFT_CAP       = 5% of optimal income after minute 3
-BIO_BUILDING_GROWTH          = 1.15–1.20
-CIV_BUILDING_GROWTH          = 1.17–1.22
-COUNT_MILESTONE_10           = ×2.0
-COUNT_MILESTONE_25           = ×2.0
-COUNT_MILESTONE_50           = ×2.5
-FOOD_CONSUMPTION_PER_POP     = 0.105 / sec
-BASE_POP_GROWTH              = 0.0010 / sec
-OFFLINE_EFFICIENCY_FIRST_RUN = 0.50
-OFFLINE_CAP_FIRST_RUN        = 2 h
-CRISIS_BASE_DRAIN            = 0.08 ST/sec
-ASH_NORMAL_TRIGGER           = 480 sec after Atomic Age
-FIRST_RESET_AF_TARGET        = 14–18
+manual contribution <= 5% of competent optimal income
 ```
 
 ---
 
-# 18. Что считать «готовым балансом» перед релизом
+# 5. 0–12 — RNA → DNA → Cell
 
-v1.0 можно считать приемлемой, если на тестах минимум 30–50 полных прогонов выполняются условия:
+The old molecular economy based on:
 
-- median Proto-cell: 9–11 мин;
-- median Sapience: 43–49 мин;
-- median City: 76–84 мин;
-- median Atomic Age: 103–112 мин;
-- median first reset: 116–124 мин;
-- p75 не отстаёт от median более чем на 20%;
-- ни один ресурс не является bottleneck более 50% времени одной эры;
-- после 5-й минуты оптимальная стратегия не требует частого ручного клика;
-- rewarded ads ускоряют прохождение, но отсутствие рекламы не выбивает игрока из 120-минутного коридора.
+- Chemical Gradient;
+- Catalytic Fold;
+- Energy Pocket;
+- Energy / Information;
 
-Это базовая числовая модель. После первого telemetry-теста меняются прежде всего `base_output`, цены breakthrough и job output; growth-факторы лучше трогать последними, потому что они сильнее всего меняют форму всей кривой.
+is **superseded**.
+
+## Canonical economic flow
+
+```text
+primordial manual process
+→ RNA
+→ passive RNA reaction
+→ Self Replication
+→ stronger RNA production
+→ DNA Synthesis
+→ DNA
+→ Membrane
+→ Cell
+→ Biomass
+```
+
+### Biological tuning status
+
+Exact numbers are intentionally **TBD until Rework Iteration simulation**.
+
+Required tuning constraints:
+
+- first passive RNA <60 sec;
+- Self Replication ~2–3 min;
+- DNA visible before ~6 min;
+- Cell ~9–11 min;
+- no need to buy arbitrary counts of three abstract molecular generators;
+- optional M04 Error Correction must not become hidden prerequisite;
+- competent path and slower path both remain understandable without hidden catch-up.
+
+The previous measured values `M01 00:45 / M02 02:25 / M06 09:20` are historical results for the superseded E/I ruleset, not targets that constrain the new content.
+
+---
+
+# 6. 10–18 — Cell / Metabolism / first branch
+
+After Cell:
+
+- Biomass becomes active;
+- Metabolism unlocks Energy production;
+- organelles/protein synthesis improve Biomass/Energy;
+- first branch chooses **Absorption / Symbiosis / Shell**.
+
+Branch effects must be strong enough to feel different but weak enough that all paths remain inside the first-run timing corridor.
+
+Target branch power guideline:
+
+```text
+primary advantage: roughly 10–25%
+secondary disadvantage: <=10–15%
+```
+
+Do not implement second-branch `×2.5` purchase in Timeline #1.
+
+Photosynthesis/Chemosynthesis can be optional metabolism nodes with local effects and must not be required for all routes.
+
+---
+
+# 7. 18–28 — Multicellularity / AP economy
+
+Core resources:
+
+- DNA;
+- Biomass;
+- Energy.
+
+`Adaptation Points` come from discrete rewards.
+
+Suggested first-run AP envelope for later tuning:
+
+```text
+available before Sapience: 3–6 AP
+core path AP cost: 0
+optional adaptation typical cost: 1–2 AP
+```
+
+This is a balance envelope, not final pricing.
+
+Optional adaptations must not be required to reach Multicellularity or Sapience.
+
+---
+
+# 8. 28–40 — Nervous System / Cognition
+
+Cognition is not purchased directly.
+
+```text
+Cognition = sum(core neural progress + adaptation contributions + behavior/event contributions)
+clamp 0..100
+```
+
+Tuning rules:
+
+- core nervous-system route alone must provide most of the required progress;
+- player must make at least one meaningful behavior/sensory choice;
+- optional AP spending can accelerate or reshape Cognition but cannot soft-lock a player who spent AP elsewhere;
+- final stretch should feel like qualitative emergence, not waiting for one huge resource price.
+
+Target:
+
+```text
+Cognition 100 / Sapience ≈ 38–40 min median
+```
+
+---
+
+# 9. Sapience → civilization transition
+
+Remove the old formula converting E/B/I stock into 18–24 Population.
+
+Canonical start:
+
+```text
+Population ≈ 5
+```
+
+New-run start package must be fixed/derived from completed evolutionary profile, not farmable biological stock.
+
+Provisional design envelope for future simulation:
+
+```text
+Population: 5
+Food: enough for 2–4 minutes of safe onboarding
+Materials: enough for first shelter/tool decision
+Knowledge: small seed, not enough to skip first tribal goals
+```
+
+Exact values TBD in full civilization rebalance.
+
+---
+
+# 10. Tribe / Settlement / City
+
+The aggregate economy remains:
+
+```text
+Food + Materials + Knowledge + Population
+```
+
+Keep phase-aware jobs and buildings from DS-01, but retune population thresholds for the smaller civilization start.
+
+The old numeric thresholds `24/32/42/58/78/105` must not be assumed canonical before the new simulation pass. `City ≈80 min` remains the pacing anchor; population values are variables to retune around that anchor.
+
+## Population model
+
+Keep the concept:
+
+```text
+Food surplus → growth
+Food deficit → growth pauses / recovery hint
+```
+
+No demographic hard fail in Timeline #1.
+
+## Materials
+
+Wood/Stone/Metal remain aggregate Materials for top-level economy. Internal breakdown can be used later without changing the primary resource model.
+
+---
+
+# 11. Industry / Power
+
+Power becomes a full active resource at the Industry/electrification transition, not immediately on City unlock.
+
+Carry-over industrial entities worth retaining:
+
+- Mine;
+- Foundry;
+- Steam Plant;
+- Rail Hub;
+- Laboratory;
+- Steelworks;
+- Grid Station;
+- Research Institute;
+- Chemical Complex.
+
+Exact costs/output from balance v1.0 are **provisional carry-over** until the 38–108 simulation is rerun with corrected biological/civilization pacing.
+
+Industry target remains ~94–95 min.
+
+---
+
+# 12. Modern bridge
+
+95–104 min should provide a short acceleration phase rather than another full economy reset.
+
+Economic meaning:
+
+- Power scaling;
+- Knowledge scaling;
+- automation/logistics;
+- global connection/communications;
+- preparation for Atomic Theory.
+
+Modern bridge should add at most a small number of mandatory purchases. Its job is pacing and scale change, not another 15-node tree.
+
+---
+
+# 13. Atomic / crisis
+
+Keep current late-game model as the strongest accepted part of balance, subject to regression simulation:
+
+On Atomic Age:
+
+```text
+Stability = 100
+crisis_clock = 0
+crisis_active = true
+```
+
+Canonical internal drain shape remains configurable:
+
+```text
+stability_drain/sec = base + atomic_load contribution + unresolved_crisis contribution
+```
+
+First run:
+
+- Ash unavoidable;
+- minimum dramatic window before ending;
+- maximum crisis duration around 8 min;
+- offline crisis clock frozen;
+- crisis choices affect reward/Chronicle/subtype, not survival of Timeline #1.
+
+---
+
+# 14. Archive reward
+
+Keep DS-04 first-reset envelope:
+
+```text
+14–18 AF typical
+```
+
+AF reward remains idempotent and cannot be multiplied by ads/meta.
+
+The exact formula may continue to use discovered evolution nodes, peak Population and crisis bonus, but thresholds must be revalidated after node/population reconciliation.
+
+---
+
+# 15. Timeline #2 impact
+
+Because Timeline #1 Sapience moves from ~46 to ~38–40 min, old Timeline #2 target `20–28 min` is no longer automatically canonical.
+
+New rule:
+
+```text
+familiar pre-Sapience replay target ≈ 50–65% of corrected Timeline #1 pre-Sapience time
+```
+
+Initial tuning target for validation:
+
+```text
+no-spend: ~22–25 min
+typical Tier1: ~18–22 min
+hard readability floor: ~16–18 min
+```
+
+These values are provisional until the corrected first-run simulation exists.
+
+---
+
+# 16. Rebalance order
+
+After documentation approval:
+
+1. implement corrected 0–10 content;
+2. balance 0–10;
+3. manual playtest;
+4. implement/rebalance 10–18;
+5. simulate biological 0–40 end-to-end;
+6. retune civilization start and population thresholds;
+7. simulate 38–108;
+8. regression-test crisis/Ash/reset;
+9. only then freeze Timeline #1 numeric v2.
+
+Do not tune old E/I numbers further.
