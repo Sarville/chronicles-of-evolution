@@ -2,9 +2,9 @@ schema_version: 1
 project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
-  scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "documentation_design_and_parallel_implementation"
-  last_updated: "2026-09-15"
+  scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
+  work_mode: "design_reconciliation_before_code_rework"
+  last_updated: "2026-09-16"
 
 authority:
   project_status: "docs/PROJECT_STATE.yaml"
@@ -13,252 +13,133 @@ authority:
   decisions_addenda:
     - "docs/DECISIONS_DS03.md"
     - "docs/DECISIONS_DS04.md"
+    - "docs/DECISIONS_RECONCILIATION.md"
+  gameplay_canon: "docs/gdd/01_FIRST_120_MINUTES.md"
+  economy: "docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md"
+  evolution_tree: "docs/gdd/03_EVOLUTION_TREE.md"
   technical_contract: "docs/technical/00_TECHNICAL_OVERVIEW.md"
   glossary: "docs/GLOSSARY.md"
   design_session_plan: "docs/production/DESIGN_SESSION_PLAN.md"
   implementation_plan: "docs/production/IMPLEMENTATION_ITERATION_PLAN.md"
-  implementation_handoff: "docs/production/DS03_CODEX_HANDOFF.md"
 
 workflow:
   user_review_required_before_session_done: true
-  one_primary_design_block_per_chat: true
   state_update_required_at_session_end: true
   todo_update_required_at_session_end: true
   decisions_update_when_needed: true
   push_after_approval: true
+  no_game_code_during_design_reconciliation: true
 
 design:
-  current_session: "DS-05"
-  last_completed_session: "DS-04"
+  current_session: "reconciliation"
+  status: "documentation_reconciled_pending_user_review"
+  objective: "Restore original readable evolutionary progression while preserving accepted architecture, narrative and meta systems"
+  accepted_reconciliation:
+    - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
+    - "Information removed as player-facing spendable resource"
+    - "Chemical Gradient / Catalytic Fold / Energy Pocket removed from canonical player-facing gameplay"
+    - "Energy introduced through metabolism rather than at game start"
+    - "first biological branch restored to Absorption / Symbiosis / Shell"
+    - "Photosynthesis / Chemosynthesis retained as optional metabolic adaptations"
+    - "Adaptation Points restored as milestone/side-objective currency for optional adaptations"
+    - "Cognition 0..100 restored; Sapience becomes condition-driven convergence"
+    - "civilization starts as small group around Population 5"
+    - "Power moved to Industry/electrification layer"
+    - "Modern bridge restored before Atomic"
+    - "Goal Engine, branching/data config, save/recovery, dev simulation and telemetry preserved"
+    - "Stability/World Tension, Error 17, Again, Ash, Archive, idempotent reset and Timeline #2 preserved"
+  canonical_documents:
+    - "docs/DECISIONS_RECONCILIATION.md"
+    - "docs/gdd/01_FIRST_120_MINUTES.md"
+    - "docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md"
+    - "docs/gdd/03_EVOLUTION_TREE.md"
+    - "docs/gdd/04_CIVILIZATION_PROGRESSION.md"
+    - "docs/gdd/05_BUILDINGS_AND_JOBS.md"
+    - "docs/gdd/06_TECH_TREE.md"
+    - "docs/gdd/07_GOALS_AND_MILESTONES.md"
+    - "docs/gdd/08_EVENTS_AND_CHOICES.md"
+    - "docs/gdd/09_ENDINGS_AND_RESET.md"
+    - "docs/gdd/10_META_PROGRESSION.md"
+    - "docs/gdd/11_BALANCE_RULES.md"
   sessions:
     DS-00: { name: "Documentation orchestration and repository structure", status: done }
-    DS-01: { name: "Civilization gameplay contract", status: done, depends_on: [DS-00] }
-    DS-02: { name: "Goals, events and first ending contract", status: done, depends_on: [DS-01] }
-    DS-03: { name: "Technical architecture and data contract", status: done, depends_on: [DS-01, DS-02] }
-    DS-04:
-      name: "Meta progression and balance rules"
-      status: done
-      depends_on: [DS-02, DS-03]
-      outputs:
-        - "docs/gdd/10_META_PROGRESSION.md"
-        - "docs/gdd/11_BALANCE_RULES.md"
-        - "docs/DECISIONS_DS04.md"
-      accepted_contracts:
-        - "first reset target remains 14-18 AF; AF reward is idempotent and not multiplied by ads/meta"
-        - "Archive Recall is automatic after first reset for familiar pre-Sapience CORE: cost x0.75, production x1.25"
-        - "Timeline #2 Sapience p50 target is 20-28 minutes; no-spend 24-28, typical Tier1 20-25"
-        - "familiar CORE effective cost floor is 70%; pre-Sapience meta production cap is x1.60"
-        - "AR05 retains one OPTIONAL biological node after original prerequisites"
-        - "AR06 removes second cellular branch x2.5 penalty without dual numeric stacking"
-        - "AR09 allows one secondary biological trait at 65% numerical effect"
-        - "offline: Timeline #1 50%, AR04 60%, future hard cap 75%"
-        - "Archive Intervention balance envelope: x1.50, 120s base, <=180s, <=3 charges, no stacking"
-    DS-05: { name: "Timeline #1 full narrative package", status: ready, depends_on: [DS-02] }
-    DS-06: { name: "UX architecture and wireframes", status: ready, depends_on: [DS-01, DS-02, DS-03] }
-    DS-07: { name: "Art direction, locations and era transitions", status: blocked, depends_on: [DS-05, DS-06] }
-    DS-08: { name: "Art production manifest and generation prompts", status: blocked, depends_on: [DS-07] }
-    DS-09: { name: "Audio design and generation package", status: blocked, depends_on: [DS-05, DS-07] }
-    DS-10: { name: "Analytics, platform and production readiness", status: blocked, depends_on: [DS-03, DS-06] }
-    DS-11: { name: "Cross-document consistency pass and design freeze v1", status: blocked, depends_on: [DS-04, DS-05, DS-06, DS-08, DS-09, DS-10] }
-
-documentation:
-  foundation: done
-  ds01_gameplay_contract: done
-  ds02_goals_events_ending: done
-  ds03_technical_contract: done
-  meta_progression: done
-  balance_rules: done
-  narrative_package: ready
-  ux_package: ready
+    DS-01: { name: "Civilization gameplay contract", status: reconciled }
+    DS-02: { name: "Goals, events and first ending contract", status: reconciled }
+    DS-03: { name: "Technical architecture and data contract", status: accepted_architecture_content_refs_reconciled }
+    DS-04: { name: "Meta progression and balance rules", status: reconciled }
+    RECONCILIATION: { name: "Original GDD design reconciliation", status: documentation_complete_pending_review }
+    DS-05: { name: "Timeline #1 full narrative package", status: blocked_by_reconciliation_review }
+    DS-06: { name: "UX architecture and wireframes", status: blocked_by_reconciliation_review }
+    DS-07: { name: "Art direction, locations and era transitions", status: blocked }
+    DS-08: { name: "Art production manifest and generation prompts", status: blocked }
+    DS-09: { name: "Audio design and generation package", status: blocked }
+    DS-10: { name: "Analytics, platform and production readiness", status: blocked }
+    DS-11: { name: "Cross-document consistency pass and design freeze", status: blocked_by_code_rework_and_balance }
 
 implementation:
-  mode: "iteration_3_goal_engine_and_early_playable_slice_completed"
   current_iteration: 3
-  resume_gate: "iteration_3_gate_passed_stop_before_iteration_4"
-  last_iteration_3:
-    date: "2026-09-15"
-    base_commit: "331a5c83425fad67ac429c3aed70c1d7d1c007f6"
-    status: "passed"
-    scope: "Expanded Iteration 3: Goal Engine + tutorial shell + early playable 0-10 min molecular slice through Proto-cell; Iteration 4 not started"
-    delivered:
-      - "Data-driven Goal Engine with lifecycle, prerequisites, conditions, rewards, timestamps, CTA/highlight, hint timeout foundation, chapter and side slots."
-      - "Manual primordial process using canonical manual gain formula and explicit provisional cooldown tuning."
-      - "Playable Timeline #1 molecular path from new run through M01/M02/M03/M05/M06 with M04 optional."
-      - "Technical Chronicles UI at chronicles.html with World/Evolution views, resources, objective panel, generators, evolution nodes and production-only dev tool exclusion."
-      - "Autosave/save-load integration for playable runtime and mid-slice persistence coverage."
-      - "Domain telemetry events for goals, hints, manual process, producers, nodes and Proto-cell."
-    gates:
-      npm_test: passed
-      test_sim: passed
-      smoke: passed
-      build: passed
-    notes:
-      - "Early playable 0-10 min slice is included in Iteration 3 as requested; Iteration 4 remains the next content expansion step."
-      - "Reference simulation reaches automatic income at ~00:21, Self Replication at ~02:52 and Proto-cell at ~04:53; Proto-cell is faster than the 9-11 min target with current canonical economy and recommended pre-Proto producer counts."
-  iteration_3_correction_pass:
-    date: "2026-09-15"
-    base_commit: "69f81a782cdf63c0b9ef7445235eed634cc74609"
-    status: "passed"
-    scope: "Correction pass for Iteration 3 Goal Engine + early playable 0-10 min slice; Iteration 4 not started"
-    fixes:
-      - "RECOVERY_REQUIRED UI no longer creates a temporary playable run, starts loop/autosave or writes save slots before explicit Start fresh."
-      - "Manual primordial process remains available after M01 and M01 manual_gain_multiplier now remains meaningful."
-      - "stalled goal lifecycle no longer reactivates/re-emits goal_started; tick performs one goal evaluation pass after production."
-      - "Objective CTA routes to World/Evolution and focuses the target entity; UI runtime smoke coverage added."
-    gates:
-      npm_test: passed
-      test_ui: passed
-      test_sim: passed
-      smoke: passed
-      build: passed
-    notes:
-      - "No 0-10 balance rebalance was performed."
-      - "Reference timings remain automatic income ~00:21, Self Replication ~02:52, Proto-cell ~04:53."
-  iteration_3_balance_pass_0_10:
-    date: "2026-09-16"
-    base_commit: "f17adde7bae2b8242b722c5153d2f4d3196d7ede"
-    status: "passed"
-    scope: "Balance pass for Timeline #1 first 0-10 minutes only; Iteration 4 not started"
-    changes:
-      - "Molecular producer outputs tuned: Chemical Gradient 0.20 E/s, Catalytic Fold 0.036 I/s, Energy Pocket 0.38 E/s."
-      - "Manual primordial cooldown tuned provisionally: 2.0s before M01, 6.5s after M01."
-      - "Headless simulation now has optimized, competent and slow profiles plus optional M04 route."
-    gates:
-      npm_test: passed
-      test_ui: passed
-      test_sim: passed
-      smoke: passed
-      build: passed
-    notes:
-      - "Canonical node costs and M02/M03/M05 evolution multipliers remain unchanged."
-      - "Competent route reaches Proto-cell at ~09:05; optimized at ~08:12; competent+M04 at ~09:15."
-      - "M02 remains later than ideal target (~03:10 competent) to avoid node-cost changes and clicker-dominant manual play."
-  iteration_3_final_balance_correction_0_10:
-    date: "2026-09-16"
-    base_commit: "401b493a8fc39c394b24505549ef4eaacadf9255"
-    status: "passed"
-    scope: "Final correction pass for Timeline #1 first 0-10 minute balance only; Iteration 4 not started"
-    changes:
-      - "Manual primordial cooldown is now config-driven by completed-node stages: 2.0s before M01, 3.5s from M01 to M02, 90.0s after M02."
-      - "Catalytic Fold base cost tuned from 20 E to 14 E to move Self Replication into the accepted window without changing node costs."
-      - "Competent scripted reference target before Lipid Shell adjusted to 9 Chemical Gradient / 6 Catalytic Fold / 3 Energy Pocket."
-      - "Optional M04 simulation route now evaluates M04 after Lipid Shell as a side choice before Proto-cell."
-    gates:
-      npm_test: passed
-      test_ui: passed
-      test_sim: passed
-      smoke: passed
-      build: passed
-    notes:
-      - "Competent route timings: M01 00:45, M02 02:25, M03 03:55, M05 07:30, M06 09:20."
-      - "Around 03:00, optimal manual contribution is ~4.44% of automatic Energy income."
-      - "Canonical node costs and M02/M03/M05 evolution multipliers remain unchanged."
-  last_iteration_2_micro_fix:
-    date: "2026-09-15"
-    base_commit: "82c60bc86f88a27c9941d6153efecf93b6e15510"
-    status: "passed"
-    scope: "Implementation Iteration 2 micro-fix only; Iteration 3 not started"
-    fixes:
-      - "Reset transaction ID is stable canonical timeline_<timelineId>_ending_<endingId>."
-      - "createdAtSimulationMs remains informational and no longer participates in idempotency identity."
-      - "meta.appliedTransactions uses the canonical array-of-IDs shape."
-    gates:
-      npm_test: passed
-      test_sim: passed
-      smoke: passed
-      build: passed
-  last_iteration_2_correction_pass:
-    date: "2026-09-15"
-    base_commit: "4492d736f194487c1e62bfeb39c4ca3b70202c54"
-    status: "passed"
-    scope: "Implementation Iteration 2 correction pass only; Iteration 3 not started"
-    fixes:
-      - "Debug API manualDevReset creates a clean run while preserving meta/settings and dev-only access."
-      - "Debug triggerEvent uses canonical event queue/state helper and blocks duplicates unless forced."
-      - "Reset transaction foundation supports prepared canonical transaction IDs, appliedTransactions and idempotent reward/chronicle application."
-      - "Corrupt-all save recovery returns RECOVERY_REQUIRED when save slots exist but all candidates are invalid."
-    gates:
-      npm_test: passed
-      test_sim: passed
-      smoke: passed
-      build: passed
-  last_correction_pass:
-    date: "2026-09-15"
-    base_commit: "d0a00a281147af026398046f86308fa8cf750937"
-    status: "passed"
-    scope: "Implementation Iteration 1 correction pass only; Iteration 2 not started"
-    gates:
-      npm_test: passed
-      test_sim: passed
-      smoke: passed
-      build: passed
-    notes:
-      - "Auto-production is gated by M01 unlock_auto_production."
-      - "Metabolism sibling branches remain purchasable with canonical x2.5 second-branch cost penalty; AR06 waiver seam is present but AR06 is not implemented in Iteration 1."
-      - "Initial GameState shape is aligned with canonical goals/events/modifiers/pathScores minimum."
-      - "Resource baseCap is optional; absent cap derives to Infinity."
-      - "manual_gain_multiplier and job_output_multiplier are explicitly deferred until their systems exist."
+  status:
+    - "iteration_3_technical_foundation_passed"
+    - "playable_0_10_requires_content_reconciliation"
+  accepted_implementation_commit: "32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb"
+  architecture_status: "accepted"
+  content_status: "0_10_superseded_by_reconciliation"
+  preserved_systems:
+    - "isolated src/chronicles domain"
+    - "data-driven config and validators"
+    - "canonical GameState / commands / events / selectors"
+    - "generic Goal Engine"
+    - "save v1 / autosave / recovery"
+    - "dev speed and tools"
+    - "telemetry hooks"
+    - "headless simulation"
+    - "branch/optional support"
+    - "idempotent reset foundation"
   iterations:
     0: { name: "Repo baseline and code audit", status: done }
-    1:
-      name: "Domain adapter and data foundation"
-      status: done
-      required_inputs:
-        - "docs/production/DS03_CODEX_HANDOFF.md"
-        - "docs/technical/00_TECHNICAL_OVERVIEW.md"
-        - "docs/technical/02_DOMAIN_ADAPTER.md"
-        - "docs/technical/03_GAME_STATE.md"
-        - "docs/technical/04_SAVE_ARCHITECTURE.md"
-        - "docs/technical/07_TESTING_STRATEGY.md"
-    2:
-      name: "Save v1 and dev tools"
-      status: done
-      required_inputs:
-        - "docs/production/DS03_CODEX_HANDOFF.md"
-        - "docs/technical/03_GAME_STATE.md"
-        - "docs/technical/04_SAVE_ARCHITECTURE.md"
-        - "docs/technical/07_TESTING_STRATEGY.md"
-      delivered:
-        - "versioned save envelope v1 with run/meta/settings/narrative flags normalization"
-        - "write-ahead primary/pending/backup save flow with newest valid recovery fallback"
-        - "autosave controller for dirty periodic/flush saves"
-        - "migration/normalization interface for schema v1"
-        - "dev-only time scale, resource grant, jump-to-era, trigger-event and dump-state API"
-        - "reset transaction save coverage preserving meta state"
-      gates:
-        npm_test: passed
-        test_sim: passed
-        smoke: passed
-        build: passed
-    3:
-      name: "Goal engine + tutorial shell"
-      status: done
-      delivered:
-        - "generic data-driven goal engine"
-        - "early playable 0-10 min molecular slice through Proto-cell"
-      gates:
-        npm_test: passed
-        test_sim: passed
-        smoke: passed
-        build: passed
+    1: { name: "Domain adapter and data foundation", status: done }
+    2: { name: "Save v1 and dev tools", status: done }
+    3: { name: "Goal Engine + tutorial shell + superseded early content", status: technically_done_content_rework_required }
+    reconciliation_rework:
+      name: "Biological gameplay reconciliation implementation"
+      status: blocked_pending_user_approval
+      scope:
+        - "replace current 0-10 E/I content with RNA/DNA/Cell canon"
+        - "migrate config and Goal Engine content"
+        - "preserve architecture"
+        - "update tests and simulation"
+        - "rebalance 0-10 from scratch"
+        - "manual playtest 0-10"
     4:
-      name: "First content expansion after Proto-cell"
-      status: ready
-      note: "Not started by expanded Iteration 3 work."
+      name: "First corrected content expansion after Cell"
+      status: blocked_by_design_reconciliation
 
-parallelization:
-  now:
-    design: "DS-05"
-    codex: "Expanded Iteration 3 passed with early playable 0-10 min slice; stop before Iteration 4 until user approval"
-  also_ready: ["DS-06"]
+iteration_4:
+  status: "blocked_by_design_reconciliation"
+  unblock_conditions:
+    - "user approves reconciled documentation"
+    - "Biological gameplay reconciliation implementation passes"
+    - "0-10 rebalance passes"
+    - "manual 0-10 playtest approved"
+
+balance:
+  ruleset_target: "timeline1-v2-reconciled"
+  old_0_10_ei_balance: "historical_superseded"
+  biological_numbers: "pending_rework_simulation"
+  civilization_numbers: "provisional_until_full_rebalance"
+  crisis_contract: "accepted_pending_regression"
 
 open_decisions:
-  - "Exact production UI framework / degree of Vue 2 reuse; resolve in DS-06 / UI implementation"
-  - "Exact Yandex/VK SDK mapping, cloud conflict policy and rewarded flow; resolve in DS-10"
-  - "Remaining TBD/proposal balance values stay configurable until telemetry/testing"
-  - "Visual branch scope / alternative endings / early Space-Bioseed remain future design decisions"
+  - "Exact RNA/DNA/Biomass/Energy rates and costs for corrected 0-40 biological phase"
+  - "Exact AP reward/cost table"
+  - "Exact optional Photosynthesis/Chemosynthesis effects"
+  - "Exact civilization starting F/M/K package and population thresholds after Population~5 start"
+  - "Which civilization specializations remain paid branches versus profile/event choices"
+  - "Exact Timeline #2 p50 after corrected Timeline #1 simulation"
+  - "Production UI framework / degree of Vue 2 reuse"
+  - "Exact Yandex/VK SDK mapping and cloud policy"
 
 next_action:
-  owner: "Codex + ChatGPT/user in parallel"
-  session: "Post-Iteration 3 gate + DS-05"
-  description: "Codex stops after expanded Implementation Iteration 3; Iteration 4 starts only after user approval. Design proceeds with DS-05 Timeline #1 full narrative package."
+  owner: "ChatGPT/user -> then Codex"
+  session: "Reconciliation review"
+  description: "Review reconciled documentation. Do not change game code or start Iteration 4 until approval. After approval prepare Codex handoff for biological 0-10 code rework and rebalance."
