@@ -1,6 +1,6 @@
 import { createRulesetIndexes } from '../config/index.js';
-import { canAfford, scaleCost } from './services/costs.js';
-import { branchAvailable, prerequisitesMet } from './services/evolution.js';
+import { canAfford, multiplyCost, scaleCost } from './services/costs.js';
+import { branchAvailable, branchCostMultiplier, prerequisitesMet } from './services/evolution.js';
 import { calculateProductionRates } from './services/production.js';
 
 export function selectResourceAmounts(state) {
@@ -23,13 +23,28 @@ export function selectNodeStatus(state, ruleset, nodeId) {
   if (!prerequisitesMet(state, node) || !branchAvailable(state, node)) {
     return 'locked';
   }
-  return canAfford(state, node.cost).ok ? 'available_affordable' : 'available_unaffordable';
+  const cost = selectNodeCost(state, ruleset, nodeId);
+  return canAfford(state, cost).ok ? 'available_affordable' : 'available_unaffordable';
 }
 
 export function selectProducerPrice(state, ruleset, producerId) {
   const indexes = createRulesetIndexes(ruleset);
   const producer = indexes.producers[producerId];
   const count = state.run.producers[producerId]?.count || 0;
-  return scaleCost(producer.baseCost, producer.growth, count);
+  let cost = scaleCost(producer.baseCost, producer.growth, count);
+  for (const modifier of Object.values(state.run.modifiers.active)) {
+    if (modifier.type !== 'producer_cost_multiplier') {
+      continue;
+    }
+    if ((producer.tags || []).includes(modifier.producerTag)) {
+      cost = multiplyCost(cost, modifier.value);
+    }
+  }
+  return cost;
 }
 
+export function selectNodeCost(state, ruleset, nodeId) {
+  const indexes = createRulesetIndexes(ruleset);
+  const node = indexes.nodes[nodeId];
+  return multiplyCost(node.cost, branchCostMultiplier(state, ruleset, node));
+}

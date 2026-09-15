@@ -15,7 +15,7 @@ export function calculateCap(state, resourceId, ruleset) {
   }
   const indexes = createRulesetIndexes(ruleset);
   const config = indexes.resources[resourceId];
-  return config ? config.baseCap : Infinity;
+  return config?.baseCap ?? Infinity;
 }
 
 export function addResource(state, resourceId, amount, ruleset, ports) {
@@ -27,10 +27,9 @@ export function addResource(state, resourceId, amount, ruleset, ports) {
   const before = resource.amount;
   const cap = calculateCap(state, resourceId, ruleset);
   resource.amount = Math.min(cap, Math.max(0, before + amount));
-  state.run.stats.totalEarned[resourceId] = Math.max(
-    state.run.stats.totalEarned[resourceId] || 0,
-    (state.run.stats.totalEarned[resourceId] || 0) + Math.max(0, resource.amount - before)
-  );
+  state.run.stats.totalEarned ||= {};
+  state.run.stats.totalEarned[resourceId] =
+    (state.run.stats.totalEarned[resourceId] || 0) + Math.max(0, resource.amount - before);
 
   if (before !== resource.amount) {
     return [
@@ -44,4 +43,3 @@ export function addResource(state, resourceId, amount, ruleset, ports) {
   }
   return [];
 }
-

@@ -1,5 +1,6 @@
 import { createRulesetIndexes } from '../../config/index.js';
 import { addResource } from './resources.js';
+import { isAutoProductionUnlocked } from './modifiers.js';
 
 const PRODUCER_MILESTONES = [
   { count: 50, multiplier: 2.5 },
@@ -15,7 +16,7 @@ export function producerMilestoneMultiplier(count) {
 
 export function productionMultiplierForResource(state, resourceId) {
   let multiplier = 1;
-  for (const modifier of Object.values(state.run.modifiers)) {
+  for (const modifier of Object.values(state.run.modifiers.active)) {
     if (modifier.type === 'global_production_multiplier') {
       multiplier *= modifier.value;
     }
@@ -27,6 +28,9 @@ export function productionMultiplierForResource(state, resourceId) {
 }
 
 export function calculateProductionRates(state, ruleset) {
+  if (!isAutoProductionUnlocked(state)) {
+    return {};
+  }
   const indexes = createRulesetIndexes(ruleset);
   const rates = {};
 
@@ -48,6 +52,9 @@ export function calculateProductionRates(state, ruleset) {
 }
 
 export function applyProduction(state, ruleset, deltaMs, ports) {
+  if (state.run.lifecycle !== 'active') {
+    return { rates: {}, events: [] };
+  }
   const seconds = deltaMs / 1000;
   const rates = calculateProductionRates(state, ruleset);
   const events = [];
@@ -56,4 +63,3 @@ export function applyProduction(state, ruleset, deltaMs, ports) {
   }
   return { rates, events };
 }
-

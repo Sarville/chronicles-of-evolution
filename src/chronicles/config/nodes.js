@@ -3,6 +3,13 @@ export const branchGroups = {
   culture_1: ['T01A', 'T01B', 'T01C'],
 };
 
+export const branchCostRules = {
+  metabolism_1: {
+    additionalBranchCostMultiplier: 2.5,
+    waiveWithArchiveNodeId: 'AR06',
+  },
+};
+
 export const nodes = [
   {
     id: 'M01',
@@ -13,7 +20,7 @@ export const nodes = [
     cost: { energy: 12 },
     requiresNodes: [],
     effects: [
-      { type: 'manual_gain_multiplier', value: 2 },
+      { type: 'manual_gain_multiplier', value: 2, deferred: true, deferredUntil: 'manual_process_system' },
       { type: 'unlock_auto_production' },
     ],
     goalId: 'G001',
@@ -121,7 +128,9 @@ export const nodes = [
     labelKey: 'node.T01A',
     cost: { food: 250, materials: 120, knowledge: 35 },
     requiresNodes: [],
-    effects: [{ type: 'job_output_multiplier', jobId: 'JOB_TRIBE_FORAGER', value: 1.35 }],
+    effects: [
+      { type: 'job_output_multiplier', jobId: 'JOB_TRIBE_FORAGER', value: 1.35, deferred: true, deferredUntil: 'jobs_system' },
+    ],
   },
   {
     id: 'T01B',
@@ -167,7 +176,9 @@ export const nodes = [
     labelKey: 'node.T03',
     cost: { food: 610, materials: 330, knowledge: 95 },
     requiresNodes: ['T02'],
-    effects: [{ type: 'job_output_multiplier', jobId: 'JOB_TRIBE_FORAGER', value: 1.25 }],
+    effects: [
+      { type: 'job_output_multiplier', jobId: 'JOB_TRIBE_FORAGER', value: 1.25, deferred: true, deferredUntil: 'jobs_system' },
+    ],
     goalId: 'G014',
   },
   {

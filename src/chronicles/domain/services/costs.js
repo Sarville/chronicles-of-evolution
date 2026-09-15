@@ -20,6 +20,12 @@ export function scaleCost(baseCost, growth, ownedCount) {
   );
 }
 
+export function multiplyCost(cost, multiplier) {
+  return Object.fromEntries(
+    Object.entries(cost).map(([resourceId, amount]) => [resourceId, round3sig(amount * multiplier)])
+  );
+}
+
 export function canAfford(state, cost) {
   for (const [resourceId, amount] of Object.entries(cost)) {
     const current = state.run.resources[resourceId]?.amount || 0;
@@ -57,4 +63,3 @@ export function payCost(state, cost, ruleset, ports) {
   }
   return { ok: true, events };
 }
-

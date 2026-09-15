@@ -1,9 +1,27 @@
-import { RULESET_VERSION, ruleset } from '../config/index.js';
+import { ruleset as defaultRuleset } from '../config/index.js';
+
+export const CANONICAL_PATH_SCORE_IDS = [
+  'nature',
+  'industry',
+  'freedom',
+  'control',
+  'cooperation',
+  'dominance',
+  'biology',
+  'machines',
+  'preservation',
+  'expansion',
+];
+
+function createInitialPathScores() {
+  return Object.fromEntries(CANONICAL_PATH_SCORE_IDS.map((pathId) => [pathId, 0]));
+}
 
 export function createInitialGameState(options = {}) {
+  const sourceRuleset = options.ruleset || defaultRuleset;
   const runId = options.runId || 'run_001';
   const resources = {};
-  for (const resource of ruleset.resources) {
+  for (const resource of sourceRuleset.resources) {
     if (resource.visibleFromEra === 'MOLECULAR') {
       resources[resource.id] = { amount: resource.initialAmount };
     }
@@ -13,7 +31,7 @@ export function createInitialGameState(options = {}) {
     run: {
       id: runId,
       timelineId: 1,
-      rulesetVersion: RULESET_VERSION,
+      rulesetVersion: sourceRuleset.version,
       lifecycle: 'active',
       clock: { simulationMs: 0, activeMs: 0 },
       chapterId: 'CH01',
@@ -23,11 +41,11 @@ export function createInitialGameState(options = {}) {
       nodes: { completed: {}, selectedBranchByGroup: {} },
       population: null,
       buildings: {},
-      goals: {},
-      events: {},
+      goals: { currentId: null, states: {}, side: { activeIds: [] } },
+      events: { queue: [], states: {} },
       flags: {},
-      pathScores: {},
-      modifiers: {},
+      pathScores: createInitialPathScores(),
+      modifiers: { active: {} },
       manualProcesses: {},
       crisis: null,
       stats: { totalEarned: {} },
@@ -56,4 +74,3 @@ export function toPersistedGameState(state) {
     settings: state.settings,
   };
 }
-

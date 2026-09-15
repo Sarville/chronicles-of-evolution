@@ -6,12 +6,12 @@ export function queueEventsForGoal(state, ruleset, goalId, ports) {
     if (eventConfig.trigger?.type !== 'goal_completed' || eventConfig.trigger.goalId !== goalId) {
       continue;
     }
-    if (state.run.events[eventConfig.id]?.state) {
+    if (state.run.events.states[eventConfig.id]?.status) {
       continue;
     }
-    state.run.events[eventConfig.id] = { state: 'queued', queuedAtMs: state.run.clock.simulationMs };
+    state.run.events.states[eventConfig.id] = { status: 'queued', queuedAtMs: state.run.clock.simulationMs };
+    state.run.events.queue.push(eventConfig.id);
     events.push(createDomainEvent('event_queued', { eventId: eventConfig.id }, state, ports));
   }
   return events;
 }
-

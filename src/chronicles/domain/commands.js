@@ -1,4 +1,5 @@
 import { createRulesetIndexes } from '../config/index.js';
+import { selectNodeCost, selectProducerPrice } from './selectors.js';
 import { createDomainEvent } from './domainEvents.js';
 import { payCost, scaleCost } from './services/costs.js';
 import { applyEraTransition } from './services/eras.js';
@@ -20,7 +21,10 @@ function rejected(reason, details = {}) {
 }
 
 export function dispatchCommand(state, ruleset, command, ports = {}) {
-  if (state.run.lifecycle !== 'active' && command.type !== 'TICK') {
+  if (!state.run || state.run.lifecycle !== 'active') {
+    if (command.type === 'TICK') {
+      return { ok: true, events: [], frozen: true };
+    }
     return rejected('RUN_NOT_ACTIVE');
   }
 
@@ -56,7 +60,7 @@ function buyProducer(state, ruleset, producerId, ports) {
   }
 
   const currentCount = state.run.producers[producerId]?.count || 0;
-  const cost = scaleCost(producer.baseCost, producer.growth, currentCount);
+  const cost = selectProducerPrice(state, ruleset, producerId);
   const payment = payCost(state, cost, ruleset, ports);
   if (!payment.ok) {
     return payment;
@@ -86,16 +90,17 @@ function buyNode(state, ruleset, nodeId, ports) {
     return populationCheck;
   }
 
-  const payment = payCost(state, node.cost, ruleset, ports);
+  const cost = selectNodeCost(state, ruleset, nodeId);
+  const payment = payCost(state, cost, ruleset, ports);
   if (!payment.ok) {
     return payment;
   }
 
   state.run.nodes.completed[nodeId] = { completedAtMs: state.run.clock.simulationMs };
-  if (node.branchGroup) {
+  if (node.branchGroup && !state.run.nodes.selectedBranchByGroup[node.branchGroup]) {
     state.run.nodes.selectedBranchByGroup[node.branchGroup] = nodeId;
   }
-  applyEffects(state, node.effects);
+  applyEffects(state, node.effects, { sourceType: 'node', sourceId: nodeId });
 
   const goalEvents = completeGoalForNode(state, ruleset, nodeId, ports);
   const queuedEvents = goalEvents.flatMap((event) => {
@@ -107,7 +112,7 @@ function buyNode(state, ruleset, nodeId, ports) {
   const eraEvents = applyEraTransition(state, node.transition, ruleset, ports);
   return ok(state, [
     ...payment.events,
-    createDomainEvent('node_completed', { nodeId }, state, ports),
+    createDomainEvent('node_completed', { nodeId, cost }, state, ports),
     ...goalEvents,
     ...queuedEvents,
     ...eraEvents,
@@ -135,9 +140,9 @@ function buyBuilding(state, ruleset, buildingId, ports) {
   }
 
   state.run.buildings[buildingId] = { count: currentCount + 1 };
+  applyEffects(state, building.effects, { sourceType: 'building', sourceId: buildingId });
   return ok(state, [
     ...payment.events,
     createDomainEvent('building_bought', { buildingId, newCount: currentCount + 1, cost }, state, ports),
   ]);
 }
-

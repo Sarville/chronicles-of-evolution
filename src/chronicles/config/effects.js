@@ -1,11 +1,14 @@
-export const allowedEffectTypes = [
-  'manual_gain_multiplier',
-  'unlock_auto_production',
-  'resource_production_multiplier',
-  'global_production_multiplier',
-  'unlock_resource',
-  'producer_cost_multiplier',
-  'unlock_building',
-  'job_output_multiplier',
-];
+export const effectSupport = {
+  unlock_auto_production: { status: 'supported' },
+  resource_production_multiplier: { status: 'supported' },
+  global_production_multiplier: { status: 'supported' },
+  unlock_resource: { status: 'supported' },
+  producer_cost_multiplier: { status: 'supported' },
+  unlock_building: { status: 'supported' },
+  manual_gain_multiplier: { status: 'deferred', until: 'manual_process_system' },
+  job_output_multiplier: { status: 'deferred', until: 'jobs_system' },
+};
 
+export const allowedEffectTypes = Object.keys(effectSupport).filter(
+  (effectType) => effectSupport[effectType].status === 'supported'
+);

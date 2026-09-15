@@ -72,9 +72,25 @@ documentation:
   ux_package: ready
 
 implementation:
-  mode: "iteration_1_completed"
+  mode: "iteration_1_correction_pass_completed"
   current_iteration: 1
-  resume_gate: "iteration_1_gate_passed_stop_before_iteration_2"
+  resume_gate: "iteration_1_correction_pass_passed_stop_before_iteration_2"
+  last_correction_pass:
+    date: "2026-09-15"
+    base_commit: "d0a00a281147af026398046f86308fa8cf750937"
+    status: "passed"
+    scope: "Implementation Iteration 1 correction pass only; Iteration 2 not started"
+    gates:
+      npm_test: passed
+      test_sim: passed
+      smoke: passed
+      build: passed
+    notes:
+      - "Auto-production is gated by M01 unlock_auto_production."
+      - "Metabolism sibling branches remain purchasable with canonical x2.5 second-branch cost penalty; AR06 waiver seam is present but AR06 is not implemented in Iteration 1."
+      - "Initial GameState shape is aligned with canonical goals/events/modifiers/pathScores minimum."
+      - "Resource baseCap is optional; absent cap derives to Infinity."
+      - "manual_gain_multiplier and job_output_multiplier are explicitly deferred until their systems exist."
   iterations:
     0: { name: "Repo baseline and code audit", status: done }
     1:
@@ -92,7 +108,7 @@ implementation:
 parallelization:
   now:
     design: "DS-05"
-    codex: "Iteration 1 gate passed; stop before Iteration 2 until user approval"
+    codex: "Iteration 1 correction pass gate passed; stop before Iteration 2 until user approval"
   also_ready: ["DS-06"]
 
 open_decisions:

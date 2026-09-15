@@ -4,6 +4,10 @@ export function prerequisitesMet(state, entity) {
   if (!nodesMet) {
     return false;
   }
+  const flagsMet = (entity.requiresFlags || []).every((flagId) => state.run.flags[flagId]);
+  if (!flagsMet) {
+    return false;
+  }
   if (entity.requiresAnyBranchGroup) {
     return Boolean(state.run.nodes.selectedBranchByGroup[entity.requiresAnyBranchGroup]);
   }
@@ -15,5 +19,25 @@ export function branchAvailable(state, node) {
     return true;
   }
   const selected = state.run.nodes.selectedBranchByGroup[node.branchGroup];
+  if (node.branchGroup === 'metabolism_1') {
+    return true;
+  }
   return !selected || selected === node.id;
+}
+
+export function branchCostMultiplier(state, ruleset, node) {
+  if (!node.branchGroup) {
+    return 1;
+  }
+  const rule = ruleset.branchCostRules?.[node.branchGroup];
+  if (!rule) {
+    return 1;
+  }
+  const selected = state.run.nodes.selectedBranchByGroup[node.branchGroup];
+  const archiveWaivesPenalty =
+    rule.waiveWithArchiveNodeId && state.meta.archiveNodes?.[rule.waiveWithArchiveNodeId];
+  if (!selected || selected === node.id || archiveWaivesPenalty) {
+    return 1;
+  }
+  return rule.additionalBranchCostMultiplier || 1;
 }

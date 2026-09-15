@@ -4,6 +4,7 @@ export const producers = [
     entityType: 'producer',
     labelKey: 'producer.chemical_gradient',
     unlocksAtStart: true,
+    tags: ['energy'],
     baseCost: { energy: 10 },
     growth: 1.15,
     output: { energy: 0.4 },
@@ -13,6 +14,7 @@ export const producers = [
     entityType: 'producer',
     labelKey: 'producer.catalytic_fold',
     requiresNodes: ['M01'],
+    tags: ['information'],
     baseCost: { energy: 24 },
     growth: 1.17,
     output: { information: 0.055 },
@@ -22,9 +24,9 @@ export const producers = [
     entityType: 'producer',
     labelKey: 'producer.energy_pocket',
     requiresNodes: ['M02'],
+    tags: ['energy'],
     baseCost: { energy: 38 },
     growth: 1.15,
     output: { energy: 0.75 },
   },
 ];
-

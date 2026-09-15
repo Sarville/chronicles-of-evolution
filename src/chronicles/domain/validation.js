@@ -27,6 +27,23 @@ function validateCost(cost, resourcesById, ownerId, errors) {
   }
 }
 
+function validateEffect(effect, ruleset, ownerId, errors) {
+  const support = ruleset.effectSupport?.[effect.type];
+  if (!support) {
+    errors.push(`${ownerId} uses unknown effect type ${effect.type}`);
+    return;
+  }
+  if (support.status === 'deferred') {
+    if (effect.deferred !== true || effect.deferredUntil !== support.until) {
+      errors.push(`${ownerId} uses deferred effect ${effect.type} without explicit deferred marker`);
+    }
+    return;
+  }
+  if (!ruleset.allowedEffectTypes.includes(effect.type)) {
+    errors.push(`${ownerId} uses effect type ${effect.type} that is not runtime-supported`);
+  }
+}
+
 function visitNode(nodeId, nodesById, temporary, permanent, errors) {
   if (permanent.has(nodeId)) {
     return;
@@ -72,6 +89,12 @@ export function validateRuleset(ruleset) {
   }
 
   const indexes = createRulesetIndexes(ruleset);
+  for (const resource of ruleset.resources) {
+    if (resource.baseCap != null && (!Number.isFinite(resource.baseCap) || resource.baseCap < 0)) {
+      errors.push(`${resource.id} has invalid baseCap`);
+    }
+  }
+
   for (const producer of ruleset.producers) {
     validateCost(producer.baseCost, indexes.resources, producer.id, errors);
     for (const resourceId of Object.keys(producer.output || {})) {
@@ -88,6 +111,9 @@ export function validateRuleset(ruleset) {
         errors.push(`${building.id} requires unknown node ${required}`);
       }
     }
+    for (const effect of building.effects || []) {
+      validateEffect(effect, ruleset, building.id, errors);
+    }
   }
 
   for (const node of ruleset.nodes) {
@@ -101,9 +127,7 @@ export function validateRuleset(ruleset) {
       }
     }
     for (const effect of node.effects || []) {
-      if (!ruleset.allowedEffectTypes.includes(effect.type)) {
-        errors.push(`${node.id} uses unknown effect type ${effect.type}`);
-      }
+      validateEffect(effect, ruleset, node.id, errors);
     }
     if (node.transition && !indexes.eras[node.transition]) {
       errors.push(`${node.id} transitions to unknown era ${node.transition}`);
@@ -115,6 +139,18 @@ export function validateRuleset(ruleset) {
       if (!indexes.nodes[member]) {
         errors.push(`${groupId} references unknown branch node ${member}`);
       }
+    }
+  }
+
+  for (const [groupId, rule] of Object.entries(ruleset.branchCostRules || {})) {
+    if (!ruleset.branchGroups[groupId]) {
+      errors.push(`${groupId} has branch cost rule without branch group`);
+    }
+    if (
+      rule.additionalBranchCostMultiplier != null &&
+      (!Number.isFinite(rule.additionalBranchCostMultiplier) || rule.additionalBranchCostMultiplier < 1)
+    ) {
+      errors.push(`${groupId} has invalid branch cost multiplier`);
     }
   }
 
@@ -135,11 +171,12 @@ export function validateRuleset(ruleset) {
 export function validateGameState(state, ruleset) {
   const errors = [];
   assertSerializable(state, 'state', errors);
-  if (state.run.rulesetVersion !== ruleset.version) {
-    errors.push(`Unsupported ruleset version ${state.run.rulesetVersion}`);
-  }
   if (!state.run || !state.meta || !state.settings) {
     errors.push('State must contain run, meta and settings');
+    return { ok: false, errors };
+  }
+  if (state.run.rulesetVersion !== ruleset.version) {
+    errors.push(`Unsupported ruleset version ${state.run.rulesetVersion}`);
   }
   for (const [resourceId, resource] of Object.entries(state.run.resources || {})) {
     if (!Number.isFinite(resource.amount) || resource.amount < 0) {
@@ -148,4 +185,3 @@ export function validateGameState(state, ruleset) {
   }
   return { ok: errors.length === 0, errors };
 }
-

@@ -1,14 +1,14 @@
 import { resources } from './resources.js';
 import { eras } from './eras.js';
 import { producers } from './producers.js';
-import { nodes, branchGroups } from './nodes.js';
+import { nodes, branchGroups, branchCostRules } from './nodes.js';
 import { buildings } from './buildings.js';
 import { jobs } from './jobs.js';
 import { goals } from './goals.js';
 import { events } from './events.js';
 import { milestones } from './milestones.js';
 import { endings } from './endings.js';
-import { allowedEffectTypes } from './effects.js';
+import { allowedEffectTypes, effectSupport } from './effects.js';
 
 export const RULESET_VERSION = 'timeline1-v1';
 
@@ -19,6 +19,7 @@ export const ruleset = {
   producers,
   nodes,
   branchGroups,
+  branchCostRules,
   buildings,
   jobs,
   goals,
@@ -26,6 +27,7 @@ export const ruleset = {
   milestones,
   endings,
   allowedEffectTypes,
+  effectSupport,
 };
 
 export function indexById(items) {
@@ -44,4 +46,3 @@ export function createRulesetIndexes(source = ruleset) {
     events: indexById(source.events),
   };
 }
-

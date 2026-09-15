@@ -6,7 +6,7 @@ import { applyProduction } from './services/production.js';
 export function createChroniclesEngine(options = {}) {
   const ruleset = options.ruleset || defaultRuleset;
   const ports = options.ports || {};
-  const state = options.state || createInitialGameState(options);
+  const state = options.state || createInitialGameState({ ...options, ruleset });
 
   return {
     state,
@@ -19,8 +19,7 @@ export function createChroniclesEngine(options = {}) {
       const productionResult = applyProduction(state, ruleset, deltaMs, ports);
       const events = [...tickResult.events, ...productionResult.events];
       state.session.lastEvents = events;
-      return { ok: true, rates: productionResult.rates, events };
+      return { ok: tickResult.ok, frozen: tickResult.frozen || false, rates: productionResult.rates, events };
     },
   };
 }
-
