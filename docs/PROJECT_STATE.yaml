@@ -59,6 +59,13 @@ design:
       name: "Goals, events and first ending contract"
       status: ready
       depends_on: [DS-01]
+      required_inputs:
+        - "docs/production/DS-02_PRODUCT_INPUTS.md"
+      required_principles:
+        - "future content discoverability: show scale of Archive/unknown content early without spoilers or false collection totals"
+        - "manual involvement without clicker grind: click starts a process/cycle, never linear +1 resource spam"
+        - "early manual process must evolve into self-replication and automation"
+        - "Archive Intervention exists as a future temporary resource boost hook; ads are not part of baseline balance"
       outputs:
         - "docs/gdd/07_GOALS_AND_MILESTONES.md"
         - "docs/gdd/08_EVENTS_AND_CHOICES.md"
@@ -84,6 +91,8 @@ design:
       name: "Timeline #1 full narrative package"
       status: blocked
       depends_on: [DS-02]
+      required_handoffs:
+        - "give narrative meaning to unknown/corrupted Archive records introduced by DS-02"
       outputs:
         - "docs/scenario/01_TIMELINE_01_SCRIPT.md"
         - "docs/scenario/04_STORY_EVENTS.md"
@@ -94,6 +103,13 @@ design:
       name: "UX architecture and wireframes"
       status: blocked
       depends_on: [DS-01, DS-02]
+      required_handoffs:
+        - "Archive/collection preview and visible scale of future content"
+        - "locked/unknown/corrupted content states and fogged future branches"
+        - "hidden achievements and incomplete Chronicle/Timeline states"
+        - "manual process-start interaction with busy/progress/visual payoff states"
+        - "UX transition from manual cycles to automation"
+        - "Archive Intervention UI: target resource, timer, charges and cooldown"
       outputs:
         - "docs/ux/00_UX_PRINCIPLES.md"
         - "docs/ux/01_SCREEN_MAP.md"
@@ -132,6 +148,13 @@ design:
       name: "Analytics, platform and production readiness"
       status: blocked
       depends_on: [DS-03, DS-06]
+      required_handoffs:
+        - "rewarded-ad flow for Archive Intervention"
+        - "free charges, rewarded refill and cooldown/frequency rules"
+        - "ad unavailable/failure fallback"
+        - "Archive Intervention analytics and platform SDK mapping"
+        - "baseline progression must remain completable without ads"
+        - "balance limits for Archive Intervention upgrades"
       outputs:
         - "docs/technical/05_ANALYTICS_SCHEMA.md"
         - "docs/technical/06_PLATFORM_INTEGRATION.md"
@@ -159,6 +182,7 @@ documentation:
     project_state: done
     state_workflow: done
     design_session_plan: done
+    ds02_product_inputs: done
   design_docs:
     civilization_progression: done
     buildings_and_jobs: done
@@ -223,4 +247,4 @@ open_decisions:
 next_action:
   owner: "ChatGPT + user review"
   session: "DS-02"
-  description: "Design goals/milestones, meaningful events/choices, crisis flow, Ash ending and reset contract for Timeline #1."
+  description: "Design goals/milestones, discoverability/reveal hooks, early manual-process onboarding, meaningful events/choices, crisis flow, Ash ending and reset contract for Timeline #1."
