@@ -1,6 +1,7 @@
-import { ruleset } from '../config/index.js';
-import { createRulesetIndexes } from '../config/index.js';
+import { createRulesetIndexes, ruleset } from '../config/index.js';
 import { createChroniclesEngine } from '../domain/engine.js';
+import { queueEvent } from '../domain/services/events.js';
+import { createInitialGameState } from '../domain/state.js';
 
 const DEV_TIME_SCALES = Object.freeze([1, 5, 20, 100]);
 
@@ -47,14 +48,31 @@ export function createDebugApi(options = {}) {
       engine.state.session.dirty = true;
       return { ok: true, eraId: era.id, chapterId: era.chapterId };
     },
-    triggerEvent(eventId) {
+    triggerEvent(eventId, triggerOptions = {}) {
       assertDevEnabled();
-      if (!indexes.events[eventId]) {
-        return { ok: false, reason: 'UNKNOWN_EVENT', eventId };
+      const queued = queueEvent(engine.state, engine.ruleset, eventId, options.ports, {
+        force: triggerOptions.force === true || options.forceEvents === true,
+      });
+      if (!queued.ok) {
+        return queued;
       }
-      engine.state.run.events.queue.push({ id: eventId, queuedAtMs: engine.state.run.clock.simulationMs });
       engine.state.session.dirty = true;
-      return { ok: true, eventId };
+      return queued;
+    },
+    manualDevReset(resetOptions = {}) {
+      assertDevEnabled();
+      const previousMeta = engine.state.meta;
+      const previousSettings = engine.state.settings;
+      const nextState = createInitialGameState({
+        ruleset: engine.ruleset,
+        runId: resetOptions.runId || 'run_dev_reset',
+      });
+      engine.state.run = nextState.run;
+      engine.state.meta = previousMeta;
+      engine.state.settings = previousSettings;
+      engine.state.session.dirty = true;
+      engine.state.session.lastEvents = [];
+      return { ok: true, runId: engine.state.run.id };
     },
     dumpState() {
       assertDevEnabled();

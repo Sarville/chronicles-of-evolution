@@ -116,6 +116,14 @@ DS-04 можно использовать как дополнительный co
 - [x] save/load equality, autosave, migration noop, invalid save recovery, reset/meta and dev tools tests;
 - [x] `npm test`, `npm run test:sim`, `npm run smoke`, `npm run build`.
 
+Correction pass:
+
+- [x] `manualDevReset()` preserves meta/settings and creates a clean dev-only run;
+- [x] `triggerEvent()` uses canonical `events.queue = [eventId]` and `events.states[eventId]`;
+- [x] reset transaction foundation supports prepared canonical transaction IDs and idempotent application;
+- [x] corrupt-all recovery returns explicit `RECOVERY_REQUIRED` instead of silently creating a new run;
+- [x] Iteration 3 not started.
+
 ---
 
 # Next implementation
@@ -184,5 +192,5 @@ DS-06 UX также ready и может идти после/параллельн
 
 Параллельно:
 
-1. **Codex:** остановиться после Iteration 2 gate; Iteration 3 запускать только по отдельному подтверждению.
+1. **Codex:** остановиться после Iteration 2 correction pass gate; Iteration 3 запускать только по отдельному подтверждению.
 2. **ChatGPT/user:** DS-05 — Timeline #1 full narrative package.

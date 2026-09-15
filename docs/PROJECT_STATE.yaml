@@ -72,9 +72,24 @@ documentation:
   ux_package: ready
 
 implementation:
-  mode: "iteration_2_completed"
+  mode: "iteration_2_correction_pass_completed"
   current_iteration: 2
   resume_gate: "iteration_2_gate_passed_stop_before_iteration_3"
+  last_iteration_2_correction_pass:
+    date: "2026-09-15"
+    base_commit: "4492d736f194487c1e62bfeb39c4ca3b70202c54"
+    status: "passed"
+    scope: "Implementation Iteration 2 correction pass only; Iteration 3 not started"
+    fixes:
+      - "Debug API manualDevReset creates a clean run while preserving meta/settings and dev-only access."
+      - "Debug triggerEvent uses canonical event queue/state helper and blocks duplicates unless forced."
+      - "Reset transaction foundation supports prepared canonical transaction IDs, appliedTransactions and idempotent reward/chronicle application."
+      - "Corrupt-all save recovery returns RECOVERY_REQUIRED when save slots exist but all candidates are invalid."
+    gates:
+      npm_test: passed
+      test_sim: passed
+      smoke: passed
+      build: passed
   last_correction_pass:
     date: "2026-09-15"
     base_commit: "d0a00a281147af026398046f86308fa8cf750937"
@@ -127,7 +142,7 @@ implementation:
 parallelization:
   now:
     design: "DS-05"
-    codex: "Iteration 2 gate passed; stop before Iteration 3 until user approval"
+    codex: "Iteration 2 correction pass gate passed; stop before Iteration 3 until user approval"
   also_ready: ["DS-06"]
 
 open_decisions:
@@ -139,4 +154,4 @@ open_decisions:
 next_action:
   owner: "Codex + ChatGPT/user in parallel"
   session: "Post-Iteration 2 gate + DS-05"
-  description: "Codex stops after Implementation Iteration 2 gate; Iteration 3 starts only after user approval. Design proceeds with DS-05 Timeline #1 full narrative package."
+  description: "Codex stops after Implementation Iteration 2 correction pass gate; Iteration 3 starts only after user approval. Design proceeds with DS-05 Timeline #1 full narrative package."

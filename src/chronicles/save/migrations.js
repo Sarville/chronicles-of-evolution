@@ -14,6 +14,7 @@ export function normalizeEnvelope(envelope) {
     meta: {
       archiveFragments: 0,
       chronicle: [],
+      appliedTransactions: {},
       persistentFlags: {},
       seenEntities: {},
       ...(envelope.meta || {}),

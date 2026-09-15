@@ -8,7 +8,11 @@ import { createDebugApi } from '../../src/chronicles/dev/debugApi.js';
 import { createAutosaveController } from '../../src/chronicles/save/autosave.js';
 import { CURRENT_SCHEMA_VERSION, migrateEnvelope } from '../../src/chronicles/save/migrations.js';
 import { createSaveEnvelope, createSaveRepository, SAVE_KEYS } from '../../src/chronicles/save/repository.js';
-import { createResetTransaction } from '../../src/chronicles/save/resetTransaction.js';
+import {
+  applyPreparedResetTransaction,
+  createResetTransaction,
+  prepareResetTransaction,
+} from '../../src/chronicles/save/resetTransaction.js';
 
 const storage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
 const clock = createFakeClock(Date.UTC(2026, 8, 15));
@@ -60,8 +64,13 @@ assert.equal(pendingStorage.get('evolved'), 'legacy-save-must-survive');
 pendingStorage.set(SAVE_KEYS.primary, 'null');
 pendingStorage.remove(SAVE_KEYS.pending);
 const nullPrimaryFallback = pendingRepository.loadOrCreate();
-assert.equal(nullPrimaryFallback.ok, true);
-assert.equal(nullPrimaryFallback.created, true);
+assert.equal(nullPrimaryFallback.ok, false);
+assert.equal(nullPrimaryFallback.reason, 'RECOVERY_REQUIRED');
+assert.deepEqual(nullPrimaryFallback.damagedSlots.map((slot) => slot.key), [SAVE_KEYS.primary]);
+const explicitFreshAfterCorruption = pendingRepository.startFreshAfterCorruption();
+assert.equal(explicitFreshAfterCorruption.ok, true);
+assert.equal(explicitFreshAfterCorruption.created, true);
+assert.equal(pendingStorage.get('evolved'), 'legacy-save-must-survive');
 
 const newerBackupStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
 const newerBackupRepository = createSaveRepository({ storage: newerBackupStorage, clock });
@@ -145,6 +154,47 @@ assert.equal(afterResetLoad.state.run.id, 'run_after_reset');
 assert.equal(afterResetLoad.state.meta.archiveFragments, 17);
 assert.equal(afterResetLoad.state.meta.persistentFlags.firstResetCompleted, true);
 
+const preparedResetSource = createInitialGameState({ runId: 'run_fixture_reset' });
+preparedResetSource.run.resources.energy.amount = 777;
+preparedResetSource.run.flags.runOnlyFlag = true;
+preparedResetSource.meta.archiveFragments = 2;
+preparedResetSource.meta.persistentFlags.keepMe = true;
+preparedResetSource.settings.locale = 'en';
+const preparedTransaction = prepareResetTransaction(preparedResetSource, {
+  id: 'reset_tx_fixture',
+  reward: { archiveFragments: 5 },
+  chronicleRecord: { endingId: 'ENDING_ASH', summaryId: 'fixture_summary' },
+});
+const generatedTransaction = createResetTransaction(preparedResetSource);
+assert.equal(generatedTransaction.status, 'prepared');
+assert.equal(generatedTransaction.id.startsWith('reset:1:run_fixture_reset:ENDING_ASH:'), true);
+assert.equal(preparedTransaction.id, 'reset_tx_fixture');
+assert.equal(preparedTransaction.status, 'prepared');
+assert.deepEqual(preparedTransaction.source, {
+  runId: 'run_fixture_reset',
+  timelineId: 1,
+  endingId: 'ENDING_ASH',
+});
+const firstApply = applyPreparedResetTransaction(preparedResetSource, preparedTransaction, { nextRunId: 'run_after_fixture' });
+assert.equal(firstApply.ok, true);
+assert.equal(firstApply.alreadyApplied, false);
+assert.equal(firstApply.state.run.id, 'run_after_fixture');
+assert.equal(firstApply.state.run.resources.energy.amount, 0);
+assert.equal(firstApply.state.run.flags.runOnlyFlag, undefined);
+assert.equal(firstApply.state.meta.archiveFragments, 7);
+assert.equal(firstApply.state.meta.persistentFlags.keepMe, true);
+assert.equal(firstApply.state.settings.locale, 'en');
+assert.equal(firstApply.state.meta.chronicle.length, 1);
+assert.equal(firstApply.state.meta.chronicle[0].transactionId, 'reset_tx_fixture');
+assert.equal(firstApply.state.meta.appliedTransactions.reset_tx_fixture.status, 'applied');
+const retryApply = applyPreparedResetTransaction(firstApply.state, preparedTransaction, { nextRunId: 'run_after_retry' });
+assert.equal(retryApply.ok, true);
+assert.equal(retryApply.alreadyApplied, true);
+assert.equal(retryApply.state.meta.archiveFragments, 7);
+assert.equal(retryApply.state.meta.chronicle.length, 1);
+assert.equal(retryApply.state.run.id, 'run_after_retry');
+assert.equal(retryApply.state.run.resources.energy.amount, 0);
+
 const devClock = createFakeClock(0);
 const devApi = createDebugApi({ ports: { clock: devClock } });
 assert.equal(devApi.setTimeScale(20).ok, true);
@@ -154,10 +204,57 @@ assert.equal(devApi.jumpToEra('CITY').ok, true);
 assert.equal(devApi.engine.state.run.eraId, 'CITY');
 assert.equal(devApi.engine.state.run.resources.power.amount, 0);
 assert.equal(devApi.triggerEvent('EV-BIO-01').ok, true);
-assert.equal(devApi.engine.state.run.events.queue[0].id, 'EV-BIO-01');
+assert.deepEqual(devApi.engine.state.run.events.queue, ['EV-BIO-01']);
+assert.deepEqual(devApi.engine.state.run.events.states['EV-BIO-01'], { status: 'queued', queuedAtMs: 0 });
+const duplicateEvent = devApi.triggerEvent('EV-BIO-01');
+assert.equal(duplicateEvent.ok, false);
+assert.equal(duplicateEvent.reason, 'EVENT_ALREADY_TRACKED');
+assert.deepEqual(devApi.engine.state.run.events.queue, ['EV-BIO-01']);
+const forcedEvent = devApi.triggerEvent('EV-BIO-01', { force: true });
+assert.equal(forcedEvent.ok, true);
+assert.deepEqual(devApi.engine.state.run.events.queue, ['EV-BIO-01', 'EV-BIO-01']);
+devApi.engine.state.meta.archiveFragments = 11;
+devApi.engine.state.settings.autosave = false;
+devApi.engine.state.run.resources.energy.amount = 99;
+const manualDevReset = devApi.manualDevReset({ runId: 'run_after_manual_dev_reset' });
+assert.equal(manualDevReset.ok, true);
+assert.equal(devApi.engine.state.run.id, 'run_after_manual_dev_reset');
+assert.equal(devApi.engine.state.run.resources.energy.amount, 0);
+assert.deepEqual(devApi.engine.state.run.events.queue, []);
+assert.equal(devApi.engine.state.meta.archiveFragments, 11);
+assert.equal(devApi.engine.state.settings.autosave, false);
+assert.equal(devApi.engine.state.session.dirty, true);
+const manualDevResetStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
+const manualDevResetRepository = createSaveRepository({ storage: manualDevResetStorage, clock: devClock });
+assert.equal(manualDevResetRepository.save(devApi.engine.state).ok, true);
+assert.equal(manualDevResetStorage.get('evolved'), 'legacy-save-must-survive');
 const dumped = devApi.dumpState();
 dumped.run.resources.energy.amount = 999;
 assert.notEqual(devApi.engine.state.run.resources.energy.amount, 999);
 assert.throws(() => createDebugApi({ environment: 'production' }).grant('energy', 1), /disabled/);
+assert.throws(() => createDebugApi({ environment: 'production' }).manualDevReset(), /disabled/);
+
+const noSaveStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
+const noSaveRepository = createSaveRepository({ storage: noSaveStorage, clock });
+const noSaveLoad = noSaveRepository.loadOrCreate();
+assert.equal(noSaveLoad.ok, true);
+assert.equal(noSaveLoad.created, true);
+assert.equal(noSaveStorage.get('evolved'), 'legacy-save-must-survive');
+
+const allCorruptStorage = createMemoryStorage({
+  evolved: 'legacy-save-must-survive',
+  [SAVE_KEYS.primary]: '{bad',
+  [SAVE_KEYS.pending]: 'null',
+  [SAVE_KEYS.backup]: JSON.stringify({ format: 'wrong-format' }),
+});
+const allCorruptRepository = createSaveRepository({ storage: allCorruptStorage, clock });
+const allCorruptLoad = allCorruptRepository.loadOrCreate();
+assert.equal(allCorruptLoad.ok, false);
+assert.equal(allCorruptLoad.reason, 'RECOVERY_REQUIRED');
+assert.deepEqual(
+  allCorruptLoad.damagedSlots.map((slot) => slot.key),
+  [SAVE_KEYS.primary, SAVE_KEYS.pending, SAVE_KEYS.backup]
+);
+assert.equal(allCorruptStorage.get('evolved'), 'legacy-save-must-survive');
 
 console.log('save repository ok');

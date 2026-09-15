@@ -87,7 +87,7 @@ export function createSaveRepository({ storage, codec = jsonCodec, clock } = {})
 
   function readKey(key) {
     const payload = storage.get(key);
-    if (!payload) {
+    if (payload === null) {
       return { ok: false, reason: 'MISSING' };
     }
     const parsed = parseEnvelope(payload, codec);
@@ -102,7 +102,7 @@ export function createSaveRepository({ storage, codec = jsonCodec, clock } = {})
   }
 
   return {
-    loadOrCreate() {
+    loadOrCreate(options = {}) {
       const candidates = [SAVE_KEYS.primary, SAVE_KEYS.pending, SAVE_KEYS.backup]
         .map((key) => ({ key, loaded: readKey(key) }))
         .filter((candidate) => candidate.loaded.ok);
@@ -127,7 +127,23 @@ export function createSaveRepository({ storage, codec = jsonCodec, clock } = {})
           sourceKey: recovered.key,
         };
       }
+      const damagedSlots = [SAVE_KEYS.primary, SAVE_KEYS.pending, SAVE_KEYS.backup]
+        .map((key) => ({ key, loaded: readKey(key) }))
+        .filter((candidate) => candidate.loaded.reason !== 'MISSING')
+        .map((candidate) => ({
+          key: candidate.key,
+          reason: candidate.loaded.reason,
+          errors: candidate.loaded.errors || [],
+        }));
+
+      if (damagedSlots.length > 0 && !options.startFreshAfterCorruption) {
+        return { ok: false, reason: 'RECOVERY_REQUIRED', damagedSlots };
+      }
       return { ok: true, state: createInitialGameState(), created: true };
+    },
+
+    startFreshAfterCorruption() {
+      return this.loadOrCreate({ startFreshAfterCorruption: true });
     },
 
     save(state, options = {}) {
