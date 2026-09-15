@@ -1,6 +1,6 @@
 # Хроники Эволюции — план дизайн-сессий
 
-**Версия:** reconciliation revision 2.0  
+**Версия:** reconciliation revision 2.1  
 **Статус:** active plan.
 
 ---
@@ -22,120 +22,88 @@ Codex must not invent gameplay design to fill documentation gaps.
 
 # 2. Historical sessions
 
-## DS-00 — Documentation orchestration
+- **DS-00 — Documentation orchestration:** done.
+- **DS-01 — Civilization gameplay contract:** reconciled.
+- **DS-02 — Goals, events and first ending:** reconciled.
+- **DS-03 — Technical architecture/data contract:** accepted architecture; content references reconciled.
+- **DS-04 — Meta progression/balance:** reconciled.
 
-Status: done.
-
-## DS-01 — Civilization gameplay contract
-
-Status: **reconciled**.
-
-Original DS-01 entity separation remains useful; timing/resource/branch assumptions are updated by reconciliation docs.
-
-## DS-02 — Goals, events and first ending
-
-Status: **reconciled**.
-
-Goal Engine semantics, event architecture and Ash/reset contract remain; biological goals and timings were rewritten.
-
-## DS-03 — Technical architecture and data contract
-
-Status: **accepted architecture / reconciled content references**.
-
-Keep:
-
-- isolated domain;
-- canonical GameState;
-- data-driven config;
-- commands/events/selectors;
-- save/recovery;
-- test seams;
-- headless simulation;
-- idempotent reset.
-
-## DS-04 — Meta progression and balance rules
-
-Status: **reconciled**.
-
-Archive/meta concepts remain; obsolete Information/Energy-start semantics and old Timeline #2 fixed target are superseded.
+DS-03 architecture remains authoritative for domain/save/testing boundaries.
 
 ---
 
 # 3. RECONCILIATION — Original GDD design reconciliation
 
-**Status:** documentation complete / pending user review.
+**Status:** ACCEPTED / documentation complete.
 
 ## Goal
 
-Restore the readable original gameplay progression while preserving useful architecture, narrative and meta systems.
+Restore original readable gameplay progression while preserving useful architecture, narrative and meta systems.
 
-## Inputs
+## Accepted progression
 
-- PRD;
-- original `01_FIRST_120_MINUTES.md` concept;
-- late economy/tree/goals/civilization docs;
-- DS-03 technical contract;
-- DS-04 meta/balance;
-- accepted Iteration 3 implementation baseline.
+```text
+RNA → replication → DNA → membrane → Cell
+→ metabolism / Absorption-Symbiosis-Shell
+→ Multicellularity + AP
+→ Nervous System → Cognition → Sapience
+→ Tribe → Settlement → City → Industry → Modern → Atomic → Crisis → Ash → Archive
+```
+
+## Accepted retained systems
+
+- Goal Engine;
+- data-driven config;
+- normalized GameState;
+- save/recovery/autosave;
+- dev simulation/time scale;
+- telemetry;
+- branch/optional infrastructure;
+- Stability/World Tension;
+- Error 17;
+- `Снова.`;
+- Ash;
+- Archive/meta;
+- idempotent reset;
+- Timeline #2.
 
 ## Outputs
 
 - `docs/DECISIONS_RECONCILIATION.md`;
-- reconciled `gdd/01..11` contracts;
-- reconciled production plan;
-- reconciled technical references;
-- updated `PROJECT_STATE.yaml`;
-- updated `TODO.md`.
-
-## Main accepted direction
-
-```text
-RNA → replication → DNA → membrane → Cell
-→ metabolism / primary trait
-→ Multicellularity + AP
-→ Nervous System → Cognition → Sapience
-→ Tribe → Settlement → City → Industry → Modern → Atomic → Crisis
-```
-
-Preserve:
-
-- Goal Engine;
-- data-driven architecture;
-- save/recovery;
-- simulation/telemetry;
-- Archive/meta;
-- Ash;
-- Error 17;
-- idempotent reset.
+- reconciled `gdd/01..11`;
+- reconciled production/technical references;
+- updated Glossary/README/PROJECT_STATE/TODO.
 
 ## Gate
 
-User approves corrected 0–120 canon.
-
-No gameplay code changes before this gate.
+Passed by user approval on 2026-09-16.
 
 ---
 
-# 4. REWORK implementation checkpoint
+# 4. Current implementation checkpoint — Biological Rework
 
-This is not a design session but blocks further content design that depends on playable semantics.
+**Status:** READY.
 
-After reconciliation approval:
+This is the next work block before any new content expansion.
 
-1. Codex performs biological 0–10 code rework;
-2. 0–10 balance simulation;
-3. manual playtest;
-4. user approves corrected playable.
+Required sequence:
 
-Only then continue Iteration 4 and dependent narrative/UX detail.
+1. prepare Codex handoff;
+2. rework playable 0–10 to RNA→DNA→Cell;
+3. rebalance headlessly;
+4. manual playtest;
+5. user approves corrected playable;
+6. unlock Iteration 4.
+
+Iteration 4 remains blocked until this checkpoint passes.
 
 ---
 
 # 5. DS-05 — Timeline #1 full narrative package
 
-**Status:** blocked by reconciliation review/playable gate.
+**Status:** wait for corrected playable 0–10.
 
-## Create
+Create:
 
 - `scenario/01_TIMELINE_01_SCRIPT.md`;
 - `scenario/04_STORY_EVENTS.md`;
@@ -143,17 +111,7 @@ Only then continue Iteration 4 and dependent narrative/UX detail.
 - `scenario/06_ENDINGS_COPY.md`;
 - `scenario/07_COPY_GUIDE.md`.
 
-## Reconciled requirements
-
-Narrative sequencing must use:
-
-- RNA/DNA/Cell language;
-- Absorption/Symbiosis/Shell first branch;
-- AP/body adaptation phase;
-- Cognition meter;
-- Sapience ~38–40 target;
-- Population~5 civilization start;
-- Modern bridge before Atomic.
+Must use reconciled gameplay language and timings.
 
 Keep Error 17 / Again / Ash / Archive thread.
 
@@ -161,12 +119,12 @@ Keep Error 17 / Again / Ash / Archive thread.
 
 # 6. DS-06 — UX architecture and wireframes
 
-**Status:** blocked by reconciliation review/playable gate.
+**Status:** wait for corrected playable 0–10.
 
 Must include:
 
 - mobile-first shell;
-- contextual resource visibility;
+- contextual resources;
 - Goal card;
 - Evolution/AP UI;
 - Cognition meter;
@@ -174,7 +132,7 @@ Must include:
 - phase-aware jobs;
 - Industry Power reveal;
 - Modern bridge;
-- World Tension crisis UI;
+- World Tension;
 - Archive/reset UI.
 
 No Energy/Information molecular top bar.
@@ -185,11 +143,11 @@ No Energy/Information molecular top bar.
 
 Blocked until DS-05 + DS-06.
 
-Reconciled visual states must visibly distinguish:
+Visual states must distinguish:
 
-- molecular RNA;
-- first cell;
-- primary trait branch;
+- RNA/molecular;
+- Cell;
+- primary biological trait;
 - multicellular organism;
 - nervous/cognitive organism;
 - tiny sapient group;
@@ -215,7 +173,7 @@ Create stable asset IDs, formats, layer rules and generation prompts.
 
 Blocked until DS-05 + DS-07.
 
-Audio arc must follow reconciled eras and preserve crisis/ending emotional progression.
+Audio arc follows reconciled eras and crisis/ending progression.
 
 ---
 
@@ -223,7 +181,7 @@ Audio arc must follow reconciled eras and preserve crisis/ending emotional progr
 
 Blocked until gameplay/UX contracts stabilize.
 
-Must include telemetry for:
+Telemetry must include:
 
 - RNA/DNA timings;
 - AP earned/spent;
@@ -231,31 +189,29 @@ Must include telemetry for:
 - Population/job bottlenecks;
 - Power/Modern pacing;
 - crisis/Archive;
-- rewarded systems outside baseline.
+- optional rewarded systems outside baseline.
 
 ---
 
 # 11. DS-11 — Cross-document consistency / design freeze v2
 
-Final freeze occurs only after:
+Final freeze only after:
 
-- reconciled docs accepted;
-- biological code rework accepted;
-- 0–40 biological simulation passes;
+- biological rework accepted;
+- 0–40 simulation passes;
 - civilization rebalance passes;
 - crisis regression passes;
-- narrative/UX/art/audio/platform docs are consistent.
+- narrative/UX/art/audio/platform docs align.
 
-Checks:
+Checks include:
 
-- no canonical references to visible molecular Information;
-- no Chemical Gradient/Catalytic Fold/Energy Pocket canonical content;
+- no canonical visible molecular Information;
+- no canonical Chemical Gradient/Catalytic Fold/Energy Pocket;
 - M01–M06 semantics consistent;
-- Sapience timing/condition consistent;
-- AP/Cognition consistently represented;
+- AP/Cognition consistent;
 - Power timing consistent;
-- Modern phase present;
-- Archive/meta effects use restored vocabulary;
+- Modern exists;
+- Archive uses restored vocabulary;
 - no orphan IDs/events/assets.
 
 Result:
@@ -267,13 +223,11 @@ Result:
 # 12. Current order
 
 ```text
-Reconciliation review
-→ Biological code rework 0–10
+Prepare Codex biological rework handoff
+→ rework 0–10
 → rebalance/manual playtest
 → corrected Iteration 4
 → DS-05 / DS-06
 → art/audio/platform tracks
 → DS-11 freeze v2
 ```
-
-Do not resume the old DS-05/Iteration-4 order from pre-reconciliation documents.
