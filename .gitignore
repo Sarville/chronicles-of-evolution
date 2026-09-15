@@ -1,6 +1,9 @@
 *~
 *#
 .*
+!.github/
+!.github/workflows/
+!.github/workflows/*.yml
 update.*.json
 strings/last-strings.json
 node_modules/*
