@@ -72,9 +72,9 @@ documentation:
   ux_package: ready
 
 implementation:
-  mode: "iteration_1_correction_pass_completed"
-  current_iteration: 1
-  resume_gate: "iteration_1_correction_pass_passed_stop_before_iteration_2"
+  mode: "iteration_2_completed"
+  current_iteration: 2
+  resume_gate: "iteration_2_gate_passed_stop_before_iteration_3"
   last_correction_pass:
     date: "2026-09-15"
     base_commit: "d0a00a281147af026398046f86308fa8cf750937"
@@ -103,12 +103,31 @@ implementation:
         - "docs/technical/03_GAME_STATE.md"
         - "docs/technical/04_SAVE_ARCHITECTURE.md"
         - "docs/technical/07_TESTING_STRATEGY.md"
-    2: { name: "Save v1 and dev tools", status: ready_after_user_review, depends_on: ["Implementation Iteration 1"] }
+    2:
+      name: "Save v1 and dev tools"
+      status: done
+      required_inputs:
+        - "docs/production/DS03_CODEX_HANDOFF.md"
+        - "docs/technical/03_GAME_STATE.md"
+        - "docs/technical/04_SAVE_ARCHITECTURE.md"
+        - "docs/technical/07_TESTING_STRATEGY.md"
+      delivered:
+        - "versioned save envelope v1 with run/meta/settings/narrative flags normalization"
+        - "write-ahead primary/pending/backup save flow with newest valid recovery fallback"
+        - "autosave controller for dirty periodic/flush saves"
+        - "migration/normalization interface for schema v1"
+        - "dev-only time scale, resource grant, jump-to-era, trigger-event and dump-state API"
+        - "reset transaction save coverage preserving meta state"
+      gates:
+        npm_test: passed
+        test_sim: passed
+        smoke: passed
+        build: passed
 
 parallelization:
   now:
     design: "DS-05"
-    codex: "Iteration 1 correction pass gate passed; stop before Iteration 2 until user approval"
+    codex: "Iteration 2 gate passed; stop before Iteration 3 until user approval"
   also_ready: ["DS-06"]
 
 open_decisions:
@@ -119,5 +138,5 @@ open_decisions:
 
 next_action:
   owner: "Codex + ChatGPT/user in parallel"
-  session: "Post-Iteration 1 gate + DS-05"
-  description: "Codex stops after Implementation Iteration 1 gate; Iteration 2 starts only after user approval. Design proceeds with DS-05 Timeline #1 full narrative package."
+  session: "Post-Iteration 2 gate + DS-05"
+  description: "Codex stops after Implementation Iteration 2 gate; Iteration 3 starts only after user approval. Design proceeds with DS-05 Timeline #1 full narrative package."

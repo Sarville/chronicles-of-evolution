@@ -2,7 +2,7 @@ import { ruleset } from '../config/index.js';
 import { createInitialGameState, toPersistedGameState } from '../domain/state.js';
 import { validateGameState } from '../domain/validation.js';
 import { jsonCodec } from './codec.js';
-import { CURRENT_SCHEMA_VERSION, migrateEnvelope } from './migrations.js';
+import { CURRENT_SCHEMA_VERSION, migrateEnvelope, normalizeEnvelope } from './migrations.js';
 
 export const SAVE_KEYS = Object.freeze({
   primary: 'chronicles_evolution',
@@ -19,7 +19,7 @@ function nowIso(clock) {
 export function createSaveEnvelope(state, options = {}) {
   const persisted = toPersistedGameState(state);
   const timestamp = nowIso(options.clock);
-  return {
+  return normalizeEnvelope({
     format: SAVE_FORMAT,
     schemaVersion: CURRENT_SCHEMA_VERSION,
     saveRevision: options.saveRevision || 1,
@@ -32,7 +32,7 @@ export function createSaveEnvelope(state, options = {}) {
       pendingReset: null,
       ...(options.transactions || {}),
     },
-  };
+  });
 }
 
 export function parseEnvelope(payload, codec = jsonCodec) {
@@ -47,7 +47,10 @@ export function parseEnvelope(payload, codec = jsonCodec) {
 
 export function validateEnvelope(envelope) {
   const errors = [];
-  if (!envelope || envelope.format !== SAVE_FORMAT) {
+  if (!envelope || typeof envelope !== 'object') {
+    return { ok: false, errors: ['Save envelope must be an object'] };
+  }
+  if (envelope.format !== SAVE_FORMAT) {
     errors.push('Invalid save format');
   }
   if (envelope.schemaVersion !== CURRENT_SCHEMA_VERSION) {
@@ -55,6 +58,15 @@ export function validateEnvelope(envelope) {
   }
   if (envelope.rulesetVersion !== ruleset.version) {
     errors.push(`Unsupported ruleset version ${envelope.rulesetVersion}`);
+  }
+  if (!Number.isInteger(envelope.saveRevision) || envelope.saveRevision < 1) {
+    errors.push('Save revision must be a positive integer');
+  }
+  if (!envelope.createdAt || !envelope.updatedAt) {
+    errors.push('Save envelope must include createdAt and updatedAt');
+  }
+  if (!envelope.transactions || !Object.prototype.hasOwnProperty.call(envelope.transactions, 'pendingReset')) {
+    errors.push('Save envelope must include transactions.pendingReset');
   }
   const stateValidation = validateGameState(
     { run: envelope.run, meta: envelope.meta, settings: envelope.settings, session: { dirty: false } },
@@ -91,21 +103,29 @@ export function createSaveRepository({ storage, codec = jsonCodec, clock } = {})
 
   return {
     loadOrCreate() {
-      for (const key of [SAVE_KEYS.primary, SAVE_KEYS.pending, SAVE_KEYS.backup]) {
-        const loaded = readKey(key);
-        if (loaded.ok) {
-          return {
-            ok: true,
-            state: {
-              run: loaded.envelope.run,
-              meta: loaded.envelope.meta,
-              settings: loaded.envelope.settings,
-              session: { dirty: false, lastEvents: [] },
-            },
-            envelope: loaded.envelope,
-            sourceKey: key,
-          };
-        }
+      const candidates = [SAVE_KEYS.primary, SAVE_KEYS.pending, SAVE_KEYS.backup]
+        .map((key) => ({ key, loaded: readKey(key) }))
+        .filter((candidate) => candidate.loaded.ok);
+
+      const primary = candidates.find((candidate) => candidate.key === SAVE_KEYS.primary);
+      const recovered =
+        primary ||
+        candidates
+          .filter((candidate) => candidate.key !== SAVE_KEYS.primary)
+          .sort((a, b) => b.loaded.envelope.saveRevision - a.loaded.envelope.saveRevision)[0];
+
+      if (recovered) {
+        return {
+          ok: true,
+          state: {
+            run: recovered.loaded.envelope.run,
+            meta: recovered.loaded.envelope.meta,
+            settings: recovered.loaded.envelope.settings,
+            session: { dirty: false, lastEvents: [] },
+          },
+          envelope: recovered.loaded.envelope,
+          sourceKey: recovered.key,
+        };
       }
       return { ok: true, state: createInitialGameState(), created: true };
     },
@@ -147,4 +167,3 @@ export function createSaveRepository({ storage, codec = jsonCodec, clock } = {})
     },
   };
 }
-

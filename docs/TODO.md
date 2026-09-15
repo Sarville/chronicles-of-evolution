@@ -96,6 +96,53 @@ DS-04 можно использовать как дополнительный co
 
 ---
 
+## Iteration 2 — Save v1 and dev tools
+
+**Status:** done / gate passed
+
+Реализовано в Iteration 2:
+
+- [x] versioned save envelope v1;
+- [x] run/meta/settings/narrative flags save normalization;
+- [x] autosave controller for dirty periodic/flush saves;
+- [x] corrupt-save fallback through primary/pending/backup recovery;
+- [x] migration/normalization interface;
+- [x] reset transaction save coverage preserving meta state;
+- [x] dev-only time scale: 1x / 5x / 20x / 100x;
+- [x] dev resource grant;
+- [x] dev jump-to-era;
+- [x] dev trigger-event;
+- [x] dev dump-state;
+- [x] save/load equality, autosave, migration noop, invalid save recovery, reset/meta and dev tools tests;
+- [x] `npm test`, `npm run test:sim`, `npm run smoke`, `npm run build`.
+
+---
+
+# Next implementation
+
+## Iteration 3 — Goal engine + tutorial shell
+
+**Status:** ready after user approval
+
+Не начинать без отдельного подтверждения.
+
+Основной scope:
+
+- [ ] current goal state;
+- [ ] goal prerequisites;
+- [ ] completion conditions;
+- [ ] reward application;
+- [ ] sequential chains;
+- [ ] optional goals;
+- [ ] hint timeout;
+- [ ] CTA/highlight target;
+- [ ] chapter goal slot;
+- [ ] destiny goal slot;
+- [ ] basic objective UI shell;
+- [ ] goal analytics.
+
+---
+
 # Next design session
 
 ## DS-05 — Timeline #1 full narrative package
@@ -137,5 +184,5 @@ DS-06 UX также ready и может идти после/параллельн
 
 Параллельно:
 
-1. **Codex:** остановиться после Iteration 1 gate; Iteration 2 запускать только по отдельному подтверждению.
+1. **Codex:** остановиться после Iteration 2 gate; Iteration 3 запускать только по отдельному подтверждению.
 2. **ChatGPT/user:** DS-05 — Timeline #1 full narrative package.
