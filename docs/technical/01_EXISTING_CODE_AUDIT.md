@@ -22,6 +22,25 @@
 | UI и локализация | HTML-шаблоны/биндинги, стили, строки, wiki | `src/index.js`, `src/evolve.less`, `strings/`, `src/wiki/` |
 | Сборка и доставка | esbuild, Less/CSS minification, статический `dist` | `buildEvolve.js`, `buildWiki.js`, `package.json` |
 
+## Baseline build и smoke-проверка
+
+Дата проверки: 2026-09-15. `npm run build` успешно собирает production game и wiki. Скрипт запускает esbuild для каждого JS entry point и Less/CSSO для CSS без вложенных `npm run`: это важно, поскольку локальная dependency `node@16.6.1` попадает в PATH npm scripts и прежняя рекурсивная команда приводила к несовместимости с npm 11.
+
+Размеры после чистой baseline-сборки:
+
+| Артефакт | Размер |
+| --- | ---: |
+| `evolve/main.js` | 2,302,934 B |
+| `evolve/evolve.css` | 194,688 B |
+| `evolve/` всего | 2,499,991 B |
+| `wiki/wiki.js` | 2,432,434 B |
+| `wiki/wiki.css` | 5,965 B |
+| `wiki/` всего | 2,438,399 B |
+
+`npm run smoke` выполняет `scripts/smoke-build.js`. Проверка подтверждает, что `index.html` и `wiki.html` ссылаются на существующие непустые JS/CSS артефакты. Это намеренно статический smoke, а не тест игровой симуляции: legacy runtime требует DOM, CDN dependencies и `localStorage`; headless simulation будет добавлен по контракту DS-03.
+
+Startup baseline измерен локально через headless Chrome на `http://127.0.0.1`: 1.90 s, 1.57 s и 1.45 s (медиана 1.57 s). Это cold browser-process command-to-DOM измерение без browser cache, полезное как сравнительная baseline-метрика, но не RUM и не обещание interactive latency для пользователя.
+
 Исходники занимают примерно 102 тыс. строк JavaScript. Самые большие файлы — `src/tech.js` (15 725), `src/main.js` (12 995), `src/actions.js` (9 744), `src/races.js` (9 533), `src/portal.js` (9 111), `src/space.js` (8 653). Это полезный ориентир для локальных изменений: править их стоит малыми изолированными патчами с особенно внимательной проверкой регрессий.
 
 ## Игровой цикл
@@ -154,7 +173,7 @@ UI строится динамически: доменные модули соз
 ## Приоритеты без большого refactor
 
 1. **P1 — надёжность save.** Добавить малую защиту чтения/записи: `try/catch`, понятный путь к `evolveBak`/import при повреждении и телеметрию только факта ошибки. Не менять формат сохранения без отдельной миграции.
-2. **P1 — минимальный regression harness.** До изменения формул завести фиксированные экспортированные saves и smoke-проверку загрузки, одного long loop и ключевых migrations. Сейчас в репозитории нет test suite.
+2. **P1 — минимальный regression harness.** Статический build smoke уже есть (`npm run smoke`), но до изменения формул нужны фиксированные экспортированные saves и проверка загрузки, одного long loop и ключевых migrations. Полноценного test suite пока нет.
 3. **P2 — карта формул для конкретных сценариев.** Для первого 120-минутного контента поддерживать небольшой список «source of truth»: действие → cost → `adjustCosts` → production → UI breakdown. Это документационная дисциплина, не миграция framework.
 4. **P2 — platform boundary только по запросу публикации.** Когда будут определены Yandex, VK или обе цели, добавить маленький `platform` adapter поверх save/ads/payments, не встраивая SDK-вызовы в `main.js` и доменные модули.
 5. **P3 — постепенное уменьшение coupling.** При касании конкретного action/renderer отделять чистую расчётную функцию от DOM-отрисовки и добавлять ей тест. Не переносить массово существующие декларации.

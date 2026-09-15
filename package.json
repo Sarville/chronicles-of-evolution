@@ -4,10 +4,10 @@
   "description": "Хроники Эволюции — сюжетная incremental-стратегия о развитии жизни и цивилизаций",
   "private": true,
   "scripts": {
-    "build": "npm run evolve && npm run evolve-less && npm run wiki && npm run wiki-less",
-    "build-debug": "npm run evolve-debug && npm run evolve-less && npm run wiki-debug && npm run wiki-less",
-    "build-win": "npm run evolve && npm run evolve-less-win && npm run wiki && npm run wiki-less-win",
-    "build-debug-win": "npm run evolve-debug && npm run evolve-less-win && npm run wiki-debug && npm run wiki-less-win",
+    "build": "node buildEvolve.js && lessc src/evolve.less evolve/evolve-unminified.css && csso -i evolve/evolve-unminified.css -o evolve/evolve.css && rm evolve/evolve-unminified.css && node buildWiki.js && lessc src/wiki/wiki.less wiki/wiki-unminified.css && csso -i wiki/wiki-unminified.css -o wiki/wiki.css && rm wiki/wiki-unminified.css",
+    "build-debug": "node buildEvolveDebug.js && lessc src/evolve.less evolve/evolve-unminified.css && csso -i evolve/evolve-unminified.css -o evolve/evolve.css && rm evolve/evolve-unminified.css && node buildWikiDebug.js && lessc src/wiki/wiki.less wiki/wiki-unminified.css && csso -i wiki/wiki-unminified.css -o wiki/wiki.css && rm wiki/wiki-unminified.css",
+    "build-win": "node buildEvolve.js && lessc src/evolve.less evolve/evolve-unminified.css && csso -i evolve/evolve-unminified.css -o evolve/evolve.css && del evolve\\evolve-unminified.css && node buildWiki.js && lessc src/wiki/wiki.less wiki/wiki-unminified.css && csso -i wiki/wiki-unminified.css -o wiki/wiki.css && del wiki\\wiki-unminified.css",
+    "build-debug-win": "node buildEvolveDebug.js && lessc src/evolve.less evolve/evolve-unminified.css && csso -i evolve/evolve-unminified.css -o evolve/evolve.css && del evolve\\evolve-unminified.css && node buildWikiDebug.js && lessc src/wiki/wiki.less wiki/wiki-unminified.css && csso -i wiki/wiki-unminified.css -o wiki/wiki.css && del wiki\\wiki-unminified.css",
     "evolve": "node buildEvolve.js",
     "evolve-debug": "node buildEvolveDebug.js",
     "evolve-less": "lessc src/evolve.less evolve/evolve-unminified.css && csso -i evolve/evolve-unminified.css -o evolve/evolve.css && rm evolve/evolve-unminified.css",
@@ -17,6 +17,7 @@
     "wiki-less": "lessc src/wiki/wiki.less wiki/wiki-unminified.css && csso -i wiki/wiki-unminified.css -o wiki/wiki.css && rm wiki/wiki-unminified.css",
     "wiki-less-win": "lessc src/wiki/wiki.less wiki/wiki-unminified.css && csso -i wiki/wiki-unminified.css -o wiki/wiki.css && del wiki\\wiki-unminified.css",
     "serve": "servehere -c",
+    "smoke": "node scripts/smoke-build.js",
     "deploy": "rm -rf dist && mkdir dist && cp -r *.html *.ico LICENSE evolve lib font strings wiki dist && gh-pages -d dist",
     "deploy-win": "(rmdir /S /Q dist || echo recreating dist) && mkdir dist && xcopy /E /I evolve dist\\evolve && xcopy /E /I font dist\\font && xcopy /E /I lib dist\\lib && xcopy /E /I strings dist\\strings && xcopy /E /I wiki dist\\wiki && copy *.html dist && copy *.ico dist && copy LICENSE dist && gh-pages -d dist"
   },

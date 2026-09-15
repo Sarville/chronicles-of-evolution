@@ -223,26 +223,26 @@ documentation:
 
 implementation:
   mode: resumed_after_DS03
-  current_iteration: 0
+  current_iteration: 1
   resume_gate: "open"
   iterations:
     0:
       name: "Repo baseline and code audit"
-      status: active
+      status: done
       completed:
         - "static code audit"
         - "architecture/module map"
         - "game loop/resource/save/UI/platform reconnaissance"
-      pending:
-        - "baseline build confirmation"
-        - "baseline bundle size"
-        - "baseline startup measurement"
-        - "smoke command/script decision"
+        - "baseline build confirmation (npm run build)"
+        - "baseline bundle size recorded"
+        - "baseline startup measurement recorded"
+        - "smoke command added (npm run smoke)"
     1:
       name: "Domain adapter and data foundation"
       status: ready
       depends_on:
-        - "Iteration 0 pending baseline tasks complete"
+        - "DS-03 approved"
+        - "Iteration 0 baseline tasks complete"
       required_inputs:
         - "docs/technical/00_TECHNICAL_OVERVIEW.md"
         - "docs/technical/02_DOMAIN_ADAPTER.md"
@@ -257,15 +257,14 @@ implementation:
 parallelization:
   now:
     design: "DS-04"
-    codex: "complete Iteration 0 baseline tasks, then start Iteration 1"
+    codex: "start Iteration 1 using DS03_CODEX_HANDOFF"
   after_DS_03:
     design_can_continue_with:
       - "DS-04"
       - "DS-05"
       - "DS-06"
     codex_can_resume_with:
-      - "complete Iteration 0 baseline tasks"
-      - "start Iteration 1 after Iteration 0 baseline gate"
+      - "start Iteration 1 after DS-03 review and Iteration 0 baseline gate"
   after_DS_05_and_DS_06:
     parallel_design_tracks:
       - "DS-07 art"
@@ -279,5 +278,5 @@ open_decisions:
 
 next_action:
   owner: "Codex + ChatGPT/user in parallel"
-  session: "Implementation Iteration 0 + DS-04"
-  description: "Codex closes baseline build, bundle size, startup measurement and smoke command, then starts headless Domain Adapter/data foundation using DS03_CODEX_HANDOFF. In parallel, design proceeds with DS-04 meta progression and balance rules."
+  session: "Implementation Iteration 1 + DS-04"
+  description: "Codex starts headless Domain Adapter/data foundation using DS03_CODEX_HANDOFF. In parallel, design proceeds with DS-04 meta progression and balance rules."

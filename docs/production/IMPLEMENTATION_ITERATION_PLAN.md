@@ -101,20 +101,20 @@ Codex не должен менять дизайн без явного обнов
 
 ## Задачи
 
-- [ ] определить build tool;
-- [ ] определить runtime/framework;
-- [ ] найти главный game loop;
-- [ ] найти resource calculations;
-- [ ] найти save/load;
-- [ ] найти current UI mounting points;
-- [ ] найти tech/building/job data;
-- [ ] определить platform-specific code;
-- [ ] определить зависимости, которые нельзя безопасно обновлять сейчас;
-- [ ] сделать baseline build;
-- [ ] зафиксировать baseline bundle size;
-- [ ] зафиксировать baseline startup time;
-- [ ] добавить smoke command/script, если отсутствует;
-- [ ] написать `docs/technical/01_EXISTING_CODE_AUDIT.md`.
+- [x] определить build tool;
+- [x] определить runtime/framework;
+- [x] найти главный game loop;
+- [x] найти resource calculations;
+- [x] найти save/load;
+- [x] найти current UI mounting points;
+- [x] найти tech/building/job data;
+- [x] определить platform-specific code;
+- [x] определить зависимости, которые нельзя безопасно обновлять сейчас;
+- [x] сделать baseline build;
+- [x] зафиксировать baseline bundle size;
+- [x] зафиксировать baseline startup time;
+- [x] добавить smoke command/script, если отсутствует;
+- [x] написать `docs/technical/01_EXISTING_CODE_AUDIT.md`.
 
 ## Deliverable
 

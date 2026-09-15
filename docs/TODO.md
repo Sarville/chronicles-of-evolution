@@ -44,7 +44,7 @@
 
 ## Iteration 0 — Repo baseline and code audit
 
-**Status:** active
+**Status:** done
 
 Уже сделано:
 
@@ -52,15 +52,16 @@
 - [x] architecture/module map;
 - [x] найдены game loop, resources/payment, save/reset и UI boundaries;
 - [x] подтверждено отсутствие platform abstraction.
+- [x] создан `docs/technical/01_EXISTING_CODE_AUDIT.md`.
 
-Осталось:
+Baseline, зафиксированный 2026-09-15:
 
-- [ ] baseline build confirmation;
-- [ ] baseline bundle size;
-- [ ] baseline startup measurement;
-- [ ] smoke command/script decision.
+- [x] Production build: `npm run build` проходит.
+- [x] Bundle size: `evolve/` — 2,499,991 B (основной JS 2,302,934 B, CSS 194,688 B); `wiki/` — 2,438,399 B (JS 2,432,434 B, CSS 5,965 B).
+- [x] Startup measurement: три локальных headless Chrome запуска дали 1.90 s, 1.57 s и 1.45 s; медиана 1.57 s. Это command-to-DOM на `http://127.0.0.1`, без кеша браузера; не user-interactive RUM-метрика.
+- [x] Добавлен `npm run smoke`: проверяет наличие и ненулевой размер статических entry points и build artifacts.
 
-После этого без дополнительного design gate перейти в Iteration 1.
+После этого можно перейти в Iteration 1 по DS-03 handoff.
 
 ## Iteration 1 — Domain adapter and data foundation
 
@@ -138,4 +139,4 @@ DS-05 narrative и DS-06 UX также можно вести параллель�
 
 # Правило следующего шага
 
-Codex сейчас можно запускать. Его первая задача — **не Iteration 1 сразу**, а закрыть четыре оставшихся baseline-пункта Iteration 0; после их успешной проверки он переходит в Iteration 1 по DS-03 без самостоятельного проектирования архитектуры.
+Codex сейчас можно запускать в **Iteration 1 — Domain adapter and data foundation** по `docs/production/DS03_CODEX_HANDOFF.md`, без самостоятельного проектирования архитектуры.
