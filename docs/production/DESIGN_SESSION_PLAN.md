@@ -78,7 +78,7 @@
 ## DS-02 — Goals, events and first ending contract
 
 ### Входы
-DS-01 + текущий GDD + Narrative Bible.
+DS-01 + текущий GDD + Narrative Bible + `docs/production/DS-02_PRODUCT_INPUTS.md`.
 
 ### Создаём
 1. `docs/gdd/07_GOALS_AND_MILESTONES.md`
@@ -93,10 +93,16 @@ DS-01 + текущий GDD + Narrative Bible.
 - event IDs, варианты и механические последствия;
 - crisis flow;
 - Ash trigger/variants;
-- reset contract: что сбрасывается и что сохраняется.
+- reset contract: что сбрасывается и что сохраняется;
+- discovery/reveal progression: как уже в первые минуты показать масштаб будущего неизвестного контента Архива без спойлеров и ложных collection totals;
+- reveal hooks для будущих ветвей, Chronicle, anomalies, outcomes и achievements;
+- early manual interaction как запуск timed process/cycle, а не `+1 resource per click`;
+- progression ручного участия: manual process -> self-replication/semi-auto -> automation;
+- короткий tactile interaction для реакции/деления клетки с visual payoff без clicker grind;
+- Archive Intervention как future gameplay hook для временного boost выбранного ресурса без зависимости baseline economy от рекламы.
 
 ### Review gate
-Timeline #1 можно описать как data-driven последовательность gameplay states без необходимости придумывать механику в сценарии или UI.
+Timeline #1 можно описать как data-driven последовательность gameplay states без необходимости придумывать механику в сценарии или UI. Первые минуты одновременно дают ручную причастность без clicker grind и показывают, что текущая линия — малая часть большого Архива.
 
 ---
 
@@ -145,7 +151,8 @@ DS-01, DS-02, `technical/01_EXISTING_CODE_AUDIT.md`.
 - branch retention/hybridization;
 - catch-up/anti-snowball rules;
 - offline ограничения первого run;
-- tuning invariants и telemetry adjustment order.
+- tuning invariants и telemetry adjustment order;
+- при необходимости meta-upgrades Archive Intervention: duration/charges/flexibility без разрушения baseline economy.
 
 ### Gate
 Reset и второй run имеют конкретную механику, а не только narrative teaser.
@@ -173,7 +180,8 @@ Reset и второй run имеют конкретную механику, а �
 - Ash;
 - summary/reset;
 - teaser Timeline #2;
-- flag IDs и последствия.
+- flag IDs и последствия;
+- narrative meaning неизвестных/повреждённых записей Архива, видимых игроку до их раскрытия.
 
 ### Gate
 Для первого Timeline больше не требуется писать текст непосредственно во время implementation.
@@ -202,10 +210,17 @@ Reset и второй run имеют конкретную механику, а �
 - crisis UI;
 - ending/reset UI;
 - responsive desktop adaptation;
-- component state matrix.
+- component state matrix;
+- Archive/collection preview, который рано показывает масштаб неоткрытого контента;
+- locked / unknown / corrupted states вместо однообразной стены замков;
+- fogged future evolution/tech branches;
+- hidden achievements и incomplete Chronicle/Timeline states;
+- manual process-start button, busy/progress state и visual payoff реакции/деления;
+- UX-переход ручного процесса в автоматизацию;
+- Archive Intervention: выбор target resource, timer, charges/cooldown и active-boost state.
 
 ### Gate
-Codex может реализовать UI без самостоятельного продуктового дизайна.
+Codex может реализовать UI без самостоятельного продуктового дизайна. DS-06 не считается завершённым, пока оба handoff из `DS-02_PRODUCT_INPUTS.md` не оформлены в UX.
 
 ---
 
@@ -293,7 +308,17 @@ Codex может реализовать UI без самостоятельног
 - save/cloud responsibilities;
 - ads integration points;
 - content delivery pipeline;
-- release gates.
+- release gates;
+- rewarded-ad activation flow для Archive Intervention;
+- бесплатные charges vs rewarded refill, cooldown/frequency limits;
+- поведение при unavailable/failed ad;
+- telemetry использования boost/rewarded;
+- platform SDK mapping;
+- проверка, что baseline progression полностью проходим без рекламы;
+- monetization/balance limits для улучшений Archive Intervention.
+
+### Gate
+DS-10 не считается завершённым, пока rewarded-механика Archive Intervention не оформлена как необязательное ускорение, а не обязательная часть экономики.
 
 ---
 
@@ -322,7 +347,7 @@ Codex может реализовать UI без самостоятельног
 # Рекомендуемая параллельность
 
 ## Сейчас
-Только DS-01. Codex на реализации паузится.
+Только DS-02. Codex на реализации паузится.
 
 ## После DS-03
 Параллельно:
