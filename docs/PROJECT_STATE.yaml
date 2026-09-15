@@ -3,7 +3,7 @@ project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "design_reconciliation_before_code_rework"
+  work_mode: "reconciliation_accepted_prepare_code_rework"
   last_updated: "2026-09-16"
 
 authority:
@@ -32,7 +32,7 @@ workflow:
 
 design:
   current_session: "reconciliation"
-  status: "documentation_reconciled_pending_user_review"
+  status: "accepted_documentation_complete"
   objective: "Restore original readable evolutionary progression while preserving accepted architecture, narrative and meta systems"
   accepted_reconciliation:
     - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
@@ -67,9 +67,9 @@ design:
     DS-02: { name: "Goals, events and first ending contract", status: reconciled }
     DS-03: { name: "Technical architecture and data contract", status: accepted_architecture_content_refs_reconciled }
     DS-04: { name: "Meta progression and balance rules", status: reconciled }
-    RECONCILIATION: { name: "Original GDD design reconciliation", status: documentation_complete_pending_review }
-    DS-05: { name: "Timeline #1 full narrative package", status: blocked_by_reconciliation_review }
-    DS-06: { name: "UX architecture and wireframes", status: blocked_by_reconciliation_review }
+    RECONCILIATION: { name: "Original GDD design reconciliation", status: accepted }
+    DS-05: { name: "Timeline #1 full narrative package", status: wait_for_playable_rework }
+    DS-06: { name: "UX architecture and wireframes", status: wait_for_playable_rework }
     DS-07: { name: "Art direction, locations and era transitions", status: blocked }
     DS-08: { name: "Art production manifest and generation prompts", status: blocked }
     DS-09: { name: "Audio design and generation package", status: blocked }
@@ -102,7 +102,7 @@ implementation:
     3: { name: "Goal Engine + tutorial shell + superseded early content", status: technically_done_content_rework_required }
     reconciliation_rework:
       name: "Biological gameplay reconciliation implementation"
-      status: blocked_pending_user_approval
+      status: ready
       scope:
         - "replace current 0-10 E/I content with RNA/DNA/Cell canon"
         - "migrate config and Goal Engine content"
@@ -112,12 +112,11 @@ implementation:
         - "manual playtest 0-10"
     4:
       name: "First corrected content expansion after Cell"
-      status: blocked_by_design_reconciliation
+      status: blocked_by_reconciliation_rework
 
 iteration_4:
-  status: "blocked_by_design_reconciliation"
+  status: "blocked_by_reconciliation_rework"
   unblock_conditions:
-    - "user approves reconciled documentation"
     - "Biological gameplay reconciliation implementation passes"
     - "0-10 rebalance passes"
     - "manual 0-10 playtest approved"
@@ -140,6 +139,6 @@ open_decisions:
   - "Exact Yandex/VK SDK mapping and cloud policy"
 
 next_action:
-  owner: "ChatGPT/user -> then Codex"
-  session: "Reconciliation review"
-  description: "Review reconciled documentation. Do not change game code or start Iteration 4 until approval. After approval prepare Codex handoff for biological 0-10 code rework and rebalance."
+  owner: "ChatGPT -> Codex"
+  session: "Prepare biological reconciliation code handoff"
+  description: "Documentation reconciliation is accepted. Prepare Codex prompt for 0-10 RNA/DNA/Cell content rework + rebalance. Do not start Iteration 4 until the rework and manual playtest pass."
