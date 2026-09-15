@@ -473,6 +473,69 @@ Building schema должна различать unique structures и stackable i
 
 ---
 
+## DEC-021 — Ранний интерфейс должен показывать масштаб неизвестного контента
+
+**Status:** accepted  
+**Date:** 2026-09-15
+
+### Decision
+
+Уже в первые минуты игрок должен понимать, что текущая стадия — малая часть большого Архива. Игра заранее показывает существование будущих ветвей, Chronicle/Timeline records, anomalies, outcomes, achievements и других областей, но скрывает содержание и сюжетные спойлеры.
+
+Locked content подаётся через язык Архива (`???`, повреждённые/неизвестные записи, silhouettes, fogged branches, incomplete collections), а не только через однообразные серые замки.
+
+Фиксированные collection totals нельзя показывать для контента, который ещё не существует или не гарантирован release scope.
+
+### Reason
+
+Первый Timeline должен продавать не только следующий upgrade, но и долгосрочное чувство исследования, коллекционирования историй и открытия неизвестных слоёв игры.
+
+### Affected documents
+
+- `docs/production/DS-02_PRODUCT_INPUTS.md`
+- DS-02 goals/reveal hooks;
+- DS-05 narrative package;
+- DS-06 UX/locked states.
+
+### Implementation consequence
+
+Domain/presentation state должен уметь различать как минимум known/open, known/locked, unknown/corrupted и discovered content states там, где это требуется UX contract.
+
+---
+
+## DEC-022 — Ручной input запускает процесс, а не даёт +1 ресурс
+
+**Status:** accepted  
+**Date:** 2026-09-15
+
+### Decision
+
+В ранней игре ручной клик сохраняется для ощущения причастности, но означает запуск timed process/cycle: реакции, каталитического процесса, клеточного деления или аналогичного действия. Один клик не должен линейно выдавать `+1 ресурс`, а постоянный spam clicking не является оптимальной стратегией.
+
+С progression ручная зависимость должна естественно исчезать:
+
+**manual process → self-replication / semi-auto → automation.**
+
+После автоматизации активное вмешательство может вернуться как редкая способность `Archive Intervention`: временный boost выбранного ресурса. Позднее эта способность может быть связана с rewarded ad, но baseline pacing обязан оставаться полностью проходимым без рекламы.
+
+### Reason
+
+Это сохраняет tactile involvement и зрелищность раннего зарождения жизни, не превращая игру в clicker grind и не создавая autoclicker abuse.
+
+### Affected documents
+
+- `docs/production/DS-02_PRODUCT_INPUTS.md`;
+- DS-02 onboarding/goals;
+- DS-04 возможные meta-upgrades;
+- DS-06 UX states;
+- DS-10 rewarded/platform/analytics contract.
+
+### Implementation consequence
+
+Early manual actions требуют duration/busy/progress state и пакетного результата. DS-06 обязан определить interaction/feedback, DS-10 — rewarded flow, charges/cooldowns/fallback/analytics и monetization limits Archive Intervention.
+
+---
+
 # Open decisions
 
 Следующие вопросы пока требуют отдельного решения:
