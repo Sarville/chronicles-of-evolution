@@ -1,7 +1,7 @@
 {
-  "name": "evolveidle",
+  "name": "chronicles-of-evolution",
   "version": "1.4.10",
-  "description": "Evolve Idle",
+  "description": "Хроники Эволюции — сюжетная incremental-стратегия о развитии жизни и цивилизаций",
   "private": true,
   "scripts": {
     "build": "npm run evolve && npm run evolve-less && npm run wiki && npm run wiki-less",
@@ -20,19 +20,14 @@
     "deploy": "rm -rf dist && mkdir dist && cp -r *.html *.ico LICENSE evolve lib font strings wiki dist && gh-pages -d dist",
     "deploy-win": "(rmdir /S /Q dist || echo recreating dist) && mkdir dist && xcopy /E /I evolve dist\\evolve && xcopy /E /I font dist\\font && xcopy /E /I lib dist\\lib && xcopy /E /I strings dist\\strings && xcopy /E /I wiki dist\\wiki && copy *.html dist && copy *.ico dist && copy LICENSE dist && gh-pages -d dist"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pmotschmann/Evolve.git"
-  },
   "keywords": [
-    "Evolve"
+    "incremental",
+    "idle-game",
+    "evolution",
+    "chronicles"
   ],
-  "author": "Peter Motschmann",
+  "author": "Sarville <sarville@gmail.com>",
   "license": "MPL-2.0",
-  "bugs": {
-    "url": "https://github.com/pmotschmann/Evolve/issues"
-  },
-  "homepage": "https://github.com/pmotschmann/Evolve#readme",
   "devDependencies": {
     "csso-cli": "^4.0.2",
     "ini": "^1.3.8",
