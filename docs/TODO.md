@@ -18,117 +18,136 @@
 
 # Last completed design session
 
-## DS-01 — Civilization gameplay contract
+## DS-02 — Goals, events and first ending contract
 
 **Status:** done
 
 Accepted documents:
-- [x] `docs/gdd/04_CIVILIZATION_PROGRESSION.md`
-- [x] `docs/gdd/05_BUILDINGS_AND_JOBS.md`
-- [x] `docs/gdd/06_TECH_TREE.md`
+- [x] `docs/gdd/07_GOALS_AND_MILESTONES.md`
+- [x] `docs/gdd/08_EVENTS_AND_CHOICES.md`
+- [x] `docs/gdd/09_ENDINGS_AND_RESET.md`
 
 Зафиксировано:
-- [x] canonical progression Sapience -> Tribe -> Agriculture -> Settlement -> City -> Industry -> Atomic Age;
-- [x] canonical jobs и buildings 46–108 минут;
-- [x] stable design IDs для tech/jobs/buildings;
-- [x] Merchant / Wood-Stone-Metal / Radio / Computing не являются обязательными runtime systems v1;
-- [x] industrial resource называется Power;
-- [x] Tribe structures unique, поздняя infrastructure stackable;
-- [x] phase job sets не накапливаются параллельно.
+- [x] 24 core goals `G001–G024` для Timeline #1;
+- [x] canonical timing использует economy v1.0: Sapience ~46, City ~80, Industry ~94, Atomic ~108, Ash ~116, reset ~120 минут;
+- [x] обязательные branch/narrative/crisis events имеют stable IDs и triggers;
+- [x] World Tension = `100 - Stability`, одна система с двумя представлениями;
+- [x] Energy Crisis и A01 pre-atomic specialization разделены как разные решения;
+- [x] `Следы до нас`, `ERROR 17`, `Снова.` формируют persistent mystery hooks;
+- [x] Timeline #1 всегда сходится в `ENDING_ASH`, но Last Protocol меняет subtype/Chronicle/flags;
+- [x] первый reset использует `Фрагменты Архива (AF)` с целевым reward 14–18;
+- [x] `Память Архива` — название meta-system, а не параллельная spendable currency;
+- [x] Chronicle/meta state сохраняется до очистки run state;
+- [x] reset transaction должен быть idempotent;
+- [x] ранний интерфейс показывает масштаб неизвестного контента через locked/unknown/corrupted states;
+- [x] ручное действие запускает процесс/cycle и естественно переходит в self-replication/automation.
 
-Новые решения: `DEC-018` — `DEC-020`.
+Также обновлена ревизия DS-01:
+- [x] `docs/gdd/04_CIVILIZATION_PROGRESSION.md`;
+- [x] `docs/gdd/05_BUILDINGS_AND_JOBS.md`;
+- [x] `docs/gdd/06_TECH_TREE.md`.
+
+Ревизия уточняет entity roles, stable IDs, Goal/Event mapping и implementation-facing contracts без изменения канонических economy values.
 
 ---
 
 # Current design session
 
-## DS-02 — Goals, events and first ending contract
+## DS-03 — Technical architecture and data contract
 
 **Status:** ready
 
 ### Goal
 
-Сделать весь первый Timeline описываемым как data-driven последовательность целей, событий и кризисных состояний, не оставляя Codex необходимости самостоятельно придумывать gameplay-логику ending/reset.
+Определить границу между legacy Evolve, новым gameplay/domain contract и presentation layer так, чтобы Codex мог реализовывать Timeline #1 без самостоятельного проектирования доменной модели.
 
 ### Inputs
-- `docs/PRD.md`
-- `docs/gdd/01_FIRST_120_MINUTES.md`
+- `docs/technical/01_EXISTING_CODE_AUDIT.md`
 - `docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md`
 - `docs/gdd/03_EVOLUTION_TREE.md`
 - `docs/gdd/04_CIVILIZATION_PROGRESSION.md`
 - `docs/gdd/05_BUILDINGS_AND_JOBS.md`
 - `docs/gdd/06_TECH_TREE.md`
-- `docs/scenario/00_NARRATIVE_BIBLE.md`
-- `docs/production/DS-02_PRODUCT_INPUTS.md`
+- `docs/gdd/07_GOALS_AND_MILESTONES.md`
+- `docs/gdd/08_EVENTS_AND_CHOICES.md`
+- `docs/gdd/09_ENDINGS_AND_RESET.md`
 - `docs/DECISIONS.md`
 
 ### Deliverables
-- [ ] `docs/gdd/07_GOALS_AND_MILESTONES.md`
-- [ ] `docs/gdd/08_EVENTS_AND_CHOICES.md`
-- [ ] `docs/gdd/09_ENDINGS_AND_RESET.md`
+- [ ] `docs/technical/00_TECHNICAL_OVERVIEW.md`
+- [ ] `docs/technical/02_DOMAIN_ADAPTER.md`
+- [ ] `docs/technical/03_GAME_STATE.md`
+- [ ] `docs/technical/04_SAVE_ARCHITECTURE.md`
+- [ ] `docs/technical/07_TESTING_STRATEGY.md`
 
 ### Must decide
-- [ ] current/chapter/destiny goals на 0–120 минут;
-- [ ] stable goal IDs и completion conditions;
-- [ ] milestone sequencing;
-- [ ] обязательные meaningful choices первого Timeline;
-- [ ] government-lite choice и его mechanical flags;
-- [ ] energy-crisis choice и mapping к DS-01 tech branches;
-- [ ] `Следы до нас`;
-- [ ] `ERROR 17` как gameplay/story hook;
-- [ ] Atomic Age -> crisis handoff;
-- [ ] Stability / World Tension presentation contract на уровне gameplay;
-- [ ] crisis event chain;
-- [ ] Last Protocol;
-- [ ] Ash trigger/subtypes;
-- [ ] reset: что сбрасывается и что сохраняется;
-- [ ] какие значения передаются в Chronicle/meta layer;
-- [ ] ранний Archive/discovery reveal: как игрок в первые минуты понимает масштаб ещё не открытого контента;
-- [ ] reveal hooks для неизвестных эволюционных ветвей, Chronicle, anomalies, outcomes и achievements без сюжетных спойлеров;
-- [ ] early manual interaction как запуск timed process/cycle, а не `+1 resource per click`;
-- [ ] момент перехода `manual process -> self replication/semi-auto -> full automation`;
-- [ ] возможность короткого manual catalytic/division interaction с visual payoff без clicker grind;
-- [ ] Archive Intervention как future gameplay hook: временный boost выбранного ресурса без включения рекламы в baseline economy.
+- [ ] граница legacy engine / новый gameplay contract / presentation;
+- [ ] normalized game state;
+- [ ] entity schemas и stable IDs;
+- [ ] domain-event model;
+- [ ] canonical gameplay config location/format recommendation;
+- [ ] save wrapper и migration approach;
+- [ ] test seams и headless simulation contract;
+- [ ] mapping найденных Codex loop/resource/payment/save primitives;
+- [ ] что переиспользуется и что не переписывается;
+- [ ] debug/time-acceleration инструменты для полного Timeline #1;
+- [ ] automated milestone timing checks.
 
 ### Review gate
-- [ ] каждый обязательный event имеет trigger и stable ID;
-- [ ] каждый choice имеет механическое последствие или явно narrative-only flag;
-- [ ] crisis не может быть случайно пропущен;
-- [ ] Timeline #1 неизбежно приходит к Ash, но choices влияют на summary/reward/flags;
-- [ ] reset contract однозначен;
-- [ ] первые минуты показывают масштаб будущих открытий без ложных обещаний и крупных спойлеров;
-- [ ] ручной onboarding не требует повторного линейного resource clicking;
-- [ ] DS-03 получает полный gameplay state contract без необходимости придумывать goals/events/endings.
+- [ ] Codex может завершить Iteration 0 без design guesses;
+- [ ] Codex может начать Iteration 1 Domain adapter/data foundation;
+- [ ] game-design values находятся в config/data, не в UI;
+- [ ] TODO/TBD из design docs остаются configurable и не получают придуманные значения;
+- [ ] save/reset contract поддерживает idempotent first reset;
+- [ ] headless simulation может прогнать Timeline #1 с ускорением и проверить pacing windows.
 
-После approval перевести DS-02 в `done`, разблокировать DS-03, DS-04 и DS-05; DS-06 станет ready после DS-02 вместе с уже завершённым DS-01.
+После approval DS-03 implementation можно возобновить параллельно с DS-04/DS-05/DS-06.
 
 ---
 
-# Required downstream handoff
+# Parallel design tracks after DS-03
+
+## DS-04 — Meta progression and balance rules
+
+**Status:** ready
+
+Основные темы:
+- [ ] AF/meta economy;
+- [ ] Archive Tree;
+- [ ] Timeline #2 acceleration;
+- [ ] retained traits/hybridization;
+- [ ] catch-up/anti-snowball;
+- [ ] offline rules;
+- [ ] Archive Intervention upgrades/limits при необходимости.
+
+## DS-05 — Timeline #1 full narrative package
+
+**Status:** ready
+
+Основные темы:
+- [ ] точный сценарный sequencing 0–120;
+- [ ] короткие реплики Архива;
+- [ ] milestone copy;
+- [ ] Story events;
+- [ ] Error 17 / «Снова.» / Last Protocol / Ash;
+- [ ] narrative flags;
+- [ ] ending/Chronicle copy.
 
 ## DS-06 — UX architecture and wireframes
 
-Обязательно оформить принятые в `DS-02_PRODUCT_INPUTS.md` принципы:
-
-- [ ] Archive/collection preview с ранним ощущением большого объёма контента;
-- [ ] locked / unknown / corrupted states;
-- [ ] fogged future evolution/tech branches;
-- [ ] hidden achievements / incomplete Chronicle states;
-- [ ] manual process button, busy/progress state и visual payoff;
-- [ ] UX перехода от ручного запуска к автоматизации;
-- [ ] Archive Intervention UI, resource target, timer, charges/cooldown.
-
-## DS-10 — Analytics, platform and production readiness
+**Status:** ready
 
 Обязательно оформить:
-
-- [ ] rewarded-ad flow для Archive Intervention;
-- [ ] бесплатные charges / rewarded refill / cooldown rules;
-- [ ] fallback при недоступной/неуспешной рекламе;
-- [ ] analytics для boost/ad use;
-- [ ] platform SDK mapping;
-- [ ] ограничение monetization: baseline progression не зависит от рекламы;
-- [ ] balance limits для апгрейдов Archive Intervention.
+- [ ] mobile-first shell;
+- [ ] resource/goal/navigation layout;
+- [ ] evolution/tech/building/job screens;
+- [ ] event choices;
+- [ ] crisis/ending/reset UI;
+- [ ] locked / unknown / corrupted states;
+- [ ] Archive/collection preview;
+- [ ] manual process busy/progress feedback;
+- [ ] переход manual -> automation;
+- [ ] Archive Intervention UI contract.
 
 ---
 
@@ -136,7 +155,7 @@ Accepted documents:
 
 ## Iteration 0 — Repo baseline and code audit
 
-**Status:** partial / paused for design contract
+**Status:** partial / paused for DS-03
 
 ### Уже сделано
 - [x] Static code audit.
@@ -155,33 +174,51 @@ Accepted documents:
 
 Не начинать Iteration 1 до approval **DS-03 — Technical architecture and data contract**.
 
+После DS-03 Codex получает чёткий первый implementation slice:
+
+```text
+config/data registries
+-> domain adapter
+-> resources/production
+-> evolution/tech nodes
+-> buildings/jobs
+-> Goal Engine
+-> Event Engine
+-> Era State Machine
+-> crisis/reset
+-> headless/debug simulation
+```
+
+Финальный production UI в этот момент ещё не является обязательным; допускается developer/debug interface.
+
 ---
 
 # Current open decisions
 
-Не блокируют DS-02, если не затрагиваются напрямую:
+DS-03 должен закрыть или дать recommendation по следующим вопросам:
 
 - [ ] exact UI framework / степень reuse Vue 2;
 - [ ] canonical gameplay config format;
-- [ ] legacy save compatibility vs new versioned wrapper;
-- [ ] portal SDK abstraction details;
-- [ ] visible World Tension vs Stability + explanations — желательно закрыть в DS-02;
-- [ ] user-facing name Archive permanent currency — можно окончательно закрыть в DS-04.
+- [ ] legacy save compatibility vs clean versioned wrapper;
+- [ ] portal SDK abstraction boundary.
+
+Уже закрыто DS-02:
+- [x] World Tension vs Stability;
+- [x] first-reset spendable currency = Archive Fragments (AF).
 
 ---
 
 # Rules for this phase
 
-- [ ] Не писать gameplay implementation до DS-03 approval.
-- [ ] Не проектировать финальные wireframes в DS-02.
-- [ ] Не писать полный литературный сценарий вместо gameplay event contract.
-- [ ] Не менять DS-01 economy/tech prerequisites без возврата DS-01 в review.
-- [ ] Не расширять первый Timeline глубоким Space/Bioseed.
-- [ ] `docs/production/DS-02_PRODUCT_INPUTS.md` является обязательным входом DS-02.
+- [ ] Не начинать gameplay Iteration 1 до DS-03 approval.
+- [ ] Не менять economy/tech prerequisites без design decision.
+- [ ] Не переносить TBD values в hardcoded constants.
+- [ ] Не расширять Timeline #1 глубоким Space/Bioseed.
+- [ ] Техническая архитектура должна поддержать DEC-021/DEC-022: discoverability states и process-based manual onboarding.
 - [ ] После approval обновлять `PROJECT_STATE.yaml` и этот TODO в одном push cycle.
 
 ---
 
 # Start command for next chat
 
-> Продолжаем Хроники Эволюции. Открой GitHub, прочитай `docs/PROJECT_STATE.yaml` и выполни текущую design session.
+> Продолжаем Хроники Эволюции. Открой GitHub, прочитай `docs/PROJECT_STATE.yaml` и начинай DS-03 — Technical architecture and data contract.
