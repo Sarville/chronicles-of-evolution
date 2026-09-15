@@ -1,79 +1,219 @@
-# Хроники Эволюции — Civilization Progression
+# Хроники Эволюции — цивилизационная progression Timeline #1
 
-**Документ:** `04_CIVILIZATION_PROGRESSION.md`  
-**DS:** DS-01 — Civilization gameplay contract  
-**Статус:** ACCEPTED  
-**Версия:** 1.0  
-**Scope:** Timeline #1, переход `Sapience` → `Atomic Age`, примерно 46–108 минут.
+**Версия:** DS-01 revision 1.1  
+**Область:** от `N06 Разум` (~46:00) до `A06 Атомный век` (~108:00).  
+**Назначение:** канонический progression-каркас цивилизационной части первого Timeline.  
+**Связанные документы:** `07_GOALS_AND_MILESTONES.md`, `08_EVENTS_AND_CHOICES.md`, `09_ENDINGS_AND_RESET.md`, `05_BUILDINGS_AND_JOBS.md`, `06_TECH_TREE.md`.
 
-> Принято в DS-01. Является каноническим gameplay-contract для указанной области до следующего version bump.
-
----
-
-# 1. Назначение
-
-Документ определяет каноническую последовательность цивилизационной части первого Timeline:
-
-**Разум → Племя → Земледелие → Поселение → Город → Индустрия → Атомный век.**
-
-Он связывает:
-- числовую экономику;
-- культурно-технологическое дерево;
-- population/jobs;
-- buildings/infrastructure;
-- визуальные состояния мира;
-- будущие goals/events/UX hooks.
-
-Финальный кризис после `Atomic Age` относится к DS-02 и здесь описывается только как точка передачи управления следующему блоку.
+> Этот документ не меняет утверждённый balance v1.0. Он разделяет ранее смешанные сущности — технологии, здания, профессии, milestones и upgrades — и описывает, как они образуют один игровой flow.
 
 ---
 
-# 2. Источники и приоритет
+# 1. Источники и приоритет
 
-Используются:
+Для DS-03 используются следующие правила при расхождениях:
 
-1. `docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md` — source of truth для цен, rates и target timings;
-2. `docs/gdd/03_EVOLUTION_TREE.md` — source of truth для node IDs, типов узлов и prerequisite graph;
-3. `docs/gdd/01_FIRST_120_MINUTES.md` — концепция pacing, визуальных milestones и presentation;
-4. `docs/PRD.md` — product-level intent;
-5. `docs/DECISIONS.md` — принятые решения проекта.
+1. **Экономика первых 120 минут v1.0** — источник истины для цен, rates, population thresholds, growth factors и целевых таймингов.
+2. **Evolution tree v1.0** — источник истины для node IDs, prerequisite graph, branch groups и числовых эффектов ветвей.
+3. **DS-02 Goals/Events/Ending** — источник истины для Goal IDs, порядка narrative events, flags и перехода к кризису.
+4. GDD/сценарный план — источник presentation, визуальных состояний, UX-смысла эпох и narrative framing.
 
-При конфликте раннего GDD и экономики/дерева используются экономика и дерево.
-
----
-
-# 3. Канонические фазы 46–108 минут
-
-| Phase ID | Фаза | Target | Основной переход | Ресурсы |
-|---|---|---:|---|---|
-| `era.sapience_transition` | Разум → цивилизация | ~46:00 | biological stock → стартовый пакет | F / M / K / Population |
-| `era.tribe` | Племя | 46–62 | `T08 Agriculture` | F / M / K / Population |
-| `era.settlement` | Поселение | 62–80 | `S08 City` | F / M / K / Population |
-| `era.city` | Город | 80–94 | `I05 Industry` | F / M / K / PWR / Population |
-| `era.industry` | Индустрия | 94–108 | `A06 Atomic Age` | F / M / K / PWR / Population |
-| `era.atomic` | Атомный век | ~108 | передача в crisis contract | M / K / PWR / Stability |
-
-Целевые коридоры:
-- Agriculture: **59:30–64:30**;
-- City: **76:30–83:30**;
-- Industry: **90:30–97:30**;
-- Atomic Age: **104:00–111:30**.
+Если параметр отсутствует во всех этих источниках, DS-03 не выдаёт его за существующее решение. Новые решения явно помечаются как **DS-03 proposal**.
 
 ---
 
-# 4. Переход Sapience → Civilization
+# 2. Нормализация сущностей
 
-## 4.1. Условие входа
+В реализации используются пять разных типов сущностей.
 
-Вход в цивилизационную часть происходит при завершении узла:
+## 2.1. Technology Node
 
-`N06 / evolution.sapience`
+Покупаемый узел дерева знаний/культуры.
 
-Целевой момент первого Timeline: около **46:00**.
+Примеры:
 
-## 4.2. Конвертация биологического результата
+- `T02 Fire`;
+- `T08 Agriculture`;
+- `S04 Writing`;
+- `I02 Mechanization`;
+- `A05 Atomic Theory`.
 
-Каноническая формула:
+Technology Node:
+
+- имеет цену;
+- имеет prerequisites;
+- покупается один раз в Timeline;
+- открывает system/building/job/modifier;
+- может быть CORE / BRANCH / OPTIONAL / CONVERGENCE.
+
+## 2.2. Building
+
+Повторяемый инфраструктурный объект.
+
+Примеры:
+
+- Shelter;
+- Field;
+- Workshop;
+- Steam Plant;
+- Research Institute.
+
+Building:
+
+- имеет `count`;
+- покупается много раз, если в конфигурации не указано иначе;
+- цена растёт по growth factor;
+- производит ресурс либо усиливает jobs/system;
+- может иметь представление в диораме.
+
+## 2.3. Job
+
+Назначение единицы Population.
+
+Примеры:
+
+- Forager;
+- Farmer;
+- Scholar;
+- Engineer;
+- Scientist.
+
+Job не покупается как здание. Его capacity определяется Population и, при необходимости, unlocked system/building.
+
+## 2.4. Upgrade
+
+Одноразовое числовое усиление уже открытой системы, которое не является переходом эпохи.
+
+Примеры из текущего дерева:
+
+- `T06A Craft`;
+- `T06B Oral Tradition`;
+- `S03 Storage`;
+- `S05A Law`;
+- `S05B Accounting`;
+- `I04A Standardization`;
+- `I04B Mass Education`;
+- `A04 Engines & Logistics`.
+
+Технически они могут храниться в том же data registry, что и Technology Nodes, но `semantic_role = upgrade`.
+
+## 2.5. Milestone / Era State
+
+Не покупаемая сущность мира.
+
+Примеры:
+
+- `TRIBE`;
+- `SETTLEMENT`;
+- `CITY`;
+- `INDUSTRY`;
+- `ATOMIC`.
+
+Milestone включается после выполнения convergence-node + Goal conditions и меняет:
+
+- диораму;
+- доступную resource panel;
+- job set;
+- navigation/UI;
+- набор доступных building/tech categories;
+- narrative queue.
+
+---
+
+# 3. Почему convergence-node и era state не одно и то же
+
+Существующие документы называют `T05 Tribe`, `S08 City`, `I05 Industry`, `A06 Atomic Age` узлами дерева. DS-03 сохраняет эти node IDs, но трактует их как **покупаемые breakthrough/convergence nodes**, после покупки которых State Machine подтверждает переход в соответствующее состояние мира.
+
+Пример:
+
+```text
+player buys S08 City
+    ↓
+validate population >= 105
+    ↓
+complete G019
+    ↓
+set era_state = CITY
+    ↓
+unlock Power + city jobs + city infrastructure
+    ↓
+play City milestone
+    ↓
+queue EV-CIV-04 and EV-CIV-05
+```
+
+Это предотвращает ситуацию, когда UI должен одновременно считать `City` технологией, зданием и эпохой.
+
+---
+
+# 4. Каноническая шкала 46–108 минут
+
+| Окно | Era state | Goal | Breakthrough | Population target | Главный новый слой |
+|---|---|---|---|---:|---|
+| 46–56 | `EARLY_CIV` → `TRIBE` | G014–G015 | T02/T03 → T05 | 24 → 32 | jobs, Food/M/Knowledge |
+| 56–62 | `TRIBE` | G016 | T07 → T08 | 42 | Agriculture / Farmer / Field |
+| 62–68 | `SETTLEMENT_EARLY` | G017 | S01* → S02 | 58 | permanent infrastructure |
+| 68–80 | `SETTLEMENT` | G018–G019 | S04 → S06 → S07 → S08 | 78 → 105 | Writing, specialization, City |
+| 80–94 | `CITY` | G020–G021 | I01* → I02 → I03 → I05 | 135 → 170 | Power, mechanization |
+| 94–101 | `INDUSTRY` | G022 | A01* → A02 | ~215 | modern grid + research |
+| 101–108 | `INDUSTRY_LATE` | G023 | A03 → A05 → A06 | 260 | atomic theory → Atomic Age |
+| 108+ | `ATOMIC` | G024 | crisis nodes X* | 260+ | Stability / World Tension |
+
+Тайминги — targets, а не hard timers. Economy v1.0 допускает коридор до нескольких минут.
+
+---
+
+# 5. State Machine цивилизации
+
+```text
+BIOLOGICAL
+  └─ N06 Sapience
+      ↓
+EARLY_CIV
+  └─ T05 Tribe
+      ↓
+TRIBE
+  └─ T08 Agriculture
+      ↓
+SETTLEMENT_EARLY
+  └─ S02 Permanent Settlement
+      ↓
+SETTLEMENT
+  └─ S08 City
+      ↓
+CITY
+  └─ I05 Industry
+      ↓
+INDUSTRY
+  └─ A06 Atomic Age
+      ↓
+ATOMIC
+  └─ crisis / X99 Ash
+      ↓
+ARCHIVE_SUMMARY
+```
+
+## 5.1. Hard rule
+
+Переход состояния происходит только через state transition service. Нельзя привязывать смену UI напрямую к наличию технологии в inventory.
+
+Причина: позднее Archive/meta modifiers могут позволять начинать Timeline с уже известными технологиями, не перескакивая автоматически эпохи.
+
+---
+
+# 6. Переход N06 Sapience → EARLY_CIV
+
+## Trigger
+
+Покупка `N06 Разум`, completion `G013`.
+
+## Старые ресурсы
+
+Energy / Biomass / Information перестают быть активными spendable currencies текущей фазы.
+
+## Стартовый пакет
+
+Используется утверждённая формула:
 
 ```text
 start_population = 18 + floor(log10(total_biomass_earned + 1) × 3)
@@ -82,519 +222,799 @@ start_materials  = 70 + floor(E_stock × 0.003)
 start_knowledge  = 15 + floor(I_stock × 0.02)
 ```
 
-Ограничения Timeline #1:
-- Population: **18–24**;
-- бонус Food: максимум **+120**;
-- бонус Materials: максимум **+100**;
-- бонус Knowledge: максимум **+35**.
+Caps:
 
-Биологические ресурсы после перехода перестают быть активными валютами текущего UI, но история эволюции остаётся доступной как run history / Evolution data.
+- Population: 18–24;
+- Food bonus: +120 max;
+- Materials bonus: +100 max;
+- Knowledge bonus: +35 max.
+
+## UI transition
+
+Main resources:
+
+- Food;
+- Materials;
+- Knowledge;
+- Population.
+
+Biological resources уходят в history/evolution view и больше не должны конкурировать за top-bar.
+
+## Unlocks
+
+- Forager;
+- Gatherer;
+- Thinker;
+- Caregiver;
+- ранние tribal buildings;
+- `EV-CIV-01 Первая культурная традиция`.
 
 ---
 
-# 5. Общая модель цивилизационной progression
+# 7. EARLY_CIV — 46–56 минут
 
-Цивилизационная часть строится вокруг трёх взаимосвязанных контуров.
+## 7.1. Главная задача фазы
 
-## 5.1. Population loop
+Научить игрока управлять Population как производственным ресурсом.
 
-Population:
-- занимает jobs;
-- потребляет Food;
-- растёт только при достаточном Food surplus;
-- ограничивается population cap;
-- является prerequisite крупных переходов.
+Игрок должен понять:
 
-Базовое потребление:
+```text
+Population → job allocation → resource rates → technology/building affordability
+```
+
+## 7.2. Core progression
+
+```text
+EV-CIV-01 T01A/B/C
+        ↓
+T02 Fire
+        ↓
+T03 Cooperative Hunt
+        ↓
+[T04 Role Division optional]
+        ↓
+T05 Tribe + pop 32
+```
+
+Связано с:
+
+- G014 — Fire + Cooperative Hunt;
+- G015 — Tribe.
+
+## 7.3. Buildings
+
+Доступный pool:
+
+- Hearth;
+- Shelter;
+- Tool Bench;
+- Hunting Ground;
+- Story Circle;
+- Clan Camp.
+
+Точные параметры — `05_BUILDINGS_AND_JOBS.md`.
+
+## 7.4. Jobs
+
+- Forager;
+- Gatherer;
+- Thinker;
+- Caregiver.
+
+## 7.5. Resource pressure
+
+Главный bottleneck: Knowledge при необходимости поддерживать Food surplus.
+
+Food deficit не hard-fail:
+
+- birth rate → 0;
+- current Population не исчезает автоматически;
+- Goal Engine предлагает перераспределить jobs.
+
+## 7.6. Milestone T05
+
+После T05:
+
+- `era_state = TRIBE`;
+- pop cap +25;
+- job presets unlock;
+- `EV-CIV-02 Как делить добычу`;
+- milestone presentation `ПЛЕМЯ`.
+
+---
+
+# 8. TRIBE — 56–62 минут
+
+## Core progression
+
+```text
+T05 Tribe
+  ├─ T06A Craft [optional]
+  ├─ T06B Oral Tradition [optional]
+  └─ T07 Seed Selection
+        ↓
+     T08 Agriculture + pop 42
+```
+
+## G016
+
+`T08 Agriculture` — convergence node G016.
+
+После покупки:
+
+- unlock Farmer;
+- unlock Field;
+- обновляется job economy;
+- запускается `EV-CIV-03 Специализация поселения`;
+- `era_state = SETTLEMENT_EARLY`.
+
+## Semantic rule
+
+`Agriculture` — Technology Node. `Field` — Building. `Farmer` — Job. `Settlement` — Era State.
+
+Эти четыре сущности нельзя хранить как один generic unlock.
+
+---
+
+# 9. SETTLEMENT_EARLY — 62–68 минут
+
+## Blocking branch
+
+`EV-CIV-03` выбирает один `S01*`:
+
+- Irrigation;
+- Masonry;
+- Exchange.
+
+Выбор блокирует `S02` до resolution.
+
+## G017
+
+Переход к постоянному поселению:
+
+```text
+S01* selected
++ Population >= 58
++ afford S02
+→ buy S02 Permanent Settlement
+→ complete G017
+```
+
+После G017:
+
+- `era_state = SETTLEMENT`;
+- pop cap +40;
+- birth ×1.10;
+- диорама меняется с temporary camp на permanent houses/fields/roads;
+- milestone `МЫ ОСТАЛИСЬ`;
+- ставится в очередь `EV-NAR-01 Следы до нас`.
+
+---
+
+# 10. SETTLEMENT — 68–80 минут
+
+## 10.1. Jobs
+
+- Farmer;
+- Builder;
+- Scholar;
+- Artisan.
+
+Ранние tribal jobs заменяются/апгрейдятся presentation-wise. История назначения может сохраняться, но UI должен показывать актуальные профессии эпохи.
+
+## 10.2. Buildings
+
+- Field;
+- House;
+- Workshop;
+- Granary;
+- School;
+- Market.
+
+## 10.3. Core tech flow
+
+```text
+S02 Permanent Settlement
+  ├─ S03 Storage [optional]
+  ↓
+S04 Writing
+  ├─ S05A Law [optional]
+  ├─ S05B Accounting [optional]
+  ↓
+S06 Division of Labor
+  ↓
+S07 Urban Planning
+  ↓
+S08 City + pop 105
+```
+
+## 10.4. G018 — Writing
+
+При `S04`:
+
+- Knowledge ×1.50;
+- Chronicle становится видимым разделом;
+- locked future Chronicle cards `???` показывают глубину будущего контента.
+
+## 10.5. Recommended jobs перед City
+
+Source-defined target:
+
+- 42% Farmer;
+- 30% Builder/Artisan;
+- 23% Scholar;
+- 5% Care/utility.
+
+Это hint preset, а не обязательное условие.
+
+## 10.6. G019 — City
+
+Requirements:
+
+- `S07` complete;
+- Population >= 105;
+- цена S08 оплачена.
+
+После completion:
+
+- `era_state = CITY`;
+- unlock Power;
+- V5 City diorama;
+- jobs переходят в городской набор;
+- milestone City;
+- queue `EV-CIV-04 Кто принимает решения?`;
+- после него — blocking `EV-CIV-05 Городская специализация`.
+
+---
+
+# 11. CITY — 80–94 минут
+
+## 11.1. Новый ресурс
+
+`Power (PWR)` появляется впервые.
+
+Food остаётся активным, но становится supporting resource; основной выбор игрока смещается к Materials / Knowledge / Power.
+
+## 11.2. Jobs
+
+- Industrial Farmer;
+- Miner;
+- Engineer;
+- Researcher.
+
+## 11.3. Infrastructure
+
+- Mine;
+- Foundry;
+- Steam Plant;
+- Rail Hub;
+- Laboratory.
+
+## 11.4. Blocking specialization
+
+После government-lite event игрок выбирает:
+
+- I01A Production City;
+- I01B Academic City;
+- I01C Energy City.
+
+Это технологическая специализация и реальный multiplier, в отличие от government-lite profile choice.
+
+## 11.5. G020 — Mechanization
+
+```text
+I01* selected
+→ I02 Mechanization
+→ G020 complete
+```
+
+Target ~87:00, Population ~135.
+
+## 11.6. G021 — Industry
+
+Core path:
+
+```text
+I02 Mechanization
+→ I03 Steam Network
+→ [I04A/B optional]
+→ I05 Industry + pop 170
+```
+
+После `I05`:
+
+- `era_state = INDUSTRY`;
+- industrial jobs;
+- V6 Industrial diorama;
+- factories/smoke/rail overlays;
+- milestone `ЭПОХА МАШИН`;
+- queue `EV-CIV-06 Энергетический кризис`.
+
+---
+
+# 12. INDUSTRY — 94–108 минут
+
+Эта эпоха содержит два разных выбора, которые нельзя объединять.
+
+## 12.1. Narrative energy path — EV-CIV-06
+
+- fossil;
+- clean;
+- early atomic.
+
+Это society/path decision с visual/crisis flags.
+
+GDD задаёт +40/+20/+30% эффекты, но balance v1.0 не содержит их отдельной постоянной строки. DS-02 рекомендует временный chapter modifier до Atomic Age и обязательный simulation test.
+
+**DS-03 hard rule:** эти проценты должны жить в отдельном `chapter_modifiers` config и не должны быть зашиты в Technology Nodes A01*.
+
+## 12.2. Tech specialization — EV-CIV-07 / A01*
+
+Отдельно игрок выбирает:
+
+- A01A Electrification;
+- A01B Research Institutes;
+- A01C Mass Logistics.
+
+Это реальные branch nodes evolution tree.
+
+## 12.3. Jobs
+
+- Mechanized Farmer;
+- Industrial Worker;
+- Power Engineer;
+- Scientist.
+
+## 12.4. Infrastructure
+
+- Steelworks;
+- Grid Station;
+- Research Institute;
+- Chemical Complex.
+
+## 12.5. G022 — Modern grid + science base
+
+Checklist:
+
+- `A01*` selected;
+- stable Power surplus;
+- `A02 Electrical Grid` purchased;
+- минимум одна активная research infrastructure line.
+
+После G022:
+
+- Power ×1.45;
+- open A03/A05 path;
+- `EV-NAR-02 Ошибка 17`.
+
+## 12.6. Late industrial path
+
+```text
+A02 Electrical Grid
+  ├─ A04 Engines & Logistics [optional]
+  ↓
+A03 Scientific Method
+  ↓
+A05 Atomic Theory
+  ↓
+A06 Atomic Age + pop 260
+```
+
+`A04` требует A02 и может покупаться параллельно с научной веткой, но не является prerequisite для A05.
+
+---
+
+# 13. ATOMIC transition — G023
+
+## Requirements
+
+- `A05 Atomic Theory`;
+- Population >= 260;
+- оплатить A06.
+
+## On transition
+
+```text
+set era_state = ATOMIC
+set stability = 100
+set crisis_clock = 0
+apply global production x1.35
+freeze first-run offline crisis progression
+```
+
+Presentation:
+
+- milestone `МЫ РАСКОЛОЛИ МАТЕРИЮ`;
+- Archive: `Снова.` → correction;
+- V7 Atomic;
+- Destiny Goal → `Переживите Великий фильтр`.
+
+Дальнейшие X-nodes и ending описаны в DS-02/09 и не дублируются как обычная цивилизационная progression.
+
+---
+
+# 14. Unlock matrix по эпохам
+
+| Entity | Early Civ | Tribe | Settlement | City | Industry | Atomic |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| Food | ✓ | ✓ | ✓ | ✓ | ✓ supporting | hidden/supporting in crisis |
+| Materials | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Knowledge | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Power | — | — | — | ✓ | ✓ | ✓ |
+| Population | ✓ | ✓ | ✓ | ✓ | ✓ | frozen/limited growth |
+| Stability | — | — | — | — | — | ✓ |
+| Basic jobs | ✓ | ✓ | replaced | replaced | replaced | industrial set |
+| Buildings | tribal | tribal | settlement | city | industrial | crisis/atomic |
+| Chronicle | teaser | teaser | visible after Writing | ✓ | ✓ | ✓ |
+| World Tension | — | — | — | hidden profile only | hidden profile only | visible |
+
+---
+
+# 15. Progression gates
+
+Каждый breakthrough должен использовать минимум два типа gate, чтобы игрок не мог решать всё накоплением одного ресурса.
+
+Допустимые gates:
+
+- prerequisite node;
+- resource price;
+- Population threshold;
+- resolved branch event;
+- building/system requirement;
+- narrative event resolution;
+- Goal completion.
+
+## Пример City
+
+```text
+requires_nodes: [S07]
+requires_population: 105
+requires_resources: F/M/K cost
+requires_event: settlement branch already resolved through S01*
+```
+
+## Пример G022
+
+Это composite gate, а не только A02 purchase:
+
+```text
+requires_branch: A01*
+requires_node: A02
+requires_power_surplus: true
+requires_research_line: >= 1
+```
+
+---
+
+# 16. Population architecture
+
+Population — производственная ёмкость, а не spendable currency.
+
+## 16.1. Consumption
 
 ```text
 food_consumption = population × 0.105 F/s
 ```
 
-Рост при Food surplus ≥20%:
+## 16.2. Growth
 
 ```text
-birth_rate/sec =
-population × 0.0010 × fertility_mult × era_fertility_mult
+birth_rate/sec = population × 0.0010 × fertility_mult × era_fertility_mult
 ```
 
-`era_fertility_mult`:
-- Tribe: **1.00**;
-- Settlement: **0.75**;
-- City: **0.45**;
-- Industry: **0.45**;
-- Crisis: **0.00**.
+Era multipliers:
 
-Food deficit в Timeline #1 не создаёт hard fail:
-- population growth останавливается;
-- player получает bottleneck/recovery hook;
-- дальнейший штраф детализируется в DS-02/UX.
+- Tribe: 1.00;
+- Settlement: 0.75;
+- City: 0.45;
+- Industry: 0.45;
+- Crisis: 0.00.
 
-## 5.2. Production loop
+## 16.3. Food surplus gate
 
-В каждой фазе Population распределяется между несколькими ролями.
+- surplus >=20% → full growth;
+- 0–20% → linear 0..1 multiplier;
+- negative → growth 0.
 
-Роли должны заставлять игрока выбирать между:
-- поддержанием Food;
-- Materials/infrastructure;
-- Knowledge/progression;
-- Power после City.
+## 16.4. Hard rule
 
-Knowledge является целевым soft bottleneck почти всей цивилизационной части.
-
-## 5.3. Breakthrough loop
-
-Progression не определяется только количеством ресурсов.
-
-Каждый major transition требует:
-- core tech chain;
-- population threshold;
-- достаточного production;
-- иногда branch choice.
-
-Крупные convergence nodes:
-- `T08 Agriculture`;
-- `S08 City`;
-- `I05 Industry`;
-- `A06 Atomic Age`.
+В Timeline #1 нет demographic hard fail из-за временного Food deficit.
 
 ---
 
-# 6. Фаза Tribe — 46–62 минут
+# 17. Jobs replacement policy
 
-**Phase ID:** `era.tribe`  
-**Visual state:** `V3_TRIBE`
-
-## 6.1. Fantasy
-
-Игрок впервые управляет не организмом, а группой разумных существ:
-- добывает пищу;
-- распределяет труд;
-- увеличивает population;
-- создаёт первые устойчивые социальные практики.
-
-## 6.2. Канонические jobs
-
-- `job.tribe.forager`
-- `job.tribe.gatherer`
-- `job.tribe.thinker`
-- `job.tribe.caregiver`
-
-Подробные rates — в `05_BUILDINGS_AND_JOBS.md`.
-
-## 6.3. Первый культурный branch
-
-Сразу после входа в цивилизацию доступен один из трёх branch nodes:
-
-| Spec ID | Canonical ID | Выбор | Роль |
-|---|---|---|---|
-| T01A | `tech.tribe.hunting_tradition` | Охотничья традиция | ускоряет Food через Forager |
-| T01B | `tech.tribe.gathering_network` | Собирательная сеть | сбалансированный F/M |
-| T01C | `tech.tribe.knowledge_ritual` | Ритуал знания | ускоряет K |
-
-В Timeline #1 это специализация текущей цивилизации, а не moral alignment.
-
-## 6.4. Core progression
+Источник задаёт разные наборы профессий по эпохам, но не определяет миграцию старых профессий. DS-03 вводит implementation proposal:
 
 ```text
-T01* cultural branch
-    ↓
-T02 Fire
-    ↓
-T03 Cooperative Hunt
-    ↓
-T05 Tribe
-    ↓
-T07 Seed Selection
-    ↓
-T08 Agriculture
+on era transition:
+    old jobs remain in save history
+    assigned population is remapped to closest new role when possible
+    remainder becomes unassigned
+    player sees one short "jobs updated" explanation
 ```
 
-Optional:
-- `T04 Division of Roles`;
-- `T06A Craft`;
-- `T06B Oral Tradition`.
+Рекомендуемый mapping:
 
-## 6.5. Ключевые thresholds
+| Old | New |
+|---|---|
+| Forager | Farmer / Industrial Farmer |
+| Gatherer | Builder → Miner / Industrial Worker |
+| Thinker | Scholar → Researcher → Scientist |
+| Caregiver | utility/unassigned; не исчезает как concept |
+| Artisan | Engineer / Industrial Worker depending current need |
 
-- ~51:00: Fire + Cooperative Hunt;
-- ~56:00: `T05 Tribe`, Population ≥32;
-- ~62:00: `T08 Agriculture`, Population ≥42.
+Это **DS-03 proposal**, потому что исходники не задают migration policy.
 
-## 6.6. Выход
-
-`T08 Agriculture`:
-- завершает Tribe phase;
-- открывает Farmer;
-- открывает Field;
-- переводит мир в `era.settlement`;
-- запускает визуальный переход к постоянному поселению.
+Auto-remap не должен менять historical flags и не должен покупать buildings.
 
 ---
 
-# 7. Фаза Settlement — 62–80 минут
+# 18. Resource visibility
 
-**Phase ID:** `era.settlement`  
-**Visual state:** `V4_SETTLEMENT`
+## 18.1. 46–80
 
-## 7.1. Fantasy
+Top bar:
 
-Общество перестаёт жить только текущим днём:
-- появляется земледелие;
-- постоянное жильё;
-- мастерские;
-- накопление;
-- formal Knowledge;
-- инфраструктурная специализация.
+- Food;
+- Materials;
+- Knowledge;
+- Population.
 
-## 7.2. Канонические jobs
+## 18.2. 80–108
 
-- `job.settlement.farmer`
-- `job.settlement.builder`
-- `job.settlement.scholar`
-- `job.settlement.artisan`
+Power добавляется. На mobile нельзя постоянно показывать пять равноправных counters.
 
-## 7.3. Специализация поселения
+**DS-03 proposal:** Population показывается как compact `current/cap` рядом с jobs icon, а top resource row остаётся F / M / K / PWR.
 
-После Agriculture выбирается один branch:
+## 18.3. 108+
 
-| Spec ID | Canonical ID | Выбор | Роль |
-|---|---|---|---|
-| S01A | `tech.settlement.irrigation` | Ирригация | Food/Farmer |
-| S01B | `tech.settlement.stonework` | Каменная кладка | cheaper infrastructure |
-| S01C | `tech.settlement.exchange` | Обмен | F/M + Market synergy |
-
-## 7.4. Core progression
-
-```text
-S01* settlement branch
-    ↓
-S02 Permanent Settlement
-    ↓
-S04 Writing
-    ↓
-S06 Division of Labor
-    ↓
-S07 Urban Planning
-    ↓
-S08 City
-```
-
-Optional:
-- `S03 Storage`;
-- `S05A Law`;
-- `S05B Counting`.
-
-## 7.5. Ключевые thresholds
-
-- ~68:00: `S02 Permanent Settlement`, Population ≥58;
-- ~74:00: `S04 Writing`, Population ≥78;
-- ~80:00: `S08 City`, Population ≥105.
-
-## 7.6. Выход
-
-`S08 City`:
-- завершает Settlement phase;
-- открывает ресурс `Power`;
-- переводит visual state в `V5_CITY`;
-- открывает городскую специализацию.
+Stability/World Tension получает отдельную crisis bar и не занимает место обычной валюты.
 
 ---
 
-# 8. Фаза City — 80–94 минут
+# 19. Diorama state transitions
 
-**Phase ID:** `era.city`  
-**Visual state:** `V5_CITY`, затем подготовка `V6_INDUSTRIAL`
-
-## 8.1. Fantasy
-
-Экономика становится инфраструктурной:
-- сельское хозяйство механизируется;
-- Materials перестают быть только ручным ремеслом;
-- появляются специализированные производственные объекты;
-- Power становится новым ограничителем;
-- формальная наука ускоряет progression.
-
-## 8.2. Канонические jobs
-
-- `job.city.industrial_farmer`
-- `job.city.miner`
-- `job.city.engineer`
-- `job.city.researcher`
-
-## 8.3. Городская специализация
-
-| Spec ID | Canonical ID | Выбор | Роль |
-|---|---|---|---|
-| I01A | `tech.city.production_city` | Производственный город | Materials |
-| I01B | `tech.city.academic_city` | Академический город | Knowledge |
-| I01C | `tech.city.energy_city` | Энергетический город | Power |
-
-Эта специализация уже влияет на будущий профиль Великого фильтра через экономическую траекторию, но narrative последствия описываются в DS-02.
-
-## 8.4. Core progression
-
-```text
-I01* city specialization
-    ↓
-I02 Mechanization
-    ↓
-I03 Steam Network
-    ↓
-I05 Industry
-```
-
-Optional:
-- `I04A Standardization`;
-- `I04B Mass Education`.
-
-## 8.5. Ключевые thresholds
-
-- ~87:00: `I02 Mechanization`, Population ≈135;
-- ~94:00: `I05 Industry`, Population ≥170.
-
-## 8.6. Выход
-
-`I05 Industry`:
-- переводит phase в `era.industry`;
-- открывает industrial jobs;
-- переводит диораму к `V6_INDUSTRIAL`.
-
----
-
-# 9. Фаза Industry — 94–108 минут
-
-**Phase ID:** `era.industry`  
-**Visual state:** `V6_INDUSTRIAL`, затем `V7_ATOMIC`
-
-## 9.1. Fantasy
-
-Общество входит в фазу быстрого масштабирования:
-- массовое производство;
-- энергосеть;
-- исследовательские институты;
-- химическая индустрия;
-- технологическая зависимость от Knowledge + Power.
-
-## 9.2. Канонические jobs
-
-- `job.industry.mechanized_farmer`
-- `job.industry.industrial_worker`
-- `job.industry.power_engineer`
-- `job.industry.scientist`
-
-## 9.3. Предатомная специализация
-
-| Spec ID | Canonical ID | Выбор | Роль |
-|---|---|---|---|
-| A01A | `tech.industry.electrification` | Электрификация | Power |
-| A01B | `tech.industry.science_institutes` | Научные институты | Knowledge |
-| A01C | `tech.industry.mass_logistics` | Массовая логистика | Materials |
-
-## 9.4. Core progression
-
-```text
-A01* pre-atomic specialization
-    ↓
-A02 Electrical Grid
-    ↓
-A03 Scientific Method
-    ↓
-A05 Atomic Theory
-    ↓
-A06 Atomic Age
-```
-
-Optional:
-- `A04 Engines and Logistics`.
-
-## 9.5. Ключевые thresholds
-
-- ~101:00: Electrical Grid + research infrastructure, Population ≈215;
-- ~108:00: `A06 Atomic Age`, Population ≥260.
-
-## 9.6. Выход
-
-При `A06 Atomic Age`:
-- создаётся `Stability = 100`;
-- начинается crisis clock;
-- активируется `V7_ATOMIC`;
-- управление progression передаётся DS-02 contract Великого фильтра.
-
----
-
-# 10. Канонический graph 46–108
-
-```text
-Sapience
-  ↓
-[T01A Hunting | T01B Gathering | T01C Knowledge]
-  ↓
-Fire
-  ↓
-Cooperative Hunt
-  ↓
-Tribe
-  ↓
-Seed Selection
-  ↓
-AGRICULTURE
-  ↓
-[S01A Irrigation | S01B Stonework | S01C Exchange]
-  ↓
-Permanent Settlement
-  ↓
-Writing
-  ↓
-Division of Labor
-  ↓
-Urban Planning
-  ↓
-CITY
-  ↓
-[I01A Production | I01B Academic | I01C Energy]
-  ↓
-Mechanization
-  ↓
-Steam Network
-  ↓
-INDUSTRY
-  ↓
-[A01A Electrification | A01B Science | A01C Logistics]
-  ↓
-Electrical Grid
-  ↓
-Scientific Method
-  ↓
-Atomic Theory
-  ↓
-ATOMIC AGE
-```
-
-Optional nodes не должны блокировать core route.
-
----
-
-# 11. Design role branch choices
-
-Branch choice первого Timeline должен:
-- давать преимущество примерно в диапазоне, уже заданном деревом;
-- менять оптимальное распределение jobs;
-- не делать одну ветвь обязательной;
-- не уводить completion первого run за допустимый timing corridor;
-- давать visual tag для будущего art/UX layer;
-- сохраняться в Chronicle/run summary.
-
-Branch не должен:
-- вводить новый отдельный ресурс;
-- скрытно менять ending в Timeline #1;
-- закрывать core tech;
-- создавать hard fail.
-
----
-
-# 12. Что считается каноническим gameplay v1
-
-В первый Timeline входят как реальные gameplay systems:
-- Food / Materials / Knowledge / Power;
-- Population;
-- jobs;
-- population cap;
-- Food consumption/growth;
-- buildings/infrastructure из economy specification;
-- культурные/городские/индустриальные branches из Evolution Tree;
-- Power с момента City;
-- convergence progression до Atomic Age.
-
----
-
-# 13. DS-01 canonicalization: концепты раннего GDD
-
-Следующие элементы раннего GDD сохраняются как идеи, но **не являются обязательными отдельными gameplay entities v1**, потому что у них нет согласованной числовой модели в economy/evolution tree.
-
-## 13.1. Merchant
-
-Ранний GDD перечисляет `Merchant` как job.
-
-В v1:
-- отдельного `Merchant` job нет;
-- trade-lite представлен эффектом `Market` и веткой `Exchange`;
-- полноценный trade job/system deferred.
-
-## 13.2. Wood / Stone / Metal
-
-Ранний GDD предлагает secondary production resources.
-
-В v1:
-- глобальной активной валютой остаётся `Materials`;
-- Wood/Stone/Metal могут использоваться как presentation/codex labels;
-- отдельные балансовые валюты не вводятся в Timeline #1 без нового decision/rebalance.
-
-## 13.3. Energy
-
-Ранний GDD использует industrial `Energy`.
-
-Каноническое runtime/resource имя v1:
-- `Power (PWR)`.
-
-## 13.4. Power Plant / Motor
-
-Ранний GDD описывает generic Power Plant и Motor.
-
-В v1 механическую роль выполняют:
-- `Steam Plant`;
-- `Grid Station`;
-- `Steam Network`;
-- `Electrical Grid`;
-- `Mechanization`.
-
-Generic названия могут использоваться только в пользовательском objective copy, если DS-02/UX сочтут это полезным.
-
-## 13.5. Radio / Computing precursor / Connect regions
-
-Эти элементы есть в раннем GDD Modern Era, но отсутствуют в числовой progression.
-
-В v1:
-- они не являются обязательными tech prerequisites до Atomic Age;
-- могут стать story/presentation hooks в DS-02/DS-05;
-- добавление их как реальных tech nodes требует отдельного balance update.
-
-## 13.6. Research Reactor / Atomic Lab
-
-Ранний GDD показывает физические объекты перед Nuclear Technology.
-
-Текущая экономика определяет `Atomic Theory → Atomic Age`, а reactor upgrades находятся уже в crisis phase.
-
-Поэтому до DS-02:
-- `Reactor Project` остаётся unlock hook от `A05 Atomic Theory`;
-- отдельные pre-crisis Reactor/Atomic Lab buildings не входят в canonical building list DS-01.
-
----
-
-# 14. Визуальные hooks для следующих сессий
-
-| Phase | Visual state | Обязательные hooks |
+| Era | State | Обязательные visual layers |
 |---|---|---|
-| Tribe | V3 | костёр, временные укрытия, небольшая группа |
-| Settlement | V4 | поля, постоянные дома, мастерские, дороги |
-| City | V5 | плотная застройка, школа/рынок, инфраструктура |
-| Industry | V6 | фабрики, железная дорога, дым, энергосеть |
-| Atomic | V7 | grid lighting, research landmark, атомный motif |
+| Early Civ | V3a Camp | костёр, 3–5 жителей, temporary shelters |
+| Tribe | V3 Tribe | больше шатров, storage, activity loops |
+| Settlement | V4 Settlement | permanent houses, fields, roads, workshop smoke |
+| City | V5 City | market/street density, school/workshop clusters, first power infrastructure |
+| Industry | V6 Industrial | factories, rail, smoke, dense skyline |
+| Atomic | V7 Atomic | grid, research complex/reactor landmark, modern skyline |
 
-Branch visual variation проектируется в DS-07, но DS-01 требует сохранять `branch visual tag` в состоянии.
+Buildings не обязаны визуализироваться 1:1. Diorama использует thresholds/landmarks.
 
 ---
 
-# 15. Acceptance criteria DS-01 для progression
+# 20. Visual thresholds для building counts
 
-Документ считается согласованным, если:
+Исходники не задают точные count thresholds визуального роста. DS-03 proposal:
 
-- [ ] все обязательные переходы 46–108 имеют node ID;
-- [ ] каждый transition имеет population threshold и экономическую цену;
-- [ ] нет обязательных `Merchant/Radio/Computing` без числовой модели;
-- [ ] Power используется последовательно вместо industrial Energy;
-- [ ] каждый phase имеет канонический набор jobs;
-- [ ] каждый phase имеет канонический building/infrastructure set;
-- [ ] optional node нельзя случайно сделать prerequisite core route;
-- [ ] все branch choices имеют путь к следующему convergence node;
-- [ ] gameplay заканчивается на `A06 Atomic Age`, после чего начинается DS-02 crisis contract.
+Для repeatable building семей использовать presentation tiers:
+
+```text
+0       → absent
+1–2     → landmark / first instance
+3–5     → small cluster
+6–9     → mature cluster
+10+     → dense/advanced variant
+```
+
+Это presentation only. Gameplay count остаётся точным.
+
+---
+
+# 21. Goal integration
+
+| Goal | Progression object | Era transition? |
+|---|---|---|
+| G014 | T02 + T03 | no |
+| G015 | T05 | → TRIBE |
+| G016 | T08 | → SETTLEMENT_EARLY |
+| G017 | S02 | → SETTLEMENT |
+| G018 | S04 | no |
+| G019 | S08 | → CITY |
+| G020 | I02 | no |
+| G021 | I05 | → INDUSTRY |
+| G022 | A01* + A02 + research condition | no |
+| G023 | A06 | → ATOMIC |
+| G024 | crisis chain | → ARCHIVE_SUMMARY |
+
+---
+
+# 22. Event integration
+
+| Event | Progression location | Blocks? |
+|---|---|---|
+| EV-CIV-01 Cultural Tradition | immediately after Sapience | T02 path |
+| EV-CIV-02 Distribution | after T05 | no economy node |
+| EV-CIV-03 Settlement Specialization | after T08 | S02 |
+| EV-NAR-01 Traces Before Us | after S02 | only narrative queue |
+| EV-CIV-04 Governance | after S08 | precedes city branch |
+| EV-CIV-05 City Specialization | after governance | I02 |
+| EV-CIV-06 Energy Crisis | after I05 | narrative path, no A01 replacement |
+| EV-CIV-07 Preatomic Specialization | Industry | A02 |
+| EV-NAR-02 Error 17 | after G022 | no |
+| EV-NAR-03 Again | A06 | crisis begins |
+
+---
+
+# 23. Bottleneck expectations
+
+Source balance establishes Knowledge as main soft bottleneck through most civilization phases.
+
+Expected priority:
+
+| Era | Primary | Secondary |
+|---|---|---|
+| Early Civ | Knowledge | Food surplus |
+| Tribe | Knowledge | Materials |
+| Settlement | Knowledge | Materials/building budget |
+| City | Knowledge | Power |
+| Industry | Knowledge | Power/Materials |
+
+Если telemetry показывает Food главным bottleneck после City более половины времени, balance расходится с design target.
+
+---
+
+# 24. Optional nodes policy
+
+Optional node не должен становиться скрытым обязательным prerequisite через UI или balance.
+
+Timeline #1 может рекомендовать некоторые optional nodes, но core path обязан быть проходим без них.
+
+Optional nodes:
+
+- T04 Role Division;
+- T06A Craft;
+- T06B Oral Tradition;
+- S03 Storage;
+- S05A Law;
+- S05B Accounting;
+- I04A Standardization;
+- I04B Mass Education;
+- A04 Engines & Logistics.
+
+---
+
+# 25. Branch policy
+
+В Timeline #1 branch group выбирается один раз.
+
+Groups:
+
+```text
+culture_1: T01A/B/C
+settlement_1: S01A/B/C
+city_1: I01A/B/C
+preatomic_1: A01A/B/C
+```
+
+В отличие от раннего biological tree, civilization branch sources не задают secondary-choice multiplier. Поэтому DS-03 не разрешает покупать вторую civ branch в Timeline #1 без будущей meta-spec.
+
+---
+
+# 26. Data model — Era State
+
+```json
+{
+  "id": "CITY",
+  "index": 3,
+  "entry_node": "S08",
+  "entry_goal": "G019",
+  "resources_visible": ["food", "materials", "knowledge", "power"],
+  "jobs_set": "city_v1",
+  "building_set": "city_v1",
+  "diorama_state": "V5_CITY",
+  "events_on_enter": ["EV-CIV-04", "EV-CIV-05"]
+}
+```
+
+---
+
+# 27. Data model — Transition Rule
+
+```json
+{
+  "id": "TR_SET_CITY",
+  "from": "SETTLEMENT",
+  "to": "CITY",
+  "requires": {
+    "node": "S08",
+    "population_min": 105,
+    "goal_complete": "G019"
+  },
+  "actions": [
+    "unlock_resource:power",
+    "switch_jobs:city_v1",
+    "switch_buildings:city_v1",
+    "set_diorama:V5_CITY",
+    "queue_event:EV-CIV-04"
+  ]
+}
+```
+
+---
+
+# 28. Save requirements
+
+Civilization run state сохраняет отдельно:
+
+```text
+era_state
+population
+population_cap
+job_allocations
+building_counts
+purchased_nodes
+selected_branches
+resource_stock
+resource_rates
+chapter_modifiers
+run.civ.* flags
+```
+
+Не выводить era state заново только из purchased nodes при загрузке save; использовать versioned state + migration validation.
+
+---
+
+# 29. Analytics
+
+Минимально:
+
+```text
+era_entered
+population_threshold_reached
+job_set_changed
+building_first_built
+building_count_milestone
+tech_node_bought
+branch_selected
+resource_rate_changed
+power_unlocked
+civilization_bottleneck_detected
+```
+
+Для каждого era transition:
+
+- real elapsed time;
+- active elapsed time;
+- Population;
+- resources stock/rates;
+- selected branch profile;
+- building counts;
+- job distribution.
+
+---
+
+# 30. Acceptance criteria DS-03 / Progression
+
+Документ считается реализованным корректно, если:
+
+- Technology / Building / Job / Upgrade / Milestone разделены в коде и UI;
+- node IDs T/S/I/A сохраняют совместимость с evolution tree;
+- G014–G023 имеют однозначные progression dependencies;
+- переходы Tribe/Settlement/City/Industry/Atomic выполняются через State Machine;
+- Power появляется только на City transition;
+- Stability появляется только на Atomic transition;
+- narrative EV-CIV-06 не подменяет A01 tech branch;
+- опциональные узлы не требуются для core completion;
+- Economy v1.0 цены и rates не изменены DS-03 без отдельной маркировки;
+- будущий Timeline #2 сможет переиспользовать те же registries без hardcoded UI progression.
+
+---
+
+# 31. Open issues после DS-03
+
+Не определяются этим документом и требуют следующих пакетов:
+
+1. полноценная government system после Timeline #1;
+2. точные numeric modifiers narrative choices, если они станут экономическими;
+3. detailed storage caps;
+4. building upgrade visual variants;
+5. full automation rules Timeline #2+;
+6. post-Atomic/space civilization progression;
+7. exact diorama asset mapping.
