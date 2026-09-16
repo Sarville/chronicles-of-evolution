@@ -2,13 +2,20 @@ import { ruleset } from '../config/index.js';
 import { createFakeClock } from '../adapters/clock.js';
 import { createSeededRng } from '../adapters/rng.js';
 import { createChroniclesEngine } from '../domain/engine.js';
-import { selectNodeStatus, selectProducerPrice, selectProducerStatus, selectProductionRates } from '../domain/selectors.js';
+import {
+  selectManualProcessView,
+  selectNodeStatus,
+  selectProducerPrice,
+  selectProducerStatus,
+  selectProductionRates,
+} from '../domain/selectors.js';
 import { calculateManualReward, manualProcessCooldownMs } from '../domain/services/manualProcesses.js';
 import { producerMilestoneMultiplier, productionMultiplierForResource } from '../domain/services/production.js';
 
 const MAIN_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M06'];
 const OPTIONAL_NODE_ORDER = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06'];
 const MANUAL_PROCESS_ID = 'MANUAL_PRIMORDIAL_PULSE';
+const MANUAL_DNA_PROCESS_ID = 'MANUAL_DNA_SYNTHESIS';
 
 export const simulationProfiles = {
   baseline_optimized: {
@@ -75,6 +82,22 @@ export const simulationProfiles = {
     decisionIntervalMs: 5000,
     manualEfficiencyThreshold: 0.05,
     manualSafetyUntilMs: 12 * 60 * 1000,
+    maxActionsPerDecision: 3,
+    phaseProducerTargets: {
+      M01: { PROC_PRIMORDIAL_REACTION: 1, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M02: { PROC_PRIMORDIAL_REACTION: 4, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M03: { PROC_PRIMORDIAL_REACTION: 5, PROC_RNA_REPLICATION: 2, PROC_DNA_SYNTHESIS: 0 },
+      M05: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 4, PROC_DNA_SYNTHESIS: 3 },
+      M06: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 },
+    },
+    dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
+    rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
+  },
+  manual_assisted: {
+    decisionIntervalMs: 5000,
+    manualEfficiencyThreshold: 0.05,
+    manualSafetyUntilMs: 12 * 60 * 1000,
+    manualProcessIds: ['MANUAL_PRIMORDIAL_PULSE', 'MANUAL_DNA_SYNTHESIS'],
     maxActionsPerDecision: 3,
     phaseProducerTargets: {
       M01: { PROC_PRIMORDIAL_REACTION: 1, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
@@ -258,9 +281,20 @@ export function calculateManualEconomics(state, sourceRuleset, processId = MANUA
   };
 }
 
-function shouldUseManual(engine, sourceRuleset, profile, now) {
+function manualProcessIdsForProfile(profile) {
+  return profile.manualProcessIds || [MANUAL_PROCESS_ID];
+}
+
+function shouldUseManual(engine, sourceRuleset, profile, now, processId = MANUAL_PROCESS_ID) {
   if (now > (profile.manualSafetyUntilMs ?? Infinity)) {
     return false;
+  }
+  const view = selectManualProcessView(engine.state, sourceRuleset, processId);
+  if (!view?.available || !view.affordable) {
+    return false;
+  }
+  if (processId === MANUAL_DNA_PROCESS_ID) {
+    return Boolean(engine.state.run.nodes.completed.M03) && !engine.state.run.nodes.completed.M06;
   }
   if (!engine.state.run.nodes.completed.M02) {
     return true;
@@ -283,29 +317,37 @@ export function runHeadlessSimulation(options = {}) {
   const timingsByNode = {};
   const snapshots = {};
   const spends = { producers: {}, nodes: {} };
-  const manual = { uses: 0, rna: 0, rnaAfterThreeMinutes: 0 };
+  const manual = { uses: 0, rna: 0, dna: 0, rnaAfterThreeMinutes: 0, byProcess: {} };
   let automaticIncomeAtMs = null;
   let nextDecisionAtMs = 0;
-  let nextManualAtMs = 0;
+  const nextManualAtMs = Object.fromEntries(manualProcessIdsForProfile(profile).map((processId) => [processId, 0]));
   let manualEconomicsAtThreeMinutes = null;
 
   while (engine.state.run.clock.simulationMs <= maxMs && !engine.state.run.nodes.completed.M06) {
     const now = engine.state.run.clock.simulationMs;
 
-    if (now >= nextManualAtMs && shouldUseManual(engine, sourceRuleset, profile, now)) {
-      const manualResult = engine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: MANUAL_PROCESS_ID });
+    for (const processId of manualProcessIdsForProfile(profile)) {
+      if (now < (nextManualAtMs[processId] || 0) || !shouldUseManual(engine, sourceRuleset, profile, now, processId)) {
+        continue;
+      }
+      const manualResult = engine.dispatch({ type: 'USE_MANUAL_PROCESS', processId });
       if (manualResult.ok) {
         const reward = manualResult.events.find((event) => event.type === 'manual_process_used')?.payload.reward || {};
         const rna = reward.rna || 0;
+        const dna = reward.dna || 0;
         manual.uses += 1;
         manual.rna += rna;
+        manual.dna += dna;
+        manual.byProcess[processId] ||= { uses: 0, reward: {} };
+        manual.byProcess[processId].uses += 1;
+        addCost(manual.byProcess[processId].reward, reward);
         if (now >= 180000) {
           manual.rnaAfterThreeMinutes += rna;
         }
-        log.push({ atMs: now, action: 'manual', reward });
-        nextManualAtMs = engine.state.run.manualProcesses.MANUAL_PRIMORDIAL_PULSE.availableAtMs;
+        log.push({ atMs: now, action: 'manual', processId, reward });
+        nextManualAtMs[processId] = engine.state.run.manualProcesses[processId].availableAtMs;
       } else {
-        nextManualAtMs = now + stepMs;
+        nextManualAtMs[processId] = now + stepMs;
       }
     }
 

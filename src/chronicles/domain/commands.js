@@ -46,7 +46,7 @@ export function dispatchCommand(state, ruleset, command, ports = {}) {
       return ok(state, withGoalEvaluation(state, ruleset, events, ports));
     }
     case 'USE_MANUAL_PROCESS':
-      return manualProcess(state, ruleset, command.processId, ports);
+      return manualProcess(state, ruleset, command, ports);
     case 'BUY_PRODUCER':
       return buyProducer(state, ruleset, command.producerId, ports);
     case 'BUY_NODE':
@@ -64,8 +64,10 @@ export function dispatchCommand(state, ruleset, command, ports = {}) {
   }
 }
 
-function manualProcess(state, ruleset, processId, ports) {
-  const result = useManualProcess(state, ruleset, processId, ports);
+function manualProcess(state, ruleset, command, ports) {
+  const result = useManualProcess(state, ruleset, command.processId, ports, {
+    rewardMultiplier: command.rewardMultiplier,
+  });
   if (!result.ok) {
     return result;
   }

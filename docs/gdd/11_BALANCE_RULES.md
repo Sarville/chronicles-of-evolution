@@ -67,6 +67,8 @@ After ~3 min:
 manual contribution <= 5% competent optimal income
 ```
 
+Manual actions are resource-agnostic config entries, not hardcoded RNA clicks. A manual action may grant or convert resources, declare cooldown/input/reward data, and support a future reward multiplier at the command layer. Ads/rewarded multipliers must not be required for baseline Timeline #1 progression.
+
 ## INV-05 — Optional means optional
 
 An OPTIONAL node must not become mandatory through:

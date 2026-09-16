@@ -2,8 +2,48 @@ import { createRulesetIndexes } from '../config/index.js';
 import { canAfford, multiplyCost, scaleCost } from './services/costs.js';
 import { branchAvailable, branchCostMultiplier, prerequisitesMet } from './services/evolution.js';
 import { getGoalState, goalConditionsMet } from './services/goals.js';
-import { calculateManualReward, manualProcessAvailable, manualProcessCooldownMs } from './services/manualProcesses.js';
+import {
+  calculateManualReward,
+  manualProcessAvailable,
+  manualProcessCooldownMs,
+  manualProcessInputCost,
+} from './services/manualProcesses.js';
 import { calculateProductionRates, producerMilestoneMultiplier, productionMultiplierForResource } from './services/production.js';
+
+export function formatResourceAmount(value) {
+  if (!Number.isFinite(value)) {
+    return '0';
+  }
+  return String(Math.floor(Math.max(0, value)));
+}
+
+export function formatDuration(seconds) {
+  const totalSeconds = Math.max(0, Math.floor(Number.isFinite(seconds) ? seconds : 0));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const remainingSeconds = totalSeconds % 60;
+  if (days > 0) {
+    return `${days}д ${hours}ч ${minutes}м`;
+  }
+  if (hours > 0) {
+    return `${hours}ч ${minutes}м`;
+  }
+  if (minutes > 0) {
+    return `${minutes}м ${remainingSeconds}с`;
+  }
+  return `${remainingSeconds}с`;
+}
+
+export function formatEta(eta) {
+  if (!eta || eta.status === 'unavailable') {
+    return 'Недоступно';
+  }
+  if (eta.status === 'now') {
+    return 'Сейчас';
+  }
+  return `≈${formatDuration(eta.seconds)}`;
+}
 
 export function selectResourceAmounts(state) {
   return Object.fromEntries(Object.entries(state.run.resources).map(([id, value]) => [id, value.amount]));
@@ -11,6 +51,28 @@ export function selectResourceAmounts(state) {
 
 export function selectProductionRates(state, ruleset) {
   return calculateProductionRates(state, ruleset);
+}
+
+export function timeUntilAffordable(state, ruleset, cost) {
+  const rates = calculateProductionRates(state, ruleset);
+  let seconds = 0;
+  const missing = {};
+  for (const [resourceId, amount] of Object.entries(cost || {})) {
+    const current = state.run.resources[resourceId]?.amount || 0;
+    const deficit = amount - current;
+    if (deficit <= 0) {
+      continue;
+    }
+    missing[resourceId] = deficit;
+    if ((rates[resourceId] || 0) <= 0) {
+      return { status: 'unavailable', resourceId, missing };
+    }
+    seconds = Math.max(seconds, deficit / rates[resourceId]);
+  }
+  if (seconds <= 0) {
+    return { status: 'now', seconds: 0, missing };
+  }
+  return { status: 'waiting', seconds, missing };
 }
 
 export function selectVisibleResources(state, ruleset) {
@@ -128,10 +190,14 @@ export function selectManualProcessView(state, ruleset, processId) {
     return null;
   }
   const processState = state.run.manualProcesses[processId] || { uses: 0, availableAtMs: 0 };
+  const inputCost = manualProcessInputCost(process);
+  const affordable = canAfford(state, inputCost).ok;
   return {
     ...process,
     state: processState,
     available: manualProcessAvailable(state, process),
+    affordable,
+    inputCost,
     reward: calculateManualReward(state, ruleset, process),
     cooldownMs: manualProcessCooldownMs(state, process),
   };

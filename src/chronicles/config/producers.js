@@ -44,7 +44,7 @@ export const producers = [
     tags: ['dna', 'process'],
     baseCost: { rna: 78 },
     growth: 1.35,
-    output: { dna: 0.24 },
+    output: { dna: 0.26 },
     milestones: [
       {
         count: 10,

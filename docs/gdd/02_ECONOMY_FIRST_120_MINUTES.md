@@ -118,7 +118,19 @@ Current early examples:
 
 ## Manual onboarding
 
-Manual action starts or accelerates a biological process; it is not balanced as permanent `+resource/click` gameplay.
+Manual actions are a generic data-driven framework:
+
+- an action may grant a resource or convert one resource into another;
+- each action declares its own availability gate, cooldown, input cost and reward resource;
+- future rewarded multipliers may scale the reward through the same domain command, but ads are not part of baseline first-run balance;
+- passive production remains the primary economy.
+
+Current biological 0–10 manual actions:
+
+| Action | Availability | Effect | Intent |
+|---|---|---|---|
+| Primordial reaction | start | RNA grant equal to max(`1`, `1.5s` of current RNA production), affected by early manual-gain modifier | onboarding / first push |
+| Manual DNA Synthesis | after M03 | convert `18 RNA` into `3 DNA`, 45 sec cooldown | small active assist after DNA chemistry unlocks |
 
 After ~3 min:
 
@@ -164,6 +176,7 @@ Required tuning constraints:
 - Self Replication ~2–3 min;
 - DNA visible before ~6 min;
 - Cell ~9–11 min;
+- DNA Synthesis producer output is currently `0.26 DNA/s`;
 - no need to buy arbitrary counts of three abstract molecular generators;
 - optional M04 Error Correction must not become hidden prerequisite;
 - competent path and slower path both remain understandable without hidden catch-up.

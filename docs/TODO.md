@@ -122,6 +122,7 @@ Codex tasks:
 ### Findings from 0–10 playtest
 
 - [x] Document repeatable process milestone bonuses with scenario justification, threshold labels and UI wording for the current 0–10 slice.
+- [x] Add generic manual-resource framework note: manual actions may grant/convert resources, passive production remains primary, future reward multipliers are not baseline ads progression.
 - [ ] Before expanding biological economy beyond Cell, define any new repeatable-process milestones per producer; no implicit global `10/25/50` thresholds.
 
 ---

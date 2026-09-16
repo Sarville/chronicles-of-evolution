@@ -2,6 +2,8 @@ import { createBrowserStorage } from '../adapters/storageAdapter.js';
 import { ruleset, createRulesetIndexes } from '../config/index.js';
 import {
   selectCurrentGoal,
+  formatEta,
+  formatResourceAmount,
   selectManualProcessView,
   selectNodeCost,
   selectNodeStatus,
@@ -11,6 +13,7 @@ import {
   selectProductionRates,
   selectSideGoals,
   selectVisibleResources,
+  timeUntilAffordable,
 } from '../domain/selectors.js';
 import { createSaveRepository } from '../save/repository.js';
 import { createPlayableRuntime, routeCtaFocus } from './runtime.js';
@@ -107,7 +110,7 @@ function renderResources() {
     .map(
       (resource) => `<div class="resource-row">
         <span>${RESOURCE_NAMES[resource.id] || resource.id}</span>
-        <strong>${formatNumber(resource.amount)}</strong>
+        <strong>${formatResourceAmount(resource.amount)}</strong>
         <small>${resource.perSecond > 0 ? '+' : ''}${formatNumber(resource.perSecond)}/s</small>
       </div>`
     )
@@ -136,17 +139,54 @@ function renderObjective() {
   </section>`;
 }
 
-function renderManualAction() {
-  const process = selectManualProcessView(engine().state, ruleset, 'MANUAL_PRIMORDIAL_PULSE');
-  if (!process || (process.obsoleteAfterNodeId && engine().state.run.nodes.completed[process.obsoleteAfterNodeId])) {
-    return '';
+function manualActionStatus(process) {
+  if (!process.available) {
+    const remaining = Math.max(0, (process.state.availableAtMs || 0) - engine().state.run.clock.simulationMs);
+    if (remaining > 0) {
+      return `${Math.ceil(remaining / 1000)}s`;
+    }
+    return 'Locked';
   }
-  const reward = formatCost(process.reward);
-  const remaining = Math.max(0, (process.state.availableAtMs || 0) - engine().state.run.clock.simulationMs);
-  return `<button class="wide primary ${focusedEntityId === process.id ? 'focused' : ''}" data-entity-id="${process.id}" data-action="manual" ${process.available ? '' : 'disabled'}>
-    Primordial reaction
-    <small>${process.available ? `Gain ${reward}` : `${Math.ceil(remaining / 1000)}s`}</small>
+  if (!process.affordable) {
+    return `Needs ${formatCost(process.inputCost)}`;
+  }
+  const cost = Object.keys(process.inputCost || {}).length ? `${formatCost(process.inputCost)} → ` : '';
+  return `${cost}+${formatCost(process.reward)}`;
+}
+
+function renderManualActions() {
+  return ruleset.manualProcesses
+    .map((config) => {
+      const process = selectManualProcessView(engine().state, ruleset, config.id);
+      if (!process || (process.obsoleteAfterNodeId && engine().state.run.nodes.completed[process.obsoleteAfterNodeId])) {
+        return '';
+      }
+      if (!process.available && !process.availableFromStart && !engine().state.run.nodes.completed[process.availableAfterNodeId]) {
+        return '';
+      }
+      const disabled = process.available && process.affordable ? '' : 'disabled';
+      return `<button class="wide primary ${focusedEntityId === process.id ? 'focused' : ''}" data-entity-id="${process.id}" data-action="manual" data-id="${process.id}" ${disabled}>
+    ${process.label}
+    <small>${manualActionStatus(process)}</small>
   </button>`;
+    })
+    .join('');
+}
+
+function etaText(cost) {
+  return formatEta(timeUntilAffordable(engine().state, ruleset, cost));
+}
+
+function renderProducerMilestone(outputView) {
+  const bonus = outputView.nextMilestone || outputView.reachedMilestone;
+  const bonusText = bonus ? `x${formatNumber(bonus.multiplier)} (+${formatNumber((bonus.multiplier - 1) * 100)}%)` : '';
+  if (outputView.nextMilestone) {
+    return `<small>${outputView.nextMilestone.label} ${outputView.count}/${outputView.nextMilestone.count} · Bonus ${bonusText} production · ${outputView.nextMilestone.description}</small>`;
+  }
+  if (outputView.reachedMilestone) {
+    return `<small>${outputView.reachedMilestone.label} · ${bonusText} production: ${outputView.reachedMilestone.description}</small>`;
+  }
+  return '';
 }
 
 function renderProducers() {
@@ -155,21 +195,16 @@ function renderProducers() {
       const status = selectProducerStatus(engine().state, ruleset, producer.id);
       if (status === 'locked') return '';
       const outputView = selectProducerOutputView(engine().state, ruleset, producer.id);
-      const bonus = outputView.nextMilestone || outputView.reachedMilestone;
-      const bonusText = bonus ? `x${formatNumber(bonus.multiplier)} (${formatNumber((bonus.multiplier - 1) * 100)}%)` : '';
-      const milestone = outputView.nextMilestone
-        ? `<small>${outputView.nextMilestone.label} ${outputView.count}/${outputView.nextMilestone.count} · Bonus ${bonusText}</small>`
-        : outputView.reachedMilestone
-          ? `<small>${outputView.reachedMilestone.label} · ${bonusText}: ${outputView.reachedMilestone.description}</small>`
-          : '';
+      const cost = selectProducerPrice(engine().state, ruleset, producer.id);
+      const milestone = renderProducerMilestone(outputView);
       return `<button class="entity ${status} ${focusedEntityId === producer.id ? 'focused' : ''}" data-entity-id="${producer.id}" data-action="producer" data-id="${producer.id}" ${status === 'available_affordable' ? '' : 'disabled'}>
         <span><strong>${PRODUCER_NAMES[producer.id] || producer.id}</strong><small>Owned ${outputView.count}</small>${milestone}</span>
-        <span><small>Cost</small>${formatCost(selectProducerPrice(engine().state, ruleset, producer.id))}</span>
+        <span><small>Cost</small>${formatCost(cost)}<small>ETA ${etaText(cost)}</small></span>
         <span><small>Base / unit</small>${formatCost(outputView.basePerUnit)}/s<small>Current total</small>${formatCost(outputView.currentTotal)}/s</span>
       </button>`;
     })
     .join('');
-  return `<section class="panel"><h2>Actions / Generators</h2>${renderManualAction()}<div class="entity-list">${rows}</div></section>`;
+  return `<section class="panel"><h2>Actions / Generators</h2>${renderManualActions()}<div class="entity-list">${rows}</div></section>`;
 }
 
 function renderEvolution() {
@@ -177,10 +212,11 @@ function renderEvolution() {
     const node = indexes.nodes[nodeId];
     const status = selectNodeStatus(engine().state, ruleset, nodeId);
     const optional = node.type === 'OPTIONAL' ? '<small class="optional">OPTIONAL</small>' : '';
+    const cost = selectNodeCost(engine().state, ruleset, nodeId);
     return `<button class="node ${status} ${focusedEntityId === nodeId ? 'focused' : ''}" data-entity-id="${nodeId}" data-action="node" data-id="${nodeId}" ${status === 'available_affordable' ? '' : 'disabled'}>
       <span><strong>${nodeId} — ${NODE_NAMES[nodeId]}</strong>${optional}</span>
-      <span>${status.replaceAll('_', ' ')}</span>
-      <small>${formatCost(selectNodeCost(engine().state, ruleset, nodeId))}</small>
+      <span>${status.replaceAll('_', ' ')}<small>ETA ${etaText(cost)}</small></span>
+      <small>${formatCost(cost)}</small>
     </button>`;
   }).join('');
   return `<section class="panel evolution-panel"><h2>Evolution</h2><div class="node-grid">${rows}</div></section>`;
@@ -283,7 +319,7 @@ function handleAction(target) {
     activeView = routed.activeView;
     focusedEntityId = routed.focusedEntityId;
   }
-  if (action === 'manual') engine().dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
+  if (action === 'manual') engine().dispatch({ type: 'USE_MANUAL_PROCESS', processId: button.dataset.id });
   if (action === 'producer') engine().dispatch({ type: 'BUY_PRODUCER', producerId: button.dataset.id });
   if (action === 'node') {
     const result = engine().dispatch({ type: 'BUY_NODE', nodeId: button.dataset.id });

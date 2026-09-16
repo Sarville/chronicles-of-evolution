@@ -4,6 +4,9 @@ import { createFakeClock } from '../../src/chronicles/adapters/clock.js';
 import { createSeededRng } from '../../src/chronicles/adapters/rng.js';
 import { createChroniclesEngine } from '../../src/chronicles/domain/engine.js';
 import {
+  formatDuration,
+  formatEta,
+  formatResourceAmount,
   selectCurrentGoal,
   selectManualProcessView,
   selectNodeCost,
@@ -13,6 +16,7 @@ import {
   selectProductionRates,
   selectResourceAmounts,
   selectVisibleResources,
+  timeUntilAffordable,
 } from '../../src/chronicles/domain/selectors.js';
 import { createInitialGameState } from '../../src/chronicles/domain/state.js';
 import { producerMilestoneMultiplier } from '../../src/chronicles/domain/services/production.js';
@@ -169,6 +173,56 @@ result = manualRewardEngine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'M
 assert.equal(result.ok, true);
 assert.deepEqual(result.events.find((event) => event.type === 'manual_process_used').payload.reward, { rna: 2 });
 
+const manualDnaEngine = createChroniclesEngine({ ruleset });
+assert.equal(selectManualProcessView(manualDnaEngine.state, ruleset, 'MANUAL_DNA_SYNTHESIS').available, false);
+result = manualDnaEngine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_DNA_SYNTHESIS' });
+assert.equal(result.ok, false);
+assert.equal(result.reason, 'MANUAL_PROCESS_UNAVAILABLE');
+manualDnaEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 9 });
+assert.equal(manualDnaEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M01' }).ok, true);
+manualDnaEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 130 });
+assert.equal(manualDnaEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M02' }).ok, true);
+manualDnaEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 350 });
+assert.equal(manualDnaEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M03' }).ok, true);
+assert.equal(selectManualProcessView(manualDnaEngine.state, ruleset, 'MANUAL_DNA_SYNTHESIS').available, true);
+assert.deepEqual(selectManualProcessView(manualDnaEngine.state, ruleset, 'MANUAL_DNA_SYNTHESIS').inputCost, { rna: 18 });
+assert.deepEqual(selectManualProcessView(manualDnaEngine.state, ruleset, 'MANUAL_DNA_SYNTHESIS').reward, { dna: 3 });
+result = manualDnaEngine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_DNA_SYNTHESIS' });
+assert.equal(result.ok, false);
+assert.equal(result.reason, 'INSUFFICIENT_RESOURCES');
+manualDnaEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 18 });
+result = manualDnaEngine.dispatch({
+  type: 'USE_MANUAL_PROCESS',
+  processId: 'MANUAL_DNA_SYNTHESIS',
+  rewardMultiplier: 2,
+});
+assert.equal(result.ok, true);
+assert.equal(manualDnaEngine.state.run.resources.rna.amount, 0);
+assert.equal(manualDnaEngine.state.run.resources.dna.amount, 6);
+assert.equal(manualDnaEngine.state.run.manualProcesses.MANUAL_DNA_SYNTHESIS.availableAtMs, 45000);
+
+assert.equal(formatResourceAmount(8.9), '8');
+assert.equal(formatResourceAmount(-0.2), '0');
+assert.equal(formatDuration(1), '1с');
+assert.equal(formatDuration(45), '45с');
+assert.equal(formatDuration(63), '1м 3с');
+assert.equal(formatDuration(3599), '59м 59с');
+assert.equal(formatDuration(3660), '1ч 1м');
+assert.equal(formatDuration(101040), '1д 4ч 4м');
+
+const etaEngine = createChroniclesEngine({ ruleset });
+etaEngine.state.run.producers.PROC_PRIMORDIAL_REACTION = { count: 1 };
+let eta = timeUntilAffordable(etaEngine.state, ruleset, { rna: 2.2 });
+assert.equal(eta.status, 'waiting');
+assert.equal(Math.abs(eta.seconds - 10) < 0.000001, true);
+assert.equal(formatEta(eta), '≈10с');
+etaEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 3 });
+assert.equal(timeUntilAffordable(etaEngine.state, ruleset, { rna: 2.2 }).status, 'now');
+assert.equal(formatEta(timeUntilAffordable(etaEngine.state, ruleset, { rna: 2.2 })), 'Сейчас');
+eta = timeUntilAffordable(etaEngine.state, ruleset, { dna: 1 });
+assert.equal(eta.status, 'unavailable');
+assert.equal(formatEta(eta), 'Недоступно');
+
 const stalledEngine = createChroniclesEngine({ ruleset });
 let initialStartedEvents = stalledEngine.state.session.lastEvents.filter((event) => event.type === 'goal_started');
 assert.equal(initialStartedEvents.length, 1);
@@ -225,6 +279,7 @@ const customRuleset = {
   nodes: [],
   buildings: [],
   jobs: [],
+  manualProcesses: [],
   goals: [],
   events: [],
   milestones: [],

@@ -69,7 +69,15 @@ assert.equal(milestoneSeeker.producerCounts.PROC_PRIMORDIAL_REACTION, 10);
 assert.equal(milestoneSeeker.producerCounts.PROC_RNA_REPLICATION >= 5, true);
 assert.equal(milestoneSeeker.timings.cellAtMs >= 480000, true);
 assert.equal(milestoneSeeker.timings.cellAtMs <= 660000, true);
-assert.equal(milestoneSeeker.manual.economicsAtThreeMinutes.contributionRatio < 0.05, true);
+
+const manualAssisted = runHeadlessSimulation({ seed: 7, profile: 'manual_assisted' });
+assert.equal(manualAssisted.ok, true);
+assert.equal(simulationProfiles.manual_assisted.manualProcessIds.includes('MANUAL_DNA_SYNTHESIS'), true);
+assert.equal(manualAssisted.manual.byProcess.MANUAL_DNA_SYNTHESIS.uses > 0, true);
+assert.equal(manualAssisted.manual.byProcess.MANUAL_DNA_SYNTHESIS.reward.dna > 0, true);
+assert.equal(manualAssisted.timings.cellAtMs >= competent.timings.cellAtMs - 90000, true);
+assert.equal(manualAssisted.timings.cellAtMs <= competent.timings.cellAtMs + 30000, true);
+assert.equal(manualAssisted.manual.economicsAtThreeMinutes.contributionRatio < 0.05, true);
 
 const paybackEngine = createChroniclesEngine({ ruleset });
 paybackEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 500 });

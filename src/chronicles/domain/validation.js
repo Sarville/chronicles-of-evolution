@@ -189,6 +189,14 @@ export function validateRuleset(ruleset) {
     if (process.cooldownAfterNodeId && !indexes.nodes[process.cooldownAfterNodeId]) {
       errors.push(`${process.id} references unknown cooldownAfterNodeId ${process.cooldownAfterNodeId}`);
     }
+    if (process.availableAfterNodeId && !indexes.nodes[process.availableAfterNodeId]) {
+      errors.push(`${process.id} references unknown availableAfterNodeId ${process.availableAfterNodeId}`);
+    }
+    for (const required of process.requiresNodes || []) {
+      if (!indexes.nodes[required]) {
+        errors.push(`${process.id} requires unknown node ${required}`);
+      }
+    }
     for (const stage of process.cooldownStages || []) {
       if (!stage.afterNodeId || !indexes.nodes[stage.afterNodeId]) {
         errors.push(`${process.id} references unknown cooldown stage node ${stage.afterNodeId}`);
@@ -197,8 +205,31 @@ export function validateRuleset(ruleset) {
         errors.push(`${process.id} has invalid cooldown stage cooldownMs`);
       }
     }
-    if (process.reward?.type === 'manual_gain' && !indexes.resources[process.reward.resourceId]) {
-      errors.push(`${process.id} rewards unknown resource ${process.reward.resourceId}`);
+    if (process.reward) {
+      if (!['manual_gain', 'convert_resource'].includes(process.reward.type)) {
+        errors.push(`${process.id} uses unknown manual reward type ${process.reward.type}`);
+      }
+      if (!indexes.resources[process.reward.resourceId]) {
+        errors.push(`${process.id} rewards unknown resource ${process.reward.resourceId}`);
+      }
+      if (!Number.isFinite(process.reward.baseAmount) || process.reward.baseAmount < 0) {
+        errors.push(`${process.id} has invalid manual reward baseAmount`);
+      }
+      if (
+        process.reward.productionSeconds != null &&
+        (!Number.isFinite(process.reward.productionSeconds) || process.reward.productionSeconds < 0)
+      ) {
+        errors.push(`${process.id} has invalid manual reward productionSeconds`);
+      }
+      if (
+        process.reward.rewardMultiplier != null &&
+        (!Number.isFinite(process.reward.rewardMultiplier) || process.reward.rewardMultiplier <= 0)
+      ) {
+        errors.push(`${process.id} has invalid manual reward multiplier`);
+      }
+      if (process.reward.inputCost) {
+        validateCost(process.reward.inputCost, indexes.resources, process.id, errors);
+      }
     }
   }
 

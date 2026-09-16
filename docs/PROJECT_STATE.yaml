@@ -82,6 +82,7 @@ implementation:
   status:
     - "iteration_3_technical_foundation_passed"
     - "playable_0_10_requires_content_reconciliation"
+    - "biological_0_10_verified_with_data_driven_milestones_and_generic_manual_actions"
   accepted_implementation_commit: "32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb"
   architecture_status: "accepted"
   content_status: "0_10_superseded_by_reconciliation"
@@ -126,7 +127,7 @@ iteration_4:
 balance:
   ruleset_target: "timeline1-v2-reconciled"
   old_0_10_ei_balance: "historical_superseded"
-  biological_numbers: "pending_rework_simulation"
+  biological_numbers: "0_10_verified_stop_at_cell"
   civilization_numbers: "provisional_until_full_rebalance"
   crisis_contract: "accepted_pending_regression"
 

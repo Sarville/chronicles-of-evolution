@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { createMemoryStorage } from '../../src/chronicles/adapters/storageAdapter.js';
 import { ruleset, createRulesetIndexes } from '../../src/chronicles/config/index.js';
 import { createChroniclesEngine } from '../../src/chronicles/domain/engine.js';
-import { selectProducerOutputView } from '../../src/chronicles/domain/selectors.js';
+import { formatEta, formatResourceAmount, selectProducerOutputView } from '../../src/chronicles/domain/selectors.js';
 import { createPlayableRuntime, createPresentationSnapshot, routeCtaFocus } from '../../src/chronicles/ui/runtime.js';
 import { createSaveRepository, SAVE_KEYS } from '../../src/chronicles/save/repository.js';
 
@@ -51,5 +52,15 @@ assert.equal(outputView.reachedMilestone.label, 'Reaction network');
 assert.equal(outputView.reachedMilestone.multiplier, 1.15);
 assert.deepEqual(outputView.basePerUnit, { rna: 0.22 });
 assert.deepEqual(outputView.currentTotal, { rna: 2.53 });
+assert.equal(formatResourceAmount(8.99), '8');
+assert.equal(formatEta({ status: 'now', seconds: 0 }), 'Сейчас');
+assert.equal(formatEta({ status: 'waiting', seconds: 63 }), '≈1м 3с');
+assert.equal(formatEta({ status: 'unavailable' }), 'Недоступно');
+
+const appSource = readFileSync(`${process.cwd()}/src/chronicles/ui/app.js`, 'utf8');
+assert.equal(appSource.includes('Current total'), true);
+assert.equal(appSource.includes('(+'), true);
+assert.equal(appSource.includes('ETA'), true);
+assert.equal(appSource.includes('data-action="manual" data-id="${process.id}"'), true);
 
 console.log('ui runtime ok');
