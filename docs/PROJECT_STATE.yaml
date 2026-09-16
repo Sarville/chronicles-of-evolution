@@ -5,6 +5,7 @@ project:
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
   work_mode: "ds07_active"
   last_updated: "2026-09-16"
+  documentation_language: "Описания по умолчанию пишутся на русском. Английский допустим только для стабильных идентификаторов, имён файлов, кодовых состояний, enum-подобных меток и закреплённых названий фич."
 
 authority:
   project_status: "docs/PROJECT_STATE.yaml"
@@ -200,4 +201,4 @@ open_decisions:
 next_action:
   owner: "Codex"
   session: "DS-07"
-  description: "Create art direction, locations/dioramas, era transitions and creature evolution documents using accepted V0-V9/C0-C7 continuity plus DS-06 UX layout constraints as fixed inputs."
+  description: "Проверить черновой пакет арт-направления DS-07, затем после принятия перейти к DS-08: манифест ассетов и промпты генерации."

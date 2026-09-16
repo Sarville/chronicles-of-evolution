@@ -151,31 +151,31 @@ Must inherit `PB00–PB30` and may refine layout without changing their narrativ
 
 ---
 
-# DS-07 — Art direction
+# DS-07 — Арт-направление
 
-**Status:** CURRENT / ACTIVE.
+**Статус:** текущая / активная.
 
-Must inherit `V0–V9` and `C0–C7`.
+Должен наследовать `V0–V9` и `C0–C7`.
 
-Planned:
+План:
 
-- [ ] `00_ART_DIRECTION.md`
-- [ ] `01_LOCATIONS_AND_DIORAMAS.md`
-- [ ] `02_ERA_TRANSITIONS.md`
-- [ ] `03_CREATURE_EVOLUTION.md`
-- [ ] branch/adaptation visual grammar
-- [ ] camera/composition rules
-- [ ] crisis degradation layers
-- [ ] Ash composition
+- [x] `00_ART_DIRECTION.md`
+- [x] `01_LOCATIONS_AND_DIORAMAS.md`
+- [x] `02_ERA_TRANSITIONS.md`
+- [x] `03_CREATURE_EVOLUTION.md`
+- [x] визуальная грамматика веток/адаптаций
+- [x] правила камеры и композиции
+- [x] слои деградации кризиса
+- [x] композиция Ash
 
 ---
 
-# Following design sessions
+# Следующие дизайн-сессии
 
-- [ ] DS-08 — asset manifest and generation prompts
-- [ ] DS-09 — audio design and generation package
-- [ ] DS-10 — analytics/platform readiness
-- [ ] DS-11 — final cross-document consistency / design freeze v2
+- [ ] DS-08 — манифест ассетов и промпты генерации
+- [ ] DS-09 — аудиодизайн и пакет генерации
+- [ ] DS-10 — аналитика, платформы и готовность к продакшену
+- [ ] DS-11 — финальная междокументная сверка / design freeze v2
 
 Dependencies:
 
