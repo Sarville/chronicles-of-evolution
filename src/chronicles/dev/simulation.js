@@ -12,10 +12,69 @@ import {
 import { calculateManualReward, manualProcessCooldownMs } from '../domain/services/manualProcesses.js';
 import { producerMilestoneMultiplier, productionMultiplierForResource } from '../domain/services/production.js';
 
-const MAIN_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M06'];
-const OPTIONAL_NODE_ORDER = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06'];
+const MAIN_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M06', 'C01', 'C02A', 'C03', 'C05', 'C06'];
+const OPTIONAL_NODE_ORDER = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'C01', 'C02A', 'C03', 'C05', 'C06'];
+const SYMBIOSIS_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M06', 'C01', 'C02B', 'C03', 'C05', 'C06'];
+const BRANCH_NODE_ORDER = {
+  C02A: MAIN_NODE_ORDER,
+  C02B: SYMBIOSIS_NODE_ORDER,
+};
 const MANUAL_PROCESS_ID = 'MANUAL_PRIMORDIAL_PULSE';
 const MANUAL_DNA_PROCESS_ID = 'MANUAL_DNA_SYNTHESIS';
+const DEFAULT_BIOMASS_ORDER = ['PROC_BIOMASS_UPTAKE', 'PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'];
+const DEFAULT_ENERGY_ORDER = ['PROC_RESPIRATION', 'PROC_BIOMASS_UPTAKE', 'PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'];
+
+// Cell-era (C01..C06) producer ramps, layered on top of the frozen M06 targets.
+// Order per schedule entry: C01, <branch node>, C03, C05, C06.
+function cellPhaseTargets(m06Targets, branchNodeId, schedule) {
+  const [c01, branch, c03, c05, c06] = schedule;
+  const phase = (extra) => ({ ...m06Targets, PROC_BIOMASS_UPTAKE: extra.biomass, PROC_RESPIRATION: extra.energy });
+  return {
+    C01: phase(c01),
+    [branchNodeId]: phase(branch),
+    C03: phase(c03),
+    C05: phase(c05),
+    C06: phase(c06),
+  };
+}
+
+const FAST_CELL_SCHEDULE = [
+  { biomass: 2, energy: 0 },
+  { biomass: 4, energy: 2 },
+  { biomass: 6, energy: 4 },
+  { biomass: 8, energy: 6 },
+  { biomass: 10, energy: 8 },
+];
+const MEDIUM_CELL_SCHEDULE = [
+  { biomass: 1, energy: 0 },
+  { biomass: 3, energy: 1 },
+  { biomass: 4, energy: 3 },
+  { biomass: 6, energy: 5 },
+  { biomass: 8, energy: 6 },
+];
+const SLOW_CELL_SCHEDULE = [
+  { biomass: 1, energy: 0 },
+  { biomass: 2, energy: 1 },
+  { biomass: 3, energy: 2 },
+  { biomass: 5, energy: 4 },
+  { biomass: 6, energy: 5 },
+];
+const MAX_CELL_SCHEDULE = [
+  { biomass: 10, energy: 10 },
+  { biomass: 10, energy: 10 },
+  { biomass: 10, energy: 10 },
+  { biomass: 10, energy: 10 },
+  { biomass: 10, energy: 10 },
+];
+
+const BASELINE_OPTIMIZED_M06 = { PROC_PRIMORDIAL_REACTION: 8, PROC_RNA_REPLICATION: 6, PROC_DNA_SYNTHESIS: 6 };
+const BASELINE_COMPETENT_M06 = { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 };
+const BASELINE_SLOW_M06 = { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 };
+const OPTIMIZED_M06 = { PROC_PRIMORDIAL_REACTION: 8, PROC_RNA_REPLICATION: 6, PROC_DNA_SYNTHESIS: 6 };
+const COMPETENT_M06 = { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 };
+const MANUAL_ASSISTED_M06 = { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 };
+const SLOW_M06 = { PROC_PRIMORDIAL_REACTION: 9, PROC_RNA_REPLICATION: 6, PROC_DNA_SYNTHESIS: 6 };
+const MILESTONE_SEEKER_M06 = { PROC_PRIMORDIAL_REACTION: 10, PROC_RNA_REPLICATION: 10, PROC_DNA_SYNTHESIS: 10 };
 
 export const simulationProfiles = {
   baseline_optimized: {
@@ -28,7 +87,8 @@ export const simulationProfiles = {
       M02: { PROC_PRIMORDIAL_REACTION: 5, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
       M03: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 3, PROC_DNA_SYNTHESIS: 0 },
       M05: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 4 },
-      M06: { PROC_PRIMORDIAL_REACTION: 8, PROC_RNA_REPLICATION: 6, PROC_DNA_SYNTHESIS: 6 },
+      M06: BASELINE_OPTIMIZED_M06,
+      ...cellPhaseTargets(BASELINE_OPTIMIZED_M06, 'C02A', FAST_CELL_SCHEDULE),
     },
     dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
     rnaOrder: ['PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION', 'PROC_DNA_SYNTHESIS'],
@@ -43,7 +103,8 @@ export const simulationProfiles = {
       M02: { PROC_PRIMORDIAL_REACTION: 4, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
       M03: { PROC_PRIMORDIAL_REACTION: 5, PROC_RNA_REPLICATION: 2, PROC_DNA_SYNTHESIS: 0 },
       M05: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 4, PROC_DNA_SYNTHESIS: 3 },
-      M06: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 },
+      M06: BASELINE_COMPETENT_M06,
+      ...cellPhaseTargets(BASELINE_COMPETENT_M06, 'C02A', MEDIUM_CELL_SCHEDULE),
     },
     dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
     rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
@@ -58,7 +119,8 @@ export const simulationProfiles = {
       M02: { PROC_PRIMORDIAL_REACTION: 3, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
       M03: { PROC_PRIMORDIAL_REACTION: 4, PROC_RNA_REPLICATION: 1, PROC_DNA_SYNTHESIS: 0 },
       M05: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 4, PROC_DNA_SYNTHESIS: 3 },
-      M06: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 },
+      M06: BASELINE_SLOW_M06,
+      ...cellPhaseTargets(BASELINE_SLOW_M06, 'C02A', SLOW_CELL_SCHEDULE),
     },
     dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION'],
     rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
@@ -73,7 +135,8 @@ export const simulationProfiles = {
       M02: { PROC_PRIMORDIAL_REACTION: 5, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
       M03: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 3, PROC_DNA_SYNTHESIS: 0 },
       M05: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 4 },
-      M06: { PROC_PRIMORDIAL_REACTION: 8, PROC_RNA_REPLICATION: 6, PROC_DNA_SYNTHESIS: 6 },
+      M06: OPTIMIZED_M06,
+      ...cellPhaseTargets(OPTIMIZED_M06, 'C02A', FAST_CELL_SCHEDULE),
     },
     dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
     rnaOrder: ['PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION', 'PROC_DNA_SYNTHESIS'],
@@ -88,7 +151,24 @@ export const simulationProfiles = {
       M02: { PROC_PRIMORDIAL_REACTION: 4, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
       M03: { PROC_PRIMORDIAL_REACTION: 5, PROC_RNA_REPLICATION: 2, PROC_DNA_SYNTHESIS: 0 },
       M05: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 4, PROC_DNA_SYNTHESIS: 3 },
-      M06: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 },
+      M06: COMPETENT_M06,
+      ...cellPhaseTargets(COMPETENT_M06, 'C02A', MEDIUM_CELL_SCHEDULE),
+    },
+    dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
+    rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
+  },
+  competent_symbiosis: {
+    decisionIntervalMs: 5000,
+    manualEfficiencyThreshold: 0.05,
+    manualSafetyUntilMs: 12 * 60 * 1000,
+    maxActionsPerDecision: 3,
+    phaseProducerTargets: {
+      M01: { PROC_PRIMORDIAL_REACTION: 1, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M02: { PROC_PRIMORDIAL_REACTION: 4, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M03: { PROC_PRIMORDIAL_REACTION: 5, PROC_RNA_REPLICATION: 2, PROC_DNA_SYNTHESIS: 0 },
+      M05: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 4, PROC_DNA_SYNTHESIS: 3 },
+      M06: COMPETENT_M06,
+      ...cellPhaseTargets(COMPETENT_M06, 'C02B', MEDIUM_CELL_SCHEDULE),
     },
     dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
     rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
@@ -104,7 +184,8 @@ export const simulationProfiles = {
       M02: { PROC_PRIMORDIAL_REACTION: 4, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
       M03: { PROC_PRIMORDIAL_REACTION: 5, PROC_RNA_REPLICATION: 2, PROC_DNA_SYNTHESIS: 0 },
       M05: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 4, PROC_DNA_SYNTHESIS: 3 },
-      M06: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 },
+      M06: MANUAL_ASSISTED_M06,
+      ...cellPhaseTargets(MANUAL_ASSISTED_M06, 'C02A', MEDIUM_CELL_SCHEDULE),
     },
     dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
     rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
@@ -119,7 +200,8 @@ export const simulationProfiles = {
       M02: { PROC_PRIMORDIAL_REACTION: 3, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
       M03: { PROC_PRIMORDIAL_REACTION: 4, PROC_RNA_REPLICATION: 1, PROC_DNA_SYNTHESIS: 0 },
       M05: { PROC_PRIMORDIAL_REACTION: 8, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 4 },
-      M06: { PROC_PRIMORDIAL_REACTION: 9, PROC_RNA_REPLICATION: 6, PROC_DNA_SYNTHESIS: 6 },
+      M06: SLOW_M06,
+      ...cellPhaseTargets(SLOW_M06, 'C02A', SLOW_CELL_SCHEDULE),
     },
     dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION'],
     rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
@@ -134,7 +216,8 @@ export const simulationProfiles = {
       M02: { PROC_PRIMORDIAL_REACTION: 10, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
       M03: { PROC_PRIMORDIAL_REACTION: 10, PROC_RNA_REPLICATION: 10, PROC_DNA_SYNTHESIS: 0 },
       M05: { PROC_PRIMORDIAL_REACTION: 10, PROC_RNA_REPLICATION: 10, PROC_DNA_SYNTHESIS: 10 },
-      M06: { PROC_PRIMORDIAL_REACTION: 10, PROC_RNA_REPLICATION: 10, PROC_DNA_SYNTHESIS: 10 },
+      M06: MILESTONE_SEEKER_M06,
+      ...cellPhaseTargets(MILESTONE_SEEKER_M06, 'C02A', MAX_CELL_SCHEDULE),
     },
     dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
     rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
@@ -149,8 +232,8 @@ function resourceSum(cost) {
   return Object.values(cost || {}).reduce((sum, amount) => sum + amount, 0);
 }
 
-function producerCounts(state, profile) {
-  const targets = profile.phaseProducerTargets?.M06 || {};
+function producerCounts(state, profile, finalNodeId) {
+  const targets = profile.phaseProducerTargets?.[finalNodeId] || {};
   return Object.fromEntries(
     Object.keys(targets).map((producerId) => [producerId, state.run.producers[producerId]?.count || 0])
   );
@@ -162,10 +245,10 @@ function addCost(target, cost) {
   }
 }
 
-function createSnapshot(engine, profile) {
+function createSnapshot(engine, profile, finalNodeId) {
   return {
     atMs: engine.state.run.clock.simulationMs,
-    producerCounts: producerCounts(engine.state, profile),
+    producerCounts: producerCounts(engine.state, profile, finalNodeId),
     rates: selectProductionRates(engine.state, engine.ruleset),
     resources: Object.fromEntries(Object.entries(engine.state.run.resources).map(([id, value]) => [id, value.amount])),
     totalEarned: { ...engine.state.run.stats.totalEarned },
@@ -206,12 +289,32 @@ export function estimateProducerPurchasePayback(state, sourceRuleset, producerId
   };
 }
 
-function nextProducerId(engine, nodeOrder, profile) {
+// Picks which resource-specific purchase order to use for the currently blocked node: the
+// resource in its cost with the largest shortfall, checked in this fixed priority (matches the
+// pre-Iteration-4 dna-vs-rna heuristic exactly when a node's cost only contains rna/dna).
+function shortfallResource(engine, activeNode) {
+  const cost = activeNode?.cost || {};
+  for (const resourceId of ['dna', 'biomass', 'energy']) {
+    const amount = cost[resourceId];
+    if (amount && amount > (engine.state.run.resources[resourceId]?.amount || 0)) {
+      return resourceId;
+    }
+  }
+  return 'rna';
+}
+
+function orderForResource(profile, resourceId) {
+  if (resourceId === 'dna') return profile.dnaOrder;
+  if (resourceId === 'biomass') return profile.biomassOrder || DEFAULT_BIOMASS_ORDER;
+  if (resourceId === 'energy') return profile.energyOrder || DEFAULT_ENERGY_ORDER;
+  return profile.rnaOrder;
+}
+
+function nextProducerId(engine, nodeOrder, profile, finalNodeId) {
   const activeNodeId = nodeOrder.find((nodeId) => !engine.state.run.nodes.completed[nodeId]);
   const activeNode = engine.ruleset.nodes.find((node) => node.id === activeNodeId);
-  const producerTargets = profile.phaseProducerTargets?.[activeNodeId] || profile.phaseProducerTargets?.M06 || {};
-  const needsDna = (activeNode?.cost.dna || 0) > (engine.state.run.resources.dna?.amount || 0);
-  const order = needsDna ? profile.dnaOrder : profile.rnaOrder;
+  const producerTargets = profile.phaseProducerTargets?.[activeNodeId] || profile.phaseProducerTargets?.[finalNodeId] || {};
+  const order = orderForResource(profile, shortfallResource(engine, activeNode));
   const affordable = order.filter((producerId) => {
     const targetCount = producerTargets[producerId] ?? 0;
     const currentCount = engine.state.run.producers[producerId]?.count || 0;
@@ -223,7 +326,7 @@ function nextProducerId(engine, nodeOrder, profile) {
   return affordable[0] || null;
 }
 
-function tryBuyNextNode(engine, nodeOrder, timings, snapshots, profile, spends) {
+function tryBuyNextNode(engine, nodeOrder, timings, snapshots, profile, spends, finalNodeId) {
   for (const nodeId of nodeOrder) {
     if (engine.state.run.nodes.completed[nodeId]) {
       continue;
@@ -238,14 +341,14 @@ function tryBuyNextNode(engine, nodeOrder, timings, snapshots, profile, spends) 
     }
     addCost(spends.nodes, node.cost);
     timings[nodeId] = engine.state.run.clock.simulationMs;
-    snapshots[`after_${nodeId}`] = createSnapshot(engine, profile);
+    snapshots[`after_${nodeId}`] = createSnapshot(engine, profile, finalNodeId);
     return true;
   }
   return false;
 }
 
-function tryBuyProducer(engine, nodeOrder, profile, spends, log) {
-  const producerId = nextProducerId(engine, nodeOrder, profile);
+function tryBuyProducer(engine, nodeOrder, profile, spends, log, finalNodeId) {
+  const producerId = nextProducerId(engine, nodeOrder, profile, finalNodeId);
   if (!producerId) {
     return false;
   }
@@ -307,11 +410,14 @@ export function runHeadlessSimulation(options = {}) {
   const sourceRuleset = options.ruleset || ruleset;
   const profileName = options.profile || 'competent';
   const profile = options.profileConfig || simulationProfiles[profileName] || simulationProfiles.competent;
-  const nodeOrder = options.includeOptionalM04 ? OPTIONAL_NODE_ORDER : MAIN_NODE_ORDER;
+  const branchId = options.branch || 'C02A';
+  const nodeOrder = options.includeOptionalM04 ? OPTIONAL_NODE_ORDER : (BRANCH_NODE_ORDER[branchId] || MAIN_NODE_ORDER);
+  const finalNodeId = nodeOrder[nodeOrder.length - 1];
+  const branchNodeId = nodeOrder.find((nodeId) => nodeId.startsWith('C02'));
   const clock = options.clock || createFakeClock(0);
   const rng = options.rng || createSeededRng(options.seed || 1);
   const engine = createChroniclesEngine({ ruleset: sourceRuleset, ports: { clock, rng } });
-  const maxMs = options.maxMs || 13 * 60 * 1000;
+  const maxMs = options.maxMs || 22 * 60 * 1000;
   const stepMs = options.stepMs || 1000;
   const log = [];
   const timingsByNode = {};
@@ -323,7 +429,7 @@ export function runHeadlessSimulation(options = {}) {
   const nextManualAtMs = Object.fromEntries(manualProcessIdsForProfile(profile).map((processId) => [processId, 0]));
   let manualEconomicsAtThreeMinutes = null;
 
-  while (engine.state.run.clock.simulationMs <= maxMs && !engine.state.run.nodes.completed.M06) {
+  while (engine.state.run.clock.simulationMs <= maxMs && !engine.state.run.nodes.completed[finalNodeId]) {
     const now = engine.state.run.clock.simulationMs;
 
     for (const processId of manualProcessIdsForProfile(profile)) {
@@ -356,8 +462,8 @@ export function runHeadlessSimulation(options = {}) {
       let actions = 0;
       while (acted && actions < profile.maxActionsPerDecision) {
         acted =
-          tryBuyNextNode(engine, nodeOrder, timingsByNode, snapshots, profile, spends) ||
-          tryBuyProducer(engine, nodeOrder, profile, spends, log);
+          tryBuyNextNode(engine, nodeOrder, timingsByNode, snapshots, profile, spends, finalNodeId) ||
+          tryBuyProducer(engine, nodeOrder, profile, spends, log, finalNodeId);
         actions += acted ? 1 : 0;
       }
       nextDecisionAtMs = now + profile.decisionIntervalMs;
@@ -374,8 +480,9 @@ export function runHeadlessSimulation(options = {}) {
   }
 
   return {
-    ok: Boolean(engine.state.run.nodes.completed.M06),
+    ok: Boolean(engine.state.run.nodes.completed[finalNodeId]),
     profile: profileName,
+    branch: branchId,
     includeOptionalM04: options.includeOptionalM04 === true,
     state: engine.state,
     log,
@@ -387,8 +494,13 @@ export function runHeadlessSimulation(options = {}) {
       errorCorrectionAtMs: timingsByNode.M04 ?? null,
       membraneAtMs: timingsByNode.M05 ?? null,
       cellAtMs: timingsByNode.M06 ?? null,
+      metabolismAtMs: timingsByNode.C01 ?? null,
+      branchAtMs: timingsByNode[branchNodeId] ?? null,
+      proteinSynthesisAtMs: timingsByNode.C03 ?? null,
+      organellesAtMs: timingsByNode.C05 ?? null,
+      cellCoordinationAtMs: timingsByNode.C06 ?? null,
     },
-    producerCounts: producerCounts(engine.state, profile),
+    producerCounts: producerCounts(engine.state, profile, finalNodeId),
     finalRates: selectProductionRates(engine.state, sourceRuleset),
     manual: { ...manual, economicsAtThreeMinutes: manualEconomicsAtThreeMinutes },
     spends,

@@ -20,12 +20,16 @@ import { createPlayableRuntime, routeCtaFocus } from './runtime.js';
 
 const DEV = __CHRONICLES_DEV__;
 const ROOT_ID = 'chronicles-root';
-const MOLECULAR_NODES = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06'];
+const EVOLUTION_NODES = [
+  'M01', 'M02', 'M03', 'M04', 'M05', 'M06',
+  'C01', 'C02A', 'C02B', 'C02C', 'C04A', 'C04B', 'C04C', 'C03', 'C05', 'C06',
+];
 const RESOURCE_NAMES = {
   rna: 'RNA',
   dna: 'DNA',
   biomass: 'Biomass',
   energy: 'Energy',
+  ap: 'Adaptation Points',
 };
 const NODE_NAMES = {
   M01: 'Stable RNA',
@@ -34,11 +38,23 @@ const NODE_NAMES = {
   M04: 'Error Correction',
   M05: 'Membrane',
   M06: 'Cell',
+  C01: 'Metabolism',
+  C02A: 'Absorption',
+  C02B: 'Symbiosis',
+  C02C: 'Shell',
+  C03: 'Protein Synthesis',
+  C04A: 'Photosynthesis',
+  C04B: 'Chemosynthesis',
+  C04C: 'Efficient Digestion',
+  C05: 'Organelles',
+  C06: 'Cell Coordination',
 };
 const PRODUCER_NAMES = {
   PROC_PRIMORDIAL_REACTION: 'Primordial Reaction',
   PROC_RNA_REPLICATION: 'RNA Replication',
   PROC_DNA_SYNTHESIS: 'DNA Synthesis',
+  PROC_BIOMASS_UPTAKE: 'Biomass Uptake',
+  PROC_RESPIRATION: 'Respiration',
 };
 
 const storage = createBrowserStorage();
@@ -83,6 +99,11 @@ function formatCost(cost) {
 }
 
 function phaseLabel() {
+  if (engine().state.run.nodes.completed.C06) return 'Cell Coordination';
+  if (engine().state.run.nodes.completed.C05) return 'Organelles';
+  if (engine().state.run.nodes.completed.C03) return 'Protein Synthesis';
+  if (engine().state.run.nodes.selectedBranchByGroup?.cell_identity_1) return NODE_NAMES[engine().state.run.nodes.selectedBranchByGroup.cell_identity_1];
+  if (engine().state.run.nodes.completed.C01) return 'Metabolism';
   if (engine().state.run.nodes.completed.M06) return 'Cell';
   if (engine().state.run.nodes.completed.M05) return 'Membrane';
   if (engine().state.run.nodes.completed.M03) return 'DNA synthesis';
@@ -209,7 +230,7 @@ function renderProducers() {
 }
 
 function renderEvolution() {
-  const rows = MOLECULAR_NODES.map((nodeId) => {
+  const rows = EVOLUTION_NODES.map((nodeId) => {
     const node = indexes.nodes[nodeId];
     const status = selectNodeStatus(engine().state, ruleset, nodeId);
     const optional = node.type === 'OPTIONAL' ? '<small class="optional">OPTIONAL</small>' : '';
@@ -245,6 +266,8 @@ const renderDevPanel = DEV
       ${debugApi().timeScales.map((scale) => `<button data-action="speed" data-scale="${scale}">${scale}x</button>`).join('')}
       <button data-action="grant" data-resource="rna">+100 RNA</button>
       <button data-action="grant" data-resource="dna">+25 DNA</button>
+      <button data-action="grant" data-resource="biomass">+25 Biomass</button>
+      <button data-action="grant" data-resource="energy">+25 Energy</button>
       <button data-action="dev-reset">Dev reset</button>
       <button data-action="dump">Dump state</button>
     </div>
@@ -276,7 +299,7 @@ function render() {
   }
   root.innerHTML = `<main class="app">
     <header>
-      <div><strong>Хроники Эволюции</strong><small>Early playable 0-10 min slice</small></div>
+      <div><strong>Хроники Эволюции</strong><small>Early playable 0-18 min slice</small></div>
       <nav>
         <button data-action="view" data-view="world" class="${activeView === 'world' ? 'active' : ''}">World</button>
         <button data-action="view" data-view="evolution" class="${activeView === 'evolution' ? 'active' : ''}">Evolution</button>

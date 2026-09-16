@@ -152,6 +152,34 @@ result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C02A' });
 assert.equal(result.ok, true);
 assert.equal(branchEngine.state.run.nodes.selectedBranchByGroup.cell_identity_1, 'C02A');
 assert.equal(selectNodeStatus(branchEngine.state, ruleset, 'C02B'), 'locked');
+assert.deepEqual(selectVisibleResources(branchEngine.state, ruleset).map((resource) => resource.id), [
+  'rna',
+  'dna',
+  'biomass',
+  'energy',
+]);
+
+assert.equal(selectNodeStatus(branchEngine.state, ruleset, 'C03'), 'available_affordable');
+result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C03' });
+assert.equal(result.ok, true);
+assert.equal(branchEngine.state.run.goals.states.G007.status, 'archived');
+
+result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C04A' });
+assert.equal(result.ok, true);
+result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C04B' });
+assert.equal(result.ok, true);
+result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C04C' });
+assert.equal(result.ok, true);
+assert.equal(branchEngine.state.run.nodes.completed.C05, undefined);
+
+result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C05' });
+assert.equal(result.ok, true);
+assert.equal(branchEngine.state.run.resources.ap, undefined);
+result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C06' });
+assert.equal(result.ok, true);
+assert.equal(branchEngine.state.run.resources.ap.amount, 1);
+assert.equal(branchEngine.state.run.flags['milestone.cell_coordination_reached'], true);
+assert.equal(branchEngine.state.run.goals.states.G009.status, 'archived');
 
 const cultureBranchEngine = createChroniclesEngine({ ruleset });
 cultureBranchEngine.state.run.eraId = 'EARLY_CIV';

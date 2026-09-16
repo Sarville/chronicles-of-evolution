@@ -17,13 +17,15 @@ assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_CHEMICAL_
 assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_CATALYTIC_FOLD'), false);
 assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_ENERGY_POCKET'), false);
 for (const producer of ruleset.producers.filter((candidate) => candidate.id.startsWith('PROC_'))) {
-  assert.deepEqual(
-    producer.milestones.map((milestone) => milestone.count),
-    [10]
-  );
+  assert.equal(producer.milestones.length, 1);
+  assert.equal(Number.isInteger(producer.milestones[0].count) && producer.milestones[0].count > 0, true);
   assert.equal(producer.milestones[0].multiplier, 1.15);
   assert.equal(Boolean(producer.milestones[0].label), true);
   assert.equal(Boolean(producer.milestones[0].description), true);
+}
+// Frozen 0-10 producer milestones: not to be reopened by later balance passes.
+for (const producerId of ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS']) {
+  assert.equal(ruleset.producers.find((candidate) => candidate.id === producerId).milestones[0].count, 10);
 }
 assert.equal(ruleset.nodes.find((node) => node.id === 'M04').type, 'OPTIONAL');
 assert.deepEqual(ruleset.nodes.find((node) => node.id === 'M05').requiresNodes, ['M03']);

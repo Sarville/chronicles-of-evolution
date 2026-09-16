@@ -127,25 +127,31 @@ Completed Codex tasks:
 
 - [x] Document repeatable process milestone bonuses with scenario justification, threshold labels and UI wording for the current 0–10 slice.
 - [x] Add generic manual-resource framework note: manual actions may grant/convert resources, passive production remains primary, future reward multipliers are not baseline ads progression.
-- [ ] Before expanding biological economy beyond Cell, define any new repeatable-process milestones per producer; no implicit global `10/25/50` thresholds.
+- [x] Before expanding biological economy beyond Cell, define any new repeatable-process milestones per producer; no implicit global `10/25/50` thresholds. (`PROC_BIOMASS_UPTAKE`/`PROC_RESPIRATION` use their own justified `count: 8` milestone with a distinct label/description; `tests/config/spec.js` no longer enforces a blanket `count: 10` across all producers, only for the three frozen 0-10 producers.)
 
 ---
 
 # Iteration 4 — corrected content after Cell
 
-**Status:** READY. Not started.
+**Status:** IMPLEMENTED, pending manual 10–18 playtest. Do not start Iteration 5 until playtest passes.
 
-Expected scope after unblock:
+Scope:
 
-- [ ] Metabolism
-- [ ] Biomass/Energy cellular economy
-- [ ] first primary branch: Absorption / Symbiosis / Shell
-- [ ] optional Photosynthesis / Chemosynthesis adaptations
-- [ ] Protein Synthesis / Ribosome
-- [ ] Organelles
-- [ ] corrected Cell → Multicellularity progression
-- [ ] first AP rewards/hooks
-- [ ] balance/simulation for 10–18
+- [x] Metabolism (C01)
+- [x] Biomass/Energy cellular economy (PROC_BIOMASS_UPTAKE, PROC_RESPIRATION; fixed dangling `energy.visibleFromEra`, added `ap` resource)
+- [x] first primary branch: Absorption / Symbiosis / Shell (C02A/B/C)
+- [x] optional Photosynthesis / Chemosynthesis / Efficient Digestion adaptations (C04A/B/C)
+- [x] Protein Synthesis / Ribosome (C03)
+- [x] Organelles (C05)
+- [x] Cell Coordination (C06) — trunk stops here; Multicellularity itself is Iteration 5
+- [x] first AP hook: 1 AP granted on C06 completion (reuses existing `grant_resource` goal reward, no new engine code)
+- [x] balance/simulation for 10–18: `npm run test:sim` extended with C0x timings across all profiles plus a new Symbiosis (C02B) branch-variant profile; all profiles land inside 10–18 min on first pass, no rebalance iteration needed
+- [ ] manual 10–18 playtest
+- [ ] user approval of corrected 10–18 playable
+
+### Findings
+
+- (none yet — pending manual playtest)
 
 ---
 

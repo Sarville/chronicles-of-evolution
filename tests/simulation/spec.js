@@ -25,11 +25,33 @@ between(competent.timings.cellAtMs, 540000, 660000, 'M06');
 between(competent.producerCounts.PROC_PRIMORDIAL_REACTION, 6, 8, 'Primordial Reaction count');
 between(competent.producerCounts.PROC_RNA_REPLICATION, 4, 6, 'RNA Replication count');
 between(competent.producerCounts.PROC_DNA_SYNTHESIS, 4, 6, 'DNA Synthesis count');
-between(competent.finalRates.rna, 9, 11, 'final RNA/s');
-between(competent.finalRates.dna, 1.2, 1.5, 'final DNA/s');
+// Frozen 0-10 rates, measured right at Cell (M06) completion, before any Cell-era (C0x) modifiers apply.
+between(competent.snapshots.after_M06.rates.rna, 9, 11, 'RNA/s at Cell');
+between(competent.snapshots.after_M06.rates.dna, 1.2, 1.5, 'DNA/s at Cell');
 assert.equal(competent.manual.economicsAtThreeMinutes.contributionRatio < 0.05, true);
 assert.equal(competent.manual.economicsAtThreeMinutes.cooldownMs, 90000);
 assert.equal(competent.manual.economicsAtThreeMinutes.resourceId, 'rna');
+
+// Iteration 4 — Cell -> Cell Coordination (~10-18 min), same competent run continued.
+assert.equal(competent.state.run.nodes.completed.C01 !== undefined, true);
+assert.equal(competent.state.run.nodes.completed.C02A !== undefined, true);
+assert.equal(competent.state.run.nodes.completed.C03 !== undefined, true);
+assert.equal(competent.state.run.nodes.completed.C05 !== undefined, true);
+assert.equal(competent.state.run.nodes.completed.C06 !== undefined, true);
+assert.equal(competent.state.run.nodes.selectedBranchByGroup.cell_identity_1, 'C02A');
+assert.equal(competent.state.run.resources.ap.amount, 1);
+assert.equal(competent.state.run.goals.states.G009.status, 'archived');
+between(competent.timings.metabolismAtMs, 550000, 800000, 'C01 Metabolism');
+between(competent.timings.branchAtMs, 600000, 850000, 'branch choice');
+between(competent.timings.proteinSynthesisAtMs, 700000, 950000, 'C03 Protein Synthesis');
+between(competent.timings.organellesAtMs, 750000, 1000000, 'C05 Organelles');
+between(competent.timings.cellCoordinationAtMs, 800000, 1080000, 'C06 Cell Coordination');
+
+const competentSymbiosis = runHeadlessSimulation({ seed: 7, profile: 'competent_symbiosis', branch: 'C02B' });
+assert.equal(competentSymbiosis.ok, true);
+assert.equal(competentSymbiosis.state.run.nodes.selectedBranchByGroup.cell_identity_1, 'C02B');
+assert.equal(competentSymbiosis.state.run.nodes.completed.C02A, undefined);
+between(competentSymbiosis.timings.cellCoordinationAtMs, 800000, 1080000, 'C06 Cell Coordination (Symbiosis)');
 
 assert.equal(simulationProfiles.baseline_optimized.decisionIntervalMs, 1000);
 assert.equal(simulationProfiles.baseline_competent.decisionIntervalMs, 5000);
@@ -48,6 +70,7 @@ assert.equal(baselineOptimized.ok, true);
 assert.equal(baselineCompetent.ok, true);
 assert.equal(baselineSlow.ok, true);
 assert.equal(baselineSlow.timings.cellAtMs <= 690000, true);
+assert.equal(baselineSlow.timings.cellCoordinationAtMs <= 1080000, true);
 
 const optimized = runHeadlessSimulation({ seed: 7, profile: 'optimized' });
 assert.equal(optimized.ok, true);
@@ -56,6 +79,7 @@ between(optimized.timings.cellAtMs, 480000, 660000, 'optimized scripted M06');
 const slow = runHeadlessSimulation({ seed: 7, profile: 'slow' });
 assert.equal(slow.ok, true);
 assert.equal(slow.timings.cellAtMs <= 690000, true);
+assert.equal(slow.timings.cellCoordinationAtMs <= 1080000, true);
 
 const withM04 = runHeadlessSimulation({ seed: 7, profile: 'competent', includeOptionalM04: true });
 assert.equal(withM04.ok, true);
@@ -69,6 +93,8 @@ assert.equal(milestoneSeeker.producerCounts.PROC_PRIMORDIAL_REACTION, 10);
 assert.equal(milestoneSeeker.producerCounts.PROC_RNA_REPLICATION >= 5, true);
 assert.equal(milestoneSeeker.timings.cellAtMs >= 480000, true);
 assert.equal(milestoneSeeker.timings.cellAtMs <= 660000, true);
+assert.equal(milestoneSeeker.timings.cellCoordinationAtMs >= 750000, true);
+assert.equal(milestoneSeeker.timings.cellCoordinationAtMs <= 900000, true);
 
 const manualAssisted = runHeadlessSimulation({ seed: 7, profile: 'manual_assisted' });
 assert.equal(manualAssisted.ok, true);

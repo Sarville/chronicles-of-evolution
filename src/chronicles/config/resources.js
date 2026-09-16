@@ -21,7 +21,13 @@ export const resources = [
     id: 'energy',
     labelKey: 'resource.energy',
     initialAmount: 0,
-    visibleFromEra: 'METABOLISM',
+    visibleFromEra: 'CELLULAR',
+  },
+  {
+    id: 'ap',
+    labelKey: 'resource.ap',
+    initialAmount: 0,
+    visibleFromEra: 'CELLULAR',
   },
   {
     id: 'food',

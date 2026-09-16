@@ -40,6 +40,8 @@ const producerRoute = routeCtaFocus({ targetId: 'PROC_PRIMORDIAL_REACTION' }, in
 assert.deepEqual(producerRoute, { activeView: 'world', focusedEntityId: 'PROC_PRIMORDIAL_REACTION' });
 const manualRoute = routeCtaFocus({ targetId: 'MANUAL_PRIMORDIAL_PULSE' }, indexes);
 assert.deepEqual(manualRoute, { activeView: 'world', focusedEntityId: 'MANUAL_PRIMORDIAL_PULSE' });
+const cellCoordinationRoute = routeCtaFocus({ targetId: 'C06' }, indexes);
+assert.deepEqual(cellCoordinationRoute, { activeView: 'evolution', focusedEntityId: 'C06' });
 
 const milestoneEngine = createChroniclesEngine({ ruleset });
 milestoneEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 1000 });
@@ -62,5 +64,8 @@ assert.equal(appSource.includes('Current total'), true);
 assert.equal(appSource.includes('(+'), true);
 assert.equal(appSource.includes('ETA'), true);
 assert.equal(appSource.includes('data-action="manual" data-id="${process.id}"'), true);
+assert.equal(appSource.includes('PROC_BIOMASS_UPTAKE'), true);
+assert.equal(appSource.includes('PROC_RESPIRATION'), true);
+assert.equal(appSource.includes("C06: 'Cell Coordination'"), true);
 
 console.log('ui runtime ok');

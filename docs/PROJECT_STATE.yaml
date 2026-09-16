@@ -3,7 +3,7 @@ project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "biological_0_10_frozen_iteration_4_ready"
+  work_mode: "iteration_4_implemented_pending_manual_playtest"
   last_updated: "2026-09-16"
 
 authority:
@@ -78,11 +78,11 @@ design:
     DS-11: { name: "Cross-document consistency pass and design freeze", status: blocked_by_code_rework_and_balance }
 
 implementation:
-  current_iteration: 3
+  current_iteration: 4
   status:
     - "iteration_3_technical_foundation_passed"
     - "biological_0_10_accepted_and_frozen"
-    - "iteration_4_ready_not_started"
+    - "iteration_4_implemented_pending_manual_playtest"
   technical_foundation_commit: "32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb"
   biological_0_10_freeze_commit: "e0b2f5e8eb9e5433eb6c3b934fa048c7203537b1"
   architecture_status: "accepted"
@@ -116,15 +116,26 @@ implementation:
         - "manual playtest 0-10"
     4:
       name: "First corrected content expansion after Cell"
-      status: ready
+      status: implemented_pending_manual_playtest
 
 iteration_4:
-  status: "ready"
+  status: "implemented_pending_manual_playtest"
   unblock_conditions:
     - "Biological gameplay reconciliation implementation passed"
     - "0-10 rebalance passed"
     - "manual 0-10 playtest approved"
-  started: false
+  started: true
+  scope:
+    - "C01 Metabolism, C02A/B/C first branch (Absorption/Symbiosis/Shell), C03 Protein Synthesis/Ribosome, C04A/B/C optional Photosynthesis/Chemosynthesis/Efficient Digestion, C05 Organelles, C06 Cell Coordination"
+    - "PROC_BIOMASS_UPTAKE / PROC_RESPIRATION producers"
+    - "G006-G009 chapter goals + 3 optional C04x side goals"
+    - "first AP hook: 1 AP granted on C06 Cell Coordination (grant_resource, no new engine code)"
+    - "fixed dangling energy.visibleFromEra ('METABOLISM' -> 'CELLULAR'), added 'ap' resource, added energy/ap to CELLULAR/MULTICELLULAR activeResources"
+    - "dev/simulation.js generalized past M06 through C06, plus a Symbiosis (C02B) branch-variant profile"
+  gate:
+    - "npm run test:config / test:domain / test:sim / test:ui / test / smoke / build all pass"
+    - "competent-profile simulation: Metabolism ~11.3min, branch ~12.1min, Protein Synthesis ~13.75min, Organelles ~14.75min, Cell Coordination ~15.9min (all profiles land inside the ~10-18min target, no rebalance needed)"
+    - "manual 10-18 playtest: NOT YET DONE — required before this iteration can be marked done"
 
 balance:
   ruleset_target: "timeline1-v2-reconciled"
@@ -144,11 +155,14 @@ balance:
       - "basic World/Evolution UX"
       - "integer stock display"
       - "ETA semantics"
+  biological_10_18:
+    status: "provisional_implemented_pending_manual_playtest"
+    freeze_scope: []
+    note: "C01/C02x/C03/C04x/C05/C06 costs and effects, PROC_BIOMASS_UPTAKE/PROC_RESPIRATION rates, and the first 1 AP grant are simulation-validated but not yet playtest-frozen; do not treat as accepted until manual playtest passes."
 
 open_decisions:
-  - "Exact RNA/DNA/Biomass/Energy rates and costs for corrected 0-40 biological phase"
-  - "Exact AP reward/cost table"
-  - "Exact optional Photosynthesis/Chemosynthesis effects"
+  - "Biomass/Energy/AP rates for 18-40 (post Cell Coordination, Multicellularity onward) remain open; 10-18 values are provisional-implemented and simulation-validated only, pending manual playtest"
+  - "Full AP reward/cost table for Iteration 5 body adaptations (Mobility/Sensory/Digestion/Structural Tissue); only the first 1 AP grant on Cell Coordination is implemented so far"
   - "Exact civilization starting F/M/K package and population thresholds after Population~5 start"
   - "Which civilization specializations remain paid branches versus profile/event choices"
   - "Exact Timeline #2 p50 after corrected Timeline #1 simulation"
@@ -157,5 +171,5 @@ open_decisions:
 
 next_action:
   owner: "Codex"
-  session: "Iteration 4"
-  description: "First corrected content expansion after Cell. Biological 0-10 is frozen; do not alter it without regression/playtest evidence."
+  session: "Iteration 4 manual playtest"
+  description: "Iteration 4 content (Cell -> Cell Coordination) is implemented and simulation-validated; do NOT start Iteration 5 until manual 10-18 playtest is run and the user approves. Biological 0-10 remains frozen; do not alter it without regression/playtest evidence."

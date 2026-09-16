@@ -54,4 +54,40 @@ export const producers = [
       },
     ],
   },
+  {
+    id: 'PROC_BIOMASS_UPTAKE',
+    entityType: 'producer',
+    labelKey: 'producer.biomass_uptake',
+    requiresNodes: ['M06'],
+    tags: ['biomass', 'process'],
+    baseCost: { dna: 60 },
+    growth: 1.35,
+    output: { biomass: 0.35 },
+    milestones: [
+      {
+        count: 8,
+        multiplier: 1.15,
+        label: 'Membrane transport network',
+        description: 'Uptake sites link into a coordinated membrane transport network.',
+      },
+    ],
+  },
+  {
+    id: 'PROC_RESPIRATION',
+    entityType: 'producer',
+    labelKey: 'producer.respiration',
+    requiresNodes: ['C01'],
+    tags: ['energy', 'process'],
+    baseCost: { biomass: 25 },
+    growth: 1.35,
+    output: { energy: 0.3 },
+    milestones: [
+      {
+        count: 8,
+        multiplier: 1.15,
+        label: 'Shared electron transport chain',
+        description: 'Respiration pathways consolidate into a shared, more efficient transport chain.',
+      },
+    ],
+  },
 ];
