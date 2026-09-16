@@ -3,7 +3,7 @@ project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "ds07_active"
+  work_mode: "ds08_global_layout"
   last_updated: "2026-09-16"
   documentation_language: "Описания по умолчанию пишутся на русском. Английский допустим только для стабильных идентификаторов, имён файлов, кодовых состояний, enum-подобных меток и закреплённых названий фич."
 
@@ -41,9 +41,9 @@ workflow:
   no_game_code_during_design_sessions: true
 
 design:
-  current_session: "DS-07"
-  status: "active"
-  objective: "Define art direction, creature evolution, locations and era transitions from accepted DS-05.5 presentation map and accepted DS-06 UX architecture"
+  current_session: "DS-08"
+  status: "global_layout_approval"
+  objective: "Choose one persistent desktop/mobile layout shell before epoch-by-epoch diorama concept generation"
   accepted_reconciliation:
     - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
     - "Information removed as player-facing spendable resource"
@@ -103,9 +103,9 @@ design:
     DS-05: { name: "Timeline #1 full narrative package", status: accepted }
     DS-05.5: { name: "Timeline presentation contract", status: accepted }
     DS-06: { name: "UX architecture and wireframes", status: accepted }
-    DS-07: { name: "Art direction, creature evolution, locations and era transitions", status: active }
-    DS-08: { name: "Art production manifest and generation prompts", status: blocked_by_ds07 }
-    DS-09: { name: "Audio design and generation package", status: blocked_by_ds05_ds07 }
+    DS-07: { name: "Art direction, creature evolution, locations and era transitions", status: accepted }
+    DS-08: { name: "Art production manifest and generation prompts", status: global_layout_approval }
+    DS-09: { name: "Audio design and generation package", status: ready }
     DS-10: { name: "Analytics, platform and production readiness", status: blocked_by_gameplay_ux_stability }
     DS-11: { name: "Cross-document consistency pass and design freeze", status: blocked_by_code_rework_and_balance }
 
@@ -200,5 +200,5 @@ open_decisions:
 
 next_action:
   owner: "Codex"
-  session: "DS-07"
-  description: "Проверить черновой пакет арт-направления DS-07, затем после принятия перейти к DS-08: манифест ассетов и промпты генерации."
+  session: "DS-08"
+  description: "Подготовить global layout approval pass: 3-4 варианта постоянного desktop shell, 3-4 варианта постоянного mobile shell и один global UI component sheet. После выбора layout shell перейти к B00_ORIGIN_CELL с 4 вариантами диорамы."

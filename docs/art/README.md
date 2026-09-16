@@ -10,15 +10,16 @@
 - **DS-07** — арт-направление, эволюция существа, локации/диорамы, переходы эпох;
 - **DS-08** — здания/реквизит, манифест ассетов, промпты генерации.
 
-## Планируемые файлы
+## Файлы
 
 - `00_ART_DIRECTION.md` — DS-07 общая художественная библия
 - `01_LOCATIONS_AND_DIORAMAS.md` — DS-07 состояния мира и многослойные диорамы
 - `02_ERA_TRANSITIONS.md` — DS-07 язык переходов
 - `03_CREATURE_EVOLUTION.md` — DS-07 морфология и наследование признаков
-- `04_BUILDINGS_AND_PROPS.md`
-- `05_ASSET_MANIFEST.md`
-- `06_GENERATION_PROMPTS.md`
+- `04_BUILDINGS_AND_PROPS.md` — DS-08 здания, реквизит и видовая эргономика
+- `05_ASSET_MANIFEST.md` — DS-08 stable asset IDs, слои, consumers, PB/V/C references
+- `06_GENERATION_PROMPTS.md` — DS-08 prompt package for concept/prototype generation
+- `07_CONCEPT_SCREEN_AND_ASSET_PIPELINE.md` — DS-08 процесс approval постоянной компоновки, 4 вариантов диорамы по эпохам, чек-листы и handoff анимаций
 
 ## Визуальные состояния мира Timeline #1
 
@@ -68,5 +69,7 @@ Primary trait и крупные видимые адаптации должны �
 - VFX.
 
 Не начинать массовую генерацию финальных ассетов до принятия `05_ASSET_MANIFEST.md`; допустимы только mood/concept-тесты.
+
+Перед production-генерацией использовать процесс из `07_CONCEPT_SCREEN_AND_ASSET_PIPELINE.md`: сначала один раз принять постоянный desktop/mobile layout shell, затем для каждого эпохального блока делать 4 варианта диорамы, UI content sheet в уже выбранном shell, animation refs, user approval и только после этого генерацию ассетов по checklist.
 
 Фактический статус раздела смотреть в `../PROJECT_STATE.yaml`.

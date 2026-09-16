@@ -153,7 +153,7 @@ Must inherit `PB00–PB30` and may refine layout without changing their narrativ
 
 # DS-07 — Арт-направление
 
-**Статус:** текущая / активная.
+**Статус:** ACCEPTED on 2026-09-16.
 
 Должен наследовать `V0–V9` и `C0–C7`.
 
@@ -167,12 +167,44 @@ Must inherit `PB00–PB30` and may refine layout without changing their narrativ
 - [x] правила камеры и композиции
 - [x] слои деградации кризиса
 - [x] композиция Ash
+- [x] user review DS-07
+- [x] mark DS-07 accepted
+
+---
+
+# DS-08 — манифест ассетов и промпты генерации
+
+**Статус:** GLOBAL LAYOUT APPROVAL.
+
+План:
+
+- [x] `docs/art/04_BUILDINGS_AND_PROPS.md`
+- [x] `docs/art/05_ASSET_MANIFEST.md`
+- [x] `docs/art/06_GENERATION_PROMPTS.md`
+- [x] `docs/art/07_CONCEPT_SCREEN_AND_ASSET_PIPELINE.md`
+- [x] stable asset ID rules
+- [x] consumer + PB/V/C references
+- [x] building/prop ergonomics for C7 species
+- [x] primary trait production variants
+- [x] Energy Crisis variant matrix
+- [x] Ash-from-V8 production rule
+- [x] epoch/block checklists before generation
+- [x] one-time desktop/mobile layout approval
+- [x] 4 diorama direction variants per block
+- [x] animation reference handoff template
+- [ ] prepare 3-4 persistent desktop layout shell concepts
+- [ ] prepare 3-4 persistent mobile layout shell concepts
+- [ ] prepare global UI component sheet
+- [ ] user chooses global layout shell
+- [ ] start `B00_ORIGIN_CELL` with 4 diorama direction variants
+- [ ] user review DS-08
+- [ ] mark DS-08 accepted
 
 ---
 
 # Следующие дизайн-сессии
 
-- [ ] DS-08 — манифест ассетов и промпты генерации
+- [ ] DS-08 — манифест ассетов и промпты генерации — GLOBAL LAYOUT APPROVAL
 - [ ] DS-09 — аудиодизайн и пакет генерации
 - [ ] DS-10 — аналитика, платформы и готовность к продакшену
 - [ ] DS-11 — финальная междокументная сверка / design freeze v2
@@ -239,7 +271,8 @@ all tracks + balance/regression
 DS-05 narrative package accepted
 + DS-05.5 presentation contract accepted
 → DS-06 UX architecture accepted
-→ DS-07 art direction active
+→ DS-07 art direction accepted
+→ DS-08 global layout approval
 → art/audio/platform tracks
 → balance/regression
 → DS-11 freeze v2

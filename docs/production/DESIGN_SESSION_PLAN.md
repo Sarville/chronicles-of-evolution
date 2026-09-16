@@ -250,7 +250,7 @@ Accepted by explicit user confirmation on 2026-09-16.
 
 # 8. DS-07 — Art direction
 
-**Status:** ACTIVE.
+**Status:** ACCEPTED — user confirmed 2026-09-16.
 
 Primary new input:
 
@@ -281,17 +281,46 @@ DS-07 must preserve:
 
 # 9. DS-08 — Art production manifest
 
-**Status:** blocked by DS-07.
+**Status:** GLOBAL LAYOUT APPROVAL.
 
 Create stable asset IDs, formats, layer rules and generation prompts.
 
 Every production asset must reference its consumer and relevant PB/V/C state.
 
+Created:
+
+- `docs/art/04_BUILDINGS_AND_PROPS.md`;
+- `docs/art/05_ASSET_MANIFEST.md`;
+- `docs/art/06_GENERATION_PROMPTS.md`;
+- `docs/art/07_CONCEPT_SCREEN_AND_ASSET_PIPELINE.md`.
+
+Draft contract:
+
+- stable `art.<track>.<state>.<name>[.<variant>][.<layer>]` asset IDs;
+- every major asset references consumer, PB, V and C where relevant;
+- world plates cover V0-V9;
+- creature assets cover C1-C7, primary trait overlays and visible secondary metabolic tags;
+- buildings/props inherit C7 body ergonomics;
+- Energy Crisis variants persist through V6-V9;
+- Ash must derive from the player's V8 composition;
+- generation prompts preserve DS-07 art direction and include rejection criteria;
+- production generation is gated by epoch/block concept approval;
+- desktop/mobile layout shell is approved once and reused across epochs;
+- each block starts with 4 diorama direction concepts, one desktop/mobile shell preview, UI content sheet and animation reference cards;
+- block checklists prevent missing required world, creature, building, prop, VFX and UI-adjacent assets.
+
+Current step:
+
+- prepare 3-4 persistent desktop layout shell concepts;
+- prepare 3-4 persistent mobile layout shell concepts;
+- prepare one global UI component sheet;
+- after user choice, keep this shell fixed for all epochs and begin `B00_ORIGIN_CELL` diorama concepts.
+
 ---
 
 # 10. DS-09 — Audio
 
-**Status:** blocked by DS-05 + DS-07.
+**Status:** READY after DS-05 and DS-07 acceptance.
 
 Audio arc follows reconciled eras and presentation beats, especially:
 
@@ -355,8 +384,8 @@ Iteration 4 complete
 → DS-05 narrative package accepted
 → DS-05.5 presentation contract accepted
 → DS-06 UX architecture accepted
-→ DS-07 art direction active
-→ DS-08 assets / DS-09 audio
+→ DS-07 art direction accepted
+→ DS-08 global layout approval / DS-09 audio
 → DS-10 analytics/platform
 → balance/regression
 → DS-11 freeze v2
