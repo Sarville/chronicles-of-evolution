@@ -191,13 +191,14 @@ assert.equal(producerMilestoneMultiplier(10), 2);
 assert.equal(producerMilestoneMultiplier(25), 4);
 assert.equal(producerMilestoneMultiplier(50), 10);
 
-const noHiddenMilestoneEngine = createChroniclesEngine({ ruleset });
-noHiddenMilestoneEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 200 });
+const explicitMilestoneEngine = createChroniclesEngine({ ruleset });
+explicitMilestoneEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 200 });
 for (let index = 0; index < 10; index += 1) {
-  result = noHiddenMilestoneEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });
+  result = explicitMilestoneEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });
   assert.equal(result.ok, true);
 }
-assert.equal(selectProductionRates(noHiddenMilestoneEngine.state, ruleset).rna, 2.2);
+assert.equal(ruleset.producers.find((producer) => producer.id === 'PROC_PRIMORDIAL_REACTION').enableMilestoneMultipliers, true);
+assert.equal(selectProductionRates(explicitMilestoneEngine.state, ruleset).rna, 4.4);
 
 const customRuleset = {
   ...ruleset,

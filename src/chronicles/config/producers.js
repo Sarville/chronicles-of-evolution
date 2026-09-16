@@ -9,6 +9,8 @@ export const producers = [
     growth: 1.14,
     output: { rna: 0.22 },
     producesBeforeAutoUnlock: true,
+    enableMilestoneMultipliers: true,
+    milestoneNarrative: 'At 10, isolated reactions link into a cooperative RNA reaction network.',
   },
   {
     id: 'PROC_RNA_REPLICATION',
@@ -19,6 +21,8 @@ export const producers = [
     baseCost: { rna: 34 },
     growth: 1.16,
     output: { rna: 0.58 },
+    enableMilestoneMultipliers: true,
+    milestoneNarrative: 'At 10, copies start reinforcing the replication loop as a shared template pool.',
   },
   {
     id: 'PROC_DNA_SYNTHESIS',
@@ -29,5 +33,7 @@ export const producers = [
     baseCost: { rna: 78 },
     growth: 1.15,
     output: { dna: 0.24 },
+    enableMilestoneMultipliers: true,
+    milestoneNarrative: 'At 10, synthesis stabilizes into a reusable genetic assembly chain.',
   },
 ];

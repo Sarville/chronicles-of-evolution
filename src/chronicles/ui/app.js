@@ -155,8 +155,12 @@ function renderProducers() {
       if (status === 'locked') return '';
       const count = engine().state.run.producers[producer.id]?.count || 0;
       const output = formatCost(producer.output);
+      const milestone =
+        producer.enableMilestoneMultipliers === true
+          ? `<small>${count < 10 ? `Network threshold ${count}/10` : producer.milestoneNarrative}</small>`
+          : '';
       return `<button class="entity ${status} ${focusedEntityId === producer.id ? 'focused' : ''}" data-entity-id="${producer.id}" data-action="producer" data-id="${producer.id}" ${status === 'available_affordable' ? '' : 'disabled'}>
-        <span><strong>${PRODUCER_NAMES[producer.id] || producer.id}</strong><small>Owned ${count}</small></span>
+        <span><strong>${PRODUCER_NAMES[producer.id] || producer.id}</strong><small>Owned ${count}</small>${milestone}</span>
         <span><small>Cost</small>${formatCost(selectProducerPrice(engine().state, ruleset, producer.id))}</span>
         <span><small>Output</small>${output}/s</span>
       </button>`;
