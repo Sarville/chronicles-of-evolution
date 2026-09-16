@@ -536,6 +536,72 @@ Early manual actions требуют duration/busy/progress state и пакетн
 
 ---
 
+## DEC-023 — Release 1 ведёт к Bioseed, а Timeline #1 является первой главой
+
+**Status:** accepted
+**Date:** 2026-09-16
+
+### Decision
+
+Release 1 сохраняет глубину основных семейств механик оригинального Evolve и
+ведёт к первому Bioseed ориентировочно за 8–12 часов активной игры. Первый
+Timeline `T1 Origin` — законченная глава RNA → Ash на 105–120 минут, но не
+весь scope продукта.
+
+Механики возвращаются по утверждённым reset-эпохам: `T2 Memory`, `T3
+Divergence`, `T4 Sky`, `T5 Exodus`, затем `P1+ Worlds` и `U1+ Beyond`.
+Крупные семейства не считаются вырезанными, если для них назначена эпоха;
+сокращаются только opaque legacy formulas, дублирующие микросистемы и
+постоянный ручной micromanagement.
+
+### Reason
+
+PRD прямо требует сохранить evolution, jobs, buildings, tech, species,
+prestige, space, Bioseed, challenges и late routes. Ранние GDD скрывали
+поздние системы без календаря их возвращения, из-за чего вертикальный срез
+выглядел как сокращение продукта.
+
+### Implementation consequence
+
+`docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` — канонический
+порядок возвращения механик. Перед runtime-работой каждой поздней эпохи нужен
+её подробный GDD; нельзя создавать поздние UI/runtime stubs только потому,
+что эпоха уже обозначена на roadmap.
+
+---
+
+## DEC-024 — Полная пересборка Timeline #1 начинается с Event Engine
+
+**Status:** accepted
+**Date:** 2026-09-16
+
+### Decision
+
+Следующая gameplay-программа — `timeline1-v3-full`: единый T1 от RNA до Ash,
+а не набор независимых post-Cell итераций. Принятый `0–18` biological slice
+сохраняется как baseline, но проходит общий audit и rebalance вместе с полным
+run.
+
+Первый пакет `T1-0` создаёт config-driven Event Engine. Minor/major
+procedural deck работает в T1 одновременно с authored milestones, branch и
+crisis events; seed, deck state, cooldowns и outcomes сохраняются в save.
+
+### Reason
+
+Случайные события, в том числе DNA/RNA rewards, были частью core loop
+оригинального Evolve и должны влиять на первый опыт. Реализация контента без
+общего event contract привела бы к нескольким несовместимым event paths и
+непроверяемым сейвам.
+
+### Implementation consequence
+
+Рабочий порядок и gates зафиксированы в
+`docs/production/TIMELINE_01_REBUILD_PLAN.md`. Ruleset получает отдельный
+идентификатор `timeline1-v3-full`; version ruleset и schema version не
+смешиваются. `T2` runtime не начинается до `T1-7` full-run regression.
+
+---
+
 # Open decisions
 
 Следующие вопросы пока требуют отдельного решения:
@@ -545,5 +611,5 @@ Early manual actions требуют duration/busy/progress state и пакетн
 - использовать ли текущий save format или вводить новый versioned wrapper;
 - точная архитектура portal SDK abstraction;
 - набор визуальных ветвей для первого публичного билда;
-- какие альтернативные endings войдут в Release 1 помимо «Пепла»;
-- точный scope раннего Space/Bioseed в Release 1.
+- точные numerical gates для `Guardians`, `Orbit` и `Exodus`;
+- точный scope expedition economy и planet generation для `T4–T5`.

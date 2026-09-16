@@ -55,13 +55,9 @@ Scope implemented:
 - [x] branch/metabolic flags aligned with `docs/scenario/05_NARRATIVE_FLAGS.md`
 - [x] automated gates green after fix
 
-Later full biological validation:
-
-- [ ] full AP reward/cost table
-- [ ] full Multicellularity / body adaptation pass
-- [ ] Nervous System / Cognition 0–100 end-to-end pass
-- [ ] biological 0–40 simulation
-- [ ] exact optional Photosynthesis/Chemosynthesis tuning if still provisional
+The accepted 0–18 slice is now a baseline inside the full `T1` rebuild below.
+Its manual 10–18 playtest remains useful, but its final numbers are approved
+only after the unified 0–120 simulation and playtest pass.
 
 ---
 
@@ -229,51 +225,52 @@ all tracks + balance/regression
 
 ---
 
-# Later implementation / balance work
+# Timeline #1 — полная пересборка 0–120 минут
 
-## Biology 0–40
+**Status:** READY. Product roadmap and implementation order approved on
+2026-09-16. Authority: `docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md`
+and `docs/production/TIMELINE_01_REBUILD_PLAN.md`.
 
-- [ ] validate AP economy
-- [ ] validate Multicellularity target ~24–28 min
-- [ ] validate Nervous System
-- [ ] validate Cognition sources
-- [ ] validate Sapience ~38–40 min
+- [ ] `T1-0` — Foundation + Event Engine: audit `0–18`; config-driven
+  minor/major deck; seeded RNG/deck state; cooldowns; atomic `RESOLVE_EVENT`;
+  save/migration contract; RNA/DNA/Cell event set; Chronicle/unlock extension
+  points; deterministic tests and event-aware simulations.
+- [ ] `T1-1` — Organism 18–28: AP, Multicellularity, adaptations and target
+  timing validation.
+- [ ] `T1-2` — Cognition 28–40: Nervous System, Cognition `0..100`, Sapience
+  convergence, biological profiles and simulations.
+- [ ] `T1-3` — First civilization 38–65: Population~5 start, Tribe,
+  Settlement, phase-aware jobs/buildings, Food/Morale/Knowledge, recovery
+  from deficits and event expansion.
+- [ ] `T1-4` — City and Industry 65–95: contextual resources/crafting,
+  compact market and Power, city/industry simulation profiles.
+- [ ] `T1-5` — Modern and Atomic 95–108: Modern bridge, World Tension,
+  Error 17, `Again`, late event deck.
+- [ ] `T1-6` — Great Filter/reset 108–120: Last Protocol, inevitable first
+  Ash, AF, Archive, idempotent reset and T2 teaser.
+- [ ] `T1-7` — Full-run closeout: p25/p50/p75 rebalance, fresh-state mobile
+  and desktop playtests, save/recovery, telemetry, UI/smoke/build gate.
 
-## Civilization 40–108
+Guardrails:
 
-- [ ] set civilization starting package around Population 5
-- [ ] retune Population growth/thresholds
-- [ ] validate Tribe 38–50
-- [ ] validate Settlement 50–65
-- [ ] validate City ~78–80
-- [ ] validate Power unlock in Industry
-- [ ] validate Industry ~93–95
-- [ ] validate Modern ~95–104
-- [ ] validate Atomic ~107–108
-
-## Crisis / Archive
-
-- [ ] regression Stability / World Tension
-- [ ] regression Error 17
-- [ ] regression `Снова.`
-- [ ] regression Last Protocol
-- [ ] regression inevitable first Ash
-- [ ] revalidate AF formula against new node/population counts
-- [ ] keep first reset ~14–18 AF
-- [ ] regression idempotent reset
-- [ ] retune Timeline #2 acceleration after Timeline #1 simulation
+- [ ] no `T2` runtime before `T1-7` passes full-run regression and manual
+  playtest;
+- [ ] keep accepted `0–10` numbers unless an explicit balance decision records
+  a change;
+- [ ] do not create late-game placeholder screens instead of a real epoch GDD.
 
 ---
 
 # Immediate order
 
 ```text
-DS-05 narrative package accepted
-+ DS-05.5 presentation contract accepted
-→ DS-06 UX architecture accepted
-→ DS-07 art direction accepted
-→ DS-08 global layout approval
-→ art/audio/platform tracks
-→ balance/regression
-→ DS-11 freeze v2
+T1-0 Event Engine + 0–18 audit
+→ T1-1 Organism
+→ T1-2 Cognition
+→ T1-3 First civilization
+→ T1-4 City and Industry
+→ T1-5 Modern and Atomic
+→ T1-6 Great Filter/reset
+→ T1-7 full-run closeout
+→ T2 Memory design and implementation
 ```

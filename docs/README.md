@@ -69,7 +69,8 @@ docs/
 │  ├─ 08_EVENTS_AND_CHOICES.md
 │  ├─ 09_ENDINGS_AND_RESET.md
 │  ├─ 10_META_PROGRESSION.md
-│  └─ 11_BALANCE_RULES.md
+│  ├─ 11_BALANCE_RULES.md
+│  └─ 12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md # accepted: T1 → late-game roadmap
 │
 ├─ scenario/
 │  ├─ 00_NARRATIVE_BIBLE.md
@@ -117,6 +118,16 @@ When documents conflict, use this order.
 3. `gdd/03_EVOLUTION_TREE.md`
 4. specialized GDD
 5. PRD
+
+### Long-term progression after first Ash
+
+1. `gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md`
+2. `PRD.md`
+3. future accepted epoch GDD for the relevant `T2+` layer
+
+`gdd/12` does not replace the detailed `T1` contracts in GDD `01–11`; it
+prevents an omitted early-Timeline mechanic from being misread as a product
+cut and assigns every retained system family to a reset epoch.
 
 ### Numbers / production / pacing
 
@@ -175,9 +186,10 @@ DS-06 may refine **layout**. DS-07 may refine **appearance**. Neither may silent
 
 1. reconciliation decisions for gameplay content
 2. accepted `technical/` architecture docs
-3. `production/IMPLEMENTATION_ITERATION_PLAN.md`
-4. code audit
-5. implementation code
+3. `production/TIMELINE_01_REBUILD_PLAN.md` for the current full-T1 program
+4. `production/IMPLEMENTATION_ITERATION_PLAN.md` for historical iterations
+5. code audit
+6. implementation code
 
 Code never silently overrides product specification.
 
