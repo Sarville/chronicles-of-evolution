@@ -3,7 +3,7 @@ project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "biological_0_10_frozen_iteration_4_ready"
+  work_mode: "iteration_4_complete_ds05_in_progress"
   last_updated: "2026-09-16"
 
 authority:
@@ -19,6 +19,12 @@ authority:
   evolution_tree: "docs/gdd/03_EVOLUTION_TREE.md"
   technical_contract: "docs/technical/00_TECHNICAL_OVERVIEW.md"
   glossary: "docs/GLOSSARY.md"
+  narrative_bible: "docs/scenario/00_NARRATIVE_BIBLE.md"
+  timeline_01_script: "docs/scenario/01_TIMELINE_01_SCRIPT.md"
+  story_events: "docs/scenario/04_STORY_EVENTS.md"
+  narrative_flags: "docs/scenario/05_NARRATIVE_FLAGS.md"
+  endings_copy: "docs/scenario/06_ENDINGS_COPY.md"
+  copy_guide: "docs/scenario/07_COPY_GUIDE.md"
   design_session_plan: "docs/production/DESIGN_SESSION_PLAN.md"
   implementation_plan: "docs/production/IMPLEMENTATION_ITERATION_PLAN.md"
   implementation_handoff: "docs/production/RECONCILIATION_CODEX_HANDOFF.md"
@@ -29,12 +35,12 @@ workflow:
   todo_update_required_at_session_end: true
   decisions_update_when_needed: true
   push_after_approval: true
-  no_game_code_during_design_reconciliation: true
+  no_game_code_during_design_sessions: true
 
 design:
-  current_session: "reconciliation"
-  status: "accepted_documentation_complete"
-  objective: "Restore original readable evolutionary progression while preserving accepted architecture, narrative and meta systems"
+  current_session: "DS-05"
+  status: "narrative_package_in_progress"
+  objective: "Create the complete Timeline #1 narrative package on top of the reconciled gameplay canon without changing mechanics, economy or progression rules"
   accepted_reconciliation:
     - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
     - "Information removed as player-facing spendable resource"
@@ -69,24 +75,26 @@ design:
     DS-03: { name: "Technical architecture and data contract", status: accepted_architecture_content_refs_reconciled }
     DS-04: { name: "Meta progression and balance rules", status: reconciled }
     RECONCILIATION: { name: "Original GDD design reconciliation", status: accepted }
-    DS-05: { name: "Timeline #1 full narrative package", status: wait_for_iteration_4 }
-    DS-06: { name: "UX architecture and wireframes", status: wait_for_iteration_4 }
-    DS-07: { name: "Art direction, locations and era transitions", status: blocked }
-    DS-08: { name: "Art production manifest and generation prompts", status: blocked }
-    DS-09: { name: "Audio design and generation package", status: blocked }
-    DS-10: { name: "Analytics, platform and production readiness", status: blocked }
+    DS-05: { name: "Timeline #1 full narrative package", status: in_progress }
+    DS-06: { name: "UX architecture and wireframes", status: unlocked }
+    DS-07: { name: "Art direction, locations and era transitions", status: blocked_by_ds05_ds06 }
+    DS-08: { name: "Art production manifest and generation prompts", status: blocked_by_ds07 }
+    DS-09: { name: "Audio design and generation package", status: blocked_by_ds05_ds07 }
+    DS-10: { name: "Analytics, platform and production readiness", status: blocked_by_gameplay_ux_stability }
     DS-11: { name: "Cross-document consistency pass and design freeze", status: blocked_by_code_rework_and_balance }
 
 implementation:
-  current_iteration: 3
+  current_iteration: 4
   status:
     - "iteration_3_technical_foundation_passed"
     - "biological_0_10_accepted_and_frozen"
-    - "iteration_4_ready_not_started"
+    - "iteration_4_complete_user_confirmed"
   technical_foundation_commit: "32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb"
   biological_0_10_freeze_commit: "e0b2f5e8eb9e5433eb6c3b934fa048c7203537b1"
+  iteration_4_completion_source: "user_confirmed_2026-09-16"
+  iteration_4_completion_commit: "pending_remote_reference"
   architecture_status: "accepted"
-  content_status: "biological_0_10_frozen_baseline"
+  content_status: "post_cell_iteration_4_complete"
   preserved_systems:
     - "isolated src/chronicles domain"
     - "data-driven config and validators"
@@ -107,29 +115,22 @@ implementation:
       name: "Biological gameplay reconciliation implementation"
       status: done
       handoff: "docs/production/RECONCILIATION_CODEX_HANDOFF.md"
-      scope:
-        - "replace current 0-10 E/I content with RNA/DNA/Cell canon"
-        - "migrate config and Goal Engine content"
-        - "preserve architecture"
-        - "update tests and simulation"
-        - "rebalance 0-10 from scratch"
-        - "manual playtest 0-10"
     4:
       name: "First corrected content expansion after Cell"
-      status: ready
+      status: done_user_confirmed
+      completion_commit: "pending_remote_reference"
 
 iteration_4:
-  status: "ready"
-  unblock_conditions:
-    - "Biological gameplay reconciliation implementation passed"
-    - "0-10 rebalance passed"
-    - "manual 0-10 playtest approved"
-  started: false
+  status: "done_user_confirmed"
+  completion_source: "user confirmation on 2026-09-16"
+  completion_commit: "pending_remote_reference"
+  note: "GitHub master did not expose a newer implementation commit at DS-05 start; do not invent a SHA. Attach it when available."
 
 balance:
   ruleset_target: "timeline1-v2-reconciled"
   old_0_10_ei_balance: "historical_superseded"
   biological_numbers: "0_10_frozen_baseline"
+  post_cell_numbers: "iteration_4_implemented_pending_full_0_40_validation"
   civilization_numbers: "provisional_until_full_rebalance"
   crisis_contract: "accepted_pending_regression"
   biological_0_10:
@@ -146,9 +147,8 @@ balance:
       - "ETA semantics"
 
 open_decisions:
-  - "Exact RNA/DNA/Biomass/Energy rates and costs for corrected 0-40 biological phase"
-  - "Exact AP reward/cost table"
-  - "Exact optional Photosynthesis/Chemosynthesis effects"
+  - "Exact AP reward/cost table beyond implemented Iteration 4 scope"
+  - "Exact optional Photosynthesis/Chemosynthesis effects if still provisional after Iteration 4"
   - "Exact civilization starting F/M/K package and population thresholds after Population~5 start"
   - "Which civilization specializations remain paid branches versus profile/event choices"
   - "Exact Timeline #2 p50 after corrected Timeline #1 simulation"
@@ -156,6 +156,6 @@ open_decisions:
   - "Exact Yandex/VK SDK mapping and cloud policy"
 
 next_action:
-  owner: "Codex"
-  session: "Iteration 4"
-  description: "First corrected content expansion after Cell. Biological 0-10 is frozen; do not alter it without regression/playtest evidence."
+  owner: "Design"
+  session: "DS-05"
+  description: "Create and review the complete Timeline #1 narrative package: main script, story events, narrative flags, endings copy and copy guide. Do not change gameplay/economy contracts."
