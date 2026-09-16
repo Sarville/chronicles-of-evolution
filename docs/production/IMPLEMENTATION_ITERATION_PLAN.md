@@ -1,6 +1,6 @@
 # Хроники Эволюции — пошаговый план реализации для Codex
 
-**Версия:** reconciliation revision 2.0  
+**Версия:** reconciliation revision 2.1  
 **Scope:** Timeline #1 0–120, first Ash/reset, Timeline #2 teaser.  
 **Principle:** preserve accepted architecture; rework content before extending it.
 
@@ -19,107 +19,73 @@ Codex must not:
 
 - restore superseded Energy/Information molecular content from old commits;
 - invent new gameplay concepts to fill gaps;
-- start Iteration 4 while reconciliation rework is blocked;
+- start Iteration 4 while reconciliation rework is incomplete;
 - change canonical design without documentation update.
 
 ---
 
-# 2. Definition of Done
-
-Every implementation iteration must:
-
-- build successfully;
-- pass relevant tests;
-- have a playable/testable path;
-- keep state/config separated from presentation;
-- preserve save/recovery invariants;
-- use stable IDs/explicit migrations;
-- update simulation where balance changes;
-- update TODO/known issues;
-- stop at its review gate.
-
----
-
-# 3. Historical iterations
+# 2. Historical iterations
 
 ## Iteration 0 — Repo baseline and code audit
 
-**Status:** done.
+Status: done.
 
 ## Iteration 1 — Domain adapter and data foundation
 
-**Status:** done.
-
-Accepted technical output:
-
-- isolated `src/chronicles` domain;
-- data-driven registries/validation;
-- commands/events/selectors;
-- resource/cost/production services;
-- ports/adapters;
-- headless test foundation.
+Status: done.
 
 ## Iteration 2 — Save v1 and dev tools
 
-**Status:** done.
-
-Accepted:
-
-- versioned save;
-- primary/pending/backup recovery;
-- autosave;
-- dev speed 1x/5x/20x/100x;
-- resource/event/state tools;
-- idempotent reset foundation.
+Status: done.
 
 ## Iteration 3 — Goal Engine + tutorial shell
 
 **Technical status:** done / gate passed.
 
-Accepted:
-
-- generic Goal Engine;
-- optional goals;
-- lifecycle/prerequisites/conditions/rewards;
-- CTA/highlights/hints;
-- objective UI shell;
-- telemetry hooks;
-- playable runtime integration;
-- save/load/autosave integration;
-- simulation/UI tests.
-
 Accepted implementation baseline:
 
 `32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb`
 
-### Important reconciliation status
+Keep:
 
-Iteration 3 **architecture is accepted**.
+- isolated domain;
+- data-driven config/validation;
+- canonical GameState;
+- commands/events/selectors;
+- Goal Engine;
+- optional goals;
+- CTA/highlight/hint foundation;
+- save/autosave/recovery;
+- dev speed/tools;
+- telemetry;
+- headless simulation;
+- UI technical shell.
 
-Its molecular content is superseded:
+Superseded content:
 
 ```text
-Energy / Information
+Energy / Information molecular economy
 Chemical Gradient
 Catalytic Fold
 Energy Pocket
 Stable Bond old semantics
 old M01–M06 effects/costs
+old 0–10 balance
 ```
 
-Do not classify Iteration 3 as technically failed.
+Iteration 3 is not a technical failure.
 
 ---
 
-# 4. Mandatory Rework Iteration — Biological gameplay reconciliation 0–10
+# 3. NEXT — Biological gameplay reconciliation 0–10
 
-**Status:** blocked until user approves reconciled docs.
+**Status:** READY.
 
-This iteration happens **before Iteration 4**.
+This is the next Codex implementation task.
 
 ## Goal
 
-Replace only the superseded early content while preserving Iteration 3 architecture.
+Replace superseded early content while preserving Iteration 3 architecture.
 
 Corrected playable path:
 
@@ -127,12 +93,15 @@ Corrected playable path:
 Stable RNA
 → Self Replication
 → DNA Synthesis
+→ Error Correction [optional]
 → Membrane
 → Cell
 ```
 
-## Inputs
+## Required inputs
 
+- `docs/PROJECT_STATE.yaml`;
+- `docs/TODO.md`;
 - `docs/DECISIONS_RECONCILIATION.md`;
 - `docs/gdd/01_FIRST_120_MINUTES.md`;
 - `docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md`;
@@ -146,18 +115,16 @@ Stable RNA
 
 ## Data/config tasks
 
-- create/activate ruleset `timeline1-v2-reconciled`;
-- replace early resource IDs/config with RNA/DNA and later Biomass hooks;
+- create/activate `timeline1-v2-reconciled`;
+- switch early player-facing resources to RNA/DNA;
 - remove player-facing Information from current ruleset;
-- remove Chemical Gradient / Catalytic Fold / Energy Pocket from current player-facing producer config;
-- update M01–M06 content semantics;
-- keep M04 Error Correction optional;
-- add explicit aliases/migration where pre-release saves require it;
-- validate no stale goal/config reference points to removed content.
+- remove Chemical Gradient / Catalytic Fold / Energy Pocket from current player-facing config;
+- remap M01–M06 semantics;
+- keep M04 optional;
+- add explicit pre-release migration/restart handling where needed;
+- remove stale config/goal/selectors refs.
 
-## Goal Engine content
-
-Update G001–G005:
+## Goal content
 
 ```text
 G001 Stable RNA
@@ -167,18 +134,18 @@ G004 Membrane
 G005 Cell
 ```
 
-Keep Goal Engine code generic. No `if G001` special cases in UI/domain unless genuinely system-level.
+Goal Engine remains generic.
 
-## Runtime/UI
+## UI/runtime
 
-- top resources show current restored resources;
-- first action starts primordial process;
-- passive RNA unlock visible;
-- replication visual feedback;
+- primordial process action;
+- passive RNA reveal;
+- replication feedback;
 - DNA reveal;
-- membrane/cell visual milestone;
+- membrane/cell transition;
 - no Information counter;
-- no old molecular generator cards.
+- no old molecular generator cards;
+- preserve save/recovery/dev tools.
 
 ## Tests
 
@@ -187,13 +154,12 @@ Update/add:
 - config validation;
 - resource unlock order;
 - M01→M06 reachability;
-- optional M04 skippability;
+- M04 skippability;
 - save/load mid-slice;
-- recovery regression;
+- ruleset migration/restart handling;
 - Goal Engine progression;
-- telemetry event names/payloads where content changed;
-- production build dev-tool hiding;
-- UI smoke.
+- UI smoke;
+- production build dev-tool hiding.
 
 ## Simulation profiles
 
@@ -202,146 +168,110 @@ Required:
 - competent;
 - optimized;
 - slower/non-optimal;
-- M04 optional route.
+- M04 optional.
 
 ## Initial timing acceptance
 
 ```text
 first meaningful action <20 sec
-first passive/self-sustaining RNA <60 sec
+passive/self-sustaining RNA <60 sec
 Self Replication ~2–3 min
 DNA visible ~4–6 min
 Cell ~9–11 min
-manual share <=5% after ~3 min
+manual contribution <=5% after ~3 min
 ```
-
-Exact values are tuned during the iteration; do not preserve old E/I node costs for nostalgia.
 
 ## Gate
 
-1. automated tests pass;
-2. headless timings acceptable;
-3. manual playtest 0–10 completed;
-4. user approves corrected playable;
-5. only then Iteration 4 may start.
+- automated tests pass;
+- simulation profiles acceptable;
+- manual 0–10 playtest completed;
+- user approves corrected playable.
+
+Only then Iteration 4 becomes ready.
 
 ---
 
-# 5. Iteration 4 — Cell → first adaptation, ~10–18
+# 4. Iteration 4 — Cell → first adaptation, ~10–18
 
-**Status:** blocked by Rework Iteration.
+**Status:** BLOCKED by Biological Rework.
 
-## Gameplay
+Scope after unblock:
 
 - Biomass;
 - Metabolism;
 - Energy as metabolic resource;
 - Protein Synthesis / Ribosome;
 - Organelles;
-- first primary branch:
-  - Absorption;
-  - Symbiosis;
-  - Shell;
+- primary branch Absorption / Symbiosis / Shell;
 - optional Photosynthesis;
 - optional Chemosynthesis;
-- Cell Coordination toward multicellularity.
+- Cell Coordination.
 
-## Branch rules
-
-- one primary trait in Timeline #1;
-- no sibling `×2.5` purchase;
-- branch must change profile/visuals and local economy;
-- all branches must stay inside pacing tolerance.
-
-## Acceptance
-
-- first branch readable and meaningful;
-- no branch soft-lock;
-- 10–18 progression remains understandable without abstract Information currency;
-- save/load and Goal Engine work through branch choice.
+No sibling `×2.5` rule.
 
 ---
 
-# 6. Iteration 5 — Multicellularity / Adaptation Points, ~18–28
-
-## Gameplay
+# 5. Iteration 5 — Multicellularity / AP, ~18–28
 
 - Multicellularity;
-- AP earning from milestones/side objectives;
-- AP spending;
+- AP milestone/side-objective rewards;
 - Mobility;
 - Sensory Cells;
 - Digestion;
 - Structural Tissue;
 - tissue specialization.
 
-## Acceptance
+Core path costs 0 AP.
 
-- core progression requires 0 AP;
-- optional AP builds differ visibly/functionally;
-- player can reach Multicellularity without buying all options;
-- target Multicellularity ~24–28 min.
+Target Multicellularity ~24–28 min.
 
 ---
 
-# 7. Iteration 6 — Nervous System / Cognition / Sapience, ~28–40
-
-## Gameplay
+# 6. Iteration 6 — Nervous System / Cognition / Sapience, ~28–40
 
 - nervous tissue/system;
 - behavior strategy;
 - Cognition 0–100;
 - sensory/neural/social/tool contributors;
 - Danger / Other micro-events;
-- condition-driven Sapience.
+- condition-driven Sapience;
+- civilization transition around Population 5.
 
-## Acceptance
-
-- Sapience cannot be purchased as one ordinary resource node;
-- Cognition contributors are inspectable;
-- optional AP build cannot soft-lock 100 Cognition;
-- target Sapience ~38–40 min;
-- transition to civilization starts around Population 5.
+Target Sapience ~38–40 min.
 
 ---
 
-# 8. Iteration 7 — Tribe, ~38–50
-
-## Gameplay
+# 7. Iteration 7 — Tribe, ~38–50
 
 - Food / Materials / Knowledge / Population;
-- initial Population ~5;
+- Population start ~5;
 - Forager/Hunter;
 - Gatherer;
 - Thinker;
-- simple shelters/hearth/storage/tool structure;
-- population growth;
+- simple camp structures;
+- job assignment;
+- recoverable Food deficit;
 - distribution event.
-
-## Acceptance
-
-- player understands Population→jobs→production;
-- temporary Food deficit recoverable;
-- Tribe established around 48–50 min.
 
 ---
 
-# 9. Iteration 8 — Settlement, ~50–65
+# 8. Iteration 8 — Settlement, ~50–65
 
 - Agriculture;
 - Fields;
 - Houses;
 - Workshop;
 - Storage;
-- Farmer/Builder/Scholar/Artisan;
+- Settlement jobs;
 - Permanent Settlement;
 - Traces Before Us.
 
-Specialization is optional/profile unless separately approved as blocking.
+Settlement specialization optional/profile by default.
 
 ---
 
-# 10. Iteration 9 — City, ~65–80
+# 9. Iteration 9 — City, ~65–80
 
 - Writing;
 - School;
@@ -350,53 +280,47 @@ Specialization is optional/profile unless separately approved as blocking.
 - government-lite;
 - City milestone.
 
-Power is not yet the main top-level resource.
-
-Target City ~78–80 min.
+Power is not yet main top-level resource.
 
 ---
 
-# 11. Iteration 10 — Industry, ~80–95
+# 10. Iteration 10 — Industry, ~80–95
 
 - Mechanization;
 - Steam;
-- factory/rail/logistics;
+- factories/rail/logistics;
 - electrification;
 - Power unlock;
 - automation;
 - Industry milestone;
-- Energy Crisis choice.
-
-Target Industry ~93–95 min.
+- Energy Crisis.
 
 ---
 
-# 12. Iteration 11 — Modern → Atomic, ~95–108
+# 11. Iteration 11 — Modern → Atomic, ~95–108
 
-## Modern
+Modern:
 
 - mature grid;
 - research institutions;
 - communications/global connection;
 - modern logistics/automation;
-- ERROR 17.
+- Error 17.
 
-## Atomic
+Atomic:
 
 - Scientific Method;
 - Atomic Theory;
 - reactor/lab project;
 - Atomic Age;
 - `Снова.`;
-- Stability/World Tension start.
-
-Target Atomic ~107–108 min.
+- Stability/World Tension.
 
 ---
 
-# 13. Iteration 12 — Crisis / Ash / Archive
+# 12. Iteration 12 — Crisis / Ash / Archive
 
-Keep accepted DS-02/DS-03 contract:
+Keep accepted contract:
 
 - crisis phases;
 - bloc conflict;
@@ -405,36 +329,29 @@ Keep accepted DS-02/DS-03 contract:
 - Last Protocol;
 - unavoidable first Ash;
 - Archive Summary;
-- AF reward;
+- AF;
 - idempotent reset;
 - Timeline #2 teaser.
 
-Regression-test the entire flow after balance changes.
-
 ---
 
-# 14. Timeline #2 / meta implementation
+# 13. Meta implementation
 
-Only after Timeline #1 v2 is stable:
+Only after Timeline #1 v2 stabilizes:
 
-- Archive Recall tuned against corrected RNA/DNA/Cognition path;
-- AR01/AR02 rewritten effects;
+- Archive Recall tuned to RNA/DNA/Cognition path;
+- AR01/AR02 reconciled effects;
 - AR05 retained optional adaptation;
 - AR06 secondary primary trait permission;
-- AR09 numerical dual-trait activation;
+- AR09 dual-trait numerical activation;
 - Timeline #2 timing tuned from corrected first-run p50.
 
 ---
 
-# 15. Current command for Codex
-
-Until explicit user approval:
+# 14. Current command for Codex
 
 ```text
-STOP.
-Do not change game code.
-Do not start Rework Iteration.
-Do not start Iteration 4.
+START only the Biological gameplay reconciliation 0–10 task.
+STOP after its tests, simulation, rebalance and handoff for manual playtest.
+DO NOT start Iteration 4 automatically.
 ```
-
-After approval, the next Codex task is the dedicated **Biological gameplay reconciliation 0–10** handoff, not the old Iteration 4.
