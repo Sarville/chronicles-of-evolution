@@ -54,7 +54,7 @@ C0 Proto-chemistry
 → C1 Protocell
 → C2 Cell
 → C2A/B/C Primary Trait
-→ C3 Early Multicellular
+→ C3 Coordinated Colony
 → C4 Multicellular Organism
 → C5 Adapted Organism
 → C6 Cognitive Organism
@@ -96,9 +96,9 @@ Transition out:
 
 # 4. V1 — Cellular
 
-**Gameplay:** G005–G008 entry.  
+**Gameplay:** G005–G008.  
 **Scale:** cell-focused microscopic.  
-**Narrative meaning:** жизнь стала отдельной системой.
+**Narrative meaning:** жизнь стала отдельной системой и учится координировать клетки до настоящего многоклеточного breakthrough.
 
 Обязательные признаки:
 
@@ -106,7 +106,8 @@ Transition out:
 - molecular background остаётся, но теряет главную роль;
 - Biomass/Metabolism должны ощущаться как процессы живой клетки;
 - Protein Synthesis / Organelles делают внутреннюю структуру богаче;
-- primary trait меняет silhouette/behavior enough to be remembered.
+- primary trait меняет silhouette/behavior enough to be remembered;
+- к G008 отдельные клетки/потомки могут образовывать более организованную колонию, но единый организм ещё не считается сформированным.
 
 ## Primary trait variants
 
@@ -144,17 +145,32 @@ Shell — самый silhouette-critical из трёх вариантов.
 
 Photosynthesis/Chemosynthesis/Efficient Digestion могут добавлять secondary visual tags, но не должны перекрывать primary trait.
 
+## C3 — Coordinated Colony / pre-multicellular
+
+**Gameplay boundary:** G008 / AP introduction, до G009.
+
+Visual semantics:
+
+- несколько клеток/единиц действуют более согласованно;
+- появляется направление будущего body plan;
+- AP adaptation previews могут показывать будущие функции/форму;
+- визуал не должен сообщать, что Multicellularity уже достигнута.
+
+Hard rule:
+
+> G008 может показать потенциал будущего тела, но переход `V1 → V2` происходит только на G009/MS02.
+
 Transition out:
 
-> coordinated multicellular form emerges → V2.
+> coordinated colony → one readable organism → V2.
 
 ---
 
 # 5. V2 — Creature
 
-**Gameplay:** Multicellularity → Cognition, ~24–40 мин.  
+**Gameplay:** G009 Multicellularity → Cognition/Sapience, ~24–40 мин.  
 **Scale:** whole organism / local environment.  
-**Narrative meaning:** жизнь получает тело, поведение и затем внутреннюю модель мира.
+**Narrative meaning:** жизнь получает единое тело, поведение и затем внутреннюю модель мира.
 
 Обязательные признаки:
 
@@ -165,16 +181,12 @@ Transition out:
 - Nervous System скорее меняет поведение/coordination, чем обязан рисовать literal мозг;
 - Cognition phase должна ощущаться сложнее через реакцию, внимание, движение, social/object behavior.
 
-## C3 — Early Multicellular
-
-- ещё простая форма;
-- видна связь с клеточной стадией;
-- specialization только начинается.
-
 ## C4 — Multicellular Organism
 
+- G009/MS02 — первый момент, когда вид становится единым многоклеточным организмом;
 - единый body plan;
-- движение/жизнедеятельность воспринимаются как действия одного организма.
+- движение/жизнедеятельность воспринимаются как действия одного организма;
+- должна сохраняться узнаваемая связь с C3 и primary trait.
 
 ## C5 — Adapted Organism
 
@@ -234,7 +246,7 @@ Transition out:
 
 **Gameplay:** Farming → permanent settlement, ~50–65 мин.  
 **Scale:** village / local territory.  
-**Narrative meaning:** люди/существа решили остаться.
+**Narrative meaning:** разумный вид решил остаться.
 
 Обязательные признаки:
 
@@ -404,13 +416,14 @@ Subtypes `ash_fire`, `ash_too_late`, `ash_system` may alter details/copy; they d
 # 13. Creature inheritance rules
 
 1. Primary trait is persistent visual ancestry across C2→C7.
-2. Optional adaptations layer on top of current morphology.
-3. Later body development may abstract an early cellular feature, but should preserve a recognizable motif where possible.
-4. No adaptation should silently disappear if it was sold to the player as visually meaningful.
-5. Not every numeric modifier requires visible morphology.
-6. Behavior choices can primarily change animation repertoire rather than anatomy.
-7. Sapience should not turn the species into a generic human unless DS-07 explicitly chooses and justifies that direction.
-8. Civilization buildings/props must be designed for the actual species/body plan chosen by DS-07.
+2. C3 is a coordinated colony/pre-multicellular state; it must not steal the G009/MS02 payoff.
+3. Optional adaptations layer on top of current morphology or preview the emerging body plan.
+4. Later body development may abstract an early cellular feature, but should preserve a recognizable motif where possible.
+5. No adaptation should silently disappear if it was sold to the player as visually meaningful.
+6. Not every numeric modifier requires visible morphology.
+7. Behavior choices can primarily change animation repertoire rather than anatomy.
+8. Sapience should not turn the species into a generic human unless DS-07 explicitly chooses and justifies that direction.
+9. Civilization buildings/props must be designed for the actual species/body plan chosen by DS-07.
 
 ---
 
@@ -447,6 +460,7 @@ Semantic camera progression:
 ```text
 molecular detail
 → single cell
+→ coordinated colony
 → whole organism
 → organism in environment
 → small sapient group
@@ -470,7 +484,7 @@ A player should be able to compare the first minutes and the Modern phase and im
 Major transitions should prefer continuity over hard cuts:
 
 - V0→V1: membrane/cell focus;
-- V1→V2: cells coordinate into body;
+- V1→V2: coordinated colony becomes one body only on G009/MS02;
 - V2→V3: cognitive organism → night scene → camera pull-back → group;
 - V3→V4: accumulation/permanence;
 - V4→V5: density/institutions;
@@ -508,6 +522,7 @@ DS-07 must solve these while preserving V0–V9/C0–C7 semantics.
 - [x] restored biology has visible continuity
 - [x] primary trait has a persistent visual identity
 - [x] AP/adaptations have a defined layering role without appearing before G008
+- [x] G008 remains pre-multicellular and G009/MS02 owns the V1→V2 breakthrough
 - [x] Sapience has a concrete scale transition
 - [x] Tribe / Settlement / City are distinct
 - [x] Industry and Modern are distinct
