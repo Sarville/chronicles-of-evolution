@@ -25,15 +25,13 @@
 
 Если `TODO.md` расходится с `PROJECT_STATE.yaml`, верен `PROJECT_STATE.yaml`.
 
-### `DECISIONS.md`
+### `DECISIONS.md` + addenda
 
-Основной исторический реестр решений.
+Исторический реестр решений. Для reconciliation используются также:
 
-### `DECISIONS_RECONCILIATION.md`
-
-Текущий authoritative addendum для design reconciliation.
-
-Для вопросов biological progression, resources, first branch, Adaptation Points, Cognition/Sapience, Power timing, Modern phase и implementation order он имеет приоритет над более ранними решениями.
+- `DECISIONS_DS03.md`;
+- `DECISIONS_DS04.md`;
+- `DECISIONS_RECONCILIATION.md`.
 
 ### `GLOSSARY.md`
 
@@ -55,10 +53,7 @@ Roadmap Codex. Фактический статус всегда берётся �
 docs/
 ├─ README.md
 ├─ PROJECT_STATE.yaml
-├─ DECISIONS.md
-├─ DECISIONS_DS03.md
-├─ DECISIONS_DS04.md
-├─ DECISIONS_RECONCILIATION.md
+├─ DECISIONS*.md
 ├─ GLOSSARY.md
 ├─ TODO.md
 ├─ PRD.md
@@ -77,8 +72,21 @@ docs/
 │  └─ 11_BALANCE_RULES.md
 │
 ├─ scenario/
+│  ├─ 00_NARRATIVE_BIBLE.md
+│  ├─ 01_TIMELINE_01_SCRIPT.md
+│  ├─ 04_STORY_EVENTS.md
+│  ├─ 05_NARRATIVE_FLAGS.md
+│  ├─ 06_ENDINGS_COPY.md
+│  └─ 07_COPY_GUIDE.md
+│
 ├─ ux/
+│  ├─ 00_TIMELINE_PRESENTATION_MAP.md   # DS-05.5 bridge contract
+│  └─ README.md                         # DS-06 plan
+│
 ├─ art/
+│  ├─ 00_VISUAL_STATE_MAP.md            # DS-05.5 bridge contract
+│  └─ README.md                         # DS-07/08 plan
+│
 ├─ audio/
 ├─ technical/
 └─ production/
@@ -118,8 +126,6 @@ When documents conflict, use this order.
 4. specialized GDD
 5. PRD
 
-Important:
-
 > Economy is a tuning source for approved gameplay. It cannot invent a new resource/generator/progression model solely for simulation convenience.
 
 ### Evolution / tech / buildings / jobs
@@ -137,6 +143,27 @@ Important:
 3. `gdd/08_EVENTS_AND_CHOICES.md`
 4. `gdd/09_ENDINGS_AND_RESET.md`
 5. scenario docs
+
+### Narrative copy / dramatic sequence
+
+1. gameplay triggers/conditions from GDD
+2. `scenario/01_TIMELINE_01_SCRIPT.md`
+3. `scenario/04_STORY_EVENTS.md`
+4. `scenario/06_ENDINGS_COPY.md`
+5. `scenario/07_COPY_GUIDE.md`
+
+Narrative docs may define presentation/copy but cannot silently create new gameplay gates.
+
+### Presentation bridge — gameplay/narrative → UX/art
+
+1. gameplay + scenario authorities above
+2. `ux/00_TIMELINE_PRESENTATION_MAP.md` for presentation beats `PB00–PB30`
+3. `art/00_VISUAL_STATE_MAP.md` for semantic world/creature states `V0–V9` / `C0–C7`
+4. future accepted DS-06 UX docs for exact layout/interaction
+5. future accepted DS-07 art docs for exact appearance
+6. DS-08 asset manifest for production files
+
+DS-06 may refine **layout**. DS-07 may refine **appearance**. Neither may silently change gameplay/narrative meaning already bound by the presentation contract.
 
 ### Meta / balance
 
@@ -158,7 +185,7 @@ Code never silently overrides product specification.
 
 ## 4. Reconciled gameplay shorthand
 
-Canonical first Timeline now follows:
+Canonical first Timeline follows:
 
 ```text
 RNA
@@ -183,7 +210,7 @@ RNA
 → Archive
 ```
 
-The following late-design improvements remain canonical:
+The following later-design improvements remain canonical:
 
 - generic Goal Engine;
 - data-driven config/branching;
@@ -200,7 +227,42 @@ The following late-design improvements remain canonical:
 
 ---
 
-## 5. Superseded early content
+## 5. Presentation shorthand
+
+World visual progression:
+
+```text
+V0 Primordial
+→ V1 Cellular
+→ V2 Creature
+→ V3 Sapient Tribe
+→ V4 Settlement
+→ V5 City
+→ V6 Industrial
+→ V7 Modern
+→ V8 Atomic
+→ V9 Ash
+```
+
+Creature continuity:
+
+```text
+C0 Proto-chemistry
+→ C1 Protocell
+→ C2 Cell
+→ C2A/B/C Primary Trait
+→ C3 Early Multicellular
+→ C4 Multicellular Organism
+→ C5 Adapted Organism
+→ C6 Cognitive Organism
+→ C7 Sapient Species
+```
+
+Detailed timing and screen mapping: `ux/00_TIMELINE_PRESENTATION_MAP.md`.
+
+---
+
+## 6. Superseded early content
 
 The following may exist in git history or implementation baseline, but are not current reconciled player-facing canon:
 
@@ -217,40 +279,40 @@ Historical references must be explicitly labelled `superseded`.
 
 ---
 
-## 6. Implementation baseline
+## 7. Implementation status
 
-Accepted technical implementation baseline before content reconciliation:
+Accepted technical foundation:
 
 `32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb`
 
-Meaning:
+Accepted biological 0–10 freeze reference:
 
-```text
-KEEP architecture
-KEEP Goal Engine
-KEEP save/recovery
-KEEP dev tools/simulation
-REWORK early content/config
-REBALANCE early gameplay
-```
+`e0b2f5e8eb9e5433eb6c3b934fa048c7203537b1`
 
-Iteration 4 is blocked until the dedicated biological 0–10 reconciliation implementation passes simulation + manual playtest.
+Iteration 4 implementation reference:
+
+`79e7b93ea5bde181ff77ad8c6d281449cc5be1d8`
+
+Iteration 4 is complete/user-confirmed. A subsequent consistency pass aligned G006/G007 with the canonical GDD/scenario and removed premature G008/G009/AP content. Exact 10–18 balance remains provisional until manual playtest.
+
+Always read `PROJECT_STATE.yaml` for current implementation scope and caveats.
 
 ---
 
-## 7. Workflow
-
-Current order:
+## 8. Current workflow
 
 ```text
-document reconciliation
-→ approval
-→ biological 0–10 code rework
-→ rebalance
-→ manual playtest
-→ corrected Iteration 4
-→ further design sessions
-→ final design freeze v2
+reconciled gameplay baseline
+→ biological 0–10 freeze
+→ Iteration 4 complete
+→ DS-05 narrative package
+→ DS-05.5 presentation bridge
+→ DS-06 UX
+→ DS-07 art direction
+→ DS-08 asset manifest / DS-09 audio
+→ DS-10 analytics/platform
+→ balance/regression
+→ DS-11 design freeze v2
 ```
 
 Before any Codex task, read `PROJECT_STATE.yaml` and the current iteration inputs.
