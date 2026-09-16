@@ -5,11 +5,20 @@ import { validateRuleset } from '../../src/chronicles/domain/validation.js';
 const result = validateRuleset(ruleset);
 assert.deepEqual(result.errors, []);
 assert.equal(result.ok, true);
-assert.equal(JSON.parse(JSON.stringify(ruleset)).version, 'timeline1-v1');
+assert.equal(JSON.parse(JSON.stringify(ruleset)).version, 'timeline1-v2-reconciled');
 assert.equal(ruleset.allowedEffectTypes.includes('manual_gain_multiplier'), true);
 assert.equal(ruleset.allowedEffectTypes.includes('job_output_multiplier'), false);
 assert.equal(ruleset.effectSupport.manual_gain_multiplier.status, 'supported');
 assert.equal(ruleset.effectSupport.unlock_auto_production.status, 'supported');
+assert.equal(ruleset.resources.some((resource) => resource.id === 'rna'), true);
+assert.equal(ruleset.resources.some((resource) => resource.id === 'dna'), true);
+assert.equal(ruleset.resources.some((resource) => resource.id === 'information'), false);
+assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_CHEMICAL_GRADIENT'), false);
+assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_CATALYTIC_FOLD'), false);
+assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_ENERGY_POCKET'), false);
+assert.equal(ruleset.nodes.find((node) => node.id === 'M04').type, 'OPTIONAL');
+assert.deepEqual(ruleset.nodes.find((node) => node.id === 'M05').requiresNodes, ['M03']);
+assert.equal(ruleset.goals.find((goal) => goal.id === 'G002').highlight.targetId, 'PROC_RNA_REPLICATION');
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -28,11 +37,11 @@ assert.equal(invalidCap.ok, false);
 assert.equal(invalidCap.errors.some((error) => error.includes('invalid baseCap')), true);
 
 const invalidBranchRuleRuleset = clone(ruleset);
-invalidBranchRuleRuleset.branchCostRules.metabolism_1.allowAdditionalBranches = 'true';
+invalidBranchRuleRuleset.branchCostRules.cell_identity_1.allowAdditionalBranches = 'true';
 const invalidBranchRule = validateRuleset(invalidBranchRuleRuleset);
 assert.equal(invalidBranchRule.ok, false);
 assert.equal(
-  invalidBranchRule.errors.includes('metabolism_1 has non-boolean allowAdditionalBranches'),
+  invalidBranchRule.errors.includes('cell_identity_1 has non-boolean allowAdditionalBranches'),
   true
 );
 

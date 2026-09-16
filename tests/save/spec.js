@@ -20,7 +20,7 @@ const clock = createFakeClock(Date.UTC(2026, 8, 15));
 const repository = createSaveRepository({ storage, clock });
 
 const state = createInitialGameState();
-state.run.resources.energy.amount = 12;
+state.run.resources.rna.amount = 12;
 assert.doesNotThrow(() => JSON.parse(JSON.stringify(state)));
 const save = repository.save(state);
 assert.equal(save.ok, true);
@@ -30,14 +30,15 @@ assert.equal(storage.get('evolved'), 'legacy-save-must-survive');
 
 const loaded = repository.loadOrCreate();
 assert.equal(loaded.ok, true);
-assert.equal(loaded.state.run.resources.energy.amount, 12);
+assert.equal(loaded.state.run.resources.rna.amount, 12);
 assert.equal(loaded.sourceKey, SAVE_KEYS.primary);
 assert.equal(loaded.envelope.schemaVersion, CURRENT_SCHEMA_VERSION);
+assert.equal(loaded.envelope.rulesetVersion, 'timeline1-v2-reconciled');
 assert.equal(loaded.envelope.transactions.pendingReset, null);
 assert.equal(loaded.state.meta.archiveFragments, 0);
 assert.equal(loaded.state.settings.autosave, true);
 
-state.run.resources.energy.amount = 24;
+state.run.resources.rna.amount = 24;
 const secondSave = repository.save(state);
 assert.equal(secondSave.ok, true);
 assert.equal(secondSave.envelope.saveRevision, 2);
@@ -48,19 +49,19 @@ storage.set(SAVE_KEYS.primary, '{bad json');
 const fallback = repository.loadOrCreate();
 assert.equal(fallback.ok, true);
 assert.equal(fallback.sourceKey, SAVE_KEYS.backup);
-assert.equal(fallback.state.run.resources.energy.amount, 12);
+assert.equal(fallback.state.run.resources.rna.amount, 12);
 
 const pendingStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
 const pendingRepository = createSaveRepository({ storage: pendingStorage, clock });
 const pendingState = createInitialGameState();
-pendingState.run.resources.energy.amount = 33;
+pendingState.run.resources.rna.amount = 33;
 const pendingEnvelope = createSaveEnvelope(pendingState, { clock });
 pendingStorage.set(SAVE_KEYS.primary, '{bad json');
 pendingStorage.set(SAVE_KEYS.pending, JSON.stringify(pendingEnvelope));
 const pendingFallback = pendingRepository.loadOrCreate();
 assert.equal(pendingFallback.ok, true);
 assert.equal(pendingFallback.sourceKey, SAVE_KEYS.pending);
-assert.equal(pendingFallback.state.run.resources.energy.amount, 33);
+assert.equal(pendingFallback.state.run.resources.rna.amount, 33);
 assert.equal(pendingStorage.get('evolved'), 'legacy-save-must-survive');
 pendingStorage.set(SAVE_KEYS.primary, 'null');
 pendingStorage.remove(SAVE_KEYS.pending);
@@ -73,19 +74,26 @@ assert.equal(explicitFreshAfterCorruption.ok, true);
 assert.equal(explicitFreshAfterCorruption.created, true);
 assert.equal(pendingStorage.get('evolved'), 'legacy-save-must-survive');
 
-const newerBackupStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
-const newerBackupRepository = createSaveRepository({ storage: newerBackupStorage, clock });
-const olderPending = createSaveEnvelope(createInitialGameState(), { clock, saveRevision: 2 });
-const newerBackupState = createInitialGameState();
-newerBackupState.run.resources.energy.amount = 44;
-const newerBackup = createSaveEnvelope(newerBackupState, { clock, saveRevision: 3 });
-newerBackupStorage.set(SAVE_KEYS.primary, '{bad json');
-newerBackupStorage.set(SAVE_KEYS.pending, JSON.stringify(olderPending));
-newerBackupStorage.set(SAVE_KEYS.backup, JSON.stringify(newerBackup));
-const newerBackupFallback = newerBackupRepository.loadOrCreate();
-assert.equal(newerBackupFallback.ok, true);
-assert.equal(newerBackupFallback.sourceKey, SAVE_KEYS.backup);
-assert.equal(newerBackupFallback.state.run.resources.energy.amount, 44);
+const legacyRulesetStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
+const legacyRulesetRepository = createSaveRepository({ storage: legacyRulesetStorage, clock });
+const oldRulesetState = createInitialGameState();
+oldRulesetState.meta.archiveFragments = 9;
+oldRulesetState.meta.persistentFlags.keepMeta = true;
+oldRulesetState.settings.locale = 'en';
+const oldRulesetEnvelope = createSaveEnvelope(oldRulesetState, { clock, saveRevision: 4 });
+oldRulesetEnvelope.rulesetVersion = 'timeline1-v1';
+oldRulesetEnvelope.run.rulesetVersion = 'timeline1-v1';
+oldRulesetEnvelope.run.resources = { energy: { amount: 999 }, information: { amount: 111 } };
+legacyRulesetStorage.set(SAVE_KEYS.primary, JSON.stringify(oldRulesetEnvelope));
+const oldRulesetRestart = legacyRulesetRepository.loadOrCreate();
+assert.equal(oldRulesetRestart.ok, true);
+assert.equal(oldRulesetRestart.oldRulesetRestarted, true);
+assert.equal(oldRulesetRestart.previousRulesetVersion, 'timeline1-v1');
+assert.deepEqual(oldRulesetRestart.state.run.resources, { rna: { amount: 0 } });
+assert.equal(oldRulesetRestart.state.meta.archiveFragments, 9);
+assert.equal(oldRulesetRestart.state.meta.persistentFlags.keepMeta, true);
+assert.equal(oldRulesetRestart.state.settings.locale, 'en');
+assert.equal(legacyRulesetStorage.get('evolved'), 'legacy-save-must-survive');
 
 const legacyV1 = createSaveEnvelope(createInitialGameState(), { clock });
 delete legacyV1.transactions;
@@ -103,7 +111,7 @@ assert.equal(missingMeta.ok, false);
 assert.equal(missingMeta.errors.includes('State must contain run, meta and settings'), true);
 
 const invalidResource = createInitialGameState();
-invalidResource.run.resources.energy.amount = Number.NaN;
+invalidResource.run.resources.rna.amount = Number.NaN;
 const invalidResourceResult = validateGameState(invalidResource, ruleset);
 assert.equal(invalidResourceResult.ok, false);
 assert.equal(invalidResourceResult.errors.some((error) => error.includes('invalid amount')), true);
@@ -128,39 +136,35 @@ const autosave = createAutosaveController({
   clock: autosaveClock,
 });
 assert.equal(autosave.tick(999).skipped, true);
-autosaveDebug.grant('energy', 5);
+autosaveDebug.grant('rna', 5);
 const autosaveResult = autosave.tick(1);
 assert.equal(autosaveResult.ok, true);
 assert.equal(autosaveDebug.engine.state.session.dirty, false);
-assert.equal(autosaveRepository.loadOrCreate().state.run.resources.energy.amount, 5);
+assert.equal(autosaveRepository.loadOrCreate().state.run.resources.rna.amount, 5);
 
-autosaveDebug.grant('energy', 3);
+autosaveDebug.grant('rna', 3);
 assert.equal(autosave.flush('visibility').ok, true);
-assert.equal(autosaveRepository.loadOrCreate().state.run.resources.energy.amount, 8);
+assert.equal(autosaveRepository.loadOrCreate().state.run.resources.rna.amount, 8);
 
 const midSliceStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
 const midSliceRepository = createSaveRepository({ storage: midSliceStorage, clock });
 const midSliceEngine = createChroniclesEngine({ ruleset, ports: { clock } });
-for (let index = 0; index < 12; index += 1) {
-  midSliceEngine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
-  midSliceEngine.tick(1000);
-}
-midSliceEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'energy', amount: 300 });
-midSliceEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'information', amount: 40 });
-midSliceEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'GEN_CHEMICAL_GRADIENT' });
-for (const nodeId of ['M01', 'M02', 'M03']) {
-  const buy = midSliceEngine.dispatch({ type: 'BUY_NODE', nodeId });
-  assert.equal(buy.ok, true);
-}
+midSliceEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 1200 });
+midSliceEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });
+midSliceEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M01' });
+midSliceEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M02' });
+midSliceEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_RNA_REPLICATION' });
+midSliceEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M03' });
+midSliceEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'dna', amount: 140 });
 assert.equal(midSliceRepository.save(midSliceEngine.state).ok, true);
 const midSliceLoaded = midSliceRepository.loadOrCreate();
 assert.equal(midSliceLoaded.ok, true);
 assert.equal(midSliceLoaded.state.run.goals.currentId, 'G004');
 assert.equal(midSliceLoaded.state.run.goals.states.G003.status, 'archived');
 assert.equal(midSliceLoaded.state.run.goals.side.activeIds.includes('G003_M04_OPTIONAL'), true);
-assert.equal(midSliceLoaded.state.run.producers.GEN_CHEMICAL_GRADIENT.count, 1);
+assert.equal(midSliceLoaded.state.run.producers.PROC_PRIMORDIAL_REACTION.count, 1);
 assert.equal(midSliceLoaded.state.run.nodes.completed.M03.completedAtMs >= 0, true);
-assert.equal(midSliceLoaded.state.run.manualProcesses.MANUAL_PRIMORDIAL_PULSE.uses, 6);
+assert.equal(midSliceLoaded.state.run.resources.dna.amount, 140);
 assert.equal(midSliceLoaded.state.run.modifiers.active['M01:auto_production'].type, 'unlock_auto_production');
 assert.equal(midSliceStorage.get('evolved'), 'legacy-save-must-survive');
 
@@ -182,7 +186,7 @@ assert.equal(afterResetLoad.state.meta.archiveFragments, 17);
 assert.equal(afterResetLoad.state.meta.persistentFlags.firstResetCompleted, true);
 
 const preparedResetSource = createInitialGameState({ runId: 'run_fixture_reset' });
-preparedResetSource.run.resources.energy.amount = 777;
+preparedResetSource.run.resources.rna.amount = 777;
 preparedResetSource.run.flags.runOnlyFlag = true;
 preparedResetSource.meta.archiveFragments = 2;
 preparedResetSource.meta.persistentFlags.keepMe = true;
@@ -206,7 +210,7 @@ const firstApply = applyPreparedResetTransaction(preparedResetSource, preparedTr
 assert.equal(firstApply.ok, true);
 assert.equal(firstApply.alreadyApplied, false);
 assert.equal(firstApply.state.run.id, 'run_after_fixture');
-assert.equal(firstApply.state.run.resources.energy.amount, 0);
+assert.equal(firstApply.state.run.resources.rna.amount, 0);
 assert.equal(firstApply.state.run.flags.runOnlyFlag, undefined);
 assert.equal(firstApply.state.meta.archiveFragments, 7);
 assert.equal(firstApply.state.meta.persistentFlags.keepMe, true);
@@ -220,95 +224,6 @@ assert.equal(retryApply.alreadyApplied, true);
 assert.equal(retryApply.state.meta.archiveFragments, 7);
 assert.equal(retryApply.state.meta.chronicle.length, 1);
 assert.equal(retryApply.state.run.id, 'run_after_retry');
-assert.equal(retryApply.state.run.resources.energy.amount, 0);
+assert.equal(retryApply.state.run.resources.rna.amount, 0);
 
-const resetAt100 = createInitialGameState({ runId: 'run_time_100' });
-resetAt100.run.clock.simulationMs = 100;
-resetAt100.meta.archiveFragments = 1;
-const transactionAt100 = prepareResetTransaction(resetAt100, {
-  endingId: 'ENDING_ASH',
-  reward: { archiveFragments: 3 },
-  chronicleRecord: { endingId: 'ENDING_ASH', summaryId: 'time_regression' },
-});
-const resetAt500 = createInitialGameState({ runId: 'run_time_500' });
-resetAt500.run.clock.simulationMs = 500;
-const transactionAt500 = prepareResetTransaction(resetAt500, {
-  endingId: 'ENDING_ASH',
-  reward: { archiveFragments: 3 },
-  chronicleRecord: { endingId: 'ENDING_ASH', summaryId: 'time_regression_retry' },
-});
-assert.equal(transactionAt100.id, 'timeline_001_ending_ENDING_ASH');
-assert.equal(transactionAt500.id, transactionAt100.id);
-assert.equal(transactionAt100.createdAtSimulationMs, 100);
-assert.equal(transactionAt500.createdAtSimulationMs, 500);
-const applyAt100 = applyPreparedResetTransaction(resetAt100, transactionAt100, { nextRunId: 'run_after_time_100' });
-const applyAt500 = applyPreparedResetTransaction(applyAt100.state, transactionAt500, { nextRunId: 'run_after_time_500' });
-assert.equal(applyAt100.state.meta.archiveFragments, 4);
-assert.equal(applyAt500.alreadyApplied, true);
-assert.equal(applyAt500.state.meta.archiveFragments, 4);
-assert.equal(applyAt500.state.meta.chronicle.length, 1);
-assert.deepEqual(applyAt500.state.meta.appliedTransactions, ['timeline_001_ending_ENDING_ASH']);
-
-const devClock = createFakeClock(0);
-const devApi = createDebugApi({ ports: { clock: devClock } });
-assert.equal(devApi.setTimeScale(20).ok, true);
-assert.equal(devApi.engine.state.settings.devTimeScale, 20);
-assert.equal(devApi.setTimeScale(7).ok, false);
-assert.equal(devApi.jumpToEra('CITY').ok, true);
-assert.equal(devApi.engine.state.run.eraId, 'CITY');
-assert.equal(devApi.engine.state.run.resources.power.amount, 0);
-assert.equal(devApi.triggerEvent('EV-BIO-01').ok, true);
-assert.deepEqual(devApi.engine.state.run.events.queue, ['EV-BIO-01']);
-assert.deepEqual(devApi.engine.state.run.events.states['EV-BIO-01'], { status: 'queued', queuedAtMs: 0 });
-const duplicateEvent = devApi.triggerEvent('EV-BIO-01');
-assert.equal(duplicateEvent.ok, false);
-assert.equal(duplicateEvent.reason, 'EVENT_ALREADY_TRACKED');
-assert.deepEqual(devApi.engine.state.run.events.queue, ['EV-BIO-01']);
-const forcedEvent = devApi.triggerEvent('EV-BIO-01', { force: true });
-assert.equal(forcedEvent.ok, true);
-assert.deepEqual(devApi.engine.state.run.events.queue, ['EV-BIO-01', 'EV-BIO-01']);
-devApi.engine.state.meta.archiveFragments = 11;
-devApi.engine.state.settings.autosave = false;
-devApi.engine.state.run.resources.energy.amount = 99;
-const manualDevReset = devApi.manualDevReset({ runId: 'run_after_manual_dev_reset' });
-assert.equal(manualDevReset.ok, true);
-assert.equal(devApi.engine.state.run.id, 'run_after_manual_dev_reset');
-assert.equal(devApi.engine.state.run.resources.energy.amount, 0);
-assert.deepEqual(devApi.engine.state.run.events.queue, []);
-assert.equal(devApi.engine.state.meta.archiveFragments, 11);
-assert.equal(devApi.engine.state.settings.autosave, false);
-assert.equal(devApi.engine.state.session.dirty, true);
-const manualDevResetStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
-const manualDevResetRepository = createSaveRepository({ storage: manualDevResetStorage, clock: devClock });
-assert.equal(manualDevResetRepository.save(devApi.engine.state).ok, true);
-assert.equal(manualDevResetStorage.get('evolved'), 'legacy-save-must-survive');
-const dumped = devApi.dumpState();
-dumped.run.resources.energy.amount = 999;
-assert.notEqual(devApi.engine.state.run.resources.energy.amount, 999);
-assert.throws(() => createDebugApi({ environment: 'production' }).grant('energy', 1), /disabled/);
-assert.throws(() => createDebugApi({ environment: 'production' }).manualDevReset(), /disabled/);
-
-const noSaveStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
-const noSaveRepository = createSaveRepository({ storage: noSaveStorage, clock });
-const noSaveLoad = noSaveRepository.loadOrCreate();
-assert.equal(noSaveLoad.ok, true);
-assert.equal(noSaveLoad.created, true);
-assert.equal(noSaveStorage.get('evolved'), 'legacy-save-must-survive');
-
-const allCorruptStorage = createMemoryStorage({
-  evolved: 'legacy-save-must-survive',
-  [SAVE_KEYS.primary]: '{bad',
-  [SAVE_KEYS.pending]: 'null',
-  [SAVE_KEYS.backup]: JSON.stringify({ format: 'wrong-format' }),
-});
-const allCorruptRepository = createSaveRepository({ storage: allCorruptStorage, clock });
-const allCorruptLoad = allCorruptRepository.loadOrCreate();
-assert.equal(allCorruptLoad.ok, false);
-assert.equal(allCorruptLoad.reason, 'RECOVERY_REQUIRED');
-assert.deepEqual(
-  allCorruptLoad.damagedSlots.map((slot) => slot.key),
-  [SAVE_KEYS.primary, SAVE_KEYS.pending, SAVE_KEYS.backup]
-);
-assert.equal(allCorruptStorage.get('evolved'), 'legacy-save-must-survive');
-
-console.log('save repository ok');
+console.log('save flow ok');

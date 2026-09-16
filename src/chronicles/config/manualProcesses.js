@@ -1,20 +1,20 @@
 export const DEV_TUNING = Object.freeze({
   manualPrimordialPulseCooldownMs: 2000,
-  manualPrimordialPulseStableBondCooldownMs: 3500,
+  manualPrimordialPulseStableRnaCooldownMs: 3500,
   manualPrimordialPulseSelfReplicationCooldownMs: 90000,
 });
 
 export const manualProcesses = [
   {
     id: 'MANUAL_PRIMORDIAL_PULSE',
-    label: 'Primordial pulse',
-    description: 'Onboarding process for the first Energy before Stable Bond unlocks auto-production.',
+    label: 'Primordial reaction',
+    description: 'Onboarding process that starts the first RNA chemistry before passive replication takes over.',
     availableFromStart: true,
     cooldownMs: DEV_TUNING.manualPrimordialPulseCooldownMs,
     cooldownStages: [
       {
         afterNodeId: 'M01',
-        cooldownMs: DEV_TUNING.manualPrimordialPulseStableBondCooldownMs,
+        cooldownMs: DEV_TUNING.manualPrimordialPulseStableRnaCooldownMs,
       },
       {
         afterNodeId: 'M02',
@@ -24,7 +24,7 @@ export const manualProcesses = [
     provisional: true,
     reward: {
       type: 'manual_gain',
-      resourceId: 'energy',
+      resourceId: 'rna',
       baseAmount: 1,
       productionSeconds: 2,
     },

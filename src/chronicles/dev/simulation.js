@@ -6,7 +6,7 @@ import { selectNodeStatus, selectProducerPrice, selectProducerStatus, selectProd
 import { calculateManualReward, manualProcessCooldownMs } from '../domain/services/manualProcesses.js';
 
 const MAIN_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M06'];
-const OPTIONAL_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M04', 'M06'];
+const OPTIONAL_NODE_ORDER = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06'];
 const MANUAL_PROCESS_ID = 'MANUAL_PRIMORDIAL_PULSE';
 
 export const simulationProfiles = {
@@ -16,14 +16,14 @@ export const simulationProfiles = {
     manualSafetyUntilMs: 12 * 60 * 1000,
     maxActionsPerDecision: 12,
     phaseProducerTargets: {
-      M01: { GEN_CHEMICAL_GRADIENT: 1, GEN_CATALYTIC_FOLD: 0, GEN_ENERGY_POCKET: 0 },
-      M02: { GEN_CHEMICAL_GRADIENT: 7, GEN_CATALYTIC_FOLD: 3, GEN_ENERGY_POCKET: 0 },
-      M03: { GEN_CHEMICAL_GRADIENT: 10, GEN_CATALYTIC_FOLD: 6, GEN_ENERGY_POCKET: 4 },
-      M05: { GEN_CHEMICAL_GRADIENT: 12, GEN_CATALYTIC_FOLD: 8, GEN_ENERGY_POCKET: 6 },
-      M06: { GEN_CHEMICAL_GRADIENT: 14, GEN_CATALYTIC_FOLD: 10, GEN_ENERGY_POCKET: 8 },
+      M01: { PROC_PRIMORDIAL_REACTION: 1, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M02: { PROC_PRIMORDIAL_REACTION: 5, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M03: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 3, PROC_DNA_SYNTHESIS: 0 },
+      M05: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 4 },
+      M06: { PROC_PRIMORDIAL_REACTION: 8, PROC_RNA_REPLICATION: 6, PROC_DNA_SYNTHESIS: 6 },
     },
-    informationOrder: ['GEN_CATALYTIC_FOLD', 'GEN_CHEMICAL_GRADIENT', 'GEN_ENERGY_POCKET'],
-    energyOrder: ['GEN_ENERGY_POCKET', 'GEN_CHEMICAL_GRADIENT', 'GEN_CATALYTIC_FOLD'],
+    dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
+    rnaOrder: ['PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION', 'PROC_DNA_SYNTHESIS'],
   },
   competent: {
     decisionIntervalMs: 5000,
@@ -31,14 +31,14 @@ export const simulationProfiles = {
     manualSafetyUntilMs: 12 * 60 * 1000,
     maxActionsPerDecision: 3,
     phaseProducerTargets: {
-      M01: { GEN_CHEMICAL_GRADIENT: 1, GEN_CATALYTIC_FOLD: 0, GEN_ENERGY_POCKET: 0 },
-      M02: { GEN_CHEMICAL_GRADIENT: 5, GEN_CATALYTIC_FOLD: 2, GEN_ENERGY_POCKET: 0 },
-      M03: { GEN_CHEMICAL_GRADIENT: 5, GEN_CATALYTIC_FOLD: 2, GEN_ENERGY_POCKET: 0 },
-      M05: { GEN_CHEMICAL_GRADIENT: 9, GEN_CATALYTIC_FOLD: 6, GEN_ENERGY_POCKET: 3 },
-      M06: { GEN_CHEMICAL_GRADIENT: 13, GEN_CATALYTIC_FOLD: 10, GEN_ENERGY_POCKET: 7 },
+      M01: { PROC_PRIMORDIAL_REACTION: 1, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M02: { PROC_PRIMORDIAL_REACTION: 4, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M03: { PROC_PRIMORDIAL_REACTION: 5, PROC_RNA_REPLICATION: 2, PROC_DNA_SYNTHESIS: 0 },
+      M05: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 4, PROC_DNA_SYNTHESIS: 3 },
+      M06: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 },
     },
-    informationOrder: ['GEN_CATALYTIC_FOLD', 'GEN_CHEMICAL_GRADIENT', 'GEN_ENERGY_POCKET'],
-    energyOrder: ['GEN_CHEMICAL_GRADIENT', 'GEN_ENERGY_POCKET', 'GEN_CATALYTIC_FOLD'],
+    dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
+    rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
   },
   slow: {
     decisionIntervalMs: 9000,
@@ -46,14 +46,14 @@ export const simulationProfiles = {
     manualSafetyUntilMs: 12 * 60 * 1000,
     maxActionsPerDecision: 2,
     phaseProducerTargets: {
-      M01: { GEN_CHEMICAL_GRADIENT: 1, GEN_CATALYTIC_FOLD: 0, GEN_ENERGY_POCKET: 0 },
-      M02: { GEN_CHEMICAL_GRADIENT: 5, GEN_CATALYTIC_FOLD: 1, GEN_ENERGY_POCKET: 0 },
-      M03: { GEN_CHEMICAL_GRADIENT: 8, GEN_CATALYTIC_FOLD: 4, GEN_ENERGY_POCKET: 2 },
-      M05: { GEN_CHEMICAL_GRADIENT: 10, GEN_CATALYTIC_FOLD: 6, GEN_ENERGY_POCKET: 4 },
-      M06: { GEN_CHEMICAL_GRADIENT: 12, GEN_CATALYTIC_FOLD: 8, GEN_ENERGY_POCKET: 6 },
+      M01: { PROC_PRIMORDIAL_REACTION: 1, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M02: { PROC_PRIMORDIAL_REACTION: 3, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M03: { PROC_PRIMORDIAL_REACTION: 4, PROC_RNA_REPLICATION: 1, PROC_DNA_SYNTHESIS: 0 },
+      M05: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 4, PROC_DNA_SYNTHESIS: 3 },
+      M06: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 },
     },
-    informationOrder: ['GEN_CHEMICAL_GRADIENT', 'GEN_CATALYTIC_FOLD', 'GEN_ENERGY_POCKET'],
-    energyOrder: ['GEN_CHEMICAL_GRADIENT', 'GEN_ENERGY_POCKET', 'GEN_CATALYTIC_FOLD'],
+    dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION'],
+    rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
   },
 };
 
@@ -92,8 +92,8 @@ function nextProducerId(engine, nodeOrder, profile) {
   const activeNodeId = nodeOrder.find((nodeId) => !engine.state.run.nodes.completed[nodeId]);
   const activeNode = engine.ruleset.nodes.find((node) => node.id === activeNodeId);
   const producerTargets = profile.phaseProducerTargets?.[activeNodeId] || profile.phaseProducerTargets?.M06 || {};
-  const needsInformation = (activeNode?.cost.information || 0) > (engine.state.run.resources.information?.amount || 0);
-  const order = needsInformation ? profile.informationOrder : profile.energyOrder;
+  const needsDna = (activeNode?.cost.dna || 0) > (engine.state.run.resources.dna?.amount || 0);
+  const order = needsDna ? profile.dnaOrder : profile.rnaOrder;
   const affordable = order.filter((producerId) => {
     const targetCount = producerTargets[producerId] ?? 0;
     const currentCount = engine.state.run.producers[producerId]?.count || 0;
@@ -188,7 +188,7 @@ export function runHeadlessSimulation(options = {}) {
   const timingsByNode = {};
   const snapshots = {};
   const spends = { producers: {}, nodes: {} };
-  const manual = { uses: 0, energy: 0, energyAfterThreeMinutes: 0 };
+  const manual = { uses: 0, rna: 0, rnaAfterThreeMinutes: 0 };
   let automaticIncomeAtMs = null;
   let nextDecisionAtMs = 0;
   let nextManualAtMs = 0;
@@ -201,11 +201,11 @@ export function runHeadlessSimulation(options = {}) {
       const manualResult = engine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: MANUAL_PROCESS_ID });
       if (manualResult.ok) {
         const reward = manualResult.events.find((event) => event.type === 'manual_process_used')?.payload.reward || {};
-        const energy = reward.energy || 0;
+        const rna = reward.rna || 0;
         manual.uses += 1;
-        manual.energy += energy;
+        manual.rna += rna;
         if (now >= 180000) {
-          manual.energyAfterThreeMinutes += energy;
+          manual.rnaAfterThreeMinutes += rna;
         }
         log.push({ atMs: now, action: 'manual', reward });
         nextManualAtMs = engine.state.run.manualProcesses.MANUAL_PRIMORDIAL_PULSE.availableAtMs;
@@ -244,12 +244,12 @@ export function runHeadlessSimulation(options = {}) {
     log,
     timings: {
       automaticIncomeAtMs,
-      stableBondAtMs: timingsByNode.M01 ?? null,
+      stableRnaAtMs: timingsByNode.M01 ?? null,
       selfReplicationAtMs: timingsByNode.M02 ?? null,
-      catalyticRnaAtMs: timingsByNode.M03 ?? null,
+      dnaSynthesisAtMs: timingsByNode.M03 ?? null,
       errorCorrectionAtMs: timingsByNode.M04 ?? null,
-      lipidShellAtMs: timingsByNode.M05 ?? null,
-      protoCellAtMs: timingsByNode.M06 ?? null,
+      membraneAtMs: timingsByNode.M05 ?? null,
+      cellAtMs: timingsByNode.M06 ?? null,
     },
     producerCounts: producerCounts(engine.state, profile),
     finalRates: selectProductionRates(engine.state, sourceRuleset),

@@ -133,7 +133,7 @@ function buyNode(state, ruleset, nodeId, ports) {
     ...eraEvents,
   ];
   if (nodeId === 'M06') {
-    events.push(createDomainEvent('proto_cell_reached', { nodeId }, state, ports));
+    events.push(createDomainEvent('cell_reached', { nodeId }, state, ports));
   }
   return ok(state, withGoalEvaluation(state, ruleset, events, ports));
 }

@@ -1,21 +1,27 @@
 export const resources = [
   {
-    id: 'energy',
-    labelKey: 'resource.energy',
+    id: 'rna',
+    labelKey: 'resource.rna',
     initialAmount: 0,
     visibleFromEra: 'MOLECULAR',
   },
   {
-    id: 'information',
-    labelKey: 'resource.information',
+    id: 'dna',
+    labelKey: 'resource.dna',
     initialAmount: 0,
-    visibleFromEra: 'MOLECULAR',
+    visibleFromEra: 'DNA_SYNTHESIS',
   },
   {
     id: 'biomass',
     labelKey: 'resource.biomass',
     initialAmount: 0,
     visibleFromEra: 'CELLULAR',
+  },
+  {
+    id: 'energy',
+    labelKey: 'resource.energy',
+    initialAmount: 0,
+    visibleFromEra: 'METABOLISM',
   },
   {
     id: 'food',

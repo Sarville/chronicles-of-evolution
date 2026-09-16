@@ -23,7 +23,7 @@ assert.equal(storage.get('evolved'), 'legacy-save-must-survive');
 const prodSnapshot = createPresentationSnapshot(fresh.runtime, { dev: false });
 assert.equal(prodSnapshot.mode, 'playable');
 assert.equal(prodSnapshot.currentGoalId, 'G001');
-assert.equal(prodSnapshot.resourceCount, 2);
+assert.equal(prodSnapshot.resourceCount, 1);
 assert.equal(prodSnapshot.hasManualAction, true);
 assert.equal(prodSnapshot.hasDevControls, false);
 
@@ -33,8 +33,8 @@ assert.equal(devSnapshot.hasDevControls, true);
 
 const nodeRoute = routeCtaFocus({ targetId: 'M01' }, indexes);
 assert.deepEqual(nodeRoute, { activeView: 'evolution', focusedEntityId: 'M01' });
-const producerRoute = routeCtaFocus({ targetId: 'GEN_CHEMICAL_GRADIENT' }, indexes);
-assert.deepEqual(producerRoute, { activeView: 'world', focusedEntityId: 'GEN_CHEMICAL_GRADIENT' });
+const producerRoute = routeCtaFocus({ targetId: 'PROC_PRIMORDIAL_REACTION' }, indexes);
+assert.deepEqual(producerRoute, { activeView: 'world', focusedEntityId: 'PROC_PRIMORDIAL_REACTION' });
 const manualRoute = routeCtaFocus({ targetId: 'MANUAL_PRIMORDIAL_PULSE' }, indexes);
 assert.deepEqual(manualRoute, { activeView: 'world', focusedEntityId: 'MANUAL_PRIMORDIAL_PULSE' });
 

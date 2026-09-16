@@ -18,22 +18,23 @@ const DEV = __CHRONICLES_DEV__;
 const ROOT_ID = 'chronicles-root';
 const MOLECULAR_NODES = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06'];
 const RESOURCE_NAMES = {
-  energy: 'Energy',
-  information: 'Information',
+  rna: 'RNA',
+  dna: 'DNA',
   biomass: 'Biomass',
+  energy: 'Energy',
 };
 const NODE_NAMES = {
-  M01: 'Stable Bond',
+  M01: 'Stable RNA',
   M02: 'Self Replication',
-  M03: 'Catalytic RNA',
+  M03: 'DNA Synthesis',
   M04: 'Error Correction',
-  M05: 'Lipid Shell',
-  M06: 'Proto-cell',
+  M05: 'Membrane',
+  M06: 'Cell',
 };
 const PRODUCER_NAMES = {
-  GEN_CHEMICAL_GRADIENT: 'Chemical Gradient',
-  GEN_CATALYTIC_FOLD: 'Catalytic Fold',
-  GEN_ENERGY_POCKET: 'Energy Pocket',
+  PROC_PRIMORDIAL_REACTION: 'Primordial Reaction',
+  PROC_RNA_REPLICATION: 'RNA Replication',
+  PROC_DNA_SYNTHESIS: 'DNA Synthesis',
 };
 
 const storage = createBrowserStorage();
@@ -78,9 +79,11 @@ function formatCost(cost) {
 }
 
 function phaseLabel() {
-  if (engine().state.run.nodes.completed.M06) return 'Proto-cell';
+  if (engine().state.run.nodes.completed.M06) return 'Cell';
+  if (engine().state.run.nodes.completed.M05) return 'Membrane';
+  if (engine().state.run.nodes.completed.M03) return 'DNA synthesis';
   if (engine().state.run.nodes.completed.M02) return 'Self replication';
-  if (engine().state.run.nodes.completed.M01) return 'Stable structures';
+  if (engine().state.run.nodes.completed.M01) return 'Stable RNA';
   return 'Primordial';
 }
 
@@ -140,7 +143,7 @@ function renderManualAction() {
   const reward = formatCost(process.reward);
   const remaining = Math.max(0, (process.state.availableAtMs || 0) - engine().state.run.clock.simulationMs);
   return `<button class="wide primary ${focusedEntityId === process.id ? 'focused' : ''}" data-entity-id="${process.id}" data-action="manual" ${process.available ? '' : 'disabled'}>
-    Primordial pulse
+    Primordial reaction
     <small>${process.available ? `Gain ${reward}` : `${Math.ceil(remaining / 1000)}s`}</small>
   </button>`;
 }
@@ -195,8 +198,8 @@ const renderDevPanel = DEV
     <summary>Development</summary>
     <div class="dev-grid">
       ${debugApi().timeScales.map((scale) => `<button data-action="speed" data-scale="${scale}">${scale}x</button>`).join('')}
-      <button data-action="grant" data-resource="energy">+100 Energy</button>
-      <button data-action="grant" data-resource="information">+25 Information</button>
+      <button data-action="grant" data-resource="rna">+100 RNA</button>
+      <button data-action="grant" data-resource="dna">+25 DNA</button>
       <button data-action="dev-reset">Dev reset</button>
       <button data-action="dump">Dump state</button>
     </div>
@@ -277,8 +280,8 @@ function handleAction(target) {
   if (action === 'producer') engine().dispatch({ type: 'BUY_PRODUCER', producerId: button.dataset.id });
   if (action === 'node') {
     const result = engine().dispatch({ type: 'BUY_NODE', nodeId: button.dataset.id });
-    if (result.ok && result.events.some((event) => event.type === 'proto_cell_reached' || event.payload?.nodeId === 'M06')) {
-      autosave().flush('proto_cell_reached');
+    if (result.ok && result.events.some((event) => event.type === 'cell_reached' || event.payload?.nodeId === 'M06')) {
+      autosave().flush('cell_reached');
     }
   }
   if (action === 'save') {
@@ -292,7 +295,7 @@ function handleAction(target) {
     window.location.reload();
   }
   if (DEV && action === 'speed') debugApi().setTimeScale(Number(button.dataset.scale));
-  if (DEV && action === 'grant') debugApi().grant(button.dataset.resource, button.dataset.resource === 'energy' ? 100 : 25);
+  if (DEV && action === 'grant') debugApi().grant(button.dataset.resource, button.dataset.resource === 'rna' ? 100 : 25);
   if (DEV && action === 'dev-reset') debugApi().manualDevReset({ runId: `run_dev_${Date.now()}` });
   if (DEV && action === 'dump') document.getElementById('dev-dump').textContent = JSON.stringify(debugApi().dumpState(), null, 2);
   render();

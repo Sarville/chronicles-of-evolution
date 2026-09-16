@@ -11,6 +11,7 @@ export const SAVE_KEYS = Object.freeze({
 });
 
 export const SAVE_FORMAT = 'chronicles-evolution-save';
+export const OLD_RULESET_RESTART_VERSIONS = new Set(['timeline1-v1']);
 
 function nowIso(clock) {
   return new Date(clock ? clock.getNow() : Date.now()).toISOString();
@@ -94,6 +95,9 @@ export function createSaveRepository({ storage, codec = jsonCodec, clock } = {})
     if (!parsed.ok) {
       return parsed;
     }
+    if (OLD_RULESET_RESTART_VERSIONS.has(parsed.envelope?.rulesetVersion)) {
+      return { ok: false, reason: 'OLD_RULESET_RESTART_REQUIRED', envelope: parsed.envelope };
+    }
     const validation = validateEnvelope(parsed.envelope);
     if (!validation.ok) {
       return { ok: false, reason: 'VALIDATION_FAILED', errors: validation.errors };
@@ -103,8 +107,8 @@ export function createSaveRepository({ storage, codec = jsonCodec, clock } = {})
 
   return {
     loadOrCreate(options = {}) {
-      const candidates = [SAVE_KEYS.primary, SAVE_KEYS.pending, SAVE_KEYS.backup]
-        .map((key) => ({ key, loaded: readKey(key) }))
+      const loadedSlots = [SAVE_KEYS.primary, SAVE_KEYS.pending, SAVE_KEYS.backup].map((key) => ({ key, loaded: readKey(key) }));
+      const candidates = loadedSlots
         .filter((candidate) => candidate.loaded.ok);
 
       const primary = candidates.find((candidate) => candidate.key === SAVE_KEYS.primary);
@@ -125,6 +129,22 @@ export function createSaveRepository({ storage, codec = jsonCodec, clock } = {})
           },
           envelope: recovered.loaded.envelope,
           sourceKey: recovered.key,
+        };
+      }
+      const oldRuleset = loadedSlots
+        .filter((candidate) => candidate.loaded.reason === 'OLD_RULESET_RESTART_REQUIRED')
+        .sort((a, b) => (b.loaded.envelope.saveRevision || 0) - (a.loaded.envelope.saveRevision || 0))[0];
+      if (oldRuleset) {
+        const state = createInitialGameState();
+        state.meta = normalizeEnvelope(oldRuleset.loaded.envelope).meta;
+        state.settings = normalizeEnvelope(oldRuleset.loaded.envelope).settings;
+        return {
+          ok: true,
+          state,
+          created: true,
+          oldRulesetRestarted: true,
+          previousRulesetVersion: oldRuleset.loaded.envelope.rulesetVersion,
+          sourceKey: oldRuleset.key,
         };
       }
       const damagedSlots = [SAVE_KEYS.primary, SAVE_KEYS.pending, SAVE_KEYS.backup]

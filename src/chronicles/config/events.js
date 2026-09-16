@@ -4,8 +4,7 @@ export const events = [
     type: 'branch',
     trigger: { type: 'goal_completed', goalId: 'G005' },
     blocksGoalId: 'G006',
-    branchGroup: 'metabolism_1',
+    branchGroup: 'cell_identity_1',
     priority: 80,
   },
 ];
-
