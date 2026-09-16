@@ -191,6 +191,14 @@ assert.equal(producerMilestoneMultiplier(10), 2);
 assert.equal(producerMilestoneMultiplier(25), 4);
 assert.equal(producerMilestoneMultiplier(50), 10);
 
+const noHiddenMilestoneEngine = createChroniclesEngine({ ruleset });
+noHiddenMilestoneEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 200 });
+for (let index = 0; index < 10; index += 1) {
+  result = noHiddenMilestoneEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });
+  assert.equal(result.ok, true);
+}
+assert.equal(selectProductionRates(noHiddenMilestoneEngine.state, ruleset).rna, 2.2);
+
 const customRuleset = {
   ...ruleset,
   version: 'custom-minimal-v1',

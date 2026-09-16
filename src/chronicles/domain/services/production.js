@@ -41,7 +41,8 @@ export function calculateProductionRates(state, ruleset) {
       continue;
     }
 
-    const milestoneMultiplier = producerMilestoneMultiplier(producerState.count);
+    const milestoneMultiplier =
+      producer.enableMilestoneMultipliers === true ? producerMilestoneMultiplier(producerState.count) : 1;
     for (const [resourceId, output] of Object.entries(producer.output)) {
       const resourceMultiplier = productionMultiplierForResource(state, resourceId);
       rates[resourceId] =
