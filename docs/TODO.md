@@ -23,9 +23,10 @@
 - [x] Reconcile balance guardrails
 - [x] Update production/technical references
 - [x] Update PROJECT_STATE
-- [x] **Approve corrected 0–120 gameplay canon**
+- [x] Approve corrected 0–120 gameplay canon
+- [x] Prepare Codex rework handoff: `docs/production/RECONCILIATION_CODEX_HANDOFF.md`
 
-Documentation reconciliation is accepted.
+Documentation reconciliation is accepted and pushed.
 
 ---
 
@@ -69,7 +70,7 @@ Accepted implementation baseline:
 
 ### Superseded Iteration 3 content
 
-The following is historical only:
+Historical only:
 
 - [x] Energy / Information molecular economy
 - [x] Chemical Gradient
@@ -87,7 +88,11 @@ Iteration 3 technical foundation remains successful.
 
 **Status:** READY.
 
-Next Codex task:
+Use:
+
+`docs/production/RECONCILIATION_CODEX_HANDOFF.md`
+
+Codex tasks:
 
 - [ ] create/activate ruleset `timeline1-v2-reconciled`
 - [ ] migrate early resource config to RNA / DNA / Biomass hooks
@@ -200,7 +205,7 @@ Expected scope after unblock:
 # Immediate order
 
 ```text
-Prepare Codex rework prompt
+Run Codex with RECONCILIATION_CODEX_HANDOFF.md
 → Biological gameplay code rework 0–10
 → Rebalance 0–10
 → Manual playtest 0–10
