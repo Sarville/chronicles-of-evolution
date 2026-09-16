@@ -30,7 +30,7 @@ export const nodes = [
     type: 'CORE',
     semanticRole: 'core_tech',
     labelKey: 'node.M02',
-    cost: { rna: 115 },
+    cost: { rna: 130 },
     requiresNodes: ['M01'],
     effects: [{ type: 'resource_production_multiplier', resourceId: 'rna', value: 1.75 }],
     goalId: 'G002',
@@ -41,7 +41,7 @@ export const nodes = [
     type: 'CORE',
     semanticRole: 'core_tech',
     labelKey: 'node.M03',
-    cost: { rna: 330 },
+    cost: { rna: 350 },
     requiresNodes: ['M02'],
     effects: [
       { type: 'unlock_resource', resourceId: 'dna' },

@@ -28,15 +28,16 @@ export function productionMultiplierForResource(state, resourceId) {
 }
 
 export function calculateProductionRates(state, ruleset) {
-  if (!isAutoProductionUnlocked(state)) {
-    return {};
-  }
+  const autoProductionUnlocked = isAutoProductionUnlocked(state);
   const indexes = createRulesetIndexes(ruleset);
   const rates = {};
 
   for (const [producerId, producerState] of Object.entries(state.run.producers)) {
     const producer = indexes.producers[producerId];
     if (!producer || !producerState.count) {
+      continue;
+    }
+    if (!autoProductionUnlocked && producer.producesBeforeAutoUnlock !== true) {
       continue;
     }
 

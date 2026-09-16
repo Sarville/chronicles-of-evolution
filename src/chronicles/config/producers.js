@@ -8,6 +8,7 @@ export const producers = [
     baseCost: { rna: 5 },
     growth: 1.14,
     output: { rna: 0.22 },
+    producesBeforeAutoUnlock: true,
   },
   {
     id: 'PROC_RNA_REPLICATION',

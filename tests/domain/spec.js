@@ -57,7 +57,8 @@ assert.equal(result.ok, true);
 assert.equal(engine.state.run.producers.PROC_PRIMORDIAL_REACTION.count, 1);
 let tick = engine.tick(1000);
 assert.equal(tick.ok, true);
-assert.deepEqual(tick.rates, {});
+assert.equal(tick.rates.rna, 0.22);
+assert.equal(engine.state.run.resources.rna.amount > 196, true);
 
 result = engine.dispatch({ type: 'BUY_NODE', nodeId: 'M02' });
 assert.equal(result.ok, false);
