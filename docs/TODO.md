@@ -41,21 +41,19 @@ Scope implemented:
 - [x] Protein Synthesis / Ribosome (C03)
 - [x] Organelles (C05)
 - [x] Cell Coordination (C06) — trunk stops here; Multicellularity itself is Iteration 5
-- [x] balance/simulation for 10–18: `npm run test:sim` extended with C0x timings across all profiles plus a new Symbiosis (C02B) branch-variant profile; all profiles land inside 10–18 min on first pass
-- [ ] manual 10–18 playtest — not yet run; closed by direct user confirmation ahead of this step, so treat exact 10–18 numbers as provisional until it happens
+- [x] balance/simulation for 10–18 across profiles incl. Symbiosis branch variant
+- [ ] manual 10–18 playtest — exact 10–18 numbers remain provisional until run
 
-### DS-05 consistency fix (2026-09-16, same day)
+### DS-05 consistency fix (2026-09-16)
 
-Checking DS-05 against the implementation found that `goals.js` had wired `C01/C03/C05/C06` to `G006-G009` purely by node order, colliding with the canonical goal contract in `docs/gdd/07_GOALS_AND_MILESTONES.md` (G008 = Adaptation Points, G009 = Multicellularity/MS02 — neither exists yet) and with `docs/scenario/01_TIMELINE_01_SCRIPT.md`'s scene beats. Corrected in the same session:
+- [x] `G006` = composite condition (`C01` completed AND primary branch selected)
+- [x] `G007` = `C06` completion; Protein Synthesis + Organelles + Cell Coordination folded into canonical cellular-systems goal
+- [x] removed premature `G008/G009`, AP grant/resource and `MS_CELL_COORDINATION`
+- [x] AP remains Iteration 5 / G008 scope (~20–24 min)
+- [x] branch/metabolic flags aligned with `docs/scenario/05_NARRATIVE_FLAGS.md`
+- [x] automated gates green after fix
 
-- [x] `G006` = composite condition (`C01` completed AND a branch selected) — matches the script's branch-choice-then-`G006 completed` beat
-- [x] `G007` = `C06` completion (folds Protein Synthesis + Organelles + Cell Coordination into one "cellular systems" goal, per canon) — `C03`/`C05` no longer carry their own `goalId`
-- [x] removed the old `G008`/`G009` (wrongly Organelles / Cell Coordination) and the premature 1 AP grant + `ap` resource + `MS_CELL_COORDINATION` milestone that rode on them — AP stays Iteration 5 scope (canon: first AP grant is part of `G008`, ~20–24 min)
-- [x] added `run.bio.primary_trait` / `run.bio.absorption|symbiosis|shell` / `run.bio.metabolism.photosynthesis|chemosynthesis` flags on the relevant node purchases, per `docs/scenario/05_NARRATIVE_FLAGS.md`
-- [x] added two small engine primitives to support the above: `branch_selected` goal condition, `set_flag` node effect
-- [x] all automated gates re-run and green
-
-Later full biological validation still includes:
+Later full biological validation:
 
 - [ ] full AP reward/cost table
 - [ ] full Multicellularity / body adaptation pass
@@ -65,7 +63,7 @@ Later full biological validation still includes:
 
 ---
 
-# CURRENT — DS-05: Timeline #1 full narrative package
+# DS-05 — Timeline #1 full narrative package
 
 **Status:** READY FOR USER REVIEW.
 
@@ -77,28 +75,64 @@ Created:
 - [x] `docs/scenario/06_ENDINGS_COPY.md`
 - [x] `docs/scenario/07_COPY_GUIDE.md`
 
-DS-05 checks:
+Checks:
 
-- [x] use reconciled RNA → DNA → Cell gameplay language
-- [x] do not add a new economy or gameplay gate
-- [x] keep text short and gameplay-readable
-- [x] preserve Error 17 / `Снова.` / Ash / Archive thread
-- [x] make Archive voice evolve gradually from neutral system to ambiguous participant
-- [x] keep Timeline #1 mystery unresolved
-- [x] align mandatory scenes with G001–G024/event contracts
-- [x] define Chronicle copy separately from blocking UI copy
-- [x] preserve first Ash as unavoidable
-- [x] preserve all three Last Protocol subtypes
-- [x] end with `АРХИВ ПОМНИТ` / Timeline #2 teaser
+- [x] RNA → DNA → Cell language
+- [x] no new economy/gameplay gate
+- [x] Error 17 / `Снова.` / Ash / Archive thread preserved
+- [x] Archive voice arc defined
+- [x] mandatory scenes aligned with G001–G024/event contracts
+- [x] all Last Protocol subtypes preserved
+- [x] Timeline #2 teaser ends on `АРХИВ ПОМНИТ`
 - [ ] user review DS-05
-- [ ] mark DS-05 accepted in `PROJECT_STATE.yaml`
+- [ ] mark DS-05 accepted
+
+---
+
+# CURRENT — DS-05.5: Timeline Presentation Contract
+
+**Status:** READY FOR USER REVIEW.
+
+Created:
+
+- [x] `docs/ux/00_TIMELINE_PRESENTATION_MAP.md`
+- [x] `docs/art/00_VISUAL_STATE_MAP.md`
+
+Presentation contract:
+
+- [x] PB00–PB30 bind triggers/goals/events to presentation surfaces
+- [x] define semantic UX surfaces: Boot / World / Evolution / Event / Milestone / Chronicle / Crisis / Ending / Archive / Meta
+- [x] define world visual states V0–V9
+- [x] define creature continuity C0–C7 + C2A/B/C primary-trait variants
+- [x] explicitly keep AP hidden until G008
+- [x] explicitly reveal Cognition only after Nervous System
+- [x] explicitly reveal Power only in Industry
+- [x] separate Modern from Industrial and Atomic
+- [x] define Sapience as camera/scale transition from individual organism to small group
+- [x] define Energy Crisis as persistent visual modifier of the world
+- [x] define ERROR 17 as in-UI anomaly, not separate cinematic
+- [x] define Atomic → crisis → Last Protocol → flash → Ash sequence
+- [x] require Ash to derive from the player's own world rather than generic apocalypse art
+- [x] define DS-06 layout responsibilities vs DS-07 visual responsibilities
+- [x] update `docs/ux/README.md`
+- [x] update `docs/art/README.md` and restore mandatory Modern visual state
+- [ ] user review DS-05.5
+- [ ] mark DS-05.5 accepted
 
 ---
 
 # DS-06 — UX architecture and wireframes
 
-**Status:** UNLOCKED; recommended next after DS-05 review.
+**Status:** UNLOCKED; start after presentation review to avoid rework.
 
+Must inherit `PB00–PB30` and may refine layout without changing their narrative/gameplay meaning.
+
+- [ ] `00_UX_PRINCIPLES.md`
+- [ ] `01_SCREEN_MAP.md`
+- [ ] `02_MOBILE_WIREFRAMES.md`
+- [ ] `03_DESKTOP_WIREFRAMES.md`
+- [ ] `04_COMPONENT_STATES.md`
+- [ ] `05_TUTORIAL_AND_HINTS.md`
 - [ ] mobile-first shell
 - [ ] contextual resource presentation
 - [ ] Goal card
@@ -113,9 +147,27 @@ DS-05 checks:
 
 ---
 
+# DS-07 — Art direction
+
+**Status:** blocked by DS-05 + DS-06.
+
+Must inherit `V0–V9` and `C0–C7`.
+
+Planned:
+
+- [ ] `00_ART_DIRECTION.md`
+- [ ] `01_LOCATIONS_AND_DIORAMAS.md`
+- [ ] `02_ERA_TRANSITIONS.md`
+- [ ] `03_CREATURE_EVOLUTION.md`
+- [ ] branch/adaptation visual grammar
+- [ ] camera/composition rules
+- [ ] crisis degradation layers
+- [ ] Ash composition
+
+---
+
 # Following design sessions
 
-- [ ] DS-07 — Art direction, locations and era transitions
 - [ ] DS-08 — asset manifest and generation prompts
 - [ ] DS-09 — audio design and generation package
 - [ ] DS-10 — analytics/platform readiness
@@ -124,7 +176,8 @@ DS-05 checks:
 Dependencies:
 
 ```text
-DS-05 + DS-06
+DS-05 + DS-05.5 review
+→ DS-06
 → DS-07
 → DS-08
 
@@ -179,9 +232,11 @@ all tracks + balance/regression
 # Immediate order
 
 ```text
-DS-05 package ready
+DS-05 narrative package ready
++ DS-05.5 presentation contract ready
 → user review / approval
 → DS-06 UX architecture
+→ DS-07 art direction
 → art/audio/platform tracks
 → balance/regression
 → DS-11 freeze v2
