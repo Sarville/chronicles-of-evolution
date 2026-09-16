@@ -44,6 +44,7 @@ const cellCoordinationRoute = routeCtaFocus({ targetId: 'C06' }, indexes);
 assert.deepEqual(cellCoordinationRoute, { activeView: 'evolution', focusedEntityId: 'C06' });
 
 const milestoneEngine = createChroniclesEngine({ ruleset });
+milestoneEngine.state.run.resources.rna.capOverride = 1000;
 milestoneEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 1000 });
 for (let index = 0; index < 10; index += 1) {
   const buy = milestoneEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });
@@ -60,12 +61,17 @@ assert.equal(formatEta({ status: 'waiting', seconds: 63 }), '≈1м 3с');
 assert.equal(formatEta({ status: 'unavailable' }), 'Недоступно');
 
 const appSource = readFileSync(`${process.cwd()}/src/chronicles/ui/app.js`, 'utf8');
-assert.equal(appSource.includes('Current total'), true);
+assert.equal(appSource.includes('Current output'), true);
+assert.equal(appSource.includes('Current consumption'), true);
 assert.equal(appSource.includes('(+'), true);
 assert.equal(appSource.includes('ETA'), true);
+assert.equal(appSource.includes('🔒 Неизвестное открытие'), true);
+assert.equal(appSource.includes('formatWholeCost'), true);
 assert.equal(appSource.includes('data-action="manual" data-id="${process.id}"'), true);
 assert.equal(appSource.includes('PROC_BIOMASS_UPTAKE'), true);
 assert.equal(appSource.includes('PROC_RESPIRATION'), true);
 assert.equal(appSource.includes("C06: 'Cell Coordination'"), true);
+assert.equal(appSource.includes('Storage buildings'), true);
+assert.equal(appSource.includes('BLD_MEMBRANE_STORE'), true);
 
 console.log('ui runtime ok');

@@ -32,7 +32,8 @@ assert.equal(competent.manual.economicsAtThreeMinutes.contributionRatio < 0.05, 
 assert.equal(competent.manual.economicsAtThreeMinutes.cooldownMs, 90000);
 assert.equal(competent.manual.economicsAtThreeMinutes.resourceId, 'rna');
 
-// Iteration 4 — Cell -> Cell Coordination (~10-18 min), same competent run continued.
+// Cell -> Cell Coordination: competent routes finish the 0-18 minute block;
+// deliberately slow profiles may use the documented 20-minute outer corridor.
 assert.equal(competent.state.run.nodes.completed.C01 !== undefined, true);
 assert.equal(competent.state.run.nodes.completed.C02A !== undefined, true);
 assert.equal(competent.state.run.nodes.completed.C03 !== undefined, true);
@@ -43,6 +44,18 @@ assert.equal(competent.state.run.resources.ap, undefined);
 assert.equal(competent.state.run.flags['run.bio.primary_trait'], 'absorption');
 assert.equal(competent.state.run.goals.states.G006.status, 'archived');
 assert.equal(competent.state.run.goals.states.G007.status, 'archived');
+const competentStoragePurchases = competent.log
+  .filter((entry) => entry.action === 'building')
+  .map((entry) => entry.buildingId);
+assert.deepEqual(competentStoragePurchases, [
+  'BLD_MEMBRANE_STORE',
+  'BLD_MEMBRANE_STORE',
+  'BLD_MEMBRANE_STORE',
+  'BLD_MEMBRANE_STORE',
+  'BLD_GENETIC_STORE',
+  'BLD_BIOMASS_STORE',
+  'BLD_ATP_STORE',
+]);
 between(competent.timings.metabolismAtMs, 550000, 800000, 'C01 Metabolism');
 between(competent.timings.branchAtMs, 600000, 850000, 'branch choice');
 between(competent.timings.proteinSynthesisAtMs, 700000, 950000, 'C03 Protein Synthesis');
@@ -72,7 +85,7 @@ assert.equal(baselineOptimized.ok, true);
 assert.equal(baselineCompetent.ok, true);
 assert.equal(baselineSlow.ok, true);
 assert.equal(baselineSlow.timings.cellAtMs <= 690000, true);
-assert.equal(baselineSlow.timings.cellCoordinationAtMs <= 1080000, true);
+assert.equal(baselineSlow.timings.cellCoordinationAtMs <= 1200000, true);
 
 const optimized = runHeadlessSimulation({ seed: 7, profile: 'optimized' });
 assert.equal(optimized.ok, true);
@@ -81,7 +94,7 @@ between(optimized.timings.cellAtMs, 480000, 660000, 'optimized scripted M06');
 const slow = runHeadlessSimulation({ seed: 7, profile: 'slow' });
 assert.equal(slow.ok, true);
 assert.equal(slow.timings.cellAtMs <= 690000, true);
-assert.equal(slow.timings.cellCoordinationAtMs <= 1080000, true);
+assert.equal(slow.timings.cellCoordinationAtMs <= 1200000, true);
 
 const withM04 = runHeadlessSimulation({ seed: 7, profile: 'competent', includeOptionalM04: true });
 assert.equal(withM04.ok, true);
@@ -96,7 +109,7 @@ assert.equal(milestoneSeeker.producerCounts.PROC_RNA_REPLICATION >= 5, true);
 assert.equal(milestoneSeeker.timings.cellAtMs >= 480000, true);
 assert.equal(milestoneSeeker.timings.cellAtMs <= 660000, true);
 assert.equal(milestoneSeeker.timings.cellCoordinationAtMs >= 750000, true);
-assert.equal(milestoneSeeker.timings.cellCoordinationAtMs <= 900000, true);
+assert.equal(milestoneSeeker.timings.cellCoordinationAtMs <= 930000, true);
 
 const manualAssisted = runHeadlessSimulation({ seed: 7, profile: 'manual_assisted' });
 assert.equal(manualAssisted.ok, true);
@@ -108,6 +121,7 @@ assert.equal(manualAssisted.timings.cellAtMs <= competent.timings.cellAtMs + 300
 assert.equal(manualAssisted.manual.economicsAtThreeMinutes.contributionRatio < 0.05, true);
 
 const paybackEngine = createChroniclesEngine({ ruleset });
+paybackEngine.state.run.resources.rna.capOverride = 1000;
 paybackEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 500 });
 for (let index = 0; index < 9; index += 1) {
   const buy = paybackEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });

@@ -47,7 +47,7 @@ export function createInitialGameState(options = {}) {
         side: { activeIds: [] },
         states: {},
       },
-      events: { queue: [], states: {} },
+      events: { rngState: options.eventSeed ?? 1, queue: [], pendingId: null, states: {}, history: [], lastDeckDrawAtMs: {} },
       flags: {},
       discovery: { seenEntities: [], corruptedSeen: [] },
       pathScores: createInitialPathScores(),
@@ -59,6 +59,7 @@ export function createInitialGameState(options = {}) {
     meta: {
       archiveFragments: 0,
       chronicle: [],
+      unlocks: {},
       persistentFlags: {},
       seenEntities: {},
     },

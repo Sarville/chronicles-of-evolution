@@ -8,7 +8,8 @@ import {
   manualProcessCooldownMs,
   manualProcessInputCost,
 } from './services/manualProcesses.js';
-import { calculateProductionRates, producerMilestoneMultiplier, productionMultiplierForResource } from './services/production.js';
+import { calculateProductionRates, producerFlowRates, producerMilestoneMultiplier, productionMultiplierForResource } from './services/production.js';
+import { calculateCap } from './services/resources.js';
 
 export function formatResourceAmount(value) {
   if (!Number.isFinite(value)) {
@@ -121,6 +122,7 @@ export function selectVisibleResources(state, ruleset) {
       id: resourceId,
       label: indexes.resources[resourceId]?.label || indexes.resources[resourceId]?.labelKey || resourceId,
       amount: state.run.resources[resourceId].amount,
+      cap: calculateCap(state, resourceId, ruleset),
       perSecond: calculateProductionRates(state, ruleset)[resourceId] || 0,
     }));
 }
@@ -168,6 +170,24 @@ export function selectProducerStatus(state, ruleset, producerId) {
   return canAfford(state, selectProducerPrice(state, ruleset, producerId)).ok ? 'available_affordable' : 'available_unaffordable';
 }
 
+export function selectBuildingPrice(state, ruleset, buildingId) {
+  const building = createRulesetIndexes(ruleset).buildings[buildingId];
+  if (!building) return null;
+  const count = state.run.buildings[buildingId]?.count || 0;
+  return scaleCost(building.baseCost, building.growth, count);
+}
+
+export function selectBuildingStatus(state, ruleset, buildingId) {
+  const building = createRulesetIndexes(ruleset).buildings[buildingId];
+  if (!building) return 'unknown';
+  if (!prerequisitesMet(state, building)) return 'locked';
+  const count = state.run.buildings[buildingId]?.count || 0;
+  if (building.maxCount != null && count >= building.maxCount) return 'maxed';
+  return canAfford(state, selectBuildingPrice(state, ruleset, buildingId)).ok
+    ? 'available_affordable'
+    : 'available_unaffordable';
+}
+
 export function selectProducerOutputView(state, ruleset, producerId) {
   const producer = createRulesetIndexes(ruleset).producers[producerId];
   if (!producer) {
@@ -177,16 +197,15 @@ export function selectProducerOutputView(state, ruleset, producerId) {
   const milestoneMultiplier = producerMilestoneMultiplier(count, producer.milestones);
   const nextMilestone = (producer.milestones || []).find((candidate) => count < candidate.count) || null;
   const reachedMilestone = [...(producer.milestones || [])].reverse().find((candidate) => count >= candidate.count) || null;
-  const basePerUnit = {};
-  const currentTotal = {};
-  for (const [resourceId, output] of Object.entries(producer.output || {})) {
-    basePerUnit[resourceId] = output;
-    currentTotal[resourceId] =
-      count * output * milestoneMultiplier * productionMultiplierForResource(state, resourceId);
-  }
+  const basePerUnit = { ...(producer.output || {}) };
+  const inputPerUnit = { ...(producer.input || {}) };
+  const flow = producerFlowRates(state, producer, count);
+  const currentTotal = flow.output;
   return {
     count,
     basePerUnit,
+    inputPerUnit,
+    currentInput: flow.input,
     currentTotal,
     milestoneMultiplier,
     nextMilestone,
@@ -198,6 +217,25 @@ export function selectNodeCost(state, ruleset, nodeId) {
   const indexes = createRulesetIndexes(ruleset);
   const node = indexes.nodes[nodeId];
   return multiplyCost(node.cost, branchCostMultiplier(state, ruleset, node));
+}
+
+export function selectEvolutionRevealLevel(state, ruleset, nodeId, memo = {}) {
+  if (memo[nodeId] != null) return memo[nodeId];
+  const node = createRulesetIndexes(ruleset).nodes[nodeId];
+  if (!node || state.run.nodes.completed[nodeId]) return -1;
+  const incompleteRequirements = (node.requiresNodes || []).filter(
+    (requiredId) => !requiredId.endsWith('*') && !state.run.nodes.completed[requiredId]
+  );
+  let level = incompleteRequirements.length
+    ? Math.max(...incompleteRequirements.map((requiredId) => selectEvolutionRevealLevel(state, ruleset, requiredId, memo) + 1))
+    : 0;
+  if (node.requiresAnyBranchGroup && !state.run.nodes.selectedBranchByGroup[node.requiresAnyBranchGroup]) {
+    const branchLevels = ruleset.branchGroups[node.requiresAnyBranchGroup]
+      .map((branchNodeId) => selectEvolutionRevealLevel(state, ruleset, branchNodeId, memo));
+    level = Math.max(level, Math.min(...branchLevels) + 1);
+  }
+  memo[nodeId] = level;
+  return level;
 }
 
 export function selectCurrentGoal(state, ruleset) {

@@ -42,6 +42,11 @@ function validateEffect(effect, ruleset, ownerId, errors) {
   if (!ruleset.allowedEffectTypes.includes(effect.type)) {
     errors.push(`${ownerId} uses effect type ${effect.type} that is not runtime-supported`);
   }
+  if (effect.type === 'resource_capacity') {
+    const resources = createRulesetIndexes(ruleset).resources;
+    if (!resources[effect.resourceId]) errors.push(`${ownerId} expands unknown resource ${effect.resourceId}`);
+    if (!Number.isFinite(effect.value) || effect.value <= 0) errors.push(`${ownerId} has invalid resource capacity value`);
+  }
 }
 
 function visitNode(nodeId, nodesById, temporary, permanent, errors) {
@@ -98,10 +103,21 @@ export function validateRuleset(ruleset) {
 
   for (const producer of ruleset.producers) {
     validateCost(producer.baseCost, indexes.resources, producer.id, errors);
+    const inputEntries = Object.entries(producer.input || {});
+    if (inputEntries.length === 0 && !producer.source) {
+      errors.push(`${producer.id} must declare an input or external source`);
+    }
+    if (inputEntries.length > 0 && producer.source) {
+      errors.push(`${producer.id} cannot declare both an input and external source`);
+    }
     for (const resourceId of Object.keys(producer.output || {})) {
       if (!indexes.resources[resourceId]) {
         errors.push(`${producer.id} outputs unknown resource ${resourceId}`);
       }
+    }
+    for (const [resourceId, amount] of inputEntries) {
+      if (!indexes.resources[resourceId]) errors.push(`${producer.id} consumes unknown resource ${resourceId}`);
+      if (!Number.isFinite(amount) || amount < 0) errors.push(`${producer.id} has invalid input for ${resourceId}`);
     }
     for (const milestone of producer.milestones || []) {
       if (!Number.isFinite(milestone.count) || milestone.count <= 0) {
@@ -271,6 +287,33 @@ export function validateRuleset(ruleset) {
     }
   }
 
+  const eventEffectTypes = new Set(['grant_resource', 'set_flag', 'unlock_meta']);
+  for (const event of ruleset.events) {
+    if (!event.type || !event.deck || !event.trigger?.type || !Array.isArray(event.choices) || event.choices.length === 0) {
+      errors.push(`${event.id} must define type, deck, trigger and choices`);
+      continue;
+    }
+    if (!Number.isFinite(event.priority)) errors.push(`${event.id} has invalid priority`);
+    if (event.weight != null && (!Number.isFinite(event.weight) || event.weight <= 0)) errors.push(`${event.id} has invalid weight`);
+    if (event.cooldownMs != null && (!Number.isFinite(event.cooldownMs) || event.cooldownMs < 0)) errors.push(`${event.id} has invalid cooldownMs`);
+    if (event.trigger.goalId && !indexes.goals[event.trigger.goalId]) errors.push(`${event.id} trigger references unknown goal ${event.trigger.goalId}`);
+    if (event.trigger.nodeId && !indexes.nodes[event.trigger.nodeId]) errors.push(`${event.id} trigger references unknown node ${event.trigger.nodeId}`);
+    if (event.blocks?.branchGroup && !ruleset.branchGroups[event.blocks.branchGroup]) errors.push(`${event.id} blocks unknown branch group ${event.blocks.branchGroup}`);
+    for (const condition of event.preconditions || []) {
+      if (condition.type === 'node_completed' && !indexes.nodes[condition.nodeId]) errors.push(`${event.id} precondition references unknown node ${condition.nodeId}`);
+    }
+    for (const choice of event.choices) {
+      if (!choice.id || !choice.label) errors.push(`${event.id} has choice without id or label`);
+      if (choice.purchaseNodeId && !indexes.nodes[choice.purchaseNodeId]) errors.push(`${event.id} choice references unknown node ${choice.purchaseNodeId}`);
+      for (const effect of choice.effects || []) {
+        if (!eventEffectTypes.has(effect.type)) errors.push(`${event.id} uses unknown event effect ${effect.type}`);
+        if (effect.type === 'grant_resource' && (!indexes.resources[effect.resourceId] || !Number.isFinite(effect.amount) || effect.amount < 0)) {
+          errors.push(`${event.id} has invalid resource grant`);
+        }
+      }
+    }
+  }
+
   const permanent = new Set();
   for (const node of ruleset.nodes) {
     visitNode(node.id, indexes.nodes, new Set(), permanent, errors);
@@ -293,6 +336,10 @@ export function validateGameState(state, ruleset) {
     if (!Number.isFinite(resource.amount) || resource.amount < 0) {
       errors.push(`Resource ${resourceId} has invalid amount`);
     }
+  }
+  const events = state.run.events;
+  if (!events || !Number.isInteger(events.rngState) || !Array.isArray(events.queue) || !events.states || !Array.isArray(events.history)) {
+    errors.push('State must contain normalized event runtime state');
   }
   return { ok: errors.length === 0, errors };
 }

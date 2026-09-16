@@ -4,7 +4,7 @@ import { createDomainEvent } from './domainEvents.js';
 import { payCost, scaleCost } from './services/costs.js';
 import { applyEraTransition } from './services/eras.js';
 import { branchAvailable, prerequisitesMet } from './services/evolution.js';
-import { queueEventsForGoal } from './services/events.js';
+import { eventBlocksNode, queueEventsForGoal, queueEventsForNode, resolveEvent } from './services/events.js';
 import { evaluateGoals } from './services/goals.js';
 import { useManualProcess } from './services/manualProcesses.js';
 import { applyEffects } from './services/modifiers.js';
@@ -51,6 +51,8 @@ export function dispatchCommand(state, ruleset, command, ports = {}) {
       return buyProducer(state, ruleset, command.producerId, ports);
     case 'BUY_NODE':
       return buyNode(state, ruleset, command.nodeId, ports);
+    case 'RESOLVE_EVENT':
+      return resolvePendingEvent(state, ruleset, command, ports);
     case 'BUY_BUILDING':
       return buyBuilding(state, ruleset, command.buildingId, ports);
     case 'TICK': {
@@ -99,7 +101,7 @@ function buyProducer(state, ruleset, producerId, ports) {
   return ok(state, withGoalEvaluation(state, ruleset, events, ports));
 }
 
-function buyNode(state, ruleset, nodeId, ports) {
+function buyNode(state, ruleset, nodeId, ports, options = {}) {
   const indexes = createRulesetIndexes(ruleset);
   const node = indexes.nodes[nodeId];
   if (!node) {
@@ -110,6 +112,9 @@ function buyNode(state, ruleset, nodeId, ports) {
   }
   if (!prerequisitesMet(state, node) || !branchAvailable(state, ruleset, node)) {
     return rejected('PREREQUISITES_NOT_MET', { nodeId });
+  }
+  if (!options.fromEvent && eventBlocksNode(state, ruleset, node)) {
+    return rejected('BLOCKED_BY_EVENT', { nodeId, eventId: state.run.events.pendingId });
   }
   const populationCheck = assertPopulationRequirement(state, node);
   if (!populationCheck.ok) {
@@ -137,7 +142,18 @@ function buyNode(state, ruleset, nodeId, ports) {
   if (nodeId === 'M06') {
     events.push(createDomainEvent('cell_reached', { nodeId }, state, ports));
   }
+  events.push(...queueEventsForNode(state, ruleset, nodeId, ports));
   return ok(state, withGoalEvaluation(state, ruleset, events, ports));
+}
+
+function resolvePendingEvent(state, ruleset, command, ports) {
+  const result = resolveEvent(state, ruleset, command.eventId, command.choiceId, ports, {
+    applyPurchaseNode(nodeId) {
+      return buyNode(state, ruleset, nodeId, ports, { fromEvent: true });
+    },
+  });
+  if (!result.ok) return result;
+  return ok(state, result.events);
 }
 
 function buyBuilding(state, ruleset, buildingId, ports) {
@@ -161,7 +177,9 @@ function buyBuilding(state, ruleset, buildingId, ports) {
   }
 
   state.run.buildings[buildingId] = { count: currentCount + 1 };
-  applyEffects(state, building.effects, { sourceType: 'building', sourceId: buildingId });
+  // Each repeatable building is its own capacity/bonus instance. Reusing one
+  // key here would make a second storage building overwrite the first.
+  applyEffects(state, building.effects, { sourceType: 'building', sourceId: `${buildingId}:${currentCount + 1}` });
   const events = [
     ...payment.events,
     createDomainEvent('building_bought', { buildingId, newCount: currentCount + 1, cost }, state, ports),

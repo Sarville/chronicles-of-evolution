@@ -188,8 +188,8 @@ Must inherit `PB00–PB30` and may refine layout without changing their narrativ
 - [x] one-time desktop/mobile layout approval
 - [x] 4 diorama direction variants per block
 - [x] animation reference handoff template
-- [ ] prepare 3-4 persistent desktop layout shell concepts
-- [ ] prepare 3-4 persistent mobile layout shell concepts
+- [x] prepare 3-4 persistent desktop layout shell concepts
+- [x] prepare 3-4 persistent mobile layout shell concepts
 - [ ] prepare global UI component sheet
 - [ ] user chooses global layout shell
 - [ ] start `B00_ORIGIN_CELL` with 4 diorama direction variants
@@ -231,17 +231,22 @@ all tracks + balance/regression
 2026-09-16. Authority: `docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md`
 and `docs/production/TIMELINE_01_REBUILD_PLAN.md`.
 
-- [ ] `T1-0` — Foundation + Event Engine: audit `0–18`; config-driven
-  minor/major deck; seeded RNG/deck state; cooldowns; atomic `RESOLVE_EVENT`;
-  save/migration contract; RNA/DNA/Cell event set; Chronicle/unlock extension
-  points; deterministic tests and event-aware simulations.
+- [-] `T1-0` — Foundation + Event Engine: config-driven early deck, seeded
+  RNG/deck state, atomic `RESOLVE_EVENT`, save v2 migration, RNA/DNA/Cell
+  event set, Chronicle/unlock extension points, deterministic and event-aware
+  simulations are implemented. RNA/DNA/Cell caps now require repeatable
+  storage purchases; only storage buildings expand capacity. Remaining:
+  formal `0–18` config/goal audit and manual playtest.
 - [ ] `T1-1` — Organism 18–28: AP, Multicellularity, adaptations and target
   timing validation.
 - [ ] `T1-2` — Cognition 28–40: Nervous System, Cognition `0..100`, Sapience
   convergence, biological profiles and simulations.
 - [ ] `T1-3` — First civilization 38–65: Population~5 start, Tribe,
   Settlement, phase-aware jobs/buildings, Food/Morale/Knowledge, recovery
-  from deficits and event expansion.
+  from deficits and event expansion. Before balance: reconstruct the original
+  Food/Materials/Knowledge/Power production and consumption chains; current
+  caps and storage gates are config-ready, but those live flows are not yet
+  implemented.
 - [ ] `T1-4` — City and Industry 65–95: contextual resources/crafting,
   compact market and Power, city/industry simulation profiles.
 - [ ] `T1-5` — Modern and Atomic 95–108: Modern bridge, World Tension,

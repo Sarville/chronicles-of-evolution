@@ -1,7 +1,7 @@
 # Хроники Эволюции — экономика первых 120 минут
 
-**Версия:** reconciliation balance spec v2.0  
-**Статус:** canonical / biological 0–10 frozen / later phases provisional  
+**Версия:** reconciliation balance spec v2.3
+**Статус:** canonical / biological 0–18 resource-flow, storage-cap and Cell-cost pass applied / later phases provisional
 **Authority:** `DECISIONS_RECONCILIATION.md` + `01_FIRST_120_MINUTES.md`.
 
 > Economy описывает **как сбалансировать утверждённый gameplay**. Она больше не может вводить новые visible resources, generators или progression nodes ради удобства симуляции.
@@ -54,8 +54,8 @@ These are telemetry targets, not hard timers except explicit crisis clamps.
 |---|---|
 | 0–7 molecular | RNA |
 | 7–12 cell formation | RNA / DNA |
-| 10–18 cell/metabolism | RNA or DNA contextually / Biomass / Energy |
-| 18–38 organism | DNA / Biomass / Energy + AP indicator |
+| 10–18 cell/metabolism | RNA or DNA contextually / Biomass / ATP |
+| 18–38 organism | DNA / Biomass / ATP + AP indicator |
 | 38–80 civilization | Food / Materials / Knowledge / Population |
 | 80–108 industry/modern | Food supporting / Materials / Knowledge / Power / Population |
 | 108–120 crisis | Materials / Knowledge / Power + World Tension UI |
@@ -145,7 +145,7 @@ The biological 0–10 slice is frozen after successful live playtest and simulat
 Freeze scope:
 
 - M01–M06;
-- RNA/DNA producer economics;
+- RNA/DNA producer economics, except an explicit original-resource-flow correction;
 - producer milestone thresholds and multipliers;
 - manual RNA;
 - manual DNA;
@@ -200,12 +200,19 @@ Frozen constraints:
 
 The previous measured values `M01 00:45 / M02 02:25 / M06 09:20` are historical results for the superseded E/I ruleset, not targets that constrain the new content.
 
+Current deterministic headless evidence (seed 7) includes every mandatory
+storage purchase: the competent Absorption route reaches M06 at **09:55** and
+C06 at **18:00**; optimized reaches C06 at **15:27**. The competent route buys
+four Membrane Layers, one Genetic Storage, one Biomass Reserve and one ATP
+Reserve. The deliberately low-attention baseline-slow profile is an outer
+corridor at **19:21**, not the target route.
+
 ### Frozen early baseline numbers
 
 | Entity | Value |
 |---|---|
 | Primordial Reaction base output | 0.22 RNA/s |
-| RNA Replication base output | 0.58 RNA/s |
+| RNA Replication base output | 0.82 RNA/s |
 | DNA Synthesis base output | 0.26 DNA/s |
 | Producer growth | ×1.35 |
 | Producer milestone | count 10 → ×1.15 (no implicit 25/50) |
@@ -218,6 +225,58 @@ The previous measured values `M01 00:45 / M02 02:25 / M06 09:20` are historical 
 | Manual RNA | productionSeconds = 1.5 |
 | Manual DNA | 18 RNA → 3 DNA, cooldown 45s |
 
+### RNA → DNA resource-flow correction
+
+The legacy evolution loop in `src/main.js` forms DNA by spending **2 RNA for
+every 1 DNA** and limits DNA output when RNA is insufficient. The earlier
+reconciled slice preserved the DNA output but omitted that consumption, which
+allowed DNA capacity to grow as an independent economy.
+
+The current ruleset restores the dependency while keeping first-run pacing
+faster than legacy:
+
+```text
+DNA Synthesis: 0.52 RNA/s → 0.26 DNA/s (2 RNA → 1 DNA)
+RNA Replication: 0.82 RNA/s base output
+Respiration: 0.30 Biomass/s → 0.35 ATP/s
+```
+
+Every repeatable process must now declare either a consumed input or its
+external source. New resource producers may not silently create a downstream
+resource without recording that relationship in config and simulation.
+
+### Resource storage caps and capacity buildings
+
+Every current resource has a finite base storage cap. Production stops adding
+the resource at that limit; spending frees space again. The visible resource
+counter is always rendered as `current / cap` with integer stock values.
+
+| Resource | Base cap | First required storage purchase |
+|---|---:|---|
+| RNA | 100 | M02 costs 130 RNA: Membrane Layers (`+250 RNA`) |
+| DNA | 100 | M06 costs 205 DNA: Genetic Storage (`+150 DNA`) |
+| Biomass | 80 | C03 costs 110 Biomass: Biomass Reserve (`+160 Biomass`) |
+| ATP | 40 | C03 costs 50 ATP: ATP Reserve (`+120 ATP`) |
+| Food | 300 | T02 costs 420 Food: Food Store (`+500 Food`) |
+| Materials | 150 | T02 costs 240 Materials: Materials Store (`+400 Materials`) |
+| Knowledge | 100 | T05 costs 145 Knowledge: Knowledge Archive (`+300 Knowledge`) |
+| Power | 100 | Power Reserve (`+500 Power`) |
+
+ATP is intentionally a new cellular-metabolism name. It must not be conflated
+with the original game's later, psychic-only `Energy` resource.
+
+Capacity is granted **only** by repeatable storage buildings; discoveries,
+branches and producer milestones never expand it. This preserves the purpose
+of a cap: a next discovery whose cost is above the current store is a visible,
+mandatory reason to buy storage rather than merely wait for more production.
+
+The early RNA/DNA role split follows the original: RNA begins at 100, membrane
+layers expand RNA space, and DNA begins at 100 with later genetic/cell storage.
+Legacy increments are small (membrane `+5 RNA`, eukaryotic cells `+10 DNA`),
+so this accelerated T1 uses larger per-building increments while retaining
+the original order and the mandatory purchase decision. Capacity remains a
+data-driven `resource_capacity` building effect for every later resource.
+
 ### DNA Synthesis output A/B decision
 
 The freeze decision compared `0.24` and `0.26 DNA/s`. Only measured values retained in the freeze record are listed here; missing per-profile values are intentionally not reconstructed.
@@ -227,7 +286,7 @@ The freeze decision compared `0.24` and `0.26 DNA/s`. Only measured values retai
 | 0.24 DNA/s | 702s / 11:42 | exceeds the existing 690s regression ceiling | rejected |
 | 0.26 DNA/s | 684s / 11:24 | `competent` remains ~10.1 min; manual DNA stays `18 RNA → 3 DNA / 45s` | **frozen** |
 
-`0.26 DNA/s` is retained because `0.24` fails the existing slow-profile regression corridor. This is a targeted freeze decision, not permission to reopen other 0–10 producer values.
+`0.26 DNA/s` is retained because `0.24` fails the existing slow-profile regression corridor. The former standalone DNA-output reading is superseded by the RNA → DNA resource-flow correction above; the RNA replication increase keeps the corrected chain inside the canonical Cell window.
 
 ---
 
@@ -236,11 +295,31 @@ The freeze decision compared `0.24` and `0.26 DNA/s`. Only measured values retai
 After Cell:
 
 - Biomass becomes active;
-- Metabolism unlocks Energy production;
-- organelles/protein synthesis improve Biomass/Energy;
+- Metabolism unlocks ATP production;
+- organelles/protein synthesis improve Biomass/ATP;
 - first branch chooses **Absorption / Symbiosis / Shell**.
 
 Branch effects must be strong enough to feel different but weak enough that all paths remain inside the first-run timing corridor.
+
+The first primary branch uses one common entry price: **30 Biomass + 15 ATP**
+for Absorption, Symbiosis and Shell. Its identity belongs in the effect, not
+in a hidden affordability advantage.
+
+For the mandatory Cell continuation, costs intentionally rise above the M06
+equivalent in the resources available at that point: C03 is `110 Biomass +
+50 ATP`, C05 is `160 Biomass + 70 ATP`, and C06 is `170 Biomass + 100 ATP +
+160 DNA`. C03 deliberately exceeds the initial Biomass and ATP caps, requiring
+Biomass Reserve and ATP Reserve after the branch. C05 and C06 receive no
+hidden capacity from discoveries: players expand a repeatable store again when
+a later cost outgrows it. This keeps storage meaningful while allowing the
+post-M06 production ramp to finish the 0–18 minute slice rather than turning
+the second half into a long flat wait.
+
+Fixed seeded headless profiles now reach C06 at: optimized `17:13`, competent
+`17:50`, Symbiosis `17:55`, and manual-assisted `17:40`. The deliberately
+slow profiles remain below the 20-minute diagnostic ceiling. A milestone-heavy
+route reaches C06 around `15:16`; it pays for that acceleration with its early
+producer investment rather than receiving a cheaper Cell path.
 
 Target branch power guideline:
 
@@ -261,7 +340,7 @@ Core resources:
 
 - DNA;
 - Biomass;
-- Energy.
+- ATP.
 
 `Adaptation Points` come from discrete rewards.
 

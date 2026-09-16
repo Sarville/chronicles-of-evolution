@@ -50,7 +50,7 @@ design:
     - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
     - "Information removed as player-facing spendable resource"
     - "Chemical Gradient / Catalytic Fold / Energy Pocket removed from canonical player-facing gameplay"
-    - "Energy introduced through metabolism rather than at game start"
+    - "ATP introduced through metabolism rather than at game start; original late psychic Energy remains a distinct future resource"
     - "first biological branch restored to Absorption / Symbiosis / Shell"
     - "Photosynthesis / Chemosynthesis retained as optional metabolic adaptations"
     - "Adaptation Points restored as milestone/side-objective currency for optional adaptations"
@@ -154,7 +154,8 @@ implementation:
       completion_commit: "79e7b93ea5bde181ff77ad8c6d281449cc5be1d8"
     T1-0:
       name: "Foundation, Event Engine and 0-18 audit"
-      status: ready
+      status: in_progress
+      delivered: "Event Engine core, original RNA→DNA resource-flow correction, finite storage caps with mandatory storage gates, ATP rename, rebalanced C03/C05/C06 costs and save migrations. Discoveries no longer expand capacity. Remaining: complete 0-18 config audit and manual playtest."
       plan: "docs/production/TIMELINE_01_REBUILD_PLAN.md"
     T1-1: { name: "Organism: AP and Multicellularity", status: planned }
     T1-2: { name: "Cognition: Nervous System through Sapience", status: planned }
@@ -165,8 +166,8 @@ implementation:
     T1-7: { name: "Full-run closeout and release gate", status: planned }
 
 timeline_01_rebuild:
-  status: "approved_ready_to_start"
-  target_ruleset: "timeline1-v3-full"
+  status: "in_progress"
+  target_ruleset: "timeline1-v7-storage-gates"
   scope: "RNA to mandatory first Ash/Archive/reset, target 105-120 active minutes"
   first_package: "T1-0 Foundation + Event Engine + 0-18 audit"
   canonical_plan: "docs/production/TIMELINE_01_REBUILD_PLAN.md"
@@ -183,7 +184,7 @@ iteration_4:
     - "G006 = Metabolism + branch resolved (composite), G007 = Protein Synthesis + Organelles + Cell Coordination (C06), matching docs/gdd/07_GOALS_AND_MILESTONES.md and docs/scenario/01_TIMELINE_01_SCRIPT.md exactly; 3 optional C04x side goals"
     - "run.bio.primary_trait / run.bio.absorption|symbiosis|shell and run.bio.metabolism.photosynthesis|chemosynthesis flags set on branch/optional-node purchase, per docs/scenario/05_NARRATIVE_FLAGS.md"
     - "AP resource and its first grant deliberately NOT implemented yet: canon ties it to G008 (~20-24min, Multicellularity track) which is Iteration 5 scope"
-    - "fixed dangling energy.visibleFromEra ('METABOLISM' -> 'CELLULAR')"
+    - "fixed dangling ATP visibleFromEra ('METABOLISM' -> 'CELLULAR')"
     - "dev/simulation.js generalized past M06 through C06, plus a Symbiosis (C02B) branch-variant profile"
   consistency_fix_2026-09-16:
     - "Initial implementation (79e7b93e) wired C01/C03/C05/C06 to goalIds G006-G009 directly by node order, colliding with the canonical G006-G009 contract in docs/gdd/07_GOALS_AND_MILESTONES.md and docs/scenario/01_TIMELINE_01_SCRIPT.md (G008=AP/adaptations, G009=Multicellularity MS02, neither of which exists yet). Found while checking DS-05 narrative consistency and corrected in the same session: goals.js now has exactly G006 (composite: C01 + branch_selected) and G007 (nodeId C06, folds Protein Synthesis+Organelles+Cell Coordination); the premature 1 AP grant, the 'ap' resource, and the invented MS_CELL_COORDINATION milestone were removed. Added two small reusable engine primitives: 'branch_selected' goal condition and 'set_flag' node effect (used for the run.bio.* flags above)."
@@ -193,17 +194,18 @@ iteration_4:
   note: "Closed by direct user confirmation on 2026-09-16, ahead of a manual 10-18 playtest pass. Automated tests/simulation/build back the implementation, and goal-ID alignment with GDD/DS-05 canon is now verified; treat exact 10-18 numbers as provisional (see balance.biological_10_18) until an actual playtest happens."
 
 balance:
-  ruleset_target: "timeline1-v3-full"
+  ruleset_target: "timeline1-v7-storage-gates"
   old_0_10_ei_balance: "historical_superseded"
-  biological_numbers: "0_10_frozen_baseline"
+  biological_numbers: "0_10_original_resource_flow_corrected"
   post_cell_numbers: "iteration_4_implemented_pending_full_0_120_validation"
   civilization_numbers: "provisional_until_full_rebalance"
   crisis_contract: "accepted_pending_regression"
   biological_0_10:
-    status: "accepted_and_frozen"
+    status: "accepted_with_original_resource_flow_and_storage_caps"
     freeze_scope:
       - "M01-M06"
-      - "RNA/DNA producer economics"
+      - "RNA/DNA producer economics, corrected to preserve legacy RNA→DNA consumption"
+      - "finite resource storage, original-role capacity expansions and capacity buildings"
       - "producer milestone thresholds and multipliers"
       - "manual RNA"
       - "manual DNA"
@@ -211,6 +213,7 @@ balance:
       - "basic World/Evolution UX"
       - "integer stock display"
       - "ETA semantics"
+    note: "Legacy DNA formation consumes 2 RNA per DNA and now throttles on available RNA; RNA Replication was raised to 0.82 RNA/s to retain the Cell timing corridor."
   biological_10_18:
     status: "provisional_implemented_pending_manual_playtest"
     freeze_scope: []
@@ -230,4 +233,4 @@ open_decisions:
 next_action:
   owner: "Codex"
   session: "T1-0"
-  description: "Start full T1 rebuild with Event Engine, persisted deck/save contract, and audit of 0-18 config/goals before Multicellularity content."
+  description: "Complete the T1-0 0-18 config/goal audit and manual playtest; Event Engine core and early event deck are implemented and regression-tested."

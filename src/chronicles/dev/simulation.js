@@ -4,6 +4,8 @@ import { createSeededRng } from '../adapters/rng.js';
 import { createChroniclesEngine } from '../domain/engine.js';
 import {
   selectManualProcessView,
+  selectBuildingPrice,
+  selectBuildingStatus,
   selectNodeStatus,
   selectProducerPrice,
   selectProducerStatus,
@@ -11,6 +13,7 @@ import {
 } from '../domain/selectors.js';
 import { calculateManualReward, manualProcessCooldownMs } from '../domain/services/manualProcesses.js';
 import { producerMilestoneMultiplier, productionMultiplierForResource } from '../domain/services/production.js';
+import { calculateCap } from '../domain/services/resources.js';
 
 const MAIN_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M06', 'C01', 'C02A', 'C03', 'C05', 'C06'];
 const OPTIONAL_NODE_ORDER = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'C01', 'C02A', 'C03', 'C05', 'C06'];
@@ -22,13 +25,13 @@ const BRANCH_NODE_ORDER = {
 const MANUAL_PROCESS_ID = 'MANUAL_PRIMORDIAL_PULSE';
 const MANUAL_DNA_PROCESS_ID = 'MANUAL_DNA_SYNTHESIS';
 const DEFAULT_BIOMASS_ORDER = ['PROC_BIOMASS_UPTAKE', 'PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'];
-const DEFAULT_ENERGY_ORDER = ['PROC_RESPIRATION', 'PROC_BIOMASS_UPTAKE', 'PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'];
+const DEFAULT_ATP_ORDER = ['PROC_RESPIRATION', 'PROC_BIOMASS_UPTAKE', 'PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'];
 
 // Cell-era (C01..C06) producer ramps, layered on top of the frozen M06 targets.
 // Order per schedule entry: C01, <branch node>, C03, C05, C06.
 function cellPhaseTargets(m06Targets, branchNodeId, schedule) {
   const [c01, branch, c03, c05, c06] = schedule;
-  const phase = (extra) => ({ ...m06Targets, PROC_BIOMASS_UPTAKE: extra.biomass, PROC_RESPIRATION: extra.energy });
+  const phase = (extra) => ({ ...m06Targets, PROC_BIOMASS_UPTAKE: extra.biomass, PROC_RESPIRATION: extra.atp });
   return {
     C01: phase(c01),
     [branchNodeId]: phase(branch),
@@ -39,32 +42,32 @@ function cellPhaseTargets(m06Targets, branchNodeId, schedule) {
 }
 
 const FAST_CELL_SCHEDULE = [
-  { biomass: 2, energy: 0 },
-  { biomass: 4, energy: 2 },
-  { biomass: 6, energy: 4 },
-  { biomass: 8, energy: 6 },
-  { biomass: 10, energy: 8 },
+  { biomass: 2, atp: 0 },
+  { biomass: 4, atp: 2 },
+  { biomass: 6, atp: 4 },
+  { biomass: 8, atp: 6 },
+  { biomass: 5, atp: 2 },
 ];
 const MEDIUM_CELL_SCHEDULE = [
-  { biomass: 1, energy: 0 },
-  { biomass: 3, energy: 1 },
-  { biomass: 4, energy: 3 },
-  { biomass: 6, energy: 5 },
-  { biomass: 8, energy: 6 },
+  { biomass: 1, atp: 0 },
+  { biomass: 3, atp: 1 },
+  { biomass: 4, atp: 3 },
+  { biomass: 6, atp: 5 },
+  { biomass: 5, atp: 2 },
 ];
 const SLOW_CELL_SCHEDULE = [
-  { biomass: 1, energy: 0 },
-  { biomass: 2, energy: 1 },
-  { biomass: 3, energy: 2 },
-  { biomass: 5, energy: 4 },
-  { biomass: 6, energy: 5 },
+  { biomass: 1, atp: 0 },
+  { biomass: 2, atp: 1 },
+  { biomass: 3, atp: 2 },
+  { biomass: 5, atp: 4 },
+  { biomass: 5, atp: 2 },
 ];
 const MAX_CELL_SCHEDULE = [
-  { biomass: 10, energy: 10 },
-  { biomass: 10, energy: 10 },
-  { biomass: 10, energy: 10 },
-  { biomass: 10, energy: 10 },
-  { biomass: 10, energy: 10 },
+  { biomass: 10, atp: 10 },
+  { biomass: 10, atp: 10 },
+  { biomass: 10, atp: 10 },
+  { biomass: 10, atp: 10 },
+  { biomass: 10, atp: 10 },
 ];
 
 const BASELINE_OPTIMIZED_M06 = { PROC_PRIMORDIAL_REACTION: 8, PROC_RNA_REPLICATION: 6, PROC_DNA_SYNTHESIS: 6 };
@@ -294,7 +297,7 @@ export function estimateProducerPurchasePayback(state, sourceRuleset, producerId
 // pre-Iteration-4 dna-vs-rna heuristic exactly when a node's cost only contains rna/dna).
 function shortfallResource(engine, activeNode) {
   const cost = activeNode?.cost || {};
-  for (const resourceId of ['dna', 'biomass', 'energy']) {
+  for (const resourceId of ['dna', 'biomass', 'atp']) {
     const amount = cost[resourceId];
     if (amount && amount > (engine.state.run.resources[resourceId]?.amount || 0)) {
       return resourceId;
@@ -306,7 +309,7 @@ function shortfallResource(engine, activeNode) {
 function orderForResource(profile, resourceId) {
   if (resourceId === 'dna') return profile.dnaOrder;
   if (resourceId === 'biomass') return profile.biomassOrder || DEFAULT_BIOMASS_ORDER;
-  if (resourceId === 'energy') return profile.energyOrder || DEFAULT_ENERGY_ORDER;
+  if (resourceId === 'atp') return profile.atpOrder || DEFAULT_ATP_ORDER;
   return profile.rnaOrder;
 }
 
@@ -347,6 +350,32 @@ function tryBuyNextNode(engine, nodeOrder, timings, snapshots, profile, spends, 
   return false;
 }
 
+// Storage is a progression gate, not a cosmetic purchase: when the next
+// discovery costs more than the current cap, acquire the corresponding
+// capacity structure before spending on more production.
+function tryBuyRequiredStorage(engine, nodeOrder, spends, log) {
+  const nodeId = nodeOrder.find((candidate) => !engine.state.run.nodes.completed[candidate]);
+  const node = engine.ruleset.nodes.find((candidate) => candidate.id === nodeId);
+  if (!node) return false;
+
+  for (const [resourceId, requiredAmount] of Object.entries(node.cost || {})) {
+    if (requiredAmount <= calculateCap(engine.state, resourceId, engine.ruleset)) continue;
+    const building = engine.ruleset.buildings.find((candidate) =>
+      (candidate.effects || []).some((effect) => effect.type === 'resource_capacity' && effect.resourceId === resourceId)
+    );
+    if (!building) return false;
+    const status = selectBuildingStatus(engine.state, engine.ruleset, building.id);
+    if (status !== 'available_affordable') return false;
+    const cost = selectBuildingPrice(engine.state, engine.ruleset, building.id);
+    const result = engine.dispatch({ type: 'BUY_BUILDING', buildingId: building.id });
+    if (!result.ok) return false;
+    addCost(spends.buildings, cost);
+    log.push({ atMs: engine.state.run.clock.simulationMs, action: 'building', buildingId: building.id });
+    return true;
+  }
+  return false;
+}
+
 function tryBuyProducer(engine, nodeOrder, profile, spends, log, finalNodeId) {
   const producerId = nextProducerId(engine, nodeOrder, profile, finalNodeId);
   if (!producerId) {
@@ -360,6 +389,25 @@ function tryBuyProducer(engine, nodeOrder, profile, spends, log, finalNodeId) {
   addCost(spends.producers, cost);
   log.push({ atMs: engine.state.run.clock.simulationMs, action: 'producer', producerId });
   return true;
+}
+
+function resolvePendingEventForProfile(engine, branchId, log, timings, snapshots, profile, spends, finalNodeId) {
+  const eventId = engine.state.run.events.pendingId;
+  if (!eventId) return false;
+  const event = engine.ruleset.events.find((candidate) => candidate.id === eventId);
+  const choice = event?.choices?.find((candidate) => candidate.purchaseNodeId === branchId) || event?.choices?.[0];
+  if (!choice) return false;
+  const result = engine.dispatch({ type: 'RESOLVE_EVENT', eventId, choiceId: choice.id });
+  if (result.ok) {
+    log.push({ atMs: engine.state.run.clock.simulationMs, action: 'event', eventId, choiceId: choice.id });
+    if (choice.purchaseNodeId) {
+      const node = engine.ruleset.nodes.find((candidate) => candidate.id === choice.purchaseNodeId);
+      timings[choice.purchaseNodeId] = engine.state.run.clock.simulationMs;
+      snapshots[`after_${choice.purchaseNodeId}`] = createSnapshot(engine, profile, finalNodeId);
+      addCost(spends.nodes, node.cost);
+    }
+  }
+  return result.ok;
 }
 
 export function calculateManualEconomics(state, sourceRuleset, processId = MANUAL_PROCESS_ID) {
@@ -422,7 +470,7 @@ export function runHeadlessSimulation(options = {}) {
   const log = [];
   const timingsByNode = {};
   const snapshots = {};
-  const spends = { producers: {}, nodes: {} };
+  const spends = { producers: {}, buildings: {}, nodes: {} };
   const manual = { uses: 0, rna: 0, dna: 0, rnaAfterThreeMinutes: 0, byProcess: {} };
   let automaticIncomeAtMs = null;
   let nextDecisionAtMs = 0;
@@ -431,6 +479,8 @@ export function runHeadlessSimulation(options = {}) {
 
   while (engine.state.run.clock.simulationMs <= maxMs && !engine.state.run.nodes.completed[finalNodeId]) {
     const now = engine.state.run.clock.simulationMs;
+
+    resolvePendingEventForProfile(engine, branchId, log, timingsByNode, snapshots, profile, spends, finalNodeId);
 
     for (const processId of manualProcessIdsForProfile(profile)) {
       if (now < (nextManualAtMs[processId] || 0) || !shouldUseManual(engine, sourceRuleset, profile, now, processId)) {
@@ -463,6 +513,7 @@ export function runHeadlessSimulation(options = {}) {
       while (acted && actions < profile.maxActionsPerDecision) {
         acted =
           tryBuyNextNode(engine, nodeOrder, timingsByNode, snapshots, profile, spends, finalNodeId) ||
+          tryBuyRequiredStorage(engine, nodeOrder, spends, log) ||
           tryBuyProducer(engine, nodeOrder, profile, spends, log, finalNodeId);
         actions += acted ? 1 : 0;
       }

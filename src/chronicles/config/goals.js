@@ -118,7 +118,7 @@ export const goals = [
     id: 'G006',
     title: 'Стабилизируйте метаболизм',
     description:
-      'Завершите C01 Metabolism, чтобы открыть Energy, и выберите один primary trait — Absorption, Symbiosis или Shell.',
+      'Завершите C01 Metabolism, чтобы открыть ATP, и выберите один primary trait — Absorption, Symbiosis или Shell.',
     targetTimeMs: 780000,
     nodeId: 'C01',
     chapterId: 'CH02',
@@ -158,7 +158,7 @@ export const goals = [
   {
     id: 'G006_C04A_OPTIONAL',
     title: 'Optional: разовейте фотосинтез',
-    description: 'C04A Photosynthesis даёт пассивный источник Energy, но не обязателен для основного пути.',
+    description: 'C04A Photosynthesis даёт пассивный источник ATP, но не обязателен для основного пути.',
     targetTimeMs: 900000,
     nodeId: 'C04A',
     chapterId: 'CH02',
@@ -170,12 +170,12 @@ export const goals = [
     cta: { type: 'node', targetId: 'C04A', label: 'Развить Photosynthesis' },
     highlight: { type: 'node', targetId: 'C04A' },
     hintTimeoutMs: 150000,
-    hint: 'Это optional-адаптация: усиливает Energy, но не блокирует Protein Synthesis.',
+    hint: 'Это optional-адаптация: усиливает ATP, но не блокирует Protein Synthesis.',
   },
   {
     id: 'G006_C04B_OPTIONAL',
     title: 'Optional: разовейте хемосинтез',
-    description: 'C04B Chemosynthesis даёт источник Energy, не зависящий от внешней среды.',
+    description: 'C04B Chemosynthesis даёт источник ATP, не зависящий от внешней среды.',
     targetTimeMs: 900000,
     nodeId: 'C04B',
     chapterId: 'CH02',
@@ -187,7 +187,7 @@ export const goals = [
     cta: { type: 'node', targetId: 'C04B', label: 'Развить Chemosynthesis' },
     highlight: { type: 'node', targetId: 'C04B' },
     hintTimeoutMs: 150000,
-    hint: 'Это optional-адаптация: усиливает Energy, но не блокирует Protein Synthesis.',
+    hint: 'Это optional-адаптация: усиливает ATP, но не блокирует Protein Synthesis.',
   },
   {
     id: 'G006_C04C_OPTIONAL',

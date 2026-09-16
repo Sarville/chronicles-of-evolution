@@ -1,6 +1,7 @@
 export const effectSupport = {
   unlock_auto_production: { status: 'supported' },
   resource_production_multiplier: { status: 'supported' },
+  resource_capacity: { status: 'supported' },
   global_production_multiplier: { status: 'supported' },
   unlock_resource: { status: 'supported' },
   producer_cost_multiplier: { status: 'supported' },

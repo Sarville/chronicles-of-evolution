@@ -21,26 +21,34 @@ export function productionMultiplierForResource(state, resourceId) {
   return multiplier;
 }
 
-export function calculateProductionRates(state, ruleset) {
+export function producerFlowRates(state, producer, count) {
+  const milestoneMultiplier = producerMilestoneMultiplier(count, producer.milestones);
+  const output = {};
+  const input = {};
+  for (const [resourceId, amount] of Object.entries(producer.output || {})) {
+    output[resourceId] = count * amount * milestoneMultiplier * productionMultiplierForResource(state, resourceId);
+  }
+  for (const [resourceId, amount] of Object.entries(producer.input || {})) {
+    // Source efficiency can improve output, but never creates a free input.
+    input[resourceId] = count * amount;
+  }
+  return { input, output };
+}
+
+function activeProducerFlows(state, ruleset) {
   const autoProductionUnlocked = isAutoProductionUnlocked(state);
   const indexes = createRulesetIndexes(ruleset);
+  return Object.entries(state.run.producers)
+    .map(([producerId, producerState]) => ({ producer: indexes.producers[producerId], count: producerState.count || 0 }))
+    .filter(({ producer, count }) => producer && count && (autoProductionUnlocked || producer.producesBeforeAutoUnlock === true))
+    .map(({ producer, count }) => ({ producer, ...producerFlowRates(state, producer, count) }));
+}
+
+export function calculateProductionRates(state, ruleset) {
   const rates = {};
-
-  for (const [producerId, producerState] of Object.entries(state.run.producers)) {
-    const producer = indexes.producers[producerId];
-    if (!producer || !producerState.count) {
-      continue;
-    }
-    if (!autoProductionUnlocked && producer.producesBeforeAutoUnlock !== true) {
-      continue;
-    }
-
-    const milestoneMultiplier = producerMilestoneMultiplier(producerState.count, producer.milestones);
-    for (const [resourceId, output] of Object.entries(producer.output)) {
-      const resourceMultiplier = productionMultiplierForResource(state, resourceId);
-      rates[resourceId] =
-        (rates[resourceId] || 0) + producerState.count * output * milestoneMultiplier * resourceMultiplier;
-    }
+  for (const flow of activeProducerFlows(state, ruleset)) {
+    for (const [resourceId, amount] of Object.entries(flow.output)) rates[resourceId] = (rates[resourceId] || 0) + amount;
+    for (const [resourceId, amount] of Object.entries(flow.input)) rates[resourceId] = (rates[resourceId] || 0) - amount;
   }
 
   return rates;
@@ -51,10 +59,30 @@ export function applyProduction(state, ruleset, deltaMs, ports) {
     return { rates: {}, events: [] };
   }
   const seconds = deltaMs / 1000;
-  const rates = calculateProductionRates(state, ruleset);
+  const flows = activeProducerFlows(state, ruleset);
+  const available = Object.fromEntries(Object.entries(state.run.resources).map(([resourceId, resource]) => [resourceId, resource.amount]));
+  const actualRates = {};
+  const appliedFlows = flows.map((flow) => {
+    let scale = 1;
+    for (const [resourceId, rate] of Object.entries(flow.input)) {
+      const needed = rate * seconds;
+      if (needed > 0) scale = Math.min(scale, Math.max(0, (available[resourceId] || 0) / needed));
+    }
+    for (const [resourceId, rate] of Object.entries(flow.input)) available[resourceId] = Math.max(0, (available[resourceId] || 0) - rate * seconds * scale);
+    return { ...flow, scale };
+  });
   const events = [];
-  for (const [resourceId, perSecond] of Object.entries(rates)) {
-    events.push(...addResource(state, resourceId, perSecond * seconds, ruleset, ports));
+  for (const flow of appliedFlows) {
+    for (const [resourceId, rate] of Object.entries(flow.input)) {
+      const appliedRate = rate * flow.scale;
+      actualRates[resourceId] = (actualRates[resourceId] || 0) - appliedRate;
+      events.push(...addResource(state, resourceId, -appliedRate * seconds, ruleset, ports));
+    }
+    for (const [resourceId, rate] of Object.entries(flow.output)) {
+      const appliedRate = rate * flow.scale;
+      actualRates[resourceId] = (actualRates[resourceId] || 0) + appliedRate;
+      events.push(...addResource(state, resourceId, appliedRate * seconds, ruleset, ports));
+    }
   }
-  return { rates, events };
+  return { rates: actualRates, events };
 }

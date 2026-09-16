@@ -5,6 +5,7 @@ export const producers = [
     labelKey: 'producer.primordial_reaction',
     unlocksAtStart: true,
     tags: ['rna', 'process'],
+    source: 'primordial_chemistry',
     baseCost: { rna: 5 },
     growth: 1.35,
     output: { rna: 0.22 },
@@ -24,9 +25,12 @@ export const producers = [
     labelKey: 'producer.rna_replication',
     requiresNodes: ['M02'],
     tags: ['rna', 'process', 'replication'],
+    source: 'replication_template',
     baseCost: { rna: 34 },
     growth: 1.35,
-    output: { rna: 0.58 },
+    // Raised from the earlier standalone-economy value so the original
+    // RNA→DNA conversion remains fast enough for the first Timeline.
+    output: { rna: 0.82 },
     milestones: [
       {
         count: 10,
@@ -44,6 +48,9 @@ export const producers = [
     tags: ['dna', 'process'],
     baseCost: { rna: 78 },
     growth: 1.35,
+    // Legacy evolution consumes two RNA for every DNA formed. The output is
+    // intentionally faster than the legacy tick loop, but keeps its ratio.
+    input: { rna: 0.52 },
     output: { dna: 0.26 },
     milestones: [
       {
@@ -60,9 +67,12 @@ export const producers = [
     labelKey: 'producer.biomass_uptake',
     requiresNodes: ['M06'],
     tags: ['biomass', 'process'],
-    baseCost: { dna: 60 },
+    source: 'environmental_uptake',
+    // Cell-only resources are a T1 bridge (they do not exist in the legacy
+    // molecular loop), so their ramp is deliberately faster after M06.
+    baseCost: { dna: 55 },
     growth: 1.35,
-    output: { biomass: 0.35 },
+    output: { biomass: 0.42 },
     milestones: [
       {
         count: 8,
@@ -77,10 +87,12 @@ export const producers = [
     entityType: 'producer',
     labelKey: 'producer.respiration',
     requiresNodes: ['C01'],
-    tags: ['energy', 'process'],
+    tags: ['atp', 'process'],
     baseCost: { biomass: 25 },
     growth: 1.35,
-    output: { energy: 0.3 },
+    // Metabolic capacity is a conversion, not a second free income stream.
+    input: { biomass: 0.3 },
+    output: { atp: 0.35 },
     milestones: [
       {
         count: 8,

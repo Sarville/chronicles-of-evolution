@@ -15,7 +15,13 @@ export function calculateCap(state, resourceId, ruleset) {
   }
   const indexes = createRulesetIndexes(ruleset);
   const config = indexes.resources[resourceId];
-  return config?.baseCap ?? Infinity;
+  const baseCap = config?.baseCap ?? Infinity;
+  if (!Number.isFinite(baseCap)) return baseCap;
+  const expansion = Object.values(state.run.modifiers.active).reduce((total, modifier) => {
+    if (modifier.type !== 'resource_capacity' || modifier.resourceId !== resourceId) return total;
+    return total + modifier.value;
+  }, 0);
+  return Math.max(0, baseCap + expansion);
 }
 
 export function addResource(state, resourceId, amount, ruleset, ports) {

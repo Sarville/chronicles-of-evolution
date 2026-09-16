@@ -5,17 +5,49 @@ import { validateRuleset } from '../../src/chronicles/domain/validation.js';
 const result = validateRuleset(ruleset);
 assert.deepEqual(result.errors, []);
 assert.equal(result.ok, true);
-assert.equal(JSON.parse(JSON.stringify(ruleset)).version, 'timeline1-v2-reconciled');
+assert.equal(JSON.parse(JSON.stringify(ruleset)).version, 'timeline1-v7-storage-gates');
+assert.equal(ruleset.events.some((event) => event.id === 'EV-BIO-01' && event.trigger.nodeId === 'C01'), true);
+assert.equal(ruleset.events.some((event) => event.id === 'EV-RNA-RESONANCE' && event.deck === 'early_biology'), true);
 assert.equal(ruleset.allowedEffectTypes.includes('manual_gain_multiplier'), true);
 assert.equal(ruleset.allowedEffectTypes.includes('job_output_multiplier'), false);
 assert.equal(ruleset.effectSupport.manual_gain_multiplier.status, 'supported');
 assert.equal(ruleset.effectSupport.unlock_auto_production.status, 'supported');
 assert.equal(ruleset.resources.some((resource) => resource.id === 'rna'), true);
 assert.equal(ruleset.resources.some((resource) => resource.id === 'dna'), true);
+assert.equal(ruleset.resources.some((resource) => resource.id === 'atp'), true);
+assert.equal(ruleset.resources.some((resource) => resource.id === 'energy'), false);
 assert.equal(ruleset.resources.some((resource) => resource.id === 'information'), false);
+assert.equal(ruleset.resources.every((resource) => Number.isFinite(resource.baseCap) && resource.baseCap > 0), true);
+assert.equal(ruleset.allowedEffectTypes.includes('resource_capacity'), true);
+assert.equal(ruleset.buildings.some((building) => building.id === 'BLD_MEMBRANE_STORE'), true);
+assert.equal(ruleset.nodes.every((node) => !(node.effects || []).some((effect) => effect.type === 'resource_capacity')), true);
+assert.deepEqual(ruleset.buildings.find((building) => building.id === 'BLD_MEMBRANE_STORE').effects, [
+  { type: 'resource_capacity', resourceId: 'rna', value: 250 },
+]);
+assert.deepEqual(ruleset.buildings.find((building) => building.id === 'BLD_GENETIC_STORE').effects, [
+  { type: 'resource_capacity', resourceId: 'dna', value: 150 },
+]);
+assert.deepEqual(ruleset.buildings.find((building) => building.id === 'BLD_BIOMASS_STORE').effects, [
+  { type: 'resource_capacity', resourceId: 'biomass', value: 160 },
+]);
+assert.deepEqual(ruleset.buildings.find((building) => building.id === 'BLD_ATP_STORE').effects, [
+  { type: 'resource_capacity', resourceId: 'atp', value: 120 },
+]);
+assert.equal(ruleset.nodes.find((node) => node.id === 'M02').cost.rna > ruleset.resources.find((resource) => resource.id === 'rna').baseCap, true);
+assert.equal(ruleset.nodes.find((node) => node.id === 'M06').cost.dna > ruleset.resources.find((resource) => resource.id === 'dna').baseCap, true);
+assert.equal(ruleset.nodes.find((node) => node.id === 'C03').cost.biomass > ruleset.resources.find((resource) => resource.id === 'biomass').baseCap, true);
+assert.equal(ruleset.nodes.find((node) => node.id === 'C03').cost.atp > ruleset.resources.find((resource) => resource.id === 'atp').baseCap, true);
+assert.equal(ruleset.nodes.find((node) => node.id === 'T02').cost.food > ruleset.resources.find((resource) => resource.id === 'food').baseCap, true);
+assert.equal(ruleset.nodes.find((node) => node.id === 'T02').cost.materials > ruleset.resources.find((resource) => resource.id === 'materials').baseCap, true);
+assert.equal(ruleset.nodes.find((node) => node.id === 'T05').cost.knowledge > ruleset.resources.find((resource) => resource.id === 'knowledge').baseCap, true);
+assert.equal(ruleset.buildings.find((building) => building.id === 'BLD_FOOD_STORE').requiresAnyBranchGroup, 'culture_1');
+assert.equal(ruleset.buildings.find((building) => building.id === 'BLD_MATERIALS_STORE').requiresAnyBranchGroup, 'culture_1');
+assert.deepEqual(ruleset.buildings.find((building) => building.id === 'BLD_KNOWLEDGE_ARCHIVE').requiresNodes, ['T02']);
 assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_CHEMICAL_GRADIENT'), false);
 assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_CATALYTIC_FOLD'), false);
 assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_ENERGY_POCKET'), false);
+assert.deepEqual(ruleset.producers.find((producer) => producer.id === 'PROC_DNA_SYNTHESIS').input, { rna: 0.52 });
+assert.deepEqual(ruleset.producers.find((producer) => producer.id === 'PROC_RESPIRATION').input, { biomass: 0.3 });
 for (const producer of ruleset.producers.filter((candidate) => candidate.id.startsWith('PROC_'))) {
   assert.equal(producer.milestones.length, 1);
   assert.equal(Number.isInteger(producer.milestones[0].count) && producer.milestones[0].count > 0, true);

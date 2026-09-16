@@ -11,7 +11,7 @@ import { milestones } from './milestones.js';
 import { endings } from './endings.js';
 import { allowedEffectTypes, effectSupport } from './effects.js';
 
-export const RULESET_VERSION = 'timeline1-v2-reconciled';
+export const RULESET_VERSION = 'timeline1-v7-storage-gates';
 
 export const ruleset = {
   version: RULESET_VERSION,

@@ -5,12 +5,15 @@ import {
   formatEta,
   formatResourceAmount,
   selectManualProcessView,
+  selectEvolutionRevealLevel,
   selectNodeCost,
   selectNodeStatus,
   selectPurchaseEta,
   selectProducerOutputView,
   selectProducerPrice,
   selectProducerStatus,
+  selectBuildingPrice,
+  selectBuildingStatus,
   selectProductionRates,
   selectSideGoals,
   selectVisibleResources,
@@ -28,7 +31,7 @@ const RESOURCE_NAMES = {
   rna: 'RNA',
   dna: 'DNA',
   biomass: 'Biomass',
-  energy: 'Energy',
+  atp: 'ATP',
 };
 const NODE_NAMES = {
   M01: 'Stable RNA',
@@ -54,6 +57,17 @@ const PRODUCER_NAMES = {
   PROC_DNA_SYNTHESIS: 'DNA Synthesis',
   PROC_BIOMASS_UPTAKE: 'Biomass Uptake',
   PROC_RESPIRATION: 'Respiration',
+};
+const BUILDING_NAMES = {
+  BLD_MEMBRANE_STORE: 'Membrane Layers',
+  BLD_GENETIC_STORE: 'Genetic Storage',
+  BLD_BIOMASS_STORE: 'Biomass Reserve',
+  BLD_ATP_STORE: 'ATP Reserve',
+  BLD_FOOD_STORE: 'Food Store',
+  BLD_MATERIALS_STORE: 'Materials Store',
+  BLD_KNOWLEDGE_ARCHIVE: 'Knowledge Archive',
+  BLD_POWER_STORE: 'Power Reserve',
+  BLD_FIELD: 'Field',
 };
 
 const storage = createBrowserStorage();
@@ -97,6 +111,12 @@ function formatCost(cost) {
     .join(' + ');
 }
 
+function formatWholeCost(cost) {
+  return Object.entries(cost)
+    .map(([resourceId, amount]) => `${formatResourceAmount(amount)} ${RESOURCE_NAMES[resourceId] || resourceId}`)
+    .join(' + ');
+}
+
 function phaseLabel() {
   if (engine().state.run.nodes.completed.C06) return 'Cell Coordination';
   if (engine().state.run.nodes.completed.C05) return 'Organelles';
@@ -118,7 +138,7 @@ function goalProgress(goal) {
     return Object.entries(selectNodeCost(engine().state, ruleset, goal.nodeId))
       .map(([resourceId, amount]) => {
         const current = engine().state.run.resources[resourceId]?.amount || 0;
-        return `${RESOURCE_NAMES[resourceId] || resourceId}: ${formatNumber(Math.min(current, amount))} / ${formatNumber(amount)}`;
+        return `${RESOURCE_NAMES[resourceId] || resourceId}: ${formatResourceAmount(Math.min(current, amount))} / ${formatResourceAmount(amount)}`;
       })
       .join('<br>');
   }
@@ -130,7 +150,7 @@ function renderResources() {
     .map(
       (resource) => `<div class="resource-row">
         <span>${RESOURCE_NAMES[resource.id] || resource.id}</span>
-        <strong>${formatResourceAmount(resource.amount)}</strong>
+        <strong>${formatResourceAmount(resource.amount)} / ${formatResourceAmount(resource.cap)}</strong>
         <small>${resource.perSecond > 0 ? '+' : ''}${formatNumber(resource.perSecond)}/s</small>
       </div>`
     )
@@ -156,6 +176,24 @@ function renderObjective() {
     ${hint}
     <button data-action="focus" data-target="${goal.cta?.targetId || ''}">${goal.cta?.label || 'Continue'}</button>
     ${side ? `<div class="side-goals">${side}</div>` : ''}
+  </section>`;
+}
+
+function renderPendingEvent() {
+  const eventId = engine().state.run.events.pendingId;
+  if (!eventId) return '';
+  const event = indexes.events[eventId];
+  if (!event) return '';
+  const choices = event.choices.map((choice) => {
+    const node = choice.purchaseNodeId ? indexes.nodes[choice.purchaseNodeId] : null;
+    const status = node ? selectNodeStatus(engine().state, ruleset, node.id) : 'available_affordable';
+    const cost = node ? `<small>${formatWholeCost(selectNodeCost(engine().state, ruleset, node.id))}</small>` : '';
+    return `<button class="event-choice" data-action="resolve-event" data-event-id="${event.id}" data-choice-id="${choice.id}" ${status === 'available_affordable' ? '' : 'disabled'}>
+      <strong>${choice.label}</strong>${cost}
+    </button>`;
+  }).join('');
+  return `<section class="event-panel ${event.type === 'branch' ? 'blocking' : ''}" role="dialog" aria-label="${event.title}">
+    <small>СОБЫТИЕ</small><h2>${event.title}</h2><p>${event.body}</p><div class="event-choices">${choices}</div>
   </section>`;
 }
 
@@ -218,27 +256,67 @@ function renderProducers() {
       const outputView = selectProducerOutputView(engine().state, ruleset, producer.id);
       const cost = selectProducerPrice(engine().state, ruleset, producer.id);
       const milestone = renderProducerMilestone(outputView);
+      const input = Object.keys(outputView.inputPerUnit).length
+        ? `<small>Consumes / unit</small>${formatCost(outputView.inputPerUnit)}/s<small>Current consumption</small>${formatCost(outputView.currentInput)}/s`
+        : '';
       return `<button class="entity ${status} ${focusedEntityId === producer.id ? 'focused' : ''}" data-entity-id="${producer.id}" data-action="producer" data-id="${producer.id}" ${status === 'available_affordable' ? '' : 'disabled'}>
         <span><strong>${PRODUCER_NAMES[producer.id] || producer.id}</strong><small>Owned ${outputView.count}</small>${milestone}</span>
         <span><small>Cost</small>${formatCost(cost)}<small>${etaText(status, cost)}</small></span>
-        <span><small>Base / unit</small>${formatCost(outputView.basePerUnit)}/s<small>Current total</small>${formatCost(outputView.currentTotal)}/s</span>
+        <span>${input}<small>Base output / unit</small>${formatCost(outputView.basePerUnit)}/s<small>Current output</small>${formatCost(outputView.currentTotal)}/s</span>
       </button>`;
     })
     .join('');
   return `<section class="panel"><h2>Actions / Generators</h2>${renderManualActions()}<div class="entity-list">${rows}</div></section>`;
 }
 
+function renderBuildingCapacity(building) {
+  const capacity = (building.effects || []).filter((effect) => effect.type === 'resource_capacity');
+  if (!capacity.length) return '';
+  return `<small>Storage</small>${capacity
+    .map((effect) => `+${formatResourceAmount(effect.value)} ${RESOURCE_NAMES[effect.resourceId] || effect.resourceId}`)
+    .join(' + ')}`;
+}
+
+function renderBuildings() {
+  const rows = ruleset.buildings
+    .map((building) => {
+      const status = selectBuildingStatus(engine().state, ruleset, building.id);
+      if (status === 'locked' || status === 'unknown') return '';
+      const count = engine().state.run.buildings[building.id]?.count || 0;
+      const cost = selectBuildingPrice(engine().state, ruleset, building.id);
+      const disabled = status === 'available_affordable' ? '' : 'disabled';
+      const price = cost ? formatWholeCost(cost) : '';
+      return `<button class="entity ${status} ${focusedEntityId === building.id ? 'focused' : ''}" data-entity-id="${building.id}" data-action="building" data-id="${building.id}" ${disabled}>
+        <span><strong>${BUILDING_NAMES[building.id] || building.id}</strong><small>Built ${count}</small></span>
+        <span><small>Cost</small>${price}<small>${status === 'maxed' ? 'Maximum reached' : etaText(status, cost)}</small></span>
+        <span>${renderBuildingCapacity(building)}</span>
+      </button>`;
+    })
+    .join('');
+  if (!rows) return '';
+  return `<section class="panel"><h2>Storage buildings</h2><div class="entity-list">${rows}</div></section>`;
+}
+
 function renderEvolution() {
+  const revealLevels = {};
   const rows = EVOLUTION_NODES.map((nodeId) => {
     const node = indexes.nodes[nodeId];
+    const revealLevel = selectEvolutionRevealLevel(engine().state, ruleset, nodeId, revealLevels);
+    if (!engine().state.run.nodes.completed[nodeId] && revealLevel > 1) {
+      return `<button class="node hidden-evolution" disabled aria-label="Недоступное открытие">
+        <span><strong>🔒 Неизвестное открытие</strong></span>
+        <small>Откроется позже</small>
+      </button>`;
+    }
     const status = selectNodeStatus(engine().state, ruleset, nodeId);
     const optional = node.type === 'OPTIONAL' ? '<small class="optional">OPTIONAL</small>' : '';
     const cost = selectNodeCost(engine().state, ruleset, nodeId);
     const eta = etaText(status, cost);
+    const etaLabel = eta || (status === 'completed' ? 'Готово' : status === 'locked' ? 'Недоступно' : 'Сейчас');
     return `<button class="node ${status} ${focusedEntityId === nodeId ? 'focused' : ''}" data-entity-id="${nodeId}" data-action="node" data-id="${nodeId}" ${status === 'available_affordable' ? '' : 'disabled'}>
       <span><strong>${nodeId} — ${NODE_NAMES[nodeId]}</strong>${optional}</span>
-      <span>${status.replaceAll('_', ' ')}${eta ? `<small>${eta}</small>` : ''}</span>
-      <small>${formatCost(cost)}</small>
+      <span>${status.replaceAll('_', ' ')}<small>ETA ${etaLabel}</small></span>
+      <small>${formatWholeCost(cost)}</small>
     </button>`;
   }).join('');
   return `<section class="panel evolution-panel"><h2>Evolution</h2><div class="node-grid">${rows}</div></section>`;
@@ -266,7 +344,7 @@ const renderDevPanel = DEV
       <button data-action="grant" data-resource="rna">+100 RNA</button>
       <button data-action="grant" data-resource="dna">+25 DNA</button>
       <button data-action="grant" data-resource="biomass">+25 Biomass</button>
-      <button data-action="grant" data-resource="energy">+25 Energy</button>
+      <button data-action="grant" data-resource="atp">+25 ATP</button>
       <button data-action="dev-reset">Dev reset</button>
       <button data-action="dump">Dump state</button>
     </div>
@@ -305,14 +383,15 @@ function render() {
       </nav>
     </header>
     <section class="resources">${renderResources()}</section>
+    ${renderPendingEvent()}
     <div class="layout">
       <div>
         ${renderDiorama()}
-        ${activeView === 'world' ? renderProducers() : renderEvolution()}
+        ${activeView === 'world' ? `${renderProducers()}${renderBuildings()}` : renderEvolution()}
       </div>
       <aside>
         ${renderObjective()}
-        <section class="panel status"><h2>Save</h2><p>${lastSaveMessage}</p><button data-action="save">Save now</button><button data-action="new-run">New run</button></section>
+        <section class="panel status"><h2>Save</h2><p>${lastSaveMessage}</p>${engine().state.run.migrationNotice ? `<p class="hint">${engine().state.run.migrationNotice}</p>` : ''}<button data-action="save">Save now</button><button data-action="new-run">New run</button></section>
         ${renderDevPanel()}
       </aside>
     </div>
@@ -345,12 +424,14 @@ function handleAction(target) {
   }
   if (action === 'manual') engine().dispatch({ type: 'USE_MANUAL_PROCESS', processId: button.dataset.id });
   if (action === 'producer') engine().dispatch({ type: 'BUY_PRODUCER', producerId: button.dataset.id });
+  if (action === 'building') engine().dispatch({ type: 'BUY_BUILDING', buildingId: button.dataset.id });
   if (action === 'node') {
     const result = engine().dispatch({ type: 'BUY_NODE', nodeId: button.dataset.id });
     if (result.ok && result.events.some((event) => event.type === 'cell_reached' || event.payload?.nodeId === 'M06')) {
       autosave().flush('cell_reached');
     }
   }
+  if (action === 'resolve-event') engine().dispatch({ type: 'RESOLVE_EVENT', eventId: button.dataset.eventId, choiceId: button.dataset.choiceId });
   if (action === 'save') {
     const saved = autosave().flush('manual');
     lastSaveMessage = saved.ok ? 'Saved' : `Save failed: ${saved.reason}`;
@@ -407,12 +488,19 @@ function installStyles() {
     .entity, .node { width: 100%; display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 8px; align-items: center; }
     .node { grid-template-columns: 1.4fr .8fr 1fr; }
     .completed { border-color: #f0c36a; background: #332d1f; }
+    .hidden-evolution { border-color: #283337; background: #14191c; color: #65706e; opacity: .7; }
     .optional { color: #f0c36a; }
     .progress { padding: 10px; border-radius: 6px; background: #20272a; color: #dfe7e4; }
     .hint { border-left: 3px solid #f0c36a; padding-left: 10px; color: #f0d99a !important; }
     .side-goal { border-top: 1px solid #2d383c; padding-top: 10px; margin-top: 10px; }
     .side-goal span { display: block; color: #c0cbc8; margin-top: 3px; }
     .status button { width: 100%; margin-top: 8px; text-align: center; }
+    .event-panel { margin: 0 0 12px; padding: 16px; border: 1px solid #66d0a5; border-radius: 8px; background: #18302c; box-shadow: 0 8px 30px rgba(0,0,0,.2); }
+    .event-panel.blocking { border-color: #f0c36a; background: #332d1f; }
+    .event-panel h2 { margin: 4px 0 8px; font-size: 22px; }
+    .event-panel p { margin: 0 0 12px; color: #e2e8e5; line-height: 1.45; }
+    .event-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+    .event-choice { min-width: 150px; flex: 1; }
     .recovery { display: grid; min-height: 100vh; place-items: center; }
     .recovery-panel { width: min(680px, calc(100vw - 32px)); }
     .recovery-panel h1 { margin: 0 0 10px; font-size: 28px; letter-spacing: 0; }

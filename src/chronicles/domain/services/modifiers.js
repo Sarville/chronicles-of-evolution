@@ -7,6 +7,9 @@ export function applyEffects(state, effects = [], source = {}) {
     if (effect.type === 'resource_production_multiplier') {
       state.run.modifiers.active[`${sourceKey}:resource:${effect.resourceId}`] = effect;
     }
+    if (effect.type === 'resource_capacity') {
+      state.run.modifiers.active[`${sourceKey}:capacity:${effect.resourceId}`] = effect;
+    }
     if (effect.type === 'global_production_multiplier') {
       state.run.modifiers.active[`${sourceKey}:global`] = effect;
     }

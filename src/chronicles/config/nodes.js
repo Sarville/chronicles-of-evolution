@@ -32,7 +32,9 @@ export const nodes = [
     labelKey: 'node.M02',
     cost: { rna: 130 },
     requiresNodes: ['M01'],
-    effects: [{ type: 'resource_production_multiplier', resourceId: 'rna', value: 1.75 }],
+    effects: [
+      { type: 'resource_production_multiplier', resourceId: 'rna', value: 1.75 },
+    ],
     goalId: 'G002',
   },
   {
@@ -67,7 +69,9 @@ export const nodes = [
     labelKey: 'node.M05',
     cost: { rna: 520, dna: 90 },
     requiresNodes: ['M03'],
-    effects: [{ type: 'global_production_multiplier', value: 1.12 }],
+    effects: [
+      { type: 'global_production_multiplier', value: 1.12 },
+    ],
     goalId: 'G004',
   },
   {
@@ -90,7 +94,7 @@ export const nodes = [
     labelKey: 'node.C01',
     cost: { biomass: 10 },
     requiresNodes: ['M06'],
-    effects: [{ type: 'unlock_resource', resourceId: 'energy' }],
+    effects: [{ type: 'unlock_resource', resourceId: 'atp' }],
   },
   {
     id: 'C02A',
@@ -99,7 +103,7 @@ export const nodes = [
     semanticRole: 'branch',
     branchGroup: 'cell_identity_1',
     labelKey: 'node.C02A',
-    cost: { biomass: 30 },
+    cost: { biomass: 30, atp: 15 },
     requiresNodes: ['C01'],
     effects: [
       { type: 'resource_production_multiplier', resourceId: 'biomass', value: 1.18 },
@@ -114,7 +118,7 @@ export const nodes = [
     semanticRole: 'branch',
     branchGroup: 'cell_identity_1',
     labelKey: 'node.C02B',
-    cost: { biomass: 30, energy: 8 },
+    cost: { biomass: 30, atp: 15 },
     requiresNodes: ['C01'],
     effects: [
       { type: 'global_production_multiplier', value: 1.12 },
@@ -129,7 +133,7 @@ export const nodes = [
     semanticRole: 'branch',
     branchGroup: 'cell_identity_1',
     labelKey: 'node.C02C',
-    cost: { biomass: 28, dna: 16 },
+    cost: { biomass: 30, atp: 15 },
     requiresNodes: ['C01'],
     effects: [
       { type: 'producer_cost_multiplier', producerTag: 'biomass', value: 0.9 },
@@ -143,9 +147,9 @@ export const nodes = [
     type: 'CORE',
     semanticRole: 'core_tech',
     labelKey: 'node.C03',
-    cost: { biomass: 55, energy: 20 },
+    cost: { biomass: 110, atp: 50 },
     requiresAnyBranchGroup: 'cell_identity_1',
-    effects: [{ type: 'resource_production_multiplier', resourceId: 'energy', value: 1.25 }],
+    effects: [{ type: 'resource_production_multiplier', resourceId: 'atp', value: 1.25 }],
   },
   {
     id: 'C04A',
@@ -153,10 +157,10 @@ export const nodes = [
     type: 'OPTIONAL',
     semanticRole: 'upgrade',
     labelKey: 'node.C04A',
-    cost: { energy: 40 },
+    cost: { atp: 40 },
     requiresNodes: ['C01'],
     effects: [
-      { type: 'resource_production_multiplier', resourceId: 'energy', value: 1.15 },
+      { type: 'resource_production_multiplier', resourceId: 'atp', value: 1.15 },
       { type: 'set_flag', flag: 'run.bio.metabolism.photosynthesis', value: true },
     ],
   },
@@ -169,7 +173,7 @@ export const nodes = [
     cost: { biomass: 45 },
     requiresNodes: ['C01'],
     effects: [
-      { type: 'resource_production_multiplier', resourceId: 'energy', value: 1.15 },
+      { type: 'resource_production_multiplier', resourceId: 'atp', value: 1.15 },
       { type: 'set_flag', flag: 'run.bio.metabolism.chemosynthesis', value: true },
     ],
   },
@@ -189,7 +193,7 @@ export const nodes = [
     type: 'CORE',
     semanticRole: 'core_tech',
     labelKey: 'node.C05',
-    cost: { biomass: 90, energy: 35 },
+    cost: { biomass: 160, atp: 70 },
     requiresNodes: ['C03'],
     effects: [{ type: 'global_production_multiplier', value: 1.15 }],
   },
@@ -199,7 +203,7 @@ export const nodes = [
     type: 'CORE',
     semanticRole: 'core_tech',
     labelKey: 'node.C06',
-    cost: { biomass: 140, energy: 60, dna: 80 },
+    cost: { biomass: 170, atp: 100, dna: 160 },
     requiresNodes: ['C05'],
     effects: [{ type: 'global_production_multiplier', value: 1.1 }],
     goalId: 'G007',
@@ -240,7 +244,9 @@ export const nodes = [
     labelKey: 'node.T01C',
     cost: { food: 230, materials: 110, knowledge: 45 },
     requiresNodes: [],
-    effects: [{ type: 'resource_production_multiplier', resourceId: 'knowledge', value: 1.25 }],
+    effects: [
+      { type: 'resource_production_multiplier', resourceId: 'knowledge', value: 1.25 },
+    ],
   },
   {
     id: 'T02',
@@ -250,7 +256,9 @@ export const nodes = [
     labelKey: 'node.T02',
     cost: { food: 420, materials: 240, knowledge: 60 },
     requiresAnyBranchGroup: 'culture_1',
-    effects: [{ type: 'resource_production_multiplier', resourceId: 'food', value: 1.2 }],
+    effects: [
+      { type: 'resource_production_multiplier', resourceId: 'food', value: 1.2 },
+    ],
     goalId: 'G014',
   },
   {

@@ -9,6 +9,8 @@ import {
   formatEtaDuration,
   formatResourceAmount,
   selectCurrentGoal,
+  selectBuildingStatus,
+  selectEvolutionRevealLevel,
   selectManualProcessView,
   selectNodeCost,
   selectNodeStatus,
@@ -28,20 +30,37 @@ const clock = createFakeClock(1000);
 const rng = createSeededRng(42);
 const engine = createChroniclesEngine({ ruleset, ports: { clock, rng } });
 
-assert.equal(engine.state.run.rulesetVersion, 'timeline1-v2-reconciled');
+assert.equal(engine.state.run.rulesetVersion, 'timeline1-v7-storage-gates');
 assert.equal(engine.state.run.eraId, 'MOLECULAR');
 assert.deepEqual(selectResourceAmounts(engine.state), { rna: 0 });
 assert.deepEqual(selectVisibleResources(engine.state, ruleset).map((resource) => resource.id), ['rna']);
 assert.equal(engine.state.run.resources.information, undefined);
-assert.equal(engine.state.run.resources.energy, undefined);
+assert.equal(engine.state.run.resources.atp, undefined);
 assert.equal(engine.state.run.goals.currentId, 'G001');
 assert.equal(engine.state.run.goals.chapter.activeId, 'G001');
 assert.equal(engine.state.run.goals.states.G001.status, 'active');
-assert.deepEqual(engine.state.run.events, { queue: [], states: {} });
+assert.deepEqual(engine.state.run.events, { rngState: 1, queue: [], pendingId: null, states: {}, history: [], lastDeckDrawAtMs: {} });
 assert.deepEqual(engine.state.run.modifiers, { active: {} });
-assert.equal(calculateCap(engine.state, 'rna', ruleset), Infinity);
+assert.equal(calculateCap(engine.state, 'rna', ruleset), 100);
 assert.equal(selectCurrentGoal(engine.state, ruleset).id, 'G001');
 assert.equal(selectManualProcessView(engine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').available, true);
+
+const conversionEngine = createChroniclesEngine({ ruleset });
+conversionEngine.state.run.modifiers.active.test = { type: 'unlock_auto_production' };
+conversionEngine.state.run.resources.rna.amount = 10;
+conversionEngine.state.run.producers.PROC_DNA_SYNTHESIS = { count: 1 };
+let conversionTick = conversionEngine.tick(1000);
+assert.equal(Math.abs(conversionTick.rates.rna + 0.52) < 0.000001, true);
+assert.equal(Math.abs(conversionTick.rates.dna - 0.26) < 0.000001, true);
+assert.equal(Math.abs(conversionEngine.state.run.resources.rna.amount - 9.48) < 0.000001, true);
+assert.equal(Math.abs(conversionEngine.state.run.resources.dna.amount - 0.26) < 0.000001, true);
+conversionEngine.state.run.resources.rna.amount = 0;
+conversionTick = conversionEngine.tick(1000);
+assert.equal(conversionTick.rates.dna, 0);
+assert.equal(conversionEngine.state.run.resources.dna.amount, 0.26);
+assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M01'), 0);
+assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M02'), 1);
+assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M03'), 2);
 
 let result = engine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_PRIMORDIAL_PULSE' });
 assert.equal(result.ok, true);
@@ -54,9 +73,13 @@ assert.equal(result.reason, 'MANUAL_PROCESS_UNAVAILABLE');
 engine.tick(2000);
 assert.equal(selectManualProcessView(engine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').available, true);
 
+// The broad flow below verifies the rest of the economy; cap gates have a
+// focused scenario later in this file.
+engine.state.run.resources.rna.capOverride = 10000;
 result = engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 200 });
 assert.equal(result.ok, true);
 assert.equal(result.events[0].type, 'resource_changed');
+assert.equal(engine.state.run.resources.rna.amount, 201);
 
 assert.deepEqual(selectProducerPrice(engine.state, ruleset, 'PROC_PRIMORDIAL_REACTION'), { rna: 5 });
 result = engine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });
@@ -65,7 +88,7 @@ assert.equal(engine.state.run.producers.PROC_PRIMORDIAL_REACTION.count, 1);
 let tick = engine.tick(1000);
 assert.equal(tick.ok, true);
 assert.equal(tick.rates.rna, 0.22);
-assert.equal(engine.state.run.resources.rna.amount > 196, true);
+assert.equal(Math.abs(engine.state.run.resources.rna.amount - 196.22) < 0.000001, true);
 
 result = engine.dispatch({ type: 'BUY_NODE', nodeId: 'M02' });
 assert.equal(result.ok, false);
@@ -82,22 +105,30 @@ assert.equal(selectManualProcessView(engine.state, ruleset, 'MANUAL_PRIMORDIAL_P
 
 result = engine.dispatch({ type: 'BUY_NODE', nodeId: 'M02' });
 assert.equal(result.ok, true);
+assert.equal(calculateCap(engine.state, 'rna', ruleset), 10000);
+assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M03'), 0);
+assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M04'), 1);
+assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M05'), 1);
+assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M06'), 2);
 assert.equal(Math.abs(selectProductionRates(engine.state, ruleset).rna - 0.385) < 0.000001, true);
 assert.equal(selectManualProcessView(engine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').cooldownMs, 90000);
 assert.equal(selectNodeStatus(engine.state, ruleset, 'M05'), 'locked');
 assert.equal(selectNodeStatus(engine.state, ruleset, 'M04'), 'locked');
 
+engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 34 });
 result = engine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_RNA_REPLICATION' });
 assert.equal(result.ok, true);
 result = engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 500 });
 assert.equal(result.ok, true);
 result = engine.dispatch({ type: 'BUY_NODE', nodeId: 'M03' });
 assert.equal(result.ok, true);
+assert.equal(calculateCap(engine.state, 'dna', ruleset), 100);
 assert.equal(engine.state.run.resources.dna.amount, 0);
 assert.deepEqual(selectVisibleResources(engine.state, ruleset).map((resource) => resource.id), ['rna', 'dna']);
 assert.equal(selectNodeStatus(engine.state, ruleset, 'M04'), 'available_unaffordable');
 assert.equal(selectNodeStatus(engine.state, ruleset, 'M05'), 'available_unaffordable');
 
+engine.state.run.resources.dna.capOverride = 10000;
 result = engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'dna', amount: 500 });
 assert.equal(result.ok, true);
 result = engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 500 });
@@ -105,6 +136,7 @@ assert.equal(result.ok, true);
 result = engine.dispatch({ type: 'BUY_NODE', nodeId: 'M05' });
 assert.equal(result.ok, true);
 assert.equal(engine.state.run.nodes.completed.M04, undefined);
+assert.equal(selectBuildingStatus(engine.state, ruleset, 'BLD_MEMBRANE_STORE'), 'available_affordable');
 result = engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 1000 });
 assert.equal(result.ok, true);
 result = engine.dispatch({ type: 'BUY_NODE', nodeId: 'M06' });
@@ -114,9 +146,41 @@ assert.equal(engine.state.run.eraId, 'CELLULAR');
 assert.equal(engine.state.run.resources.biomass.amount, 0);
 assert.deepEqual(selectVisibleResources(engine.state, ruleset).map((resource) => resource.id), ['rna', 'dna', 'biomass']);
 
+const storageBuildingEngine = createChroniclesEngine({ ruleset });
+storageBuildingEngine.state.run.nodes.completed.M01 = { completedAtMs: 0 };
+storageBuildingEngine.state.run.resources.rna.amount = 100;
+assert.equal(storageBuildingEngine.dispatch({ type: 'BUY_BUILDING', buildingId: 'BLD_MEMBRANE_STORE' }).ok, true);
+assert.equal(storageBuildingEngine.state.run.buildings.BLD_MEMBRANE_STORE.count, 1);
+assert.equal(calculateCap(storageBuildingEngine.state, 'rna', ruleset), 350);
+
+// A discovery cannot bypass a cap; the appropriate storage structure is the
+// only way forward. Later resources follow the same invariant.
+const storageGateEngine = createChroniclesEngine({ ruleset });
+storageGateEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 9 });
+assert.equal(storageGateEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M01' }).ok, true);
+storageGateEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 1000 });
+assert.equal(calculateCap(storageGateEngine.state, 'rna', ruleset), 100);
+assert.equal(selectNodeStatus(storageGateEngine.state, ruleset, 'M02'), 'available_unaffordable');
+assert.equal(storageGateEngine.dispatch({ type: 'BUY_BUILDING', buildingId: 'BLD_MEMBRANE_STORE' }).ok, true);
+assert.equal(calculateCap(storageGateEngine.state, 'rna', ruleset), 350);
+storageGateEngine.state.run.nodes.completed.M03 = { completedAtMs: 0 };
+storageGateEngine.state.run.resources.dna = { amount: 100 };
+assert.equal(storageGateEngine.dispatch({ type: 'BUY_BUILDING', buildingId: 'BLD_GENETIC_STORE' }).ok, true);
+assert.equal(calculateCap(storageGateEngine.state, 'dna', ruleset), 250);
+storageGateEngine.state.run.nodes.completed.M06 = { completedAtMs: 0 };
+storageGateEngine.state.run.resources.dna.amount = 100;
+assert.equal(storageGateEngine.dispatch({ type: 'BUY_BUILDING', buildingId: 'BLD_BIOMASS_STORE' }).ok, true);
+assert.equal(calculateCap(storageGateEngine.state, 'biomass', ruleset), 240);
+storageGateEngine.state.run.nodes.completed.C01 = { completedAtMs: 0 };
+storageGateEngine.state.run.resources.biomass = { amount: 80 };
+assert.equal(storageGateEngine.dispatch({ type: 'BUY_BUILDING', buildingId: 'BLD_ATP_STORE' }).ok, true);
+assert.equal(calculateCap(storageGateEngine.state, 'atp', ruleset), 160);
+
 engine.state.run.nodes.completed.T08 = { completedAtMs: 0 };
 engine.state.run.eraId = 'SETTLEMENT_EARLY';
 engine.state.run.flags['run.unlock.building.BLD_FIELD'] = true;
+engine.state.run.resources.food = { amount: 0, capOverride: 1000 };
+engine.state.run.resources.materials = { amount: 0, capOverride: 1000 };
 engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'food', amount: 180 });
 engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'materials', amount: 260 });
 result = engine.dispatch({ type: 'BUY_BUILDING', buildingId: 'BLD_FIELD' });
@@ -139,17 +203,26 @@ assert.equal(tick.frozen, true);
 assert.equal(JSON.stringify(engine.state.run), JSON.stringify({ ...JSON.parse(closedSnapshot), lifecycle: 'closed' }));
 
 const branchEngine = createChroniclesEngine({ ruleset });
+for (const resourceId of ['rna', 'dna', 'biomass', 'atp']) {
+  branchEngine.state.run.resources[resourceId] = { amount: 0, capOverride: 10000 };
+}
 branchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 5000 });
 branchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'dna', amount: 1000 });
 branchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'biomass', amount: 1000 });
-branchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'energy', amount: 1000 });
+branchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'atp', amount: 1000 });
 for (const nodeId of ['M01', 'M02', 'M03', 'M05', 'M06', 'C01']) {
   result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId });
   assert.equal(result.ok, true);
+  const pendingId = branchEngine.state.run.events.pendingId;
+  if (pendingId && pendingId !== 'EV-BIO-01') {
+    assert.equal(branchEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: pendingId, choiceId: 'continue' }).ok, true);
+  }
 }
 assert.equal(branchEngine.state.run.goals.states.G006.status, 'active');
-assert.deepEqual(selectNodeCost(branchEngine.state, ruleset, 'C02A'), { biomass: 30 });
+assert.deepEqual(selectNodeCost(branchEngine.state, ruleset, 'C02A'), { biomass: 30, atp: 15 });
 result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C02A' });
+assert.equal(result.reason, 'BLOCKED_BY_EVENT');
+result = branchEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-BIO-01', choiceId: 'absorption' });
 assert.equal(result.ok, true);
 assert.equal(branchEngine.state.run.nodes.selectedBranchByGroup.cell_identity_1, 'C02A');
 assert.equal(selectNodeStatus(branchEngine.state, ruleset, 'C02B'), 'locked');
@@ -161,7 +234,7 @@ assert.deepEqual(selectVisibleResources(branchEngine.state, ruleset).map((resour
   'rna',
   'dna',
   'biomass',
-  'energy',
+  'atp',
 ]);
 
 assert.equal(selectNodeStatus(branchEngine.state, ruleset, 'C03'), 'available_affordable');
@@ -190,6 +263,9 @@ assert.equal(branchEngine.state.run.goals.states.G007.status, 'archived');
 
 const cultureBranchEngine = createChroniclesEngine({ ruleset });
 cultureBranchEngine.state.run.eraId = 'EARLY_CIV';
+for (const resourceId of ['food', 'materials', 'knowledge']) {
+  cultureBranchEngine.state.run.resources[resourceId] = { amount: 0, capOverride: 10000 };
+}
 cultureBranchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'food', amount: 1000 });
 cultureBranchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'materials', amount: 1000 });
 cultureBranchEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'knowledge', amount: 1000 });
@@ -211,6 +287,7 @@ assert.equal(result.ok, true);
 assert.deepEqual(result.events.find((event) => event.type === 'manual_process_used').payload.reward, { rna: 2 });
 
 const manualDnaEngine = createChroniclesEngine({ ruleset });
+manualDnaEngine.state.run.resources.rna.capOverride = 1000;
 assert.equal(selectManualProcessView(manualDnaEngine.state, ruleset, 'MANUAL_DNA_SYNTHESIS').available, false);
 result = manualDnaEngine.dispatch({ type: 'USE_MANUAL_PROCESS', processId: 'MANUAL_DNA_SYNTHESIS' });
 assert.equal(result.ok, false);
@@ -300,6 +377,7 @@ for (let count = 1; count <= 100; count += 1) {
 }
 
 const explicitMilestoneEngine = createChroniclesEngine({ ruleset });
+explicitMilestoneEngine.state.run.resources.rna.capOverride = 1000;
 explicitMilestoneEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 1000 });
 for (let index = 0; index < 10; index += 1) {
   result = explicitMilestoneEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });
@@ -337,6 +415,43 @@ const customEngine = createChroniclesEngine({ ruleset: customRuleset });
 assert.equal(customEngine.state.run.rulesetVersion, 'custom-minimal-v1');
 assert.deepEqual(selectResourceAmounts(customEngine.state), { rna: 5 });
 assert.equal(createInitialGameState({ ruleset: customRuleset }).run.rulesetVersion, 'custom-minimal-v1');
+
+// T1-0 event contract: a pending branch is resolved atomically through the
+// same node purchase path, and cannot be bypassed from the evolution grid.
+const eventEngine = createChroniclesEngine({ ruleset, eventSeed: 77 });
+eventEngine.state.run.eraId = 'CELLULAR';
+eventEngine.state.run.nodes.completed.M06 = { completedAtMs: 0 };
+eventEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'biomass', amount: 100 });
+result = eventEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C01' });
+assert.equal(result.ok, true);
+assert.equal(eventEngine.state.run.events.pendingId, 'EV-CELL-01');
+assert.equal(eventEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CELL-01', choiceId: 'continue' }).ok, true);
+assert.equal(eventEngine.state.run.events.pendingId, 'EV-BIO-01');
+eventEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'atp', amount: 15 });
+result = eventEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C02A' });
+assert.equal(result.ok, false);
+assert.equal(result.reason, 'BLOCKED_BY_EVENT');
+result = eventEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-BIO-01', choiceId: 'absorption' });
+assert.equal(result.ok, true);
+assert.equal(eventEngine.state.run.events.pendingId, null);
+assert.equal(eventEngine.state.run.events.states['EV-BIO-01'].status, 'resolved');
+assert.equal(eventEngine.state.run.nodes.completed.C02A !== undefined, true);
+assert.equal(eventEngine.state.run.flags['run.bio.primary_trait'], 'absorption');
+assert.equal(eventEngine.state.meta.chronicle.some((record) => record.eventId === 'EV-BIO-01'), true);
+
+const deckState = createInitialGameState({ ruleset, eventSeed: 11 });
+deckState.run.nodes.completed.M01 = { completedAtMs: 0 };
+deckState.run.goals.states.G001 = { status: 'archived' };
+const deckA = createChroniclesEngine({ ruleset, state: deckState });
+deckA.tick(60000);
+assert.equal(deckA.state.run.events.pendingId, 'EV-RNA-RESONANCE');
+const deckBState = JSON.parse(JSON.stringify(createInitialGameState({ ruleset, eventSeed: 11 })));
+const deckB = createChroniclesEngine({ ruleset, state: deckBState });
+deckB.state.run.nodes.completed.M01 = { completedAtMs: 0 };
+deckB.state.run.goals.states.G001 = { status: 'archived' };
+deckB.tick(60000);
+assert.equal(deckB.state.run.events.pendingId, deckA.state.run.events.pendingId);
+assert.equal(deckB.state.run.events.rngState, deckA.state.run.events.rngState);
 
 assert.doesNotThrow(() => JSON.stringify(engine.state.run));
 assert.equal(typeof rng.next(), 'number');

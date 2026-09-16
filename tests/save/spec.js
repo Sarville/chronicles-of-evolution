@@ -33,7 +33,7 @@ assert.equal(loaded.ok, true);
 assert.equal(loaded.state.run.resources.rna.amount, 12);
 assert.equal(loaded.sourceKey, SAVE_KEYS.primary);
 assert.equal(loaded.envelope.schemaVersion, CURRENT_SCHEMA_VERSION);
-assert.equal(loaded.envelope.rulesetVersion, 'timeline1-v2-reconciled');
+assert.equal(loaded.envelope.rulesetVersion, 'timeline1-v7-storage-gates');
 assert.equal(loaded.envelope.transactions.pendingReset, null);
 assert.equal(loaded.state.meta.archiveFragments, 0);
 assert.equal(loaded.state.settings.autosave, true);
@@ -101,6 +101,69 @@ delete legacyV1.settings.autosave;
 const migrated = migrateEnvelope(legacyV1);
 assert.equal(migrated.transactions.pendingReset, null);
 assert.equal(migrated.settings.autosave, true);
+assert.equal(migrated.schemaVersion, CURRENT_SCHEMA_VERSION);
+assert.equal(migrated.run.events.rngState, 1);
+assert.deepEqual(migrated.meta.unlocks, {});
+
+const v2EventMigration = createSaveEnvelope(createInitialGameState(), { clock });
+v2EventMigration.schemaVersion = 1;
+v2EventMigration.rulesetVersion = 'timeline1-v2-reconciled';
+v2EventMigration.run.rulesetVersion = 'timeline1-v2-reconciled';
+delete v2EventMigration.run.events;
+const migratedV2 = migrateEnvelope(v2EventMigration);
+assert.equal(migratedV2.rulesetVersion, 'timeline1-v7-storage-gates');
+assert.equal(migratedV2.run.migrationNotice.includes('storage gates restored'), true);
+
+const v3CapacityMigration = createSaveEnvelope(createInitialGameState(), { clock });
+v3CapacityMigration.rulesetVersion = 'timeline1-v3-full';
+v3CapacityMigration.run.rulesetVersion = 'timeline1-v3-full';
+v3CapacityMigration.run.nodes.completed.M02 = { completedAtMs: 0 };
+v3CapacityMigration.run.modifiers.active = {};
+const migratedV3 = migrateEnvelope(v3CapacityMigration);
+assert.equal(migratedV3.rulesetVersion, 'timeline1-v7-storage-gates');
+assert.equal(migratedV3.run.modifiers.active['M02:capacity:rna'], undefined);
+
+const v4AtpMigration = createSaveEnvelope(createInitialGameState(), { clock });
+v4AtpMigration.rulesetVersion = 'timeline1-v4-caps';
+v4AtpMigration.run.rulesetVersion = 'timeline1-v4-caps';
+v4AtpMigration.run.resources.energy = { amount: 37 };
+v4AtpMigration.run.stats.totalEarned.energy = 91;
+v4AtpMigration.run.buildings.BLD_ENERGY_STORE = { count: 2 };
+v4AtpMigration.run.modifiers.active['C01:capacity:energy'] = {
+  type: 'resource_capacity', resourceId: 'energy', value: 120,
+};
+const migratedV4 = migrateEnvelope(v4AtpMigration);
+assert.equal(migratedV4.rulesetVersion, 'timeline1-v7-storage-gates');
+assert.deepEqual(migratedV4.run.resources.atp, { amount: 37 });
+assert.equal(migratedV4.run.resources.energy, undefined);
+assert.equal(migratedV4.run.stats.totalEarned.atp, 91);
+assert.deepEqual(migratedV4.run.buildings.BLD_ATP_STORE, { count: 2 });
+assert.equal(migratedV4.run.modifiers.active['C01:capacity:atp'], undefined);
+assert.equal(migratedV4.run.modifiers.active['BLD_ATP_STORE:1:capacity:atp'].resourceId, 'atp');
+
+const v5CellBalanceMigration = createSaveEnvelope(createInitialGameState(), { clock });
+v5CellBalanceMigration.rulesetVersion = 'timeline1-v5-atp';
+v5CellBalanceMigration.run.rulesetVersion = 'timeline1-v5-atp';
+v5CellBalanceMigration.run.nodes.completed.C05 = { completedAtMs: 0 };
+v5CellBalanceMigration.run.modifiers.active = {};
+const migratedV5 = migrateEnvelope(v5CellBalanceMigration);
+assert.equal(migratedV5.rulesetVersion, 'timeline1-v7-storage-gates');
+assert.equal(migratedV5.run.modifiers.active['C05:capacity:biomass'], undefined);
+
+const v6StorageGateMigration = createSaveEnvelope(createInitialGameState(), { clock });
+v6StorageGateMigration.rulesetVersion = 'timeline1-v6-cell-balance';
+v6StorageGateMigration.run.rulesetVersion = 'timeline1-v6-cell-balance';
+v6StorageGateMigration.run.nodes.completed.M02 = { completedAtMs: 0 };
+v6StorageGateMigration.run.buildings.BLD_MEMBRANE_STORE = { count: 2 };
+v6StorageGateMigration.run.resources.rna = { amount: 900 };
+v6StorageGateMigration.run.modifiers.active['M02:capacity:rna'] = {
+  type: 'resource_capacity', resourceId: 'rna', value: 300,
+};
+const migratedV6 = migrateEnvelope(v6StorageGateMigration);
+assert.equal(migratedV6.rulesetVersion, 'timeline1-v7-storage-gates');
+assert.equal(migratedV6.run.modifiers.active['M02:capacity:rna'], undefined);
+assert.equal(migratedV6.run.modifiers.active['BLD_MEMBRANE_STORE:2:capacity:rna'].value, 250);
+assert.equal(migratedV6.run.resources.rna.amount, 600);
 
 const missingRun = validateGameState({ meta: {}, settings: {}, session: {} }, ruleset);
 assert.equal(missingRun.ok, false);
@@ -149,12 +212,14 @@ assert.equal(autosaveRepository.loadOrCreate().state.run.resources.rna.amount, 8
 const midSliceStorage = createMemoryStorage({ evolved: 'legacy-save-must-survive' });
 const midSliceRepository = createSaveRepository({ storage: midSliceStorage, clock });
 const midSliceEngine = createChroniclesEngine({ ruleset, ports: { clock } });
+midSliceEngine.state.run.resources.rna.capOverride = 2000;
 midSliceEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 1200 });
 midSliceEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });
 midSliceEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M01' });
 midSliceEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M02' });
 midSliceEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_RNA_REPLICATION' });
 midSliceEngine.dispatch({ type: 'BUY_NODE', nodeId: 'M03' });
+midSliceEngine.state.run.resources.dna.capOverride = 2000;
 midSliceEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'dna', amount: 140 });
 assert.equal(midSliceRepository.save(midSliceEngine.state).ok, true);
 const midSliceLoaded = midSliceRepository.loadOrCreate();
@@ -167,6 +232,17 @@ assert.equal(midSliceLoaded.state.run.nodes.completed.M03.completedAtMs >= 0, tr
 assert.equal(midSliceLoaded.state.run.resources.dna.amount, 140);
 assert.equal(midSliceLoaded.state.run.modifiers.active['M01:auto_production'].type, 'unlock_auto_production');
 assert.equal(midSliceStorage.get('evolved'), 'legacy-save-must-survive');
+
+const pendingEventStorage = createMemoryStorage();
+const pendingEventRepository = createSaveRepository({ storage: pendingEventStorage, clock });
+const pendingEventState = createInitialGameState();
+pendingEventState.run.events.states['EV-RNA-01'] = { status: 'pending', queuedAtMs: 1200 };
+pendingEventState.run.events.pendingId = 'EV-RNA-01';
+pendingEventState.run.events.rngState = 123456;
+assert.equal(pendingEventRepository.save(pendingEventState).ok, true);
+const loadedPendingEvent = pendingEventRepository.loadOrCreate();
+assert.equal(loadedPendingEvent.state.run.events.pendingId, 'EV-RNA-01');
+assert.equal(loadedPendingEvent.state.run.events.rngState, 123456);
 
 const resetStorage = createMemoryStorage();
 const resetRepository = createSaveRepository({ storage: resetStorage, clock });
