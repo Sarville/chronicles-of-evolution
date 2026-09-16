@@ -18,6 +18,8 @@ import {
   selectProducerOutputView,
   selectProducerPrice,
   selectProductionRates,
+  selectPopulation,
+  selectCognition,
   selectResourceAmounts,
   selectVisibleResources,
   timeUntilAffordable,
@@ -30,7 +32,7 @@ const clock = createFakeClock(1000);
 const rng = createSeededRng(42);
 const engine = createChroniclesEngine({ ruleset, ports: { clock, rng } });
 
-assert.equal(engine.state.run.rulesetVersion, 'timeline1-v7-storage-gates');
+assert.equal(engine.state.run.rulesetVersion, 'timeline1-v8-civilization-chains');
 assert.equal(engine.state.run.eraId, 'MOLECULAR');
 assert.deepEqual(selectResourceAmounts(engine.state), { rna: 0 });
 assert.deepEqual(selectVisibleResources(engine.state, ruleset).map((resource) => resource.id), ['rna']);
@@ -260,6 +262,31 @@ result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C06' });
 assert.equal(result.ok, true);
 assert.equal(branchEngine.state.run.resources.ap, undefined);
 assert.equal(branchEngine.state.run.goals.states.G007.status, 'archived');
+assert.equal(branchEngine.state.run.adaptation.points, 2);
+result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'B02A' });
+assert.equal(result.ok, true);
+assert.equal(branchEngine.state.run.adaptation.points, 1);
+assert.deepEqual(branchEngine.state.run.adaptation.selectedOptionalNodes, ['B02A']);
+assert.equal(branchEngine.state.run.goals.states.G008.status, 'archived');
+
+// Cognition is derived from neural progress. Sapience has no spendable price:
+// it becomes available only at 100 and performs the civilization-start transaction.
+const sapienceEngine = createChroniclesEngine({ ruleset });
+sapienceEngine.state.run.eraId = 'MULTICELLULAR';
+sapienceEngine.state.run.resources = {
+  biomass: { amount: 1000, capOverride: 10000 }, atp: { amount: 1000, capOverride: 10000 }, dna: { amount: 1000, capOverride: 10000 },
+};
+for (const nodeId of ['C07', 'B03', 'B04', 'B05', 'N03', 'N05']) {
+  sapienceEngine.state.run.nodes.completed[nodeId] = { completedAtMs: 0 };
+}
+assert.deepEqual(selectCognition(sapienceEngine.state, ruleset), { value: 100, max: 100 });
+result = sapienceEngine.dispatch({ type: 'BUY_NODE', nodeId: 'N07' });
+assert.equal(result.ok, true);
+assert.equal(sapienceEngine.state.run.eraId, 'EARLY_CIV');
+assert.equal(sapienceEngine.state.run.population.current, 5);
+assert.equal(sapienceEngine.state.run.resources.food.amount, 120);
+assert.equal(sapienceEngine.state.run.resources.materials.amount, 45);
+assert.equal(sapienceEngine.state.run.resources.knowledge.amount, 12);
 
 const cultureBranchEngine = createChroniclesEngine({ ruleset });
 cultureBranchEngine.state.run.eraId = 'EARLY_CIV';
@@ -415,6 +442,79 @@ const customEngine = createChroniclesEngine({ ruleset: customRuleset });
 assert.equal(customEngine.state.run.rulesetVersion, 'custom-minimal-v1');
 assert.deepEqual(selectResourceAmounts(customEngine.state), { rna: 5 });
 assert.equal(createInitialGameState({ ruleset: customRuleset }).run.rulesetVersion, 'custom-minimal-v1');
+
+// Civilization resources retain distinct original semantics: jobs are their
+// source, Food pays Population maintenance, and Materials/Knowledge remain
+// spendable stocks rather than invented maintenance drains.
+const civilizationEngine = createChroniclesEngine({ ruleset });
+civilizationEngine.state.run.eraId = 'EARLY_CIV';
+civilizationEngine.state.run.resources = {
+  food: { amount: 0, capOverride: 10000 },
+  materials: { amount: 0, capOverride: 10000 },
+  knowledge: { amount: 0, capOverride: 10000 },
+};
+civilizationEngine.state.run.population = {
+  current: 5,
+  peak: 5,
+  baseCap: 8,
+  assignments: {},
+  foodStatus: 'healthy',
+};
+assert.equal(civilizationEngine.dispatch({ type: 'ASSIGN_JOB', jobId: 'JOB_TRIBE_FORAGER', amount: 2 }).ok, true);
+assert.equal(civilizationEngine.dispatch({ type: 'ASSIGN_JOB', jobId: 'JOB_TRIBE_GATHERER', amount: 2 }).ok, true);
+assert.equal(civilizationEngine.dispatch({ type: 'ASSIGN_JOB', jobId: 'JOB_TRIBE_THINKER', amount: 1 }).ok, true);
+assert.deepEqual(selectPopulation(civilizationEngine.state), {
+  current: 5,
+  peak: 5,
+  baseCap: 8,
+  assignments: { JOB_TRIBE_FORAGER: 2, JOB_TRIBE_GATHERER: 2, JOB_TRIBE_THINKER: 1 },
+  foodStatus: 'healthy',
+  cap: 8,
+  assigned: 5,
+  unassigned: 0,
+});
+tick = civilizationEngine.tick(1000);
+assert.equal(Math.abs(tick.rates.food - 1.6) < 0.000001, true);
+assert.equal(Math.abs(tick.rates.materials - 0.96) < 0.000001, true);
+assert.equal(Math.abs(tick.rates.knowledge - 0.2) < 0.000001, true);
+assert.equal(civilizationEngine.state.run.population.current > 5, true);
+assert.equal(civilizationEngine.dispatch({ type: 'ASSIGN_JOB', jobId: 'JOB_TRIBE_FORAGER', amount: 0 }).ok, true);
+civilizationEngine.state.run.resources.food.amount = 0;
+tick = civilizationEngine.tick(1000);
+assert.equal(civilizationEngine.state.run.population.foodStatus, 'deficit');
+assert.equal(tick.events.some((event) => event.type === 'food_deficit_started'), true);
+const populationAtDeficit = civilizationEngine.state.run.population.current;
+assert.equal(civilizationEngine.dispatch({ type: 'ASSIGN_JOB', jobId: 'JOB_TRIBE_FORAGER', amount: 2 }).ok, true);
+tick = civilizationEngine.tick(1000);
+assert.equal(civilizationEngine.state.run.population.foodStatus, 'healthy');
+assert.equal(tick.events.some((event) => event.type === 'food_deficit_recovered'), true);
+assert.equal(civilizationEngine.state.run.population.current > populationAtDeficit, true);
+assert.equal(
+  civilizationEngine.dispatch({ type: 'ASSIGN_JOB', jobId: 'JOB_TRIBE_GATHERER', amount: 8 }).reason,
+  'POPULATION_ASSIGNMENT_EXCEEDED'
+);
+
+// Power is generated and stored as an industrial resource. A powered building
+// is curtailed while the reserve is empty and automatically recovers once a
+// plant has filled it; it never consumes Population or creates a second fuel currency.
+const powerEngine = createChroniclesEngine({ ruleset });
+powerEngine.state.run.eraId = 'INDUSTRY';
+powerEngine.state.run.resources = {
+  materials: { amount: 10, capOverride: 10000 },
+  knowledge: { amount: 0, capOverride: 10000 },
+  power: { amount: 0, capOverride: 10000 },
+};
+powerEngine.state.run.buildings = {
+  BLD_STEAM_PLANT: { count: 1 },
+  BLD_FOUNDRY: { count: 1 },
+};
+tick = powerEngine.tick(1000);
+assert.equal(tick.events.some((event) => event.type === 'power_deficit_started'), true);
+assert.equal(powerEngine.state.run.economy.deficits.power, true);
+tick = powerEngine.tick(1000);
+assert.equal(tick.events.some((event) => event.type === 'power_deficit_recovered'), true);
+assert.equal(powerEngine.state.run.economy.deficits.power, false);
+assert.equal(powerEngine.state.run.resources.materials.amount > 10, true);
 
 // T1-0 event contract: a pending branch is resolved atomically through the
 // same node purchase path, and cannot be bypassed from the evolution grid.

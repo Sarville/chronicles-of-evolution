@@ -79,6 +79,7 @@ export const buildings = [
     entityType: 'building',
     labelKey: 'building.power_store',
     requiresNodes: ['T08'],
+    eraIds: ['INDUSTRY', 'MODERN', 'ATOMIC'],
     baseCost: { materials: 360, knowledge: 160 },
     growth: 1.28,
     maxCount: null,
@@ -93,8 +94,40 @@ export const buildings = [
     baseCost: { materials: 260, food: 180 },
     growth: 1.18,
     maxCount: null,
-    effects: [
-      { type: 'job_output_multiplier', jobId: 'JOB_SETTLEMENT_FARMER', value: 1.1, deferred: true, deferredUntil: 'jobs_system' },
-    ],
+    effects: [{ type: 'job_output_multiplier', jobId: 'JOB_SETTLEMENT_FARMER', value: 1.1 }],
+  },
+  {
+    id: 'BLD_HEARTH', entityType: 'building', labelKey: 'building.hearth', eraIds: ['EARLY_CIV', 'TRIBE'],
+    baseCost: { materials: 20, food: 15 }, growth: 1, maxCount: 1, output: { knowledge: 0.08 },
+  },
+  {
+    id: 'BLD_SHELTER', entityType: 'building', labelKey: 'building.shelter', eraIds: ['EARLY_CIV', 'TRIBE'],
+    baseCost: { materials: 35, food: 20 }, growth: 1.22, maxCount: null,
+    effects: [{ type: 'population_capacity', value: 8 }],
+  },
+  {
+    id: 'BLD_TOOL_BENCH', entityType: 'building', labelKey: 'building.tool_bench', eraIds: ['EARLY_CIV', 'TRIBE', 'SETTLEMENT_EARLY', 'SETTLEMENT'],
+    baseCost: { materials: 40, food: 20 }, growth: 1.25, maxCount: null,
+    effects: [{ type: 'job_output_multiplier', jobId: 'JOB_TRIBE_GATHERER', value: 1.12 }],
+  },
+  {
+    id: 'BLD_MINE', entityType: 'building', labelKey: 'building.mine', eraIds: ['INDUSTRY', 'MODERN', 'ATOMIC'],
+    baseCost: { materials: 180, knowledge: 45 }, growth: 1.22, maxCount: null, output: { materials: 0.75 },
+  },
+  {
+    id: 'BLD_STEAM_PLANT', entityType: 'building', labelKey: 'building.steam_plant', eraIds: ['INDUSTRY', 'MODERN', 'ATOMIC'],
+    baseCost: { materials: 260, knowledge: 80 }, growth: 1.25, maxCount: null,
+    // Aggregate Materials includes the early industrial fuel/feedstock cost.
+    input: { materials: 0.14 }, output: { power: 1.25 },
+  },
+  {
+    id: 'BLD_FOUNDRY', entityType: 'building', labelKey: 'building.foundry', eraIds: ['INDUSTRY', 'MODERN', 'ATOMIC'],
+    baseCost: { materials: 240, knowledge: 65 }, growth: 1.24, maxCount: null,
+    input: { power: 0.55 }, output: { materials: 1.05 },
+  },
+  {
+    id: 'BLD_LABORATORY', entityType: 'building', labelKey: 'building.laboratory', eraIds: ['INDUSTRY', 'MODERN', 'ATOMIC'],
+    baseCost: { materials: 220, knowledge: 100 }, growth: 1.25, maxCount: null,
+    input: { power: 0.4 }, output: { knowledge: 0.8 },
   },
 ];

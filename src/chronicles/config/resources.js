@@ -57,6 +57,6 @@ export const resources = [
     labelKey: 'resource.power',
     initialAmount: 0,
     baseCap: 100,
-    visibleFromEra: 'CITY',
+    visibleFromEra: 'INDUSTRY',
   },
 ];

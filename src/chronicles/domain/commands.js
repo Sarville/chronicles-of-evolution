@@ -55,6 +55,8 @@ export function dispatchCommand(state, ruleset, command, ports = {}) {
       return resolvePendingEvent(state, ruleset, command, ports);
     case 'BUY_BUILDING':
       return buyBuilding(state, ruleset, command.buildingId, ports);
+    case 'ASSIGN_JOB':
+      return assignJob(state, ruleset, command.jobId, command.amount, ports);
     case 'TICK': {
       state.run.clock.simulationMs += command.deltaMs;
       state.run.clock.activeMs += command.deltaMs;
@@ -64,6 +66,25 @@ export function dispatchCommand(state, ruleset, command, ports = {}) {
     default:
       return rejected('UNKNOWN_COMMAND', { type: command.type });
   }
+}
+
+function assignJob(state, ruleset, jobId, amount, ports) {
+  const job = createRulesetIndexes(ruleset).jobs[jobId];
+  if (!job) return rejected('UNKNOWN_JOB', { jobId });
+  if (!prerequisitesMet(state, job)) return rejected('JOB_UNAVAILABLE', { jobId, eraId: state.run.eraId });
+  if (!state.run.population) return rejected('POPULATION_UNAVAILABLE');
+  if (!Number.isInteger(amount) || amount < 0) return rejected('INVALID_ASSIGNMENT', { jobId, amount });
+  const assignments = state.run.population.assignments || (state.run.population.assignments = {});
+  const current = assignments[jobId] || 0;
+  const assignedElsewhere = Object.values(assignments).reduce((sum, value) => sum + value, 0) - current;
+  if (assignedElsewhere + amount > state.run.population.current + 0.000001) {
+    return rejected('POPULATION_ASSIGNMENT_EXCEEDED', {
+      jobId,
+      available: Math.floor(state.run.population.current - assignedElsewhere),
+    });
+  }
+  assignments[jobId] = amount;
+  return ok(state, [createDomainEvent('job_assigned', { jobId, previous: current, amount }, state, ports)]);
 }
 
 function manualProcess(state, ruleset, command, ports) {
@@ -120,6 +141,10 @@ function buyNode(state, ruleset, nodeId, ports, options = {}) {
   if (!populationCheck.ok) {
     return populationCheck;
   }
+  const apCost = node.adaptationPointCost || 0;
+  if (apCost > (state.run.adaptation?.points || 0)) {
+    return rejected('INSUFFICIENT_ADAPTATION_POINTS', { nodeId, required: apCost, available: state.run.adaptation?.points || 0 });
+  }
 
   const cost = selectNodeCost(state, ruleset, nodeId);
   const payment = payCost(state, cost, ruleset, ports);
@@ -128,6 +153,11 @@ function buyNode(state, ruleset, nodeId, ports, options = {}) {
   }
 
   state.run.nodes.completed[nodeId] = { completedAtMs: state.run.clock.simulationMs };
+  if (apCost) {
+    state.run.adaptation.points -= apCost;
+    state.run.adaptation.spentTotal += apCost;
+    state.run.adaptation.selectedOptionalNodes.push(nodeId);
+  }
   if (node.branchGroup && !state.run.nodes.selectedBranchByGroup[node.branchGroup]) {
     state.run.nodes.selectedBranchByGroup[node.branchGroup] = nodeId;
   }

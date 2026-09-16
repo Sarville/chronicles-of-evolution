@@ -26,6 +26,9 @@ const ROOT_ID = 'chronicles-root';
 const EVOLUTION_NODES = [
   'M01', 'M02', 'M03', 'M04', 'M05', 'M06',
   'C01', 'C02A', 'C02B', 'C02C', 'C04A', 'C04B', 'C04C', 'C03', 'C05', 'C06',
+  'B02A', 'B02B', 'B02C', 'B02D', 'C07',
+  'B03', 'B04', 'B05', 'N03', 'N05', 'N07',
+  'N02A', 'N02B', 'N02C',
 ];
 const RESOURCE_NAMES = {
   rna: 'RNA',
@@ -50,6 +53,14 @@ const NODE_NAMES = {
   C04C: 'Efficient Digestion',
   C05: 'Organelles',
   C06: 'Cell Coordination',
+  B02A: 'Mobility',
+  B02B: 'Sensory Cells',
+  B02C: 'Digestion',
+  B02D: 'Structural Tissue',
+  C07: 'Multicellularity',
+  B03: 'Tissue Specialization', B04: 'Nervous Tissue', B05: 'Nervous System',
+  N03: 'Neural Complexity', N05: 'Proto-language', N07: 'Sapience',
+  N02A: 'Solitary Strategy', N02B: 'Social Behavior', N02C: 'Object Manipulation',
 };
 const PRODUCER_NAMES = {
   PROC_PRIMORDIAL_REACTION: 'Primordial Reaction',

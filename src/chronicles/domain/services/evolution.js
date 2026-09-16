@@ -1,4 +1,7 @@
 export function prerequisitesMet(state, entity) {
+  if (entity.eraIds && !entity.eraIds.includes(state.run.eraId)) {
+    return false;
+  }
   const required = entity.requiresNodes || [];
   const nodesMet = required.every((nodeId) => state.run.nodes.completed[nodeId]);
   if (!nodesMet) {
@@ -8,10 +11,20 @@ export function prerequisitesMet(state, entity) {
   if (!flagsMet) {
     return false;
   }
+  if (entity.cognitionMin != null && cognitionValue(state, entity.cognitionContributions) < entity.cognitionMin) {
+    return false;
+  }
   if (entity.requiresAnyBranchGroup) {
     return Boolean(state.run.nodes.selectedBranchByGroup[entity.requiresAnyBranchGroup]);
   }
   return true;
+}
+
+export function cognitionValue(state, contributions = []) {
+  const total = contributions.reduce((sum, contribution) => {
+    return state.run.nodes.completed[contribution.nodeId] ? sum + contribution.value : sum;
+  }, 0);
+  return Math.min(100, total);
 }
 
 export function branchAvailable(state, ruleset, node) {

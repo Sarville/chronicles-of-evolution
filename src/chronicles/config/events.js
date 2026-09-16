@@ -58,4 +58,16 @@ export const events = [
       { id: 'shell', label: 'Панцирь', purchaseNodeId: 'C02C' },
     ],
   },
+  {
+    id: 'EV-BIO-03', type: 'branch', deck: 'authored',
+    trigger: { type: 'node_completed', nodeId: 'B05' }, phaseWindow: { eraIds: ['MULTICELLULAR'] }, priority: 80,
+    blocks: { branchGroup: 'behavior_1' }, telemetryKey: 'event_behavior_strategy', title: 'Поведение',
+    body: 'Нервная система меняет не только реакцию. Она меняет то, как организм встречает другой организм.',
+    chronicleSummary: 'Поведенческая стратегия вида была закреплена.',
+    choices: [
+      { id: 'solitary', label: 'Одиночная стратегия', purchaseNodeId: 'N02A' },
+      { id: 'social', label: 'Социальное поведение', purchaseNodeId: 'N02B' },
+      { id: 'manipulation', label: 'Манипуляция объектами', purchaseNodeId: 'N02C' },
+    ],
+  },
 ];

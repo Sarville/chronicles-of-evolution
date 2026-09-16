@@ -8,7 +8,8 @@ export const effectSupport = {
   unlock_building: { status: 'supported' },
   manual_gain_multiplier: { status: 'supported' },
   set_flag: { status: 'supported' },
-  job_output_multiplier: { status: 'deferred', until: 'jobs_system' },
+  job_output_multiplier: { status: 'supported' },
+  population_capacity: { status: 'supported' },
 };
 
 export const allowedEffectTypes = Object.keys(effectSupport).filter(

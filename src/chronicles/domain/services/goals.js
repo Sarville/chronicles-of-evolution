@@ -1,6 +1,7 @@
 import { createRulesetIndexes } from '../../config/index.js';
 import { createDomainEvent } from '../domainEvents.js';
 import { addResource } from './resources.js';
+import { cognitionValue } from './evolution.js';
 
 const TERMINAL_STATUSES = new Set(['archived', 'skipped_by_archive', 'failed_soft']);
 
@@ -24,6 +25,14 @@ export function conditionMet(state, condition) {
       return state.run.eraId === condition.eraId;
     case 'flag_set':
       return state.run.flags[condition.flag] === condition.value;
+    case 'adaptation_selected':
+      return (state.run.adaptation?.selectedOptionalNodes || []).length >= (condition.count || 1);
+    case 'cognition_at_least':
+      return cognitionValue(state, condition.contributions || []) >= condition.value;
+    case 'population_at_least':
+      return (state.run.population?.current || 0) >= condition.value;
+    case 'building_count':
+      return (state.run.buildings[condition.buildingId]?.count || 0) >= condition.count;
     default:
       return false;
   }
@@ -86,6 +95,12 @@ function applyGoalRewards(state, ruleset, goal, ports) {
     if (reward.type === 'set_flag') {
       state.run.flags[reward.flag] = reward.value;
       events.push(createDomainEvent('flag_set', { flag: reward.flag, value: reward.value, sourceGoalId: goal.id }, state, ports));
+    }
+    if (reward.type === 'grant_adaptation_points') {
+      state.run.adaptation ||= { points: 0, earnedTotal: 0, spentTotal: 0, selectedOptionalNodes: [] };
+      state.run.adaptation.points += reward.amount;
+      state.run.adaptation.earnedTotal += reward.amount;
+      events.push(createDomainEvent('adaptation_points_granted', { amount: reward.amount, sourceGoalId: goal.id }, state, ports));
     }
   }
 

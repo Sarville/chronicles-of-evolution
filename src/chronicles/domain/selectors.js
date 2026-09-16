@@ -10,6 +10,8 @@ import {
 } from './services/manualProcesses.js';
 import { calculateProductionRates, producerFlowRates, producerMilestoneMultiplier, productionMultiplierForResource } from './services/production.js';
 import { calculateCap } from './services/resources.js';
+import { calculatePopulationCap } from './services/population.js';
+import { cognitionValue } from './services/evolution.js';
 
 export function formatResourceAmount(value) {
   if (!Number.isFinite(value)) {
@@ -125,6 +127,22 @@ export function selectVisibleResources(state, ruleset) {
       cap: calculateCap(state, resourceId, ruleset),
       perSecond: calculateProductionRates(state, ruleset)[resourceId] || 0,
     }));
+}
+
+export function selectPopulation(state) {
+  if (!state.run.population) return null;
+  const assigned = Object.values(state.run.population.assignments || {}).reduce((sum, value) => sum + value, 0);
+  return {
+    ...state.run.population,
+    cap: calculatePopulationCap(state),
+    assigned,
+    unassigned: Math.max(0, Math.floor(state.run.population.current) - assigned),
+  };
+}
+
+export function selectCognition(state, ruleset) {
+  const contributions = ruleset.nodes.flatMap((node) => node.cognitionContribution ? [{ nodeId: node.id, value: node.cognitionContribution }] : []);
+  return { value: cognitionValue(state, contributions), max: 100 };
 }
 
 export function selectNodeStatus(state, ruleset, nodeId) {

@@ -5,6 +5,7 @@ import { evaluateGoals } from './services/goals.js';
 import { queueEventsForGoal } from './services/events.js';
 import { queueDueDeckEvents } from './services/events.js';
 import { applyProduction } from './services/production.js';
+import { applyPopulationFoodLoop } from './services/population.js';
 
 function evaluateGoalsWithQueuedEvents(state, ruleset, ports) {
   const goalEvents = evaluateGoals(state, ruleset, ports);
@@ -33,9 +34,10 @@ export function createChroniclesEngine(options = {}) {
     tick(deltaMs) {
       const tickResult = dispatchCommand(state, ruleset, { type: 'TICK', deltaMs }, ports);
       const productionResult = applyProduction(state, ruleset, deltaMs, ports);
+      const populationResult = applyPopulationFoodLoop(state, ruleset, deltaMs, ports);
       const goalEvents = evaluateGoalsWithQueuedEvents(state, ruleset, ports);
       const deckEvents = queueDueDeckEvents(state, ruleset, ports);
-      const events = [...tickResult.events, ...productionResult.events, ...goalEvents, ...deckEvents];
+      const events = [...tickResult.events, ...productionResult.events, ...populationResult.events, ...goalEvents, ...deckEvents];
       state.session.lastEvents = events;
       return { ok: tickResult.ok, frozen: tickResult.frozen || false, rates: productionResult.rates, events };
     },

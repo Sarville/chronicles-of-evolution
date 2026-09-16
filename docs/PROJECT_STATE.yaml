@@ -157,9 +157,9 @@ implementation:
       status: in_progress
       delivered: "Event Engine core, original RNA→DNA resource-flow correction, finite storage caps with mandatory storage gates, ATP rename, rebalanced C03/C05/C06 costs and save migrations. Discoveries no longer expand capacity. Remaining: complete 0-18 config audit and manual playtest."
       plan: "docs/production/TIMELINE_01_REBUILD_PLAN.md"
-    T1-1: { name: "Organism: AP and Multicellularity", status: planned }
+    T1-1: { name: "Organism: AP and Multicellularity", status: in_progress, delivered: "Run-local Adaptation Points, atomic optional B02A-D purchases, G008 and C07/G009 Multicellularity transition implemented. 18-28 balance profile and presentation remain." }
     T1-2: { name: "Cognition: Nervous System through Sapience", status: planned }
-    T1-3: { name: "First civilization: Tribe through Settlement", status: planned }
+    T1-3: { name: "First civilization: Tribe through Settlement", status: in_progress, delivered: "Restored job assignment, Food maintenance/deficit recovery, aggregate Materials/Knowledge sources and spend semantics, industrial Power generation/curtailment and storage-cap contract; phase content and balance route remain." }
     T1-4: { name: "City and Industry", status: planned }
     T1-5: { name: "Modern and Atomic", status: planned }
     T1-6: { name: "Great Filter, Ash, Archive and reset", status: planned }
@@ -167,7 +167,7 @@ implementation:
 
 timeline_01_rebuild:
   status: "in_progress"
-  target_ruleset: "timeline1-v7-storage-gates"
+  target_ruleset: "timeline1-v8-civilization-chains"
   scope: "RNA to mandatory first Ash/Archive/reset, target 105-120 active minutes"
   first_package: "T1-0 Foundation + Event Engine + 0-18 audit"
   canonical_plan: "docs/production/TIMELINE_01_REBUILD_PLAN.md"
@@ -194,7 +194,7 @@ iteration_4:
   note: "Closed by direct user confirmation on 2026-09-16, ahead of a manual 10-18 playtest pass. Automated tests/simulation/build back the implementation, and goal-ID alignment with GDD/DS-05 canon is now verified; treat exact 10-18 numbers as provisional (see balance.biological_10_18) until an actual playtest happens."
 
 balance:
-  ruleset_target: "timeline1-v7-storage-gates"
+  ruleset_target: "timeline1-v8-civilization-chains"
   old_0_10_ei_balance: "historical_superseded"
   biological_numbers: "0_10_original_resource_flow_corrected"
   post_cell_numbers: "iteration_4_implemented_pending_full_0_120_validation"

@@ -1,6 +1,8 @@
 import { createRulesetIndexes } from '../../config/index.js';
 import { addResource } from './resources.js';
 import { isAutoProductionUnlocked } from './modifiers.js';
+import { prerequisitesMet } from './evolution.js';
+import { createDomainEvent } from '../domainEvents.js';
 
 export function producerMilestoneMultiplier(count, milestones = []) {
   return milestones.reduce((multiplier, milestone) => {
@@ -41,12 +43,50 @@ function activeProducerFlows(state, ruleset) {
   return Object.entries(state.run.producers)
     .map(([producerId, producerState]) => ({ producer: indexes.producers[producerId], count: producerState.count || 0 }))
     .filter(({ producer, count }) => producer && count && (autoProductionUnlocked || producer.producesBeforeAutoUnlock === true))
-    .map(({ producer, count }) => ({ producer, ...producerFlowRates(state, producer, count) }));
+    .map(({ producer, count }) => ({ kind: 'producer', id: producer.id, ...producerFlowRates(state, producer, count) }));
+}
+
+export function jobOutputMultiplier(state, jobId) {
+  return Object.values(state.run.modifiers.active || {}).reduce((multiplier, modifier) => {
+    return modifier.type === 'job_output_multiplier' && modifier.jobId === jobId
+      ? multiplier * modifier.value
+      : multiplier;
+  }, 1);
+}
+
+function activeJobFlows(state, ruleset) {
+  const indexes = createRulesetIndexes(ruleset);
+  const assignments = state.run.population?.assignments || {};
+  return Object.entries(assignments)
+    .map(([jobId, count]) => ({ job: indexes.jobs[jobId], count }))
+    .filter(({ job, count }) => job && count > 0 && prerequisitesMet(state, job))
+    .map(({ job, count }) => {
+      const multiplier = jobOutputMultiplier(state, job.id);
+      const output = Object.fromEntries(Object.entries(job.output || {}).map(([resourceId, amount]) => [resourceId, count * amount * multiplier]));
+      return { kind: 'job', id: job.id, input: {}, output };
+    });
+}
+
+function activeBuildingFlows(state, ruleset) {
+  const indexes = createRulesetIndexes(ruleset);
+  return Object.entries(state.run.buildings)
+    .map(([buildingId, buildingState]) => ({ building: indexes.buildings[buildingId], count: buildingState.count || 0 }))
+    .filter(({ building, count }) => building && count > 0 && prerequisitesMet(state, building))
+    .map(({ building, count }) => ({
+      kind: 'building',
+      id: building.id,
+      input: Object.fromEntries(Object.entries(building.input || {}).map(([resourceId, amount]) => [resourceId, count * amount])),
+      output: Object.fromEntries(Object.entries(building.output || {}).map(([resourceId, amount]) => [resourceId, count * amount * productionMultiplierForResource(state, resourceId)])),
+    }));
+}
+
+function activeFlows(state, ruleset) {
+  return [...activeProducerFlows(state, ruleset), ...activeJobFlows(state, ruleset), ...activeBuildingFlows(state, ruleset)];
 }
 
 export function calculateProductionRates(state, ruleset) {
   const rates = {};
-  for (const flow of activeProducerFlows(state, ruleset)) {
+  for (const flow of activeFlows(state, ruleset)) {
     for (const [resourceId, amount] of Object.entries(flow.output)) rates[resourceId] = (rates[resourceId] || 0) + amount;
     for (const [resourceId, amount] of Object.entries(flow.input)) rates[resourceId] = (rates[resourceId] || 0) - amount;
   }
@@ -59,7 +99,7 @@ export function applyProduction(state, ruleset, deltaMs, ports) {
     return { rates: {}, events: [] };
   }
   const seconds = deltaMs / 1000;
-  const flows = activeProducerFlows(state, ruleset);
+  const flows = activeFlows(state, ruleset);
   const available = Object.fromEntries(Object.entries(state.run.resources).map(([resourceId, resource]) => [resourceId, resource.amount]));
   const actualRates = {};
   const appliedFlows = flows.map((flow) => {
@@ -83,6 +123,25 @@ export function applyProduction(state, ruleset, deltaMs, ports) {
       actualRates[resourceId] = (actualRates[resourceId] || 0) + appliedRate;
       events.push(...addResource(state, resourceId, appliedRate * seconds, ruleset, ports));
     }
+  }
+  const powerDemand = appliedFlows
+    .filter((flow) => flow.kind === 'building' && flow.input.power)
+    .reduce((total, flow) => total + flow.input.power * seconds, 0);
+  const suppliedPower = appliedFlows
+    .filter((flow) => flow.kind === 'building' && flow.input.power)
+    .reduce((total, flow) => total + flow.input.power * seconds * flow.scale, 0);
+  const hadPowerDeficit = state.run.economy?.deficits?.power === true;
+  const hasPowerDeficit = powerDemand > suppliedPower + 0.000001;
+  state.run.economy ||= { deficits: {} };
+  state.run.economy.deficits ||= {};
+  state.run.economy.deficits.power = hasPowerDeficit;
+  if (hasPowerDeficit !== hadPowerDeficit) {
+    events.push(createDomainEvent(
+      hasPowerDeficit ? 'power_deficit_started' : 'power_deficit_recovered',
+      { demand: powerDemand / seconds, supplied: suppliedPower / seconds },
+      state,
+      ports
+    ));
   }
   return { rates: actualRates, events };
 }

@@ -5,11 +5,11 @@ import { validateRuleset } from '../../src/chronicles/domain/validation.js';
 const result = validateRuleset(ruleset);
 assert.deepEqual(result.errors, []);
 assert.equal(result.ok, true);
-assert.equal(JSON.parse(JSON.stringify(ruleset)).version, 'timeline1-v7-storage-gates');
+assert.equal(JSON.parse(JSON.stringify(ruleset)).version, 'timeline1-v8-civilization-chains');
 assert.equal(ruleset.events.some((event) => event.id === 'EV-BIO-01' && event.trigger.nodeId === 'C01'), true);
 assert.equal(ruleset.events.some((event) => event.id === 'EV-RNA-RESONANCE' && event.deck === 'early_biology'), true);
 assert.equal(ruleset.allowedEffectTypes.includes('manual_gain_multiplier'), true);
-assert.equal(ruleset.allowedEffectTypes.includes('job_output_multiplier'), false);
+assert.equal(ruleset.allowedEffectTypes.includes('job_output_multiplier'), true);
 assert.equal(ruleset.effectSupport.manual_gain_multiplier.status, 'supported');
 assert.equal(ruleset.effectSupport.unlock_auto_production.status, 'supported');
 assert.equal(ruleset.resources.some((resource) => resource.id === 'rna'), true);
@@ -62,6 +62,9 @@ for (const producerId of ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'P
 assert.equal(ruleset.nodes.find((node) => node.id === 'M04').type, 'OPTIONAL');
 assert.deepEqual(ruleset.nodes.find((node) => node.id === 'M05').requiresNodes, ['M03']);
 assert.equal(ruleset.goals.find((goal) => goal.id === 'G002').highlight.targetId, 'PROC_RNA_REPLICATION');
+assert.equal(ruleset.nodes.find((node) => node.id === 'B02A').adaptationPointCost, 1);
+assert.equal(ruleset.nodes.find((node) => node.id === 'C07').transition, 'MULTICELLULAR');
+assert.equal(ruleset.goals.find((goal) => goal.id === 'G007').rewards[0].type, 'grant_adaptation_points');
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));

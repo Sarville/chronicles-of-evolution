@@ -22,6 +22,12 @@ export function applyEffects(state, effects = [], source = {}) {
     if (effect.type === 'manual_gain_multiplier') {
       state.run.modifiers.active[`${sourceKey}:manual_gain`] = effect;
     }
+    if (effect.type === 'job_output_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:job:${effect.jobId}`] = effect;
+    }
+    if (effect.type === 'population_capacity') {
+      state.run.modifiers.active[`${sourceKey}:population_capacity`] = effect;
+    }
     if (effect.type === 'unlock_resource') {
       if (!state.run.resources[effect.resourceId]) {
         state.run.resources[effect.resourceId] = { amount: 0 };

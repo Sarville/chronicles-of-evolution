@@ -144,6 +144,17 @@ export function validateRuleset(ruleset) {
     }
   }
 
+  for (const job of ruleset.jobs) {
+    if (!Array.isArray(job.eraIds) || job.eraIds.length === 0 || job.eraIds.some((eraId) => !indexes.eras[eraId])) {
+      errors.push(`${job.id} must declare known eraIds`);
+    }
+    for (const [resourceId, amount] of Object.entries(job.output || {})) {
+      if (!indexes.resources[resourceId] || !Number.isFinite(amount) || amount < 0) {
+        errors.push(`${job.id} has invalid output for ${resourceId}`);
+      }
+    }
+  }
+
   for (const node of ruleset.nodes) {
     validateCost(node.cost, indexes.resources, node.id, errors);
     for (const required of node.requiresNodes || []) {
@@ -159,6 +170,9 @@ export function validateRuleset(ruleset) {
     }
     if (node.transition && !indexes.eras[node.transition]) {
       errors.push(`${node.id} transitions to unknown era ${node.transition}`);
+    }
+    if (node.adaptationPointCost != null && (!Number.isInteger(node.adaptationPointCost) || node.adaptationPointCost < 0)) {
+      errors.push(`${node.id} has invalid Adaptation Point cost`);
     }
   }
 
@@ -193,8 +207,12 @@ export function validateRuleset(ruleset) {
     'era_reached',
     'flag_set',
     'branch_selected',
+    'adaptation_selected',
+    'cognition_at_least',
+    'population_at_least',
+    'building_count',
   ]);
-  const rewardTypes = new Set(['grant_resource', 'reveal_entity', 'set_flag']);
+  const rewardTypes = new Set(['grant_resource', 'reveal_entity', 'set_flag', 'grant_adaptation_points']);
 
   for (const process of ruleset.manualProcesses || []) {
     if (!Number.isFinite(process.cooldownMs) || process.cooldownMs < 0) {
@@ -276,6 +294,9 @@ export function validateRuleset(ruleset) {
       if (condition.branchGroup && !ruleset.branchGroups[condition.branchGroup]) {
         errors.push(`${goal.id} condition references unknown branch group ${condition.branchGroup}`);
       }
+      if (condition.buildingId && !indexes.buildings[condition.buildingId]) {
+        errors.push(`${goal.id} condition references unknown building ${condition.buildingId}`);
+      }
     }
     for (const reward of goal.rewards || []) {
       if (!rewardTypes.has(reward.type)) {
@@ -283,6 +304,9 @@ export function validateRuleset(ruleset) {
       }
       if (reward.resourceId && !indexes.resources[reward.resourceId]) {
         errors.push(`${goal.id} reward references unknown resource ${reward.resourceId}`);
+      }
+      if (reward.type === 'grant_adaptation_points' && (!Number.isInteger(reward.amount) || reward.amount < 0)) {
+        errors.push(`${goal.id} has invalid Adaptation Point reward`);
       }
     }
   }

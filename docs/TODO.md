@@ -59,6 +59,21 @@ The accepted 0–18 slice is now a baseline inside the full `T1` rebuild below.
 Its manual 10–18 playtest remains useful, but its final numbers are approved
 only after the unified 0–120 simulation and playtest pass.
 
+### T1-3 foundation — civilization resource chains (2026-09-17)
+
+- [x] Food: tribe/settlement/city/industry jobs → Population maintenance → Food storage cap → recoverable growth pause.
+- [x] Materials and Knowledge: phase-aware jobs/buildings → atomic node/building costs → dedicated storage caps; no invented passive drain.
+- [x] Power: industrial plants → stored reserve → powered-building consumption/automatic curtailment → recovery event.
+- [x] save migration to `timeline1-v8-civilization-chains`; domain/config/save regression coverage.
+- [ ] connect the chains to the Sapience-to-Tribe route, full civilization goal graph and 38–108 balance profiles.
+
+### T1-1 — Organism foundation (2026-09-17)
+
+- [x] run-local Adaptation Points: no passive rate, non-negative atomic spend and save normalization.
+- [x] G007 grants the first AP; G008 requires one selected optional body adaptation.
+- [x] B02A–D optional adaptations and C07 Multicellularity / G009 transition are in the ruleset.
+- [ ] add 18–28 headless profile, body-adaptation presentation and the next nervous-system package.
+
 ---
 
 # DS-05 — Timeline #1 full narrative package

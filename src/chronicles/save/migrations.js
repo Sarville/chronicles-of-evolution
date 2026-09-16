@@ -117,6 +117,17 @@ export function normalizeEnvelope(envelope) {
       flags: envelope.run?.flags || {},
       discovery: envelope.run?.discovery || { seenEntities: [], corruptedSeen: [] },
       manualProcesses: envelope.run?.manualProcesses || {},
+      economy: {
+        deficits: {},
+        ...(envelope.run?.economy || {}),
+      },
+      adaptation: {
+        points: 0,
+        earnedTotal: 0,
+        spentTotal: 0,
+        selectedOptionalNodes: [],
+        ...(envelope.run?.adaptation || {}),
+      },
       stats: {
         totalEarned: {},
         ...(envelope.run?.stats || {}),
@@ -184,6 +195,13 @@ export function migrateEnvelope(envelope) {
     migrated.rulesetVersion = 'timeline1-v7-storage-gates';
     migrated.run.rulesetVersion = 'timeline1-v7-storage-gates';
     migrated.run.migrationNotice = 'T1-4: storage gates restored; only storage buildings expand resource caps.';
+  }
+  if (migrated.rulesetVersion === 'timeline1-v7-storage-gates') {
+    migrated.run.economy ||= { deficits: {} };
+    migrated.run.economy.deficits ||= {};
+    migrated.rulesetVersion = 'timeline1-v8-civilization-chains';
+    migrated.run.rulesetVersion = 'timeline1-v8-civilization-chains';
+    migrated.run.migrationNotice = 'T1-5: civilization jobs, Food maintenance and industrial Power deficits restored.';
   }
   return migrated;
 }
