@@ -39,11 +39,13 @@
 - C1 Protocell
 - C2 Cell
 - C2A/B/C Primary Trait variants
-- C3 Early Multicellular
+- C3 Coordinated Colony / pre-multicellular
 - C4 Multicellular Organism
 - C5 Adapted Organism
 - C6 Cognitive Organism
 - C7 Sapient Species
+
+G008/AP may introduce `C3` and previews будущего body plan, но полноценный переход `V1 Cellular → V2 Creature` принадлежит только G009/MS02 Multicellularity.
 
 Primary trait and major visible adaptations must remain recognizable through later stages unless a future explicit meta system changes them.
 
