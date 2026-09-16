@@ -1,22 +1,22 @@
 # Хроники Эволюции — DS-03 Codex Handoff
 
-**Status:** architecture-valid / gameplay inputs superseded by reconciliation  
+**Status:** architecture-valid / reconciliation handoff ready  
 **Date updated:** 2026-09-16
 
 ---
 
-# 1. Important reconciliation note
+# 1. Authority note
 
-This handoff remains authoritative for **technical architecture only**.
+This handoff remains authoritative for technical architecture only.
 
-Its old gameplay-input assumption that `02_ECONOMY_FIRST_120_MINUTES.md` + `03_EVOLUTION_TREE.md` meant Energy/Information molecular gameplay has been superseded by:
+Gameplay content authority is now:
 
 1. `docs/DECISIONS_RECONCILIATION.md`;
-2. reconciled `docs/gdd/01_FIRST_120_MINUTES.md`;
-3. reconciled `docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md`;
-4. reconciled `docs/gdd/03_EVOLUTION_TREE.md`.
+2. `docs/gdd/01_FIRST_120_MINUTES.md`;
+3. `docs/gdd/03_EVOLUTION_TREE.md`;
+4. `docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md` for tuning inside approved gameplay.
 
-Codex must not use git history or older document revisions to restore:
+Do not use older git revisions to restore superseded:
 
 - visible Information;
 - Chemical Gradient;
@@ -27,7 +27,7 @@ Codex must not use git history or older document revisions to restore:
 
 ---
 
-# 2. DS-03 architecture remains accepted
+# 2. Architecture remains accepted
 
 Keep:
 
@@ -46,22 +46,21 @@ tests/
   simulation/
 ```
 
-Keep implementation principles:
+Keep:
 
-1. serializable config registries + validators;
-2. canonical GameState;
-3. commands + domain events + selectors;
-4. pure Resource/Cost/Production services;
-5. injectable clock/RNG/storage/localization/platform ports;
-6. versioned save/recovery;
-7. headless tests/simulation;
-8. UI uses commands/selectors, not direct state mutation.
+- serializable config + validators;
+- canonical GameState;
+- commands/events/selectors;
+- pure services;
+- injectable ports;
+- versioned save/recovery;
+- headless simulation/tests;
+- generic Goal Engine;
+- idempotent reset foundation.
 
 ---
 
-# 3. Accepted Iteration 3 baseline
-
-Technical baseline commit:
+# 3. Accepted implementation baseline
 
 `32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb`
 
@@ -74,29 +73,28 @@ save/recovery accepted
 dev tools accepted
 simulation foundation accepted
 0-10 content superseded
+0-10 balance superseded
 ```
 
-Do not roll back the architecture in order to restore original gameplay.
+Do not roll back architecture to restore original gameplay.
 
 ---
 
-# 4. Current implementation state
+# 4. Current status
 
-Iteration 0: done.  
-Iteration 1: done.  
-Iteration 2: done.  
-Iteration 3: technically done, early content requires reconciliation rework.  
-Iteration 4: blocked.
-
-Next code step after explicit user approval:
-
-**Biological gameplay reconciliation 0–10.**
+- Iteration 0: done
+- Iteration 1: done
+- Iteration 2: done
+- Iteration 3: technically done; early content requires rework
+- Reconciliation documentation: accepted
+- Biological gameplay reconciliation 0–10: **READY**
+- Iteration 4: blocked until rework/playtest passes
 
 ---
 
-# 5. Required inputs for next code step
+# 5. Required inputs for next Codex task
 
-After approval Codex must read:
+Read:
 
 - `docs/PROJECT_STATE.yaml`;
 - `docs/TODO.md`;
@@ -114,31 +112,9 @@ After approval Codex must read:
 
 ---
 
-# 6. Hard constraints for reconciliation rework
+# 6. Next implementation slice
 
-Codex must:
-
-- preserve `src/chronicles` boundaries;
-- preserve generic Goal Engine;
-- preserve versioned save/recovery;
-- preserve dev speed controls;
-- preserve telemetry/event architecture;
-- preserve headless simulation framework;
-- use a new ruleset version;
-- explicitly handle obsolete pre-release content state.
-
-Codex must not:
-
-- mass-refactor legacy Evolve;
-- replace domain architecture;
-- invent exact new balance numbers without running simulation;
-- keep old E/I config merely to reduce work;
-- start 10–18 content before corrected 0–10 passes review;
-- start old Iteration 4.
-
----
-
-# 7. Corrected first implementation slice
+Only:
 
 ```text
 Stable RNA
@@ -149,29 +125,61 @@ Stable RNA
 → Cell
 ```
 
-Player-facing early resources:
+Player-facing resources:
 
 - RNA;
 - DNA;
 - Biomass only after Cell.
 
-Energy appears in following metabolism content, not at game start.
+Energy begins in following Metabolism content.
 
 Information is not a visible spendable resource.
 
 ---
 
-# 8. Gate
+# 7. Hard constraints
 
-Before any post-Cell expansion:
+Preserve:
 
-- config validation passes;
-- domain tests pass;
-- save/recovery regression passes;
+- `src/chronicles` boundaries;
+- Goal Engine;
+- save/recovery;
+- dev speed controls;
+- telemetry/events;
+- headless simulation.
+
+Use new ruleset:
+
+```text
+timeline1-v2-reconciled
+```
+
+Explicitly handle obsolete pre-release state.
+
+Do not:
+
+- mass-refactor legacy Evolve;
+- keep old E/I config just to minimize work;
+- guess final balance without simulation;
+- start 10–18 content;
+- start Iteration 4 automatically.
+
+---
+
+# 8. Rework gate
+
+Required before Iteration 4:
+
+- config/domain/save tests pass;
 - UI smoke passes;
 - competent/optimized/slower/M04 simulations pass;
-- Cell target ~9–11 min;
-- manual playtest completed;
-- user approves playable 0–10.
+- first action <20 sec;
+- passive RNA <60 sec;
+- Self Replication ~2–3 min;
+- DNA ~4–6 min;
+- Cell ~9–11 min;
+- manual share <=5% after ~3 min;
+- manual 0–10 playtest completed;
+- user approves corrected playable.
 
-Only then unlock corrected Iteration 4.
+After this gate, stop and report. Do not continue automatically into Iteration 4.
