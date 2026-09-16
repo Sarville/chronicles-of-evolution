@@ -3,7 +3,7 @@ project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "reconciliation_accepted_prepare_code_rework"
+  work_mode: "reconciliation_accepted_code_rework_ready"
   last_updated: "2026-09-16"
 
 authority:
@@ -21,6 +21,7 @@ authority:
   glossary: "docs/GLOSSARY.md"
   design_session_plan: "docs/production/DESIGN_SESSION_PLAN.md"
   implementation_plan: "docs/production/IMPLEMENTATION_ITERATION_PLAN.md"
+  implementation_handoff: "docs/production/RECONCILIATION_CODEX_HANDOFF.md"
 
 workflow:
   user_review_required_before_session_done: true
@@ -103,6 +104,7 @@ implementation:
     reconciliation_rework:
       name: "Biological gameplay reconciliation implementation"
       status: ready
+      handoff: "docs/production/RECONCILIATION_CODEX_HANDOFF.md"
       scope:
         - "replace current 0-10 E/I content with RNA/DNA/Cell canon"
         - "migrate config and Goal Engine content"
@@ -139,6 +141,6 @@ open_decisions:
   - "Exact Yandex/VK SDK mapping and cloud policy"
 
 next_action:
-  owner: "ChatGPT -> Codex"
-  session: "Prepare biological reconciliation code handoff"
-  description: "Documentation reconciliation is accepted. Prepare Codex prompt for 0-10 RNA/DNA/Cell content rework + rebalance. Do not start Iteration 4 until the rework and manual playtest pass."
+  owner: "Codex"
+  session: "Biological gameplay reconciliation 0-10"
+  description: "Use docs/production/RECONCILIATION_CODEX_HANDOFF.md. Rework 0-10 to RNA/DNA/Cell, rebalance and stop for manual playtest. Do not start Iteration 4."
