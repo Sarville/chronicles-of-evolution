@@ -125,16 +125,16 @@ Presentation contract:
 
 # DS-06 — UX architecture and wireframes
 
-**Status:** CURRENT / ACTIVE.
+**Status:** ACCEPTED on 2026-09-16.
 
 Must inherit `PB00–PB30` and may refine layout without changing their narrative/gameplay meaning.
 
 - [x] `00_UX_PRINCIPLES.md`
 - [x] `01_SCREEN_MAP.md`
 - [x] `02_MOBILE_WIREFRAMES.md`
-- [ ] `03_DESKTOP_WIREFRAMES.md`
-- [ ] `04_COMPONENT_STATES.md`
-- [ ] `05_TUTORIAL_AND_HINTS.md`
+- [x] `03_DESKTOP_WIREFRAMES.md`
+- [x] `04_COMPONENT_STATES.md`
+- [x] `05_TUTORIAL_AND_HINTS.md`
 - [x] mobile-first shell
 - [x] contextual resource presentation
 - [x] Goal card
@@ -146,12 +146,14 @@ Must inherit `PB00–PB30` and may refine layout without changing their narrativ
 - [x] Modern bridge
 - [x] World Tension
 - [x] Archive/reset UI
+- [x] user review DS-06
+- [x] mark DS-06 accepted
 
 ---
 
 # DS-07 — Art direction
 
-**Status:** blocked by DS-05 + DS-06.
+**Status:** CURRENT / ACTIVE.
 
 Must inherit `V0–V9` and `C0–C7`.
 
@@ -179,7 +181,7 @@ Dependencies:
 
 ```text
 DS-05 + DS-05.5 accepted
-→ DS-06 active
+→ DS-06 accepted
 → DS-07
 → DS-08
 
@@ -236,8 +238,8 @@ all tracks + balance/regression
 ```text
 DS-05 narrative package accepted
 + DS-05.5 presentation contract accepted
-→ DS-06 UX architecture active
-→ DS-07 art direction
+→ DS-06 UX architecture accepted
+→ DS-07 art direction active
 → art/audio/platform tracks
 → balance/regression
 → DS-11 freeze v2

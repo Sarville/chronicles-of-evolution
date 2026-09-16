@@ -3,7 +3,7 @@ project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "ds05_5_ready_for_review"
+  work_mode: "ds07_active"
   last_updated: "2026-09-16"
 
 authority:
@@ -40,9 +40,9 @@ workflow:
   no_game_code_during_design_sessions: true
 
 design:
-  current_session: "DS-06"
+  current_session: "DS-07"
   status: "active"
-  objective: "Define UX architecture and wireframes from accepted DS-05 narrative and DS-05.5 PB00-PB30 presentation contract"
+  objective: "Define art direction, creature evolution, locations and era transitions from accepted DS-05.5 presentation map and accepted DS-06 UX architecture"
   accepted_reconciliation:
     - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
     - "Information removed as player-facing spendable resource"
@@ -101,8 +101,8 @@ design:
     RECONCILIATION: { name: "Original GDD design reconciliation", status: accepted }
     DS-05: { name: "Timeline #1 full narrative package", status: accepted }
     DS-05.5: { name: "Timeline presentation contract", status: accepted }
-    DS-06: { name: "UX architecture and wireframes", status: active }
-    DS-07: { name: "Art direction, creature evolution, locations and era transitions", status: blocked_by_ds05_ds06 }
+    DS-06: { name: "UX architecture and wireframes", status: accepted }
+    DS-07: { name: "Art direction, creature evolution, locations and era transitions", status: active }
     DS-08: { name: "Art production manifest and generation prompts", status: blocked_by_ds07 }
     DS-09: { name: "Audio design and generation package", status: blocked_by_ds05_ds07 }
     DS-10: { name: "Analytics, platform and production readiness", status: blocked_by_gameplay_ux_stability }
@@ -199,5 +199,5 @@ open_decisions:
 
 next_action:
   owner: "Codex"
-  session: "DS-06"
-  description: "Create UX architecture and wireframes using accepted DS-05 narrative, PB00-PB30 presentation beats and V0-V9/C0-C7 continuity as fixed inputs."
+  session: "DS-07"
+  description: "Create art direction, locations/dioramas, era transitions and creature evolution documents using accepted V0-V9/C0-C7 continuity plus DS-06 UX layout constraints as fixed inputs."

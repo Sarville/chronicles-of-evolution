@@ -206,7 +206,7 @@ Once accepted, DS-06 and DS-07 must inherit PB/V/C semantics and may refine layo
 
 # 7. DS-06 — UX architecture and wireframes
 
-**Status:** ACTIVE.
+**Status:** ACCEPTED.
 
 Primary new input:
 
@@ -244,11 +244,13 @@ No Energy/Information molecular top bar.
 
 DS-06 may change layout/interaction form, but not reorder or reinterpret PB00–PB30 without an explicit design decision.
 
+Accepted by explicit user confirmation on 2026-09-16.
+
 ---
 
 # 8. DS-07 — Art direction
 
-**Status:** blocked by DS-05 + DS-06.
+**Status:** ACTIVE.
 
 Primary new input:
 
@@ -352,8 +354,8 @@ Result:
 Iteration 4 complete
 → DS-05 narrative package accepted
 → DS-05.5 presentation contract accepted
-→ DS-06 UX architecture active
-→ DS-07 art direction
+→ DS-06 UX architecture accepted
+→ DS-07 art direction active
 → DS-08 assets / DS-09 audio
 → DS-10 analytics/platform
 → balance/regression
