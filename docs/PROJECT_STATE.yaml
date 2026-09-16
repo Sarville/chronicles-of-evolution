@@ -3,7 +3,7 @@ project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "iteration_4_complete_ds05_in_progress"
+  work_mode: "ds05_ready_for_review"
   last_updated: "2026-09-16"
 
 authority:
@@ -39,7 +39,7 @@ workflow:
 
 design:
   current_session: "DS-05"
-  status: "narrative_package_in_progress"
+  status: "ready_for_user_review"
   objective: "Create the complete Timeline #1 narrative package on top of the reconciled gameplay canon without changing mechanics, economy or progression rules"
   accepted_reconciliation:
     - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
@@ -68,6 +68,12 @@ design:
     - "docs/gdd/09_ENDINGS_AND_RESET.md"
     - "docs/gdd/10_META_PROGRESSION.md"
     - "docs/gdd/11_BALANCE_RULES.md"
+  narrative_review_documents:
+    - "docs/scenario/01_TIMELINE_01_SCRIPT.md"
+    - "docs/scenario/04_STORY_EVENTS.md"
+    - "docs/scenario/05_NARRATIVE_FLAGS.md"
+    - "docs/scenario/06_ENDINGS_COPY.md"
+    - "docs/scenario/07_COPY_GUIDE.md"
   sessions:
     DS-00: { name: "Documentation orchestration and repository structure", status: done }
     DS-01: { name: "Civilization gameplay contract", status: reconciled }
@@ -75,7 +81,7 @@ design:
     DS-03: { name: "Technical architecture and data contract", status: accepted_architecture_content_refs_reconciled }
     DS-04: { name: "Meta progression and balance rules", status: reconciled }
     RECONCILIATION: { name: "Original GDD design reconciliation", status: accepted }
-    DS-05: { name: "Timeline #1 full narrative package", status: in_progress }
+    DS-05: { name: "Timeline #1 full narrative package", status: ready_for_user_review }
     DS-06: { name: "UX architecture and wireframes", status: unlocked }
     DS-07: { name: "Art direction, locations and era transitions", status: blocked_by_ds05_ds06 }
     DS-08: { name: "Art production manifest and generation prompts", status: blocked_by_ds07 }
@@ -156,6 +162,6 @@ open_decisions:
   - "Exact Yandex/VK SDK mapping and cloud policy"
 
 next_action:
-  owner: "Design"
-  session: "DS-05"
-  description: "Create and review the complete Timeline #1 narrative package: main script, story events, narrative flags, endings copy and copy guide. Do not change gameplay/economy contracts."
+  owner: "User"
+  session: "DS-05 review"
+  description: "Review the Timeline #1 narrative package. On approval, mark DS-05 accepted and proceed to DS-06 UX architecture."
