@@ -167,6 +167,28 @@ A payoff may be:
 
 It does not have to be another producer multiplier.
 
+## INV-07 — Producer milestones must be legible
+
+Count-based producer/process milestone bonuses are permitted only when the player can understand why production changed.
+
+For each repeatable process that uses milestone bonuses, define:
+
+- threshold count;
+- fiction label;
+- short explanation;
+- affected resource/output;
+- whether the bonus is shown in UI/tooltip/log.
+
+Biological examples:
+
+| Process family | Acceptable explanation |
+|---|---|
+| Primordial reactions | reactions connect into a cooperative RNA network |
+| Replication | copies form a shared template pool |
+| DNA synthesis | reusable genetic assembly chain stabilizes |
+
+If no convincing explanation exists, the milestone multiplier should be disabled for that process.
+
 ---
 
 # 7. Patch priority

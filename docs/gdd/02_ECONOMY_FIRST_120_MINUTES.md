@@ -93,6 +93,26 @@ production/sec = base × local_mult × era_mult × event_mult
 
 Count is included only for actual repeatable entities.
 
+## Repeatable process milestone bonuses
+
+Implementation currently supports count-based production milestone bonuses for repeatable processes/producers.
+These bonuses are allowed only when they are player-facing and fiction-backed, not hidden math.
+
+Design finding from the 0–10 playable rework:
+
+- the `10` count threshold should read as a qualitative process transition, not as an arbitrary multiplier;
+- biological process bonuses need scenario names such as reaction network, shared template pool or genetic assembly chain;
+- every future repeatable biological process with milestone bonuses needs its own narrative justification;
+- if a process cannot be explained as a real qualitative transition, disable its milestone bonus instead of keeping a silent multiplier.
+
+Current early examples:
+
+| Process | First milestone interpretation |
+|---|---|
+| Primordial Reaction | isolated reactions link into a cooperative RNA reaction network |
+| RNA Replication | copies reinforce a shared template pool |
+| DNA Synthesis | synthesis stabilizes into a reusable genetic assembly chain |
+
 ## Manual onboarding
 
 Manual action starts or accelerates a biological process; it is not balanced as permanent `+resource/click` gameplay.

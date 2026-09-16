@@ -119,6 +119,10 @@ Codex tasks:
 - [ ] manual playtest 0–10
 - [ ] user approves corrected playable 0–10
 
+### Findings from 0–10 playtest
+
+- [ ] Document all repeatable process milestone bonuses with scenario justification, threshold labels and UI wording before expanding the biological economy beyond Cell.
+
 ---
 
 # Iteration 4 — corrected content after Cell
