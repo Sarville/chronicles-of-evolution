@@ -81,10 +81,11 @@ design:
     - "docs/art/00_VISUAL_STATE_MAP.md"
   presentation_contract:
     world_states: "V0 Primordial -> V1 Cellular -> V2 Creature -> V3 Sapient Tribe -> V4 Settlement -> V5 City -> V6 Industrial -> V7 Modern -> V8 Atomic -> V9 Ash"
-    creature_states: "C0 Proto-chemistry -> C1 Protocell -> C2 Cell -> C2A/B/C Primary Trait -> C3 Early Multicellular -> C4 Multicellular Organism -> C5 Adapted Organism -> C6 Cognitive Organism -> C7 Sapient Species"
+    creature_states: "C0 Proto-chemistry -> C1 Protocell -> C2 Cell -> C2A/B/C Primary Trait -> C3 Coordinated Colony -> C4 Multicellular Organism -> C5 Adapted Organism -> C6 Cognitive Organism -> C7 Sapient Species"
     presentation_beats: "PB00-PB30"
     hard_rules:
       - "AP UI appears only from G008, not in Iteration 4"
+      - "G008/C3 is still pre-multicellular; V1 -> V2 and C4 begin only on G009/MS02"
       - "Cognition appears only after Nervous System"
       - "Power appears only in Industry"
       - "Modern is a distinct full visual state"
