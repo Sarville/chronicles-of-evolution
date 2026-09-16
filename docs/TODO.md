@@ -17,6 +17,8 @@
 - [x] biological 0–10 reconciliation implementation
 - [x] biological 0–10 rebalance and live playtest
 - [x] freeze RNA/DNA/Cell baseline
+- [x] DS-05 — Timeline #1 full narrative package accepted
+- [x] DS-05.5 — Timeline Presentation Contract accepted
 
 Accepted technical baseline commit:
 
@@ -65,7 +67,7 @@ Later full biological validation:
 
 # DS-05 — Timeline #1 full narrative package
 
-**Status:** READY FOR USER REVIEW.
+**Status:** ACCEPTED on 2026-09-16.
 
 Created:
 
@@ -84,14 +86,14 @@ Checks:
 - [x] mandatory scenes aligned with G001–G024/event contracts
 - [x] all Last Protocol subtypes preserved
 - [x] Timeline #2 teaser ends on `АРХИВ ПОМНИТ`
-- [ ] user review DS-05
-- [ ] mark DS-05 accepted
+- [x] user review DS-05
+- [x] mark DS-05 accepted
 
 ---
 
-# CURRENT — DS-05.5: Timeline Presentation Contract
+# DS-05.5 — Timeline Presentation Contract
 
-**Status:** READY FOR USER REVIEW.
+**Status:** ACCEPTED on 2026-09-16.
 
 Created:
 
@@ -116,34 +118,34 @@ Presentation contract:
 - [x] define DS-06 layout responsibilities vs DS-07 visual responsibilities
 - [x] update `docs/ux/README.md`
 - [x] update `docs/art/README.md` and restore mandatory Modern visual state
-- [ ] user review DS-05.5
-- [ ] mark DS-05.5 accepted
+- [x] user review DS-05.5
+- [x] mark DS-05.5 accepted
 
 ---
 
 # DS-06 — UX architecture and wireframes
 
-**Status:** UNLOCKED; start after presentation review to avoid rework.
+**Status:** CURRENT / ACTIVE.
 
 Must inherit `PB00–PB30` and may refine layout without changing their narrative/gameplay meaning.
 
-- [ ] `00_UX_PRINCIPLES.md`
-- [ ] `01_SCREEN_MAP.md`
-- [ ] `02_MOBILE_WIREFRAMES.md`
+- [x] `00_UX_PRINCIPLES.md`
+- [x] `01_SCREEN_MAP.md`
+- [x] `02_MOBILE_WIREFRAMES.md`
 - [ ] `03_DESKTOP_WIREFRAMES.md`
 - [ ] `04_COMPONENT_STATES.md`
 - [ ] `05_TUTORIAL_AND_HINTS.md`
-- [ ] mobile-first shell
-- [ ] contextual resource presentation
-- [ ] Goal card
-- [ ] Evolution/AP UI
-- [ ] Cognition meter
-- [ ] small-group Sapience → Tribe transition
-- [ ] jobs/buildings phase architecture
-- [ ] Industry Power reveal
-- [ ] Modern bridge
-- [ ] World Tension
-- [ ] Archive/reset UI
+- [x] mobile-first shell
+- [x] contextual resource presentation
+- [x] Goal card
+- [x] Evolution/AP UI
+- [x] Cognition meter
+- [x] small-group Sapience → Tribe transition
+- [x] jobs/buildings phase architecture
+- [x] Industry Power reveal
+- [x] Modern bridge
+- [x] World Tension
+- [x] Archive/reset UI
 
 ---
 
@@ -176,12 +178,12 @@ Planned:
 Dependencies:
 
 ```text
-DS-05 + DS-05.5 review
-→ DS-06
+DS-05 + DS-05.5 accepted
+→ DS-06 active
 → DS-07
 → DS-08
 
-DS-05 + DS-07
+DS-05 accepted + DS-07
 → DS-09
 
 stable gameplay + UX
@@ -232,10 +234,9 @@ all tracks + balance/regression
 # Immediate order
 
 ```text
-DS-05 narrative package ready
-+ DS-05.5 presentation contract ready
-→ user review / approval
-→ DS-06 UX architecture
+DS-05 narrative package accepted
++ DS-05.5 presentation contract accepted
+→ DS-06 UX architecture active
 → DS-07 art direction
 → art/audio/platform tracks
 → balance/regression

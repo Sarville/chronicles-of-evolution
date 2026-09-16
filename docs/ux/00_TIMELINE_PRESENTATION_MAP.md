@@ -1,7 +1,7 @@
 # Хроники Эволюции — Timeline #1 Presentation Map
 
 **Документ:** DS-05.5  
-**Статус:** ready for review  
+**Статус:** accepted  
 **Область:** Timeline #1, ~0–120 минут  
 **Назначение:** единый мост между gameplay, сценарием, UX и визуальными состояниями.  
 **Gameplay authority:** `docs/gdd/01_FIRST_120_MINUTES.md`, `07_GOALS_AND_MILESTONES.md`, `08_EVENTS_AND_CHOICES.md`, `09_ENDINGS_AND_RESET.md`  

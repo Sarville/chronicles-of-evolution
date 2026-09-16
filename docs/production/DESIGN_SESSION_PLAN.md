@@ -92,7 +92,7 @@ A DS-05 consistency pass subsequently corrected the G006/G007 mapping and remove
 
 # 5. DS-05 — Timeline #1 full narrative package
 
-**Status:** READY FOR USER REVIEW.
+**Status:** ACCEPTED.
 
 Created:
 
@@ -118,15 +118,15 @@ The package:
 - ends on `АРХИВ ПОМНИТ` and the first `Мы можем изменить результат.`;
 - leaves the core Archive/Filter mystery unresolved.
 
-## Gate
+## Acceptance
 
-Pending explicit user review/approval.
+Accepted by explicit user confirmation on 2026-09-16.
 
 ---
 
 # 6. DS-05.5 — Timeline Presentation Contract
 
-**Status:** READY FOR USER REVIEW.
+**Status:** ACCEPTED.
 
 Purpose:
 
@@ -196,9 +196,9 @@ C0 Proto-chemistry
 - Ash must derive from the player's own V8 world rather than use generic apocalypse art;
 - Atomic crisis → Ash is the deliberate hard visual rupture of Timeline #1.
 
-## Gate
+## Acceptance
 
-Pending explicit user review/approval together with DS-05.
+Accepted by explicit user confirmation on 2026-09-16 together with DS-05.
 
 Once accepted, DS-06 and DS-07 must inherit PB/V/C semantics and may refine layout/appearance without silently changing their meaning.
 
@@ -206,11 +206,19 @@ Once accepted, DS-06 and DS-07 must inherit PB/V/C semantics and may refine layo
 
 # 7. DS-06 — UX architecture and wireframes
 
-**Status:** UNLOCKED, recommended after DS-05/05.5 review.
+**Status:** ACTIVE.
 
 Primary new input:
 
 `docs/ux/00_TIMELINE_PRESENTATION_MAP.md`
+
+Accepted inherited inputs:
+
+- DS-05 Timeline #1 narrative package;
+- DS-05.5 presentation beats `PB00–PB30`;
+- visual/world states `V0–V9`;
+- creature continuity states `C0–C7`;
+- accepted/reconciled GDD 01–11.
 
 Must include:
 
@@ -342,10 +350,9 @@ Result:
 
 ```text
 Iteration 4 complete
-→ DS-05 narrative package ready
-→ DS-05.5 presentation contract ready
-→ user review
-→ DS-06 UX architecture
+→ DS-05 narrative package accepted
+→ DS-05.5 presentation contract accepted
+→ DS-06 UX architecture active
 → DS-07 art direction
 → DS-08 assets / DS-09 audio
 → DS-10 analytics/platform

@@ -40,9 +40,9 @@ workflow:
   no_game_code_during_design_sessions: true
 
 design:
-  current_session: "DS-05.5"
-  status: "ready_for_user_review"
-  objective: "Bind Timeline #1 gameplay and narrative beats to semantic UX surfaces, diorama states, creature continuity and era transitions before detailed UX/art design"
+  current_session: "DS-06"
+  status: "active"
+  objective: "Define UX architecture and wireframes from accepted DS-05 narrative and DS-05.5 PB00-PB30 presentation contract"
   accepted_reconciliation:
     - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
     - "Information removed as player-facing spendable resource"
@@ -99,9 +99,9 @@ design:
     DS-03: { name: "Technical architecture and data contract", status: accepted_architecture_content_refs_reconciled }
     DS-04: { name: "Meta progression and balance rules", status: reconciled }
     RECONCILIATION: { name: "Original GDD design reconciliation", status: accepted }
-    DS-05: { name: "Timeline #1 full narrative package", status: ready_for_user_review }
-    DS-05.5: { name: "Timeline presentation contract", status: ready_for_user_review }
-    DS-06: { name: "UX architecture and wireframes", status: unlocked_pending_presentation_review }
+    DS-05: { name: "Timeline #1 full narrative package", status: accepted }
+    DS-05.5: { name: "Timeline presentation contract", status: accepted }
+    DS-06: { name: "UX architecture and wireframes", status: active }
     DS-07: { name: "Art direction, creature evolution, locations and era transitions", status: blocked_by_ds05_ds06 }
     DS-08: { name: "Art production manifest and generation prompts", status: blocked_by_ds07 }
     DS-09: { name: "Audio design and generation package", status: blocked_by_ds05_ds07 }
@@ -198,6 +198,6 @@ open_decisions:
   - "Exact Yandex/VK SDK mapping and cloud policy"
 
 next_action:
-  owner: "User"
-  session: "DS-05 + DS-05.5 review"
-  description: "Review the Timeline #1 narrative package together with the presentation/visual-state bridge. On approval, mark both accepted and proceed to DS-06 UX architecture using PB00-PB30 and V0-V9/C0-C7 as inputs."
+  owner: "Codex"
+  session: "DS-06"
+  description: "Create UX architecture and wireframes using accepted DS-05 narrative, PB00-PB30 presentation beats and V0-V9/C0-C7 continuity as fixed inputs."

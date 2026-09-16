@@ -1,7 +1,7 @@
 # Хроники Эволюции — Visual State Map
 
 **Документ:** DS-05.5  
-**Статус:** ready for review  
+**Статус:** accepted  
 **Область:** визуальные состояния Timeline #1 до детального art direction  
 **Presentation authority:** `docs/ux/00_TIMELINE_PRESENTATION_MAP.md`  
 **Narrative input:** `docs/scenario/01_TIMELINE_01_SCRIPT.md`
