@@ -174,7 +174,7 @@ C0 Proto-chemistry
 → C1 Protocell
 → C2 Cell
 → C2A/B/C Primary Trait
-→ C3 Early Multicellular
+→ C3 Coordinated Colony
 → C4 Multicellular Organism
 → C5 Adapted Organism
 → C6 Cognitive Organism
@@ -184,6 +184,7 @@ C0 Proto-chemistry
 ## Hard rules
 
 - AP UI appears only from G008; no premature AP in Iteration 4 presentation;
+- G008/C3 remains pre-multicellular; the actual `V1 → V2` / C4 breakthrough belongs to G009/MS02;
 - Cognition appears only after Nervous System;
 - Power appears only in Industry;
 - Modern is a distinct world state between Industrial and Atomic;
@@ -263,7 +264,8 @@ DS-07 must preserve:
 - C0–C7 continuity;
 - distinct Modern state;
 - inherited primary biological trait;
-- scale progression molecule → cell → organism → group → settlement → city → world.
+- G008 pre-multicellular / G009 multicellular visual boundary;
+- scale progression molecule → cell → colony → organism → group → settlement → city → world.
 
 ---
 
