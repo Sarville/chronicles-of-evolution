@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { ruleset } from '../../src/chronicles/config/index.js';
 import { createChroniclesEngine } from '../../src/chronicles/domain/engine.js';
-import { estimateProducerPurchasePayback, runHeadlessSimulation } from '../../src/chronicles/dev/simulation.js';
+import { estimateProducerPurchasePayback, runHeadlessSimulation, simulationProfiles } from '../../src/chronicles/dev/simulation.js';
 
 function between(value, min, max, label) {
   assert.equal(value >= min && value <= max, true, `${label}: expected ${value} between ${min} and ${max}`);
@@ -30,6 +30,24 @@ between(competent.finalRates.dna, 1.2, 1.5, 'final DNA/s');
 assert.equal(competent.manual.economicsAtThreeMinutes.contributionRatio < 0.05, true);
 assert.equal(competent.manual.economicsAtThreeMinutes.cooldownMs, 90000);
 assert.equal(competent.manual.economicsAtThreeMinutes.resourceId, 'rna');
+
+assert.equal(simulationProfiles.baseline_optimized.decisionIntervalMs, 1000);
+assert.equal(simulationProfiles.baseline_competent.decisionIntervalMs, 5000);
+assert.equal(simulationProfiles.baseline_slow.decisionIntervalMs, 9000);
+assert.equal(simulationProfiles.optimized.decisionIntervalMs, 2500);
+assert.equal(simulationProfiles.slow.decisionIntervalMs, 5000);
+assert.notEqual(simulationProfiles.baseline_optimized.phaseProducerTargets, simulationProfiles.optimized.phaseProducerTargets);
+assert.notEqual(simulationProfiles.baseline_competent.phaseProducerTargets, simulationProfiles.competent.phaseProducerTargets);
+assert.notEqual(simulationProfiles.baseline_slow.phaseProducerTargets, simulationProfiles.slow.phaseProducerTargets);
+assert.notDeepEqual(simulationProfiles.baseline_slow.phaseProducerTargets, simulationProfiles.slow.phaseProducerTargets);
+
+const baselineOptimized = runHeadlessSimulation({ seed: 7, profile: 'baseline_optimized' });
+const baselineCompetent = runHeadlessSimulation({ seed: 7, profile: 'baseline_competent' });
+const baselineSlow = runHeadlessSimulation({ seed: 7, profile: 'baseline_slow' });
+assert.equal(baselineOptimized.ok, true);
+assert.equal(baselineCompetent.ok, true);
+assert.equal(baselineSlow.ok, true);
+assert.equal(baselineSlow.timings.cellAtMs <= 690000, true);
 
 const optimized = runHeadlessSimulation({ seed: 7, profile: 'optimized' });
 assert.equal(optimized.ok, true);

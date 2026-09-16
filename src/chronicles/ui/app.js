@@ -5,6 +5,7 @@ import {
   selectManualProcessView,
   selectNodeCost,
   selectNodeStatus,
+  selectProducerOutputView,
   selectProducerPrice,
   selectProducerStatus,
   selectProductionRates,
@@ -153,19 +154,18 @@ function renderProducers() {
     .map((producer) => {
       const status = selectProducerStatus(engine().state, ruleset, producer.id);
       if (status === 'locked') return '';
-      const count = engine().state.run.producers[producer.id]?.count || 0;
-      const output = formatCost(producer.output);
-      const nextMilestone = (producer.milestones || []).find((candidate) => count < candidate.count);
-      const reachedMilestone = [...(producer.milestones || [])].reverse().find((candidate) => count >= candidate.count);
-      const milestone = nextMilestone
-        ? `<small>${nextMilestone.label} ${count}/${nextMilestone.count}</small>`
-        : reachedMilestone
-          ? `<small>${reachedMilestone.label}: ${reachedMilestone.description}</small>`
+      const outputView = selectProducerOutputView(engine().state, ruleset, producer.id);
+      const bonus = outputView.nextMilestone || outputView.reachedMilestone;
+      const bonusText = bonus ? `x${formatNumber(bonus.multiplier)} (${formatNumber((bonus.multiplier - 1) * 100)}%)` : '';
+      const milestone = outputView.nextMilestone
+        ? `<small>${outputView.nextMilestone.label} ${outputView.count}/${outputView.nextMilestone.count} · Bonus ${bonusText}</small>`
+        : outputView.reachedMilestone
+          ? `<small>${outputView.reachedMilestone.label} · ${bonusText}: ${outputView.reachedMilestone.description}</small>`
           : '';
       return `<button class="entity ${status} ${focusedEntityId === producer.id ? 'focused' : ''}" data-entity-id="${producer.id}" data-action="producer" data-id="${producer.id}" ${status === 'available_affordable' ? '' : 'disabled'}>
-        <span><strong>${PRODUCER_NAMES[producer.id] || producer.id}</strong><small>Owned ${count}</small>${milestone}</span>
+        <span><strong>${PRODUCER_NAMES[producer.id] || producer.id}</strong><small>Owned ${outputView.count}</small>${milestone}</span>
         <span><small>Cost</small>${formatCost(selectProducerPrice(engine().state, ruleset, producer.id))}</span>
-        <span><small>Output</small>${output}/s</span>
+        <span><small>Base / unit</small>${formatCost(outputView.basePerUnit)}/s<small>Current total</small>${formatCost(outputView.currentTotal)}/s</span>
       </button>`;
     })
     .join('');

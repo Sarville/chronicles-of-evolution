@@ -8,6 +8,7 @@ import {
   selectManualProcessView,
   selectNodeCost,
   selectNodeStatus,
+  selectProducerOutputView,
   selectProducerPrice,
   selectProductionRates,
   selectResourceAmounts,
@@ -206,6 +207,15 @@ for (let index = 0; index < 10; index += 1) {
 }
 assert.equal(primordialMilestones.length, 1);
 assert.equal(selectProductionRates(explicitMilestoneEngine.state, ruleset).rna, 2.53);
+const explicitMilestoneOutput = selectProducerOutputView(
+  explicitMilestoneEngine.state,
+  ruleset,
+  'PROC_PRIMORDIAL_REACTION'
+);
+assert.deepEqual(explicitMilestoneOutput.basePerUnit, { rna: 0.22 });
+assert.deepEqual(explicitMilestoneOutput.currentTotal, { rna: 2.53 });
+assert.equal(explicitMilestoneOutput.reachedMilestone.label, 'Reaction network');
+assert.equal(explicitMilestoneOutput.milestoneMultiplier, 1.15);
 
 const customRuleset = {
   ...ruleset,

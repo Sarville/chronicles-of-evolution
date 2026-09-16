@@ -76,7 +76,7 @@ export const nodes = [
     type: 'CONVERGENCE',
     semanticRole: 'breakthrough',
     labelKey: 'node.M06',
-    cost: { rna: 950, dna: 210 },
+    cost: { rna: 930, dna: 205 },
     requiresNodes: ['M05'],
     effects: [{ type: 'unlock_resource', resourceId: 'biomass' }],
     transition: 'CELLULAR',

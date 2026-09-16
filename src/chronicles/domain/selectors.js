@@ -3,7 +3,7 @@ import { canAfford, multiplyCost, scaleCost } from './services/costs.js';
 import { branchAvailable, branchCostMultiplier, prerequisitesMet } from './services/evolution.js';
 import { getGoalState, goalConditionsMet } from './services/goals.js';
 import { calculateManualReward, manualProcessAvailable, manualProcessCooldownMs } from './services/manualProcesses.js';
-import { calculateProductionRates } from './services/production.js';
+import { calculateProductionRates, producerMilestoneMultiplier, productionMultiplierForResource } from './services/production.js';
 
 export function selectResourceAmounts(state) {
   return Object.fromEntries(Object.entries(state.run.resources).map(([id, value]) => [id, value.amount]));
@@ -67,6 +67,32 @@ export function selectProducerStatus(state, ruleset, producerId) {
     return 'locked';
   }
   return canAfford(state, selectProducerPrice(state, ruleset, producerId)).ok ? 'available_affordable' : 'available_unaffordable';
+}
+
+export function selectProducerOutputView(state, ruleset, producerId) {
+  const producer = createRulesetIndexes(ruleset).producers[producerId];
+  if (!producer) {
+    return null;
+  }
+  const count = state.run.producers[producerId]?.count || 0;
+  const milestoneMultiplier = producerMilestoneMultiplier(count, producer.milestones);
+  const nextMilestone = (producer.milestones || []).find((candidate) => count < candidate.count) || null;
+  const reachedMilestone = [...(producer.milestones || [])].reverse().find((candidate) => count >= candidate.count) || null;
+  const basePerUnit = {};
+  const currentTotal = {};
+  for (const [resourceId, output] of Object.entries(producer.output || {})) {
+    basePerUnit[resourceId] = output;
+    currentTotal[resourceId] =
+      count * output * milestoneMultiplier * productionMultiplierForResource(state, resourceId);
+  }
+  return {
+    count,
+    basePerUnit,
+    currentTotal,
+    milestoneMultiplier,
+    nextMilestone,
+    reachedMilestone,
+  };
 }
 
 export function selectNodeCost(state, ruleset, nodeId) {
