@@ -34,15 +34,9 @@ Accepted biological 0–10 freeze reference:
 
 GitHub did not expose a newer implementation SHA when DS-05 was opened. Do not invent one; add the actual reference when it becomes available.
 
-Scope represented by Iteration 4:
-
-- [x] Metabolism / post-Cell progression
-- [x] Biomass/Energy cellular layer
-- [x] first primary branch: Absorption / Symbiosis / Shell
-- [x] post-Cell content expansion
 - [x] Iteration 4 accepted as complete for unlocking design work
 
-Still requires later full biological validation where applicable:
+Later full biological validation still includes:
 
 - [ ] full AP reward/cost table
 - [ ] full Multicellularity / body adaptation pass
@@ -54,29 +48,29 @@ Still requires later full biological validation where applicable:
 
 # CURRENT — DS-05: Timeline #1 full narrative package
 
-**Status:** IN PROGRESS.
+**Status:** READY FOR USER REVIEW.
 
-Create and reconcile:
+Created:
 
-- [ ] `docs/scenario/01_TIMELINE_01_SCRIPT.md`
-- [ ] `docs/scenario/04_STORY_EVENTS.md`
-- [ ] `docs/scenario/05_NARRATIVE_FLAGS.md`
-- [ ] `docs/scenario/06_ENDINGS_COPY.md`
-- [ ] `docs/scenario/07_COPY_GUIDE.md`
+- [x] `docs/scenario/01_TIMELINE_01_SCRIPT.md`
+- [x] `docs/scenario/04_STORY_EVENTS.md`
+- [x] `docs/scenario/05_NARRATIVE_FLAGS.md`
+- [x] `docs/scenario/06_ENDINGS_COPY.md`
+- [x] `docs/scenario/07_COPY_GUIDE.md`
 
-DS-05 rules:
+DS-05 checks:
 
-- [ ] use reconciled RNA → DNA → Cell gameplay language
-- [ ] do not add a new economy or gameplay gate
-- [ ] keep text short and gameplay-readable
-- [ ] preserve Error 17 / `Снова.` / Ash / Archive thread
-- [ ] make Archive voice evolve gradually from neutral system to ambiguous participant
-- [ ] keep Timeline #1 mystery unresolved
-- [ ] align every mandatory scene with G001–G024/event contracts
-- [ ] define Chronicle copy separately from blocking UI copy
-- [ ] preserve first Ash as unavoidable
-- [ ] preserve all three Last Protocol subtypes
-- [ ] end with `АРХИВ ПОМНИТ` / Timeline #2 teaser
+- [x] use reconciled RNA → DNA → Cell gameplay language
+- [x] do not add a new economy or gameplay gate
+- [x] keep text short and gameplay-readable
+- [x] preserve Error 17 / `Снова.` / Ash / Archive thread
+- [x] make Archive voice evolve gradually from neutral system to ambiguous participant
+- [x] keep Timeline #1 mystery unresolved
+- [x] align mandatory scenes with G001–G024/event contracts
+- [x] define Chronicle copy separately from blocking UI copy
+- [x] preserve first Ash as unavoidable
+- [x] preserve all three Last Protocol subtypes
+- [x] end with `АРХИВ ПОМНИТ` / Timeline #2 teaser
 - [ ] user review DS-05
 - [ ] mark DS-05 accepted in `PROJECT_STATE.yaml`
 
@@ -84,7 +78,7 @@ DS-05 rules:
 
 # DS-06 — UX architecture and wireframes
 
-**Status:** UNLOCKED; start after or alongside DS-05 review.
+**Status:** UNLOCKED; recommended next after DS-05 review.
 
 - [ ] mobile-first shell
 - [ ] contextual resource presentation
@@ -166,9 +160,8 @@ all tracks + balance/regression
 # Immediate order
 
 ```text
-Iteration 4 complete
-→ DS-05 narrative package
-→ user review
+DS-05 package ready
+→ user review / approval
 → DS-06 UX architecture
 → art/audio/platform tracks
 → balance/regression
