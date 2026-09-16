@@ -84,7 +84,7 @@ implementation:
     - "biological_0_10_accepted_and_frozen"
     - "iteration_4_ready_not_started"
   technical_foundation_commit: "32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb"
-  biological_0_10_freeze_commit: "pending_current_commit"
+  biological_0_10_freeze_commit: "e0b2f5e8eb9e5433eb6c3b934fa048c7203537b1"
   architecture_status: "accepted"
   content_status: "biological_0_10_frozen_baseline"
   preserved_systems:
