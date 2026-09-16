@@ -166,17 +166,17 @@ Hard rule: `SCR_WORLD` остаётся базовой поверхностью 
 
 **Trigger:** первый AP reward / G008, **не раньше**.  
 **Surface:** `SCR_EVOLUTION`.  
-**Visual state:** переход к раннему `V2_CREATURE`.  
-**Creature:** `C3_EARLY_MULTICELLULAR`.  
-**UI:** впервые появляется AP; optional adaptations получают визуальные previews.  
-**Rule:** никакого AP UI в Iteration 4 / до G008.
+**Visual state:** всё ещё `V1_CELLULAR`; появляется более организованная клеточная колония/coordination preview, но breakthrough Multicellularity ещё не произошёл.  
+**Creature:** `C3_COORDINATED_COLONY`.  
+**UI:** впервые появляется AP; optional adaptations получают previews будущих body traits.  
+**Rule:** никакого AP UI в Iteration 4 / до G008; полноценный `V2_CREATURE` начинается только с G009.
 
 ## PB10 — Multicellularity / ~24–28 мин
 
 **Trigger:** G009 / MS02.  
 **Surface:** `SCR_MILESTONE` → `SCR_WORLD`.  
-**Visual:** `V2_CREATURE`; отдельные клетки собираются в читаемое единое тело.  
-**Creature:** `C4_MULTICELLULAR_ORGANISM`.  
+**Visual transition:** `V1_CELLULAR` → `V2_CREATURE`; coordinated colony собирается в читаемое единое тело.  
+**Creature:** `C3_COORDINATED_COLONY` → `C4_MULTICELLULAR_ORGANISM`.  
 **Title:** `МНОГОКЛЕТОЧНОСТЬ`.  
 **Camera:** расширяется настолько, чтобы тело читалось целиком.  
 **Transition:** colony/cluster → coordinated organism.
@@ -412,7 +412,7 @@ C0 proto-chemistry
 → C1 protocell
 → C2 cell
 → C2A/B/C primary-trait cell
-→ C3 early multicellular form
+→ C3 coordinated colony / pre-multicellular state
 → C4 multicellular organism
 → C5 adapted organism
 → C6 cognitive organism
@@ -422,7 +422,7 @@ C0 proto-chemistry
 
 Primary trait must remain visually inherited unless a later explicit meta system replaces/hybridizes it.
 
-AP adaptations modify parts/features of the current body. They do not reset the species to a new unrelated design.
+AP adaptations modify/preview parts/features of the emerging body plan. They do not cause the Multicellularity breakthrough before G009 and do not reset the species to a new unrelated design.
 
 ---
 
@@ -487,6 +487,7 @@ No final mass asset generation before this manifest exists.
 - [x] every major G001–G024 phase has a presentation state
 - [x] RNA/DNA/Cell canon preserved
 - [x] AP appears only from G008
+- [x] G008 does not visually pre-empt the G009 Multicellularity breakthrough
 - [x] Cognition appears only after Nervous System
 - [x] primary biological branch changes creature presentation
 - [x] Sapience includes an explicit scale change from organism to group
