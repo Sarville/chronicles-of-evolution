@@ -1,7 +1,7 @@
 # Хроники Эволюции — экономика первых 120 минут
 
 **Версия:** reconciliation balance spec v2.0  
-**Статус:** canonical structure / biological numbers pending re-balance  
+**Статус:** canonical / biological 0–10 frozen / later phases provisional  
 **Authority:** `DECISIONS_RECONCILIATION.md` + `01_FIRST_120_MINUTES.md`.
 
 > Economy описывает **как сбалансировать утверждённый gameplay**. Она больше не может вводить новые visible resources, generators или progression nodes ради удобства симуляции.
@@ -186,20 +186,39 @@ primordial manual process
 
 ### Biological tuning status
 
-Exact numbers are intentionally **TBD until Rework Iteration simulation**.
+Biological 0–10 numeric baseline is **frozen**. 10–18 and later biological numbers remain provisional.
 
-Required tuning constraints:
+Frozen constraints:
 
 - first passive RNA <60 sec;
 - Self Replication ~2–3 min;
 - DNA visible before ~6 min;
 - Cell ~9–11 min;
-- DNA Synthesis producer output is currently `0.26 DNA/s`;
 - no need to buy arbitrary counts of three abstract molecular generators;
 - optional M04 Error Correction must not become hidden prerequisite;
 - competent path and slower path both remain understandable without hidden catch-up.
 
 The previous measured values `M01 00:45 / M02 02:25 / M06 09:20` are historical results for the superseded E/I ruleset, not targets that constrain the new content.
+
+### Frozen early baseline numbers
+
+| Entity | Value |
+|---|---|
+| Primordial Reaction base output | 0.22 RNA/s |
+| RNA Replication base output | 0.58 RNA/s |
+| DNA Synthesis base output | 0.26 DNA/s |
+| Producer growth | ×1.35 |
+| Producer milestone | count 10 → ×1.15 (no implicit 25/50) |
+| M01 | 9 RNA |
+| M02 | 130 RNA |
+| M03 | 350 RNA |
+| M04 | 450 RNA + 120 DNA |
+| M05 | 520 RNA + 90 DNA |
+| M06 | 930 RNA + 205 DNA |
+| Manual RNA | productionSeconds = 1.5 |
+| Manual DNA | 18 RNA → 3 DNA, cooldown 45s |
+
+**DNA Synthesis output A/B (0.24 vs 0.26):** `0.24` fails the existing `baseline_slow` regression corridor — Cell at 702s exceeds the 690s ceiling in `tests/simulation/spec.js`. `0.26` brings `baseline_slow` Cell to 684s (within corridor) while keeping `competent` Cell at ~10.1 min and manual-assisted DNA economics unchanged (18 RNA → 3 DNA, 45s cooldown, contribution <5%). Kept `0.26`.
 
 ---
 
