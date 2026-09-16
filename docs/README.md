@@ -251,12 +251,14 @@ C0 Proto-chemistry
 → C1 Protocell
 → C2 Cell
 → C2A/B/C Primary Trait
-→ C3 Early Multicellular
+→ C3 Coordinated Colony
 → C4 Multicellular Organism
 → C5 Adapted Organism
 → C6 Cognitive Organism
 → C7 Sapient Species
 ```
+
+G008/AP introduces C3/pre-multicellular coordination and adaptation previews; the actual `V1 → V2` / Multicellularity visual breakthrough belongs to G009/MS02.
 
 Detailed timing and screen mapping: `ux/00_TIMELINE_PRESENTATION_MAP.md`.
 
