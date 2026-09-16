@@ -6,187 +6,150 @@
 
 ---
 
-# Design reconciliation
+# Completed baseline
 
-## Documentation
+- [x] DS-00 — documentation orchestration
+- [x] DS-01 — civilization gameplay contract
+- [x] DS-02 — goals, events and first ending contract
+- [x] DS-03 — technical architecture/data contract
+- [x] DS-04 — meta progression and balance rules
+- [x] original GDD reconciliation
+- [x] biological 0–10 reconciliation implementation
+- [x] biological 0–10 rebalance and live playtest
+- [x] freeze RNA/DNA/Cell baseline
 
-- [x] Design reconciliation audit
-- [x] Restore original biological gameplay language in canonical GDD
-- [x] Reconcile 0–120 progression
-- [x] Restore Adaptation Points
-- [x] Restore Cognition 0–100 / condition-driven Sapience
-- [x] Restore first branch: Absorption / Symbiosis / Shell
-- [x] Preserve Photosynthesis / Chemosynthesis as optional metabolism adaptations
-- [x] Reconcile civilization timing and Power unlock
-- [x] Restore Modern bridge
-- [x] Reconcile Archive/meta rules with new biology
-- [x] Reconcile balance guardrails
-- [x] Update production/technical references
-- [x] Update PROJECT_STATE
-- [x] Approve corrected 0–120 gameplay canon
-- [x] Prepare Codex rework handoff: `docs/production/RECONCILIATION_CODEX_HANDOFF.md`
-
-Documentation reconciliation is accepted and pushed.
-
----
-
-# Implementation status
-
-## Iteration 0 — Repo baseline / audit
-
-- [x] done
-
-## Iteration 1 — Domain adapter and data foundation
-
-- [x] done
-
-## Iteration 2 — Save v1 and dev tools
-
-- [x] done
-
-## Iteration 3 — Goal Engine + tutorial shell
-
-**Technical status:** passed.
-
-Keep:
-
-- [x] isolated Chronicles domain
-- [x] data-driven config/validation
-- [x] canonical GameState
-- [x] commands/events/selectors
-- [x] Goal Engine
-- [x] optional goals
-- [x] CTA/highlight/hint foundation
-- [x] save/autosave/recovery
-- [x] dev speed/tools
-- [x] telemetry hooks
-- [x] headless simulation
-- [x] UI technical prototype
-- [x] build/tests/smoke gates
-
-Accepted implementation baseline:
+Accepted technical baseline commit:
 
 `32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb`
 
-### Superseded Iteration 3 content
+Accepted biological 0–10 freeze reference:
 
-Historical only:
-
-- [x] Energy / Information molecular economy
-- [x] Chemical Gradient
-- [x] Catalytic Fold
-- [x] Energy Pocket
-- [x] Stable Bond old semantics
-- [x] old M01–M06 effects/costs
-- [x] old 0–10 timing simulation
-
-Iteration 3 technical foundation remains successful.
-
----
-
-# DONE — Biological gameplay reconciliation implementation
-
-**Status:** DONE. Biological 0–10 frozen baseline accepted after live playtest.
-
-Use:
-
-`docs/production/RECONCILIATION_CODEX_HANDOFF.md`
-
-Completed Codex tasks:
-
-- [x] create/activate ruleset `timeline1-v2-reconciled`
-- [x] migrate early resource config to RNA / DNA / Biomass hooks
-- [x] remove Information from player-facing spendable resources
-- [x] replace Chemical Gradient / Catalytic Fold / Energy Pocket content
-- [x] change M01–M06 semantics to Stable RNA / Self Replication / DNA Synthesis / Error Correction / Membrane / Cell
-- [x] update G001–G005 content
-- [x] preserve Goal Engine architecture
-- [x] preserve save/recovery architecture
-- [x] add explicit pre-release migration/restart handling for obsolete early content
-- [x] update config validation tests
-- [x] update domain tests
-- [x] update UI smoke tests
-- [x] update headless simulation
-- [x] rebalance 0–10 from scratch
-- [x] competent / optimized / slower simulation profiles pass
-- [x] optional M04 route remains skippable
-- [x] first meaningful action <20 sec
-- [x] passive/self-sustaining RNA <60 sec
-- [x] Self Replication ~2–3 min
-- [x] DNA visible ~4–6 min
-- [x] Cell ~9–11 min
-- [x] manual contribution <=5% after ~3 min
-- [x] manual playtest 0–10
-- [x] user approves corrected playable 0–10
-- [x] generic manual resource framework
-- [x] DNA manual action
-- [x] integer resource display
-- [x] ETA UI
-
-### Findings from 0–10 playtest
-
-- [x] Document repeatable process milestone bonuses with scenario justification, threshold labels and UI wording for the current 0–10 slice.
-- [x] Add generic manual-resource framework note: manual actions may grant/convert resources, passive production remains primary, future reward multipliers are not baseline ads progression.
-- [ ] Before expanding biological economy beyond Cell, define any new repeatable-process milestones per producer; no implicit global `10/25/50` thresholds.
+`e0b2f5e8eb9e5433eb6c3b934fa048c7203537b1`
 
 ---
 
 # Iteration 4 — corrected content after Cell
 
-**Status:** READY. Not started.
+**Status:** DONE — confirmed by user on 2026-09-16.
 
-Expected scope after unblock:
+GitHub did not expose a newer implementation SHA when DS-05 was opened. Do not invent one; add the actual reference when it becomes available.
 
-- [ ] Metabolism
-- [ ] Biomass/Energy cellular economy
-- [ ] first primary branch: Absorption / Symbiosis / Shell
-- [ ] optional Photosynthesis / Chemosynthesis adaptations
-- [ ] Protein Synthesis / Ribosome
-- [ ] Organelles
-- [ ] corrected Cell → Multicellularity progression
-- [ ] first AP rewards/hooks
-- [ ] balance/simulation for 10–18
+Scope represented by Iteration 4:
 
----
+- [x] Metabolism / post-Cell progression
+- [x] Biomass/Energy cellular layer
+- [x] first primary branch: Absorption / Symbiosis / Shell
+- [x] post-Cell content expansion
+- [x] Iteration 4 accepted as complete for unlocking design work
 
-# Following biological work
+Still requires later full biological validation where applicable:
 
-## Multicellularity / Adaptation Points
-
-- [ ] full AP reward table
-- [ ] Mobility
-- [ ] Sensory Cells
-- [ ] Digestion
-- [ ] Structural Tissue
-- [ ] Multicellularity target ~24–28 min
-
-## Nervous System / Cognition
-
-- [ ] Nervous System
-- [ ] Behavior choice
-- [ ] Cognition 0–100
-- [ ] Danger / Other micro-events
-- [ ] Sapience condition transition
-- [ ] biological 0–40 end-to-end simulation
-- [ ] target Sapience ~38–40 min
+- [ ] full AP reward/cost table
+- [ ] full Multicellularity / body adaptation pass
+- [ ] Nervous System / Cognition 0–100 end-to-end pass
+- [ ] biological 0–40 simulation
+- [ ] exact optional Photosynthesis/Chemosynthesis tuning if still provisional
 
 ---
 
-# Civilization rebalance after biology
+# CURRENT — DS-05: Timeline #1 full narrative package
+
+**Status:** IN PROGRESS.
+
+Create and reconcile:
+
+- [ ] `docs/scenario/01_TIMELINE_01_SCRIPT.md`
+- [ ] `docs/scenario/04_STORY_EVENTS.md`
+- [ ] `docs/scenario/05_NARRATIVE_FLAGS.md`
+- [ ] `docs/scenario/06_ENDINGS_COPY.md`
+- [ ] `docs/scenario/07_COPY_GUIDE.md`
+
+DS-05 rules:
+
+- [ ] use reconciled RNA → DNA → Cell gameplay language
+- [ ] do not add a new economy or gameplay gate
+- [ ] keep text short and gameplay-readable
+- [ ] preserve Error 17 / `Снова.` / Ash / Archive thread
+- [ ] make Archive voice evolve gradually from neutral system to ambiguous participant
+- [ ] keep Timeline #1 mystery unresolved
+- [ ] align every mandatory scene with G001–G024/event contracts
+- [ ] define Chronicle copy separately from blocking UI copy
+- [ ] preserve first Ash as unavoidable
+- [ ] preserve all three Last Protocol subtypes
+- [ ] end with `АРХИВ ПОМНИТ` / Timeline #2 teaser
+- [ ] user review DS-05
+- [ ] mark DS-05 accepted in `PROJECT_STATE.yaml`
+
+---
+
+# DS-06 — UX architecture and wireframes
+
+**Status:** UNLOCKED; start after or alongside DS-05 review.
+
+- [ ] mobile-first shell
+- [ ] contextual resource presentation
+- [ ] Goal card
+- [ ] Evolution/AP UI
+- [ ] Cognition meter
+- [ ] small-group Sapience → Tribe transition
+- [ ] jobs/buildings phase architecture
+- [ ] Industry Power reveal
+- [ ] Modern bridge
+- [ ] World Tension
+- [ ] Archive/reset UI
+
+---
+
+# Following design sessions
+
+- [ ] DS-07 — Art direction, locations and era transitions
+- [ ] DS-08 — asset manifest and generation prompts
+- [ ] DS-09 — audio design and generation package
+- [ ] DS-10 — analytics/platform readiness
+- [ ] DS-11 — final cross-document consistency / design freeze v2
+
+Dependencies:
+
+```text
+DS-05 + DS-06
+→ DS-07
+→ DS-08
+
+DS-05 + DS-07
+→ DS-09
+
+stable gameplay + UX
+→ DS-10
+
+all tracks + balance/regression
+→ DS-11
+```
+
+---
+
+# Later implementation / balance work
+
+## Biology 0–40
+
+- [ ] validate AP economy
+- [ ] validate Multicellularity target ~24–28 min
+- [ ] validate Nervous System
+- [ ] validate Cognition sources
+- [ ] validate Sapience ~38–40 min
+
+## Civilization 40–108
 
 - [ ] set civilization starting package around Population 5
 - [ ] retune Population growth/thresholds
-- [ ] retune Tribe 38–50
-- [ ] retune Settlement 50–65
+- [ ] validate Tribe 38–50
+- [ ] validate Settlement 50–65
 - [ ] validate City ~78–80
 - [ ] validate Power unlock in Industry
 - [ ] validate Industry ~93–95
-- [ ] implement/validate Modern bridge ~95–104
+- [ ] validate Modern ~95–104
 - [ ] validate Atomic ~107–108
 
----
-
-# Crisis / Archive regression
+## Crisis / Archive
 
 - [ ] regression Stability / World Tension
 - [ ] regression Error 17
@@ -200,24 +163,14 @@ Expected scope after unblock:
 
 ---
 
-# Design sessions after playable rework
-
-- [ ] DS-05 — Timeline #1 full narrative package
-- [ ] DS-06 — UX architecture and wireframes
-- [ ] DS-07 — Art direction
-- [ ] DS-08 — Asset manifest/prompts
-- [ ] DS-09 — Audio
-- [ ] DS-10 — Analytics/platform readiness
-- [ ] DS-11 — final cross-document consistency / design freeze v2
-
----
-
 # Immediate order
 
 ```text
-Biological 0–10 frozen baseline
-→ start Iteration 4 when requested
-→ corrected content expansion after Cell
+Iteration 4 complete
+→ DS-05 narrative package
+→ user review
+→ DS-06 UX architecture
+→ art/audio/platform tracks
+→ balance/regression
+→ DS-11 freeze v2
 ```
-
-Iteration 4 is ready, but not started in the 0–10 freeze cleanup commit.
