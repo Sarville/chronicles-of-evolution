@@ -3,7 +3,7 @@ project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "iteration_4_implemented_pending_manual_playtest"
+  work_mode: "ds05_ready_for_review"
   last_updated: "2026-09-16"
 
 authority:
@@ -19,6 +19,12 @@ authority:
   evolution_tree: "docs/gdd/03_EVOLUTION_TREE.md"
   technical_contract: "docs/technical/00_TECHNICAL_OVERVIEW.md"
   glossary: "docs/GLOSSARY.md"
+  narrative_bible: "docs/scenario/00_NARRATIVE_BIBLE.md"
+  timeline_01_script: "docs/scenario/01_TIMELINE_01_SCRIPT.md"
+  story_events: "docs/scenario/04_STORY_EVENTS.md"
+  narrative_flags: "docs/scenario/05_NARRATIVE_FLAGS.md"
+  endings_copy: "docs/scenario/06_ENDINGS_COPY.md"
+  copy_guide: "docs/scenario/07_COPY_GUIDE.md"
   design_session_plan: "docs/production/DESIGN_SESSION_PLAN.md"
   implementation_plan: "docs/production/IMPLEMENTATION_ITERATION_PLAN.md"
   implementation_handoff: "docs/production/RECONCILIATION_CODEX_HANDOFF.md"
@@ -29,12 +35,12 @@ workflow:
   todo_update_required_at_session_end: true
   decisions_update_when_needed: true
   push_after_approval: true
-  no_game_code_during_design_reconciliation: true
+  no_game_code_during_design_sessions: true
 
 design:
-  current_session: "reconciliation"
-  status: "accepted_documentation_complete"
-  objective: "Restore original readable evolutionary progression while preserving accepted architecture, narrative and meta systems"
+  current_session: "DS-05"
+  status: "ready_for_user_review"
+  objective: "Create the complete Timeline #1 narrative package on top of the reconciled gameplay canon without changing mechanics, economy or progression rules"
   accepted_reconciliation:
     - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
     - "Information removed as player-facing spendable resource"
@@ -62,6 +68,12 @@ design:
     - "docs/gdd/09_ENDINGS_AND_RESET.md"
     - "docs/gdd/10_META_PROGRESSION.md"
     - "docs/gdd/11_BALANCE_RULES.md"
+  narrative_review_documents:
+    - "docs/scenario/01_TIMELINE_01_SCRIPT.md"
+    - "docs/scenario/04_STORY_EVENTS.md"
+    - "docs/scenario/05_NARRATIVE_FLAGS.md"
+    - "docs/scenario/06_ENDINGS_COPY.md"
+    - "docs/scenario/07_COPY_GUIDE.md"
   sessions:
     DS-00: { name: "Documentation orchestration and repository structure", status: done }
     DS-01: { name: "Civilization gameplay contract", status: reconciled }
@@ -69,12 +81,12 @@ design:
     DS-03: { name: "Technical architecture and data contract", status: accepted_architecture_content_refs_reconciled }
     DS-04: { name: "Meta progression and balance rules", status: reconciled }
     RECONCILIATION: { name: "Original GDD design reconciliation", status: accepted }
-    DS-05: { name: "Timeline #1 full narrative package", status: wait_for_iteration_4 }
-    DS-06: { name: "UX architecture and wireframes", status: wait_for_iteration_4 }
-    DS-07: { name: "Art direction, locations and era transitions", status: blocked }
-    DS-08: { name: "Art production manifest and generation prompts", status: blocked }
-    DS-09: { name: "Audio design and generation package", status: blocked }
-    DS-10: { name: "Analytics, platform and production readiness", status: blocked }
+    DS-05: { name: "Timeline #1 full narrative package", status: ready_for_user_review }
+    DS-06: { name: "UX architecture and wireframes", status: unlocked }
+    DS-07: { name: "Art direction, locations and era transitions", status: blocked_by_ds05_ds06 }
+    DS-08: { name: "Art production manifest and generation prompts", status: blocked_by_ds07 }
+    DS-09: { name: "Audio design and generation package", status: blocked_by_ds05_ds07 }
+    DS-10: { name: "Analytics, platform and production readiness", status: blocked_by_gameplay_ux_stability }
     DS-11: { name: "Cross-document consistency pass and design freeze", status: blocked_by_code_rework_and_balance }
 
 implementation:
@@ -82,11 +94,13 @@ implementation:
   status:
     - "iteration_3_technical_foundation_passed"
     - "biological_0_10_accepted_and_frozen"
-    - "iteration_4_implemented_pending_manual_playtest"
+    - "iteration_4_complete_user_confirmed"
   technical_foundation_commit: "32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb"
   biological_0_10_freeze_commit: "e0b2f5e8eb9e5433eb6c3b934fa048c7203537b1"
+  iteration_4_completion_source: "user_confirmed_2026-09-16"
+  iteration_4_completion_commit: "79e7b93ea5bde181ff77ad8c6d281449cc5be1d8"
   architecture_status: "accepted"
-  content_status: "biological_0_10_frozen_baseline"
+  content_status: "post_cell_iteration_4_complete"
   preserved_systems:
     - "isolated src/chronicles domain"
     - "data-driven config and validators"
@@ -107,24 +121,15 @@ implementation:
       name: "Biological gameplay reconciliation implementation"
       status: done
       handoff: "docs/production/RECONCILIATION_CODEX_HANDOFF.md"
-      scope:
-        - "replace current 0-10 E/I content with RNA/DNA/Cell canon"
-        - "migrate config and Goal Engine content"
-        - "preserve architecture"
-        - "update tests and simulation"
-        - "rebalance 0-10 from scratch"
-        - "manual playtest 0-10"
     4:
       name: "First corrected content expansion after Cell"
-      status: implemented_pending_manual_playtest
+      status: done_user_confirmed
+      completion_commit: "79e7b93ea5bde181ff77ad8c6d281449cc5be1d8"
 
 iteration_4:
-  status: "implemented_pending_manual_playtest"
-  unblock_conditions:
-    - "Biological gameplay reconciliation implementation passed"
-    - "0-10 rebalance passed"
-    - "manual 0-10 playtest approved"
-  started: true
+  status: "done_user_confirmed"
+  completion_source: "user confirmation on 2026-09-16"
+  completion_commit: "79e7b93ea5bde181ff77ad8c6d281449cc5be1d8"
   scope:
     - "C01 Metabolism, C02A/B/C first branch (Absorption/Symbiosis/Shell), C03 Protein Synthesis/Ribosome, C04A/B/C optional Photosynthesis/Chemosynthesis/Efficient Digestion, C05 Organelles, C06 Cell Coordination"
     - "PROC_BIOMASS_UPTAKE / PROC_RESPIRATION producers"
@@ -132,15 +137,16 @@ iteration_4:
     - "first AP hook: 1 AP granted on C06 Cell Coordination (grant_resource, no new engine code)"
     - "fixed dangling energy.visibleFromEra ('METABOLISM' -> 'CELLULAR'), added 'ap' resource, added energy/ap to CELLULAR/MULTICELLULAR activeResources"
     - "dev/simulation.js generalized past M06 through C06, plus a Symbiosis (C02B) branch-variant profile"
-  gate:
+  automated_gate:
     - "npm run test:config / test:domain / test:sim / test:ui / test / smoke / build all pass"
     - "competent-profile simulation: Metabolism ~11.3min, branch ~12.1min, Protein Synthesis ~13.75min, Organelles ~14.75min, Cell Coordination ~15.9min (all profiles land inside the ~10-18min target, no rebalance needed)"
-    - "manual 10-18 playtest: NOT YET DONE — required before this iteration can be marked done"
+  note: "Closed by direct user confirmation on 2026-09-16, ahead of a manual 10-18 playtest pass. Automated tests/simulation/build back the implementation; treat exact 10-18 numbers as provisional (see balance.biological_10_18) until an actual playtest happens."
 
 balance:
   ruleset_target: "timeline1-v2-reconciled"
   old_0_10_ei_balance: "historical_superseded"
   biological_numbers: "0_10_frozen_baseline"
+  post_cell_numbers: "iteration_4_implemented_pending_full_0_40_validation"
   civilization_numbers: "provisional_until_full_rebalance"
   crisis_contract: "accepted_pending_regression"
   biological_0_10:
@@ -161,8 +167,8 @@ balance:
     note: "C01/C02x/C03/C04x/C05/C06 costs and effects, PROC_BIOMASS_UPTAKE/PROC_RESPIRATION rates, and the first 1 AP grant are simulation-validated but not yet playtest-frozen; do not treat as accepted until manual playtest passes."
 
 open_decisions:
-  - "Biomass/Energy/AP rates for 18-40 (post Cell Coordination, Multicellularity onward) remain open; 10-18 values are provisional-implemented and simulation-validated only, pending manual playtest"
-  - "Full AP reward/cost table for Iteration 5 body adaptations (Mobility/Sensory/Digestion/Structural Tissue); only the first 1 AP grant on Cell Coordination is implemented so far"
+  - "Exact AP reward/cost table beyond implemented Iteration 4 scope"
+  - "Exact optional Photosynthesis/Chemosynthesis effects if still provisional after Iteration 4"
   - "Exact civilization starting F/M/K package and population thresholds after Population~5 start"
   - "Which civilization specializations remain paid branches versus profile/event choices"
   - "Exact Timeline #2 p50 after corrected Timeline #1 simulation"
@@ -170,6 +176,6 @@ open_decisions:
   - "Exact Yandex/VK SDK mapping and cloud policy"
 
 next_action:
-  owner: "Codex"
-  session: "Iteration 4 manual playtest"
-  description: "Iteration 4 content (Cell -> Cell Coordination) is implemented and simulation-validated; do NOT start Iteration 5 until manual 10-18 playtest is run and the user approves. Biological 0-10 remains frozen; do not alter it without regression/playtest evidence."
+  owner: "User"
+  session: "DS-05 review"
+  description: "Review the Timeline #1 narrative package. On approval, mark DS-05 accepted and proceed to DS-06 UX architecture."

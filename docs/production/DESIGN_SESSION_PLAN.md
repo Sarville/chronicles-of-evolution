@@ -1,6 +1,6 @@
 # Хроники Эволюции — план дизайн-сессий
 
-**Версия:** reconciliation revision 2.1  
+**Версия:** DS-05 revision 3.0  
 **Статус:** active plan.
 
 ---
@@ -27,20 +27,15 @@ Codex must not invent gameplay design to fill documentation gaps.
 - **DS-02 — Goals, events and first ending:** reconciled.
 - **DS-03 — Technical architecture/data contract:** accepted architecture; content references reconciled.
 - **DS-04 — Meta progression/balance:** reconciled.
+- **RECONCILIATION — Original GDD reconciliation:** accepted.
 
 DS-03 architecture remains authoritative for domain/save/testing boundaries.
 
 ---
 
-# 3. RECONCILIATION — Original GDD design reconciliation
+# 3. Reconciled gameplay baseline
 
-**Status:** ACCEPTED / documentation complete.
-
-## Goal
-
-Restore original readable gameplay progression while preserving useful architecture, narrative and meta systems.
-
-## Accepted progression
+Accepted progression:
 
 ```text
 RNA → replication → DNA → membrane → Cell
@@ -50,7 +45,7 @@ RNA → replication → DNA → membrane → Cell
 → Tribe → Settlement → City → Industry → Modern → Atomic → Crisis → Ash → Archive
 ```
 
-## Accepted retained systems
+Accepted retained systems:
 
 - Goal Engine;
 - data-driven config;
@@ -67,59 +62,77 @@ RNA → replication → DNA → membrane → Cell
 - idempotent reset;
 - Timeline #2.
 
-## Outputs
-
-- `docs/DECISIONS_RECONCILIATION.md`;
-- reconciled `gdd/01..11`;
-- reconciled production/technical references;
-- updated Glossary/README/PROJECT_STATE/TODO.
-
-## Gate
-
-Passed by user approval on 2026-09-16.
-
 ---
 
-# 4. Current implementation checkpoint — Biological Rework
+# 4. Implementation checkpoint
 
-**Status:** READY.
+## Biological 0–10 reconciliation
 
-This is the next work block before any new content expansion.
+**Status:** DONE / frozen baseline accepted.
 
-Required sequence:
+Completed:
 
-1. prepare Codex handoff;
-2. rework playable 0–10 to RNA→DNA→Cell;
-3. rebalance headlessly;
-4. manual playtest;
-5. user approves corrected playable;
-6. unlock Iteration 4.
+1. RNA→DNA→Cell playable rework;
+2. headless rebalance;
+3. manual playtest;
+4. user approval;
+5. 0–10 freeze.
 
-Iteration 4 remains blocked until this checkpoint passes.
+## Iteration 4 — corrected content after Cell
+
+**Status:** DONE — user confirmed 2026-09-16.
+
+The repository did not expose a newer implementation SHA when DS-05 was opened, so the state keeps the completion commit as `pending_remote_reference` rather than inventing one.
+
+Iteration 4 completion unlocks DS-05 and DS-06.
 
 ---
 
 # 5. DS-05 — Timeline #1 full narrative package
 
-**Status:** wait for corrected playable 0–10.
+**Status:** READY FOR USER REVIEW.
 
-Create:
+Created:
 
-- `scenario/01_TIMELINE_01_SCRIPT.md`;
-- `scenario/04_STORY_EVENTS.md`;
-- `scenario/05_NARRATIVE_FLAGS.md`;
-- `scenario/06_ENDINGS_COPY.md`;
-- `scenario/07_COPY_GUIDE.md`.
+- `docs/scenario/01_TIMELINE_01_SCRIPT.md`;
+- `docs/scenario/04_STORY_EVENTS.md`;
+- `docs/scenario/05_NARRATIVE_FLAGS.md`;
+- `docs/scenario/06_ENDINGS_COPY.md`;
+- `docs/scenario/07_COPY_GUIDE.md`.
 
-Must use reconciled gameplay language and timings.
+## DS-05 contract
 
-Keep Error 17 / Again / Ash / Archive thread.
+The package:
+
+- follows reconciled gameplay language and timings;
+- does not change economy or gameplay gates;
+- defines the full 0–120 narrative flow;
+- makes Archive voice evolve from neutral system to ambiguous participant;
+- preserves `Следы до нас`;
+- preserves Error 17 → `Снова.` → Ash → Archive thread;
+- preserves unavoidable first Ash;
+- defines all three Last Protocol subtypes;
+- defines implementation-ready narrative flags;
+- ends on `АРХИВ ПОМНИТ` and the first `Мы можем изменить результат.`;
+- leaves the core Archive/Filter mystery unresolved.
+
+## Gate
+
+Pending explicit user review/approval.
+
+After approval:
+
+- mark DS-05 accepted in `PROJECT_STATE.yaml`;
+- mark DS-05 done in `TODO.md`;
+- narrative package becomes authoritative for Timeline #1 implementation copy.
 
 ---
 
 # 6. DS-06 — UX architecture and wireframes
 
-**Status:** wait for corrected playable 0–10.
+**Status:** UNLOCKED.
+
+May start after DS-05 review; can technically run in parallel, but sequential review reduces rework.
 
 Must include:
 
@@ -141,7 +154,7 @@ No Energy/Information molecular top bar.
 
 # 7. DS-07 — Art direction
 
-Blocked until DS-05 + DS-06.
+**Status:** blocked by DS-05 + DS-06.
 
 Visual states must distinguish:
 
@@ -163,7 +176,7 @@ Visual states must distinguish:
 
 # 8. DS-08 — Art production manifest
 
-Blocked until DS-07.
+**Status:** blocked by DS-07.
 
 Create stable asset IDs, formats, layer rules and generation prompts.
 
@@ -171,7 +184,7 @@ Create stable asset IDs, formats, layer rules and generation prompts.
 
 # 9. DS-09 — Audio
 
-Blocked until DS-05 + DS-07.
+**Status:** blocked by DS-05 + DS-07.
 
 Audio arc follows reconciled eras and crisis/ending progression.
 
@@ -179,7 +192,7 @@ Audio arc follows reconciled eras and crisis/ending progression.
 
 # 10. DS-10 — Analytics/platform readiness
 
-Blocked until gameplay/UX contracts stabilize.
+**Status:** blocked until gameplay/UX contracts stabilize.
 
 Telemetry must include:
 
@@ -197,8 +210,7 @@ Telemetry must include:
 
 Final freeze only after:
 
-- biological rework accepted;
-- 0–40 simulation passes;
+- biological 0–40 simulation passes;
 - civilization rebalance passes;
 - crisis regression passes;
 - narrative/UX/art/audio/platform docs align.
@@ -223,11 +235,12 @@ Result:
 # 12. Current order
 
 ```text
-Prepare Codex biological rework handoff
-→ rework 0–10
-→ rebalance/manual playtest
-→ corrected Iteration 4
-→ DS-05 / DS-06
-→ art/audio/platform tracks
+Iteration 4 complete
+→ DS-05 user review
+→ DS-06 UX architecture
+→ DS-07 art direction
+→ DS-08 assets / DS-09 audio
+→ DS-10 analytics/platform
+→ balance/regression
 → DS-11 freeze v2
 ```
