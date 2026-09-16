@@ -176,6 +176,7 @@ export function validateRuleset(ruleset) {
     'manual_process_completed',
     'era_reached',
     'flag_set',
+    'branch_selected',
   ]);
   const rewardTypes = new Set(['grant_resource', 'reveal_entity', 'set_flag']);
 
@@ -255,6 +256,9 @@ export function validateRuleset(ruleset) {
       }
       if (condition.eraId && !indexes.eras[condition.eraId]) {
         errors.push(`${goal.id} condition references unknown era ${condition.eraId}`);
+      }
+      if (condition.branchGroup && !ruleset.branchGroups[condition.branchGroup]) {
+        errors.push(`${goal.id} condition references unknown branch group ${condition.branchGroup}`);
       }
     }
     for (const reward of goal.rewards || []) {

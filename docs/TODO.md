@@ -35,15 +35,25 @@ Accepted biological 0–10 freeze reference:
 Scope implemented:
 
 - [x] Metabolism (C01)
-- [x] Biomass/Energy cellular economy (PROC_BIOMASS_UPTAKE, PROC_RESPIRATION; fixed dangling `energy.visibleFromEra`, added `ap` resource)
+- [x] Biomass/Energy cellular economy (PROC_BIOMASS_UPTAKE, PROC_RESPIRATION; fixed dangling `energy.visibleFromEra`)
 - [x] first primary branch: Absorption / Symbiosis / Shell (C02A/B/C)
 - [x] optional Photosynthesis / Chemosynthesis / Efficient Digestion adaptations (C04A/B/C)
 - [x] Protein Synthesis / Ribosome (C03)
 - [x] Organelles (C05)
 - [x] Cell Coordination (C06) — trunk stops here; Multicellularity itself is Iteration 5
-- [x] first AP hook: 1 AP granted on C06 completion (reuses existing `grant_resource` goal reward, no new engine code)
 - [x] balance/simulation for 10–18: `npm run test:sim` extended with C0x timings across all profiles plus a new Symbiosis (C02B) branch-variant profile; all profiles land inside 10–18 min on first pass
 - [ ] manual 10–18 playtest — not yet run; closed by direct user confirmation ahead of this step, so treat exact 10–18 numbers as provisional until it happens
+
+### DS-05 consistency fix (2026-09-16, same day)
+
+Checking DS-05 against the implementation found that `goals.js` had wired `C01/C03/C05/C06` to `G006-G009` purely by node order, colliding with the canonical goal contract in `docs/gdd/07_GOALS_AND_MILESTONES.md` (G008 = Adaptation Points, G009 = Multicellularity/MS02 — neither exists yet) and with `docs/scenario/01_TIMELINE_01_SCRIPT.md`'s scene beats. Corrected in the same session:
+
+- [x] `G006` = composite condition (`C01` completed AND a branch selected) — matches the script's branch-choice-then-`G006 completed` beat
+- [x] `G007` = `C06` completion (folds Protein Synthesis + Organelles + Cell Coordination into one "cellular systems" goal, per canon) — `C03`/`C05` no longer carry their own `goalId`
+- [x] removed the old `G008`/`G009` (wrongly Organelles / Cell Coordination) and the premature 1 AP grant + `ap` resource + `MS_CELL_COORDINATION` milestone that rode on them — AP stays Iteration 5 scope (canon: first AP grant is part of `G008`, ~20–24 min)
+- [x] added `run.bio.primary_trait` / `run.bio.absorption|symbiosis|shell` / `run.bio.metabolism.photosynthesis|chemosynthesis` flags on the relevant node purchases, per `docs/scenario/05_NARRATIVE_FLAGS.md`
+- [x] added two small engine primitives to support the above: `branch_selected` goal condition, `set_flag` node effect
+- [x] all automated gates re-run and green
 
 Later full biological validation still includes:
 

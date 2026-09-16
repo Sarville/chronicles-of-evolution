@@ -147,11 +147,16 @@ for (const nodeId of ['M01', 'M02', 'M03', 'M05', 'M06', 'C01']) {
   result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId });
   assert.equal(result.ok, true);
 }
+assert.equal(branchEngine.state.run.goals.states.G006.status, 'active');
 assert.deepEqual(selectNodeCost(branchEngine.state, ruleset, 'C02A'), { biomass: 30 });
 result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C02A' });
 assert.equal(result.ok, true);
 assert.equal(branchEngine.state.run.nodes.selectedBranchByGroup.cell_identity_1, 'C02A');
 assert.equal(selectNodeStatus(branchEngine.state, ruleset, 'C02B'), 'locked');
+assert.equal(branchEngine.state.run.flags['run.bio.primary_trait'], 'absorption');
+assert.equal(branchEngine.state.run.flags['run.bio.absorption'], true);
+assert.equal(branchEngine.state.run.goals.states.G006.status, 'archived');
+assert.equal(branchEngine.state.run.goals.states.G007.status, 'active');
 assert.deepEqual(selectVisibleResources(branchEngine.state, ruleset).map((resource) => resource.id), [
   'rna',
   'dna',
@@ -162,24 +167,26 @@ assert.deepEqual(selectVisibleResources(branchEngine.state, ruleset).map((resour
 assert.equal(selectNodeStatus(branchEngine.state, ruleset, 'C03'), 'available_affordable');
 result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C03' });
 assert.equal(result.ok, true);
-assert.equal(branchEngine.state.run.goals.states.G007.status, 'archived');
+assert.equal(branchEngine.state.run.goals.states.G007.status, 'active');
 
 result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C04A' });
 assert.equal(result.ok, true);
+assert.equal(branchEngine.state.run.flags['run.bio.metabolism.photosynthesis'], true);
 result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C04B' });
 assert.equal(result.ok, true);
+assert.equal(branchEngine.state.run.flags['run.bio.metabolism.chemosynthesis'], true);
 result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C04C' });
 assert.equal(result.ok, true);
 assert.equal(branchEngine.state.run.nodes.completed.C05, undefined);
 
 result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C05' });
 assert.equal(result.ok, true);
+assert.equal(branchEngine.state.run.goals.states.G007.status, 'active');
 assert.equal(branchEngine.state.run.resources.ap, undefined);
 result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'C06' });
 assert.equal(result.ok, true);
-assert.equal(branchEngine.state.run.resources.ap.amount, 1);
-assert.equal(branchEngine.state.run.flags['milestone.cell_coordination_reached'], true);
-assert.equal(branchEngine.state.run.goals.states.G009.status, 'archived');
+assert.equal(branchEngine.state.run.resources.ap, undefined);
+assert.equal(branchEngine.state.run.goals.states.G007.status, 'archived');
 
 const cultureBranchEngine = createChroniclesEngine({ ruleset });
 cultureBranchEngine.state.run.eraId = 'EARLY_CIV';

@@ -101,7 +101,11 @@ export const nodes = [
     labelKey: 'node.C02A',
     cost: { biomass: 30 },
     requiresNodes: ['C01'],
-    effects: [{ type: 'resource_production_multiplier', resourceId: 'biomass', value: 1.18 }],
+    effects: [
+      { type: 'resource_production_multiplier', resourceId: 'biomass', value: 1.18 },
+      { type: 'set_flag', flag: 'run.bio.primary_trait', value: 'absorption' },
+      { type: 'set_flag', flag: 'run.bio.absorption', value: true },
+    ],
   },
   {
     id: 'C02B',
@@ -112,7 +116,11 @@ export const nodes = [
     labelKey: 'node.C02B',
     cost: { biomass: 30, energy: 8 },
     requiresNodes: ['C01'],
-    effects: [{ type: 'global_production_multiplier', value: 1.12 }],
+    effects: [
+      { type: 'global_production_multiplier', value: 1.12 },
+      { type: 'set_flag', flag: 'run.bio.primary_trait', value: 'symbiosis' },
+      { type: 'set_flag', flag: 'run.bio.symbiosis', value: true },
+    ],
   },
   {
     id: 'C02C',
@@ -123,7 +131,11 @@ export const nodes = [
     labelKey: 'node.C02C',
     cost: { biomass: 28, dna: 16 },
     requiresNodes: ['C01'],
-    effects: [{ type: 'producer_cost_multiplier', producerTag: 'biomass', value: 0.9 }],
+    effects: [
+      { type: 'producer_cost_multiplier', producerTag: 'biomass', value: 0.9 },
+      { type: 'set_flag', flag: 'run.bio.primary_trait', value: 'shell' },
+      { type: 'set_flag', flag: 'run.bio.shell', value: true },
+    ],
   },
   {
     id: 'C03',
@@ -134,7 +146,6 @@ export const nodes = [
     cost: { biomass: 55, energy: 20 },
     requiresAnyBranchGroup: 'cell_identity_1',
     effects: [{ type: 'resource_production_multiplier', resourceId: 'energy', value: 1.25 }],
-    goalId: 'G007',
   },
   {
     id: 'C04A',
@@ -144,7 +155,10 @@ export const nodes = [
     labelKey: 'node.C04A',
     cost: { energy: 40 },
     requiresNodes: ['C01'],
-    effects: [{ type: 'resource_production_multiplier', resourceId: 'energy', value: 1.15 }],
+    effects: [
+      { type: 'resource_production_multiplier', resourceId: 'energy', value: 1.15 },
+      { type: 'set_flag', flag: 'run.bio.metabolism.photosynthesis', value: true },
+    ],
   },
   {
     id: 'C04B',
@@ -154,7 +168,10 @@ export const nodes = [
     labelKey: 'node.C04B',
     cost: { biomass: 45 },
     requiresNodes: ['C01'],
-    effects: [{ type: 'resource_production_multiplier', resourceId: 'energy', value: 1.15 }],
+    effects: [
+      { type: 'resource_production_multiplier', resourceId: 'energy', value: 1.15 },
+      { type: 'set_flag', flag: 'run.bio.metabolism.chemosynthesis', value: true },
+    ],
   },
   {
     id: 'C04C',
@@ -175,7 +192,6 @@ export const nodes = [
     cost: { biomass: 90, energy: 35 },
     requiresNodes: ['C03'],
     effects: [{ type: 'global_production_multiplier', value: 1.15 }],
-    goalId: 'G008',
   },
   {
     id: 'C06',
@@ -186,7 +202,7 @@ export const nodes = [
     cost: { biomass: 140, energy: 60, dna: 80 },
     requiresNodes: ['C05'],
     effects: [{ type: 'global_production_multiplier', value: 1.1 }],
-    goalId: 'G009',
+    goalId: 'G007',
   },
   {
     id: 'T01A',

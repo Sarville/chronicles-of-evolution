@@ -27,6 +27,9 @@ export function applyEffects(state, effects = [], source = {}) {
     if (effect.type === 'unlock_building') {
       state.run.flags[`run.unlock.building.${effect.buildingId}`] = true;
     }
+    if (effect.type === 'set_flag') {
+      state.run.flags[effect.flag] = effect.value;
+    }
   }
 }
 

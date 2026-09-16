@@ -16,6 +16,8 @@ export function conditionMet(state, condition) {
       return (state.run.producers[condition.producerId]?.count || 0) >= condition.count;
     case 'node_completed':
       return Boolean(state.run.nodes.completed[condition.nodeId]);
+    case 'branch_selected':
+      return Boolean(state.run.nodes.selectedBranchByGroup[condition.branchGroup]);
     case 'manual_process_completed':
       return (state.run.manualProcesses[condition.processId]?.uses || 0) >= (condition.count || 1);
     case 'era_reached':

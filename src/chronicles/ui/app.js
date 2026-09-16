@@ -29,7 +29,6 @@ const RESOURCE_NAMES = {
   dna: 'DNA',
   biomass: 'Biomass',
   energy: 'Energy',
-  ap: 'Adaptation Points',
 };
 const NODE_NAMES = {
   M01: 'Stable RNA',

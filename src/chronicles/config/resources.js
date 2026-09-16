@@ -24,12 +24,6 @@ export const resources = [
     visibleFromEra: 'CELLULAR',
   },
   {
-    id: 'ap',
-    labelKey: 'resource.ap',
-    initialAmount: 0,
-    visibleFromEra: 'CELLULAR',
-  },
-  {
     id: 'food',
     labelKey: 'resource.food',
     initialAmount: 0,

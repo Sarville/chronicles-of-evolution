@@ -6,6 +6,7 @@ export const effectSupport = {
   producer_cost_multiplier: { status: 'supported' },
   unlock_building: { status: 'supported' },
   manual_gain_multiplier: { status: 'supported' },
+  set_flag: { status: 'supported' },
   job_output_multiplier: { status: 'deferred', until: 'jobs_system' },
 };
 

@@ -133,14 +133,17 @@ iteration_4:
   scope:
     - "C01 Metabolism, C02A/B/C first branch (Absorption/Symbiosis/Shell), C03 Protein Synthesis/Ribosome, C04A/B/C optional Photosynthesis/Chemosynthesis/Efficient Digestion, C05 Organelles, C06 Cell Coordination"
     - "PROC_BIOMASS_UPTAKE / PROC_RESPIRATION producers"
-    - "G006-G009 chapter goals + 3 optional C04x side goals"
-    - "first AP hook: 1 AP granted on C06 Cell Coordination (grant_resource, no new engine code)"
-    - "fixed dangling energy.visibleFromEra ('METABOLISM' -> 'CELLULAR'), added 'ap' resource, added energy/ap to CELLULAR/MULTICELLULAR activeResources"
+    - "G006 = Metabolism + branch resolved (composite), G007 = Protein Synthesis + Organelles + Cell Coordination (C06), matching docs/gdd/07_GOALS_AND_MILESTONES.md and docs/scenario/01_TIMELINE_01_SCRIPT.md exactly; 3 optional C04x side goals"
+    - "run.bio.primary_trait / run.bio.absorption|symbiosis|shell and run.bio.metabolism.photosynthesis|chemosynthesis flags set on branch/optional-node purchase, per docs/scenario/05_NARRATIVE_FLAGS.md"
+    - "AP resource and its first grant deliberately NOT implemented yet: canon ties it to G008 (~20-24min, Multicellularity track) which is Iteration 5 scope"
+    - "fixed dangling energy.visibleFromEra ('METABOLISM' -> 'CELLULAR')"
     - "dev/simulation.js generalized past M06 through C06, plus a Symbiosis (C02B) branch-variant profile"
+  consistency_fix_2026-09-16:
+    - "Initial implementation (79e7b93e) wired C01/C03/C05/C06 to goalIds G006-G009 directly by node order, colliding with the canonical G006-G009 contract in docs/gdd/07_GOALS_AND_MILESTONES.md and docs/scenario/01_TIMELINE_01_SCRIPT.md (G008=AP/adaptations, G009=Multicellularity MS02, neither of which exists yet). Found while checking DS-05 narrative consistency and corrected in the same session: goals.js now has exactly G006 (composite: C01 + branch_selected) and G007 (nodeId C06, folds Protein Synthesis+Organelles+Cell Coordination); the premature 1 AP grant, the 'ap' resource, and the invented MS_CELL_COORDINATION milestone were removed. Added two small reusable engine primitives: 'branch_selected' goal condition and 'set_flag' node effect (used for the run.bio.* flags above)."
   automated_gate:
     - "npm run test:config / test:domain / test:sim / test:ui / test / smoke / build all pass"
-    - "competent-profile simulation: Metabolism ~11.3min, branch ~12.1min, Protein Synthesis ~13.75min, Organelles ~14.75min, Cell Coordination ~15.9min (all profiles land inside the ~10-18min target, no rebalance needed)"
-  note: "Closed by direct user confirmation on 2026-09-16, ahead of a manual 10-18 playtest pass. Automated tests/simulation/build back the implementation; treat exact 10-18 numbers as provisional (see balance.biological_10_18) until an actual playtest happens."
+    - "competent-profile simulation: Metabolism ~11.3min, branch ~12.1min, Protein Synthesis ~13.75min, Organelles ~14.75min, Cell Coordination ~15.9min (G006 target 11-14min, G007 target 15-20min per canon: both hit)"
+  note: "Closed by direct user confirmation on 2026-09-16, ahead of a manual 10-18 playtest pass. Automated tests/simulation/build back the implementation, and goal-ID alignment with GDD/DS-05 canon is now verified; treat exact 10-18 numbers as provisional (see balance.biological_10_18) until an actual playtest happens."
 
 balance:
   ruleset_target: "timeline1-v2-reconciled"
@@ -164,7 +167,7 @@ balance:
   biological_10_18:
     status: "provisional_implemented_pending_manual_playtest"
     freeze_scope: []
-    note: "C01/C02x/C03/C04x/C05/C06 costs and effects, PROC_BIOMASS_UPTAKE/PROC_RESPIRATION rates, and the first 1 AP grant are simulation-validated but not yet playtest-frozen; do not treat as accepted until manual playtest passes."
+    note: "C01/C02x/C03/C04x/C05/C06 costs and effects and PROC_BIOMASS_UPTAKE/PROC_RESPIRATION rates are simulation-validated but not yet playtest-frozen; do not treat as accepted until manual playtest passes. AP is intentionally not implemented in this slice (canon ties the first AP grant to G008, Iteration 5)."
 
 open_decisions:
   - "Exact AP reward/cost table beyond implemented Iteration 4 scope"
