@@ -138,6 +138,24 @@ After ~3 min:
 manual contribution <= 5% of competent optimal income
 ```
 
+## Biological 0–10 frozen baseline
+
+The biological 0–10 slice is frozen after successful live playtest and simulation verification.
+
+Freeze scope:
+
+- M01–M06;
+- RNA/DNA producer economics;
+- producer milestone thresholds and multipliers;
+- manual RNA;
+- manual DNA;
+- canonical 9–11 min Cell pacing;
+- basic World/Evolution UX;
+- integer stock display;
+- ETA semantics.
+
+Further changes to this range require regression or playtest evidence.
+
 ---
 
 # 5. 0–12 — RNA → DNA → Cell

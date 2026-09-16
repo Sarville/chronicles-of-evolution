@@ -3,7 +3,7 @@ project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "reconciliation_accepted_code_rework_ready"
+  work_mode: "biological_0_10_frozen_iteration_4_ready"
   last_updated: "2026-09-16"
 
 authority:
@@ -69,8 +69,8 @@ design:
     DS-03: { name: "Technical architecture and data contract", status: accepted_architecture_content_refs_reconciled }
     DS-04: { name: "Meta progression and balance rules", status: reconciled }
     RECONCILIATION: { name: "Original GDD design reconciliation", status: accepted }
-    DS-05: { name: "Timeline #1 full narrative package", status: wait_for_playable_rework }
-    DS-06: { name: "UX architecture and wireframes", status: wait_for_playable_rework }
+    DS-05: { name: "Timeline #1 full narrative package", status: wait_for_iteration_4 }
+    DS-06: { name: "UX architecture and wireframes", status: wait_for_iteration_4 }
     DS-07: { name: "Art direction, locations and era transitions", status: blocked }
     DS-08: { name: "Art production manifest and generation prompts", status: blocked }
     DS-09: { name: "Audio design and generation package", status: blocked }
@@ -81,11 +81,11 @@ implementation:
   current_iteration: 3
   status:
     - "iteration_3_technical_foundation_passed"
-    - "playable_0_10_requires_content_reconciliation"
-    - "biological_0_10_verified_with_data_driven_milestones_and_generic_manual_actions"
+    - "biological_0_10_accepted_and_frozen"
+    - "iteration_4_ready_not_started"
   accepted_implementation_commit: "32c0d72f56f48a21e3c22c8e3eb9ef3975e967fb"
   architecture_status: "accepted"
-  content_status: "0_10_superseded_by_reconciliation"
+  content_status: "biological_0_10_frozen_baseline"
   preserved_systems:
     - "isolated src/chronicles domain"
     - "data-driven config and validators"
@@ -101,10 +101,10 @@ implementation:
     0: { name: "Repo baseline and code audit", status: done }
     1: { name: "Domain adapter and data foundation", status: done }
     2: { name: "Save v1 and dev tools", status: done }
-    3: { name: "Goal Engine + tutorial shell + superseded early content", status: technically_done_content_rework_required }
+    3: { name: "Goal Engine + tutorial shell + biological 0-10 frozen baseline", status: done }
     reconciliation_rework:
       name: "Biological gameplay reconciliation implementation"
-      status: ready
+      status: done
       handoff: "docs/production/RECONCILIATION_CODEX_HANDOFF.md"
       scope:
         - "replace current 0-10 E/I content with RNA/DNA/Cell canon"
@@ -115,21 +115,34 @@ implementation:
         - "manual playtest 0-10"
     4:
       name: "First corrected content expansion after Cell"
-      status: blocked_by_reconciliation_rework
+      status: ready
 
 iteration_4:
-  status: "blocked_by_reconciliation_rework"
+  status: "ready"
   unblock_conditions:
-    - "Biological gameplay reconciliation implementation passes"
-    - "0-10 rebalance passes"
+    - "Biological gameplay reconciliation implementation passed"
+    - "0-10 rebalance passed"
     - "manual 0-10 playtest approved"
+  started: false
 
 balance:
   ruleset_target: "timeline1-v2-reconciled"
   old_0_10_ei_balance: "historical_superseded"
-  biological_numbers: "0_10_verified_stop_at_cell"
+  biological_numbers: "0_10_frozen_baseline"
   civilization_numbers: "provisional_until_full_rebalance"
   crisis_contract: "accepted_pending_regression"
+  biological_0_10:
+    status: "accepted_and_frozen"
+    freeze_scope:
+      - "M01-M06"
+      - "RNA/DNA producer economics"
+      - "producer milestone thresholds and multipliers"
+      - "manual RNA"
+      - "manual DNA"
+      - "canonical 9-11 min Cell pacing"
+      - "basic World/Evolution UX"
+      - "integer stock display"
+      - "ETA semantics"
 
 open_decisions:
   - "Exact RNA/DNA/Biomass/Energy rates and costs for corrected 0-40 biological phase"
@@ -143,5 +156,5 @@ open_decisions:
 
 next_action:
   owner: "Codex"
-  session: "Biological gameplay reconciliation 0-10"
-  description: "Use docs/production/RECONCILIATION_CODEX_HANDOFF.md. Rework 0-10 to RNA/DNA/Cell, rebalance and stop for manual playtest. Do not start Iteration 4."
+  session: "Iteration 4"
+  description: "First corrected content expansion after Cell. Biological 0-10 is frozen; do not alter it without regression/playtest evidence."

@@ -69,6 +69,10 @@ manual contribution <= 5% competent optimal income
 
 Manual actions are resource-agnostic config entries, not hardcoded RNA clicks. A manual action may grant or convert resources, declare cooldown/input/reward data, and support a future reward multiplier at the command layer. Ads/rewarded multipliers must not be required for baseline Timeline #1 progression.
 
+## INV-04A — Frozen biological 0–10 baseline
+
+After the accepted live playtest, biological 0–10 is frozen across M01–M06, RNA/DNA producer economics, explicit milestone values, manual RNA, manual DNA, canonical 9–11 min Cell pacing and the basic World/Evolution UX. Changes in this range require regression or playtest evidence.
+
 ## INV-05 — Optional means optional
 
 An OPTIONAL node must not become mandatory through:

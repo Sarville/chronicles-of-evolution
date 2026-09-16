@@ -35,6 +35,33 @@ export function formatDuration(seconds) {
   return `${remainingSeconds}с`;
 }
 
+export function formatEtaDuration(seconds) {
+  if (!Number.isFinite(seconds) || seconds <= 0) {
+    return '0с';
+  }
+  const totalSeconds = Math.ceil(seconds);
+  if (totalSeconds < 3600) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const remainingSeconds = totalSeconds % 60;
+    if (minutes > 0 && remainingSeconds === 0) {
+      return `${minutes}м`;
+    }
+    if (minutes > 0) {
+      return `${minutes}м ${remainingSeconds}с`;
+    }
+    return `${remainingSeconds}с`;
+  }
+
+  const totalMinutes = Math.ceil(seconds / 60);
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  if (days > 0) {
+    return `${days}д ${hours}ч ${minutes}м`;
+  }
+  return `${hours}ч ${minutes}м`;
+}
+
 export function formatEta(eta) {
   if (!eta || eta.status === 'unavailable') {
     return 'Недоступно';
@@ -42,7 +69,7 @@ export function formatEta(eta) {
   if (eta.status === 'now') {
     return 'Сейчас';
   }
-  return `≈${formatDuration(eta.seconds)}`;
+  return `≈${formatEtaDuration(eta.seconds)}`;
 }
 
 export function selectResourceAmounts(state) {
@@ -73,6 +100,16 @@ export function timeUntilAffordable(state, ruleset, cost) {
     return { status: 'now', seconds: 0, missing };
   }
   return { status: 'waiting', seconds, missing };
+}
+
+export function selectPurchaseEta(state, ruleset, status, cost) {
+  if (status === 'completed') {
+    return null;
+  }
+  if (status === 'locked' || status === 'unknown') {
+    return { status: 'unavailable' };
+  }
+  return timeUntilAffordable(state, ruleset, cost);
 }
 
 export function selectVisibleResources(state, ruleset) {

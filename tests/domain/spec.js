@@ -6,11 +6,13 @@ import { createChroniclesEngine } from '../../src/chronicles/domain/engine.js';
 import {
   formatDuration,
   formatEta,
+  formatEtaDuration,
   formatResourceAmount,
   selectCurrentGoal,
   selectManualProcessView,
   selectNodeCost,
   selectNodeStatus,
+  selectPurchaseEta,
   selectProducerOutputView,
   selectProducerPrice,
   selectProductionRates,
@@ -209,19 +211,28 @@ assert.equal(formatDuration(63), '1м 3с');
 assert.equal(formatDuration(3599), '59м 59с');
 assert.equal(formatDuration(3660), '1ч 1м');
 assert.equal(formatDuration(101040), '1д 4ч 4м');
+assert.equal(formatEtaDuration(45.01), '46с');
+assert.equal(formatEtaDuration(59.01), '1м');
+assert.equal(formatEtaDuration(60.01), '1м 1с');
+assert.equal(formatEtaDuration(3599.1), '1ч 0м');
+assert.equal(formatEtaDuration(3600.1), '1ч 1м');
+assert.equal(formatEtaDuration(86400.1), '1д 0ч 1м');
 
 const etaEngine = createChroniclesEngine({ ruleset });
 etaEngine.state.run.producers.PROC_PRIMORDIAL_REACTION = { count: 1 };
-let eta = timeUntilAffordable(etaEngine.state, ruleset, { rna: 2.2 });
+let eta = selectPurchaseEta(etaEngine.state, ruleset, 'available_unaffordable', { rna: 2.2 });
 assert.equal(eta.status, 'waiting');
 assert.equal(Math.abs(eta.seconds - 10) < 0.000001, true);
 assert.equal(formatEta(eta), '≈10с');
 etaEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 3 });
-assert.equal(timeUntilAffordable(etaEngine.state, ruleset, { rna: 2.2 }).status, 'now');
-assert.equal(formatEta(timeUntilAffordable(etaEngine.state, ruleset, { rna: 2.2 })), 'Сейчас');
-eta = timeUntilAffordable(etaEngine.state, ruleset, { dna: 1 });
+assert.equal(selectPurchaseEta(etaEngine.state, ruleset, 'available_affordable', { rna: 2.2 }).status, 'now');
+assert.equal(formatEta(selectPurchaseEta(etaEngine.state, ruleset, 'available_affordable', { rna: 2.2 })), 'Сейчас');
+eta = selectPurchaseEta(etaEngine.state, ruleset, 'available_unaffordable', { dna: 1 });
 assert.equal(eta.status, 'unavailable');
 assert.equal(formatEta(eta), 'Недоступно');
+assert.equal(formatEta(selectPurchaseEta(etaEngine.state, ruleset, 'locked', { rna: 100 })), 'Недоступно');
+assert.equal(selectPurchaseEta(etaEngine.state, ruleset, 'completed', { rna: 100 }), null);
+assert.equal(timeUntilAffordable(etaEngine.state, ruleset, { rna: 2.2 }).status, 'now');
 
 const stalledEngine = createChroniclesEngine({ ruleset });
 let initialStartedEvents = stalledEngine.state.session.lastEvents.filter((event) => event.type === 'goal_started');

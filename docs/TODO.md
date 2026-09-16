@@ -84,40 +84,44 @@ Iteration 3 technical foundation remains successful.
 
 ---
 
-# NEXT — Biological gameplay reconciliation implementation
+# DONE — Biological gameplay reconciliation implementation
 
-**Status:** READY.
+**Status:** DONE. Biological 0–10 frozen baseline accepted after live playtest.
 
 Use:
 
 `docs/production/RECONCILIATION_CODEX_HANDOFF.md`
 
-Codex tasks:
+Completed Codex tasks:
 
-- [ ] create/activate ruleset `timeline1-v2-reconciled`
-- [ ] migrate early resource config to RNA / DNA / Biomass hooks
-- [ ] remove Information from player-facing spendable resources
-- [ ] replace Chemical Gradient / Catalytic Fold / Energy Pocket content
-- [ ] change M01–M06 semantics to Stable RNA / Self Replication / DNA Synthesis / Error Correction / Membrane / Cell
-- [ ] update G001–G005 content
-- [ ] preserve Goal Engine architecture
-- [ ] preserve save/recovery architecture
-- [ ] add explicit pre-release migration/restart handling for obsolete early content
-- [ ] update config validation tests
-- [ ] update domain tests
-- [ ] update UI smoke tests
-- [ ] update headless simulation
-- [ ] rebalance 0–10 from scratch
-- [ ] competent / optimized / slower simulation profiles pass
-- [ ] optional M04 route remains skippable
-- [ ] first meaningful action <20 sec
-- [ ] passive/self-sustaining RNA <60 sec
-- [ ] Self Replication ~2–3 min
-- [ ] DNA visible ~4–6 min
-- [ ] Cell ~9–11 min
-- [ ] manual contribution <=5% after ~3 min
-- [ ] manual playtest 0–10
-- [ ] user approves corrected playable 0–10
+- [x] create/activate ruleset `timeline1-v2-reconciled`
+- [x] migrate early resource config to RNA / DNA / Biomass hooks
+- [x] remove Information from player-facing spendable resources
+- [x] replace Chemical Gradient / Catalytic Fold / Energy Pocket content
+- [x] change M01–M06 semantics to Stable RNA / Self Replication / DNA Synthesis / Error Correction / Membrane / Cell
+- [x] update G001–G005 content
+- [x] preserve Goal Engine architecture
+- [x] preserve save/recovery architecture
+- [x] add explicit pre-release migration/restart handling for obsolete early content
+- [x] update config validation tests
+- [x] update domain tests
+- [x] update UI smoke tests
+- [x] update headless simulation
+- [x] rebalance 0–10 from scratch
+- [x] competent / optimized / slower simulation profiles pass
+- [x] optional M04 route remains skippable
+- [x] first meaningful action <20 sec
+- [x] passive/self-sustaining RNA <60 sec
+- [x] Self Replication ~2–3 min
+- [x] DNA visible ~4–6 min
+- [x] Cell ~9–11 min
+- [x] manual contribution <=5% after ~3 min
+- [x] manual playtest 0–10
+- [x] user approves corrected playable 0–10
+- [x] generic manual resource framework
+- [x] DNA manual action
+- [x] integer resource display
+- [x] ETA UI
 
 ### Findings from 0–10 playtest
 
@@ -129,7 +133,7 @@ Codex tasks:
 
 # Iteration 4 — corrected content after Cell
 
-**Status:** BLOCKED by Biological Rework.
+**Status:** READY. Not started.
 
 Expected scope after unblock:
 
@@ -211,12 +215,9 @@ Expected scope after unblock:
 # Immediate order
 
 ```text
-Run Codex with RECONCILIATION_CODEX_HANDOFF.md
-→ Biological gameplay code rework 0–10
-→ Rebalance 0–10
-→ Manual playtest 0–10
-→ approve playable
-→ only then Iteration 4
+Biological 0–10 frozen baseline
+→ start Iteration 4 when requested
+→ corrected content expansion after Cell
 ```
 
-Iteration 4 remains blocked until this gate is explicitly cleared.
+Iteration 4 is ready, but not started in the 0–10 freeze cleanup commit.

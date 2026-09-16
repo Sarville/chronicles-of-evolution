@@ -7,13 +7,13 @@ import {
   selectManualProcessView,
   selectNodeCost,
   selectNodeStatus,
+  selectPurchaseEta,
   selectProducerOutputView,
   selectProducerPrice,
   selectProducerStatus,
   selectProductionRates,
   selectSideGoals,
   selectVisibleResources,
-  timeUntilAffordable,
 } from '../domain/selectors.js';
 import { createSaveRepository } from '../save/repository.js';
 import { createPlayableRuntime, routeCtaFocus } from './runtime.js';
@@ -173,8 +173,9 @@ function renderManualActions() {
     .join('');
 }
 
-function etaText(cost) {
-  return formatEta(timeUntilAffordable(engine().state, ruleset, cost));
+function etaText(status, cost) {
+  const eta = selectPurchaseEta(engine().state, ruleset, status, cost);
+  return eta ? `ETA ${formatEta(eta)}` : '';
 }
 
 function renderProducerMilestone(outputView) {
@@ -199,7 +200,7 @@ function renderProducers() {
       const milestone = renderProducerMilestone(outputView);
       return `<button class="entity ${status} ${focusedEntityId === producer.id ? 'focused' : ''}" data-entity-id="${producer.id}" data-action="producer" data-id="${producer.id}" ${status === 'available_affordable' ? '' : 'disabled'}>
         <span><strong>${PRODUCER_NAMES[producer.id] || producer.id}</strong><small>Owned ${outputView.count}</small>${milestone}</span>
-        <span><small>Cost</small>${formatCost(cost)}<small>ETA ${etaText(cost)}</small></span>
+        <span><small>Cost</small>${formatCost(cost)}<small>${etaText(status, cost)}</small></span>
         <span><small>Base / unit</small>${formatCost(outputView.basePerUnit)}/s<small>Current total</small>${formatCost(outputView.currentTotal)}/s</span>
       </button>`;
     })
@@ -213,9 +214,10 @@ function renderEvolution() {
     const status = selectNodeStatus(engine().state, ruleset, nodeId);
     const optional = node.type === 'OPTIONAL' ? '<small class="optional">OPTIONAL</small>' : '';
     const cost = selectNodeCost(engine().state, ruleset, nodeId);
+    const eta = etaText(status, cost);
     return `<button class="node ${status} ${focusedEntityId === nodeId ? 'focused' : ''}" data-entity-id="${nodeId}" data-action="node" data-id="${nodeId}" ${status === 'available_affordable' ? '' : 'disabled'}>
       <span><strong>${nodeId} — ${NODE_NAMES[nodeId]}</strong>${optional}</span>
-      <span>${status.replaceAll('_', ' ')}<small>ETA ${etaText(cost)}</small></span>
+      <span>${status.replaceAll('_', ' ')}${eta ? `<small>${eta}</small>` : ''}</span>
       <small>${formatCost(cost)}</small>
     </button>`;
   }).join('');
