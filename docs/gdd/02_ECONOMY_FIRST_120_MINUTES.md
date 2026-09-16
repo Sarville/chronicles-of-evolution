@@ -218,7 +218,16 @@ The previous measured values `M01 00:45 / M02 02:25 / M06 09:20` are historical 
 | Manual RNA | productionSeconds = 1.5 |
 | Manual DNA | 18 RNA → 3 DNA, cooldown 45s |
 
-**DNA Synthesis output A/B (0.24 vs 0.26):** `0.24` fails the existing `baseline_slow` regression corridor — Cell at 702s exceeds the 690s ceiling in `tests/simulation/spec.js`. `0.26` brings `baseline_slow` Cell to 684s (within corridor) while keeping `competent` Cell at ~10.1 min and manual-assisted DNA economics unchanged (18 RNA → 3 DNA, 45s cooldown, contribution <5%). Kept `0.26`.
+### DNA Synthesis output A/B decision
+
+The freeze decision compared `0.24` and `0.26 DNA/s`. Only measured values retained in the freeze record are listed here; missing per-profile values are intentionally not reconstructed.
+
+| DNA output | `baseline_slow` Cell | Other retained evidence | Result |
+|---|---:|---|---|
+| 0.24 DNA/s | 702s / 11:42 | exceeds the existing 690s regression ceiling | rejected |
+| 0.26 DNA/s | 684s / 11:24 | `competent` remains ~10.1 min; manual DNA stays `18 RNA → 3 DNA / 45s` | **frozen** |
+
+`0.26 DNA/s` is retained because `0.24` fails the existing slow-profile regression corridor. This is a targeted freeze decision, not permission to reopen other 0–10 producer values.
 
 ---
 
@@ -452,16 +461,15 @@ These values are provisional until the corrected first-run simulation exists.
 
 # 16. Rebalance order
 
-After documentation approval:
+Biological 0–10 is already implemented, balanced, manually approved and frozen. The active rebalance order starts after Cell:
 
-1. implement corrected 0–10 content;
-2. balance 0–10;
-3. manual playtest;
-4. implement/rebalance 10–18;
-5. simulate biological 0–40 end-to-end;
-6. retune civilization start and population thresholds;
-7. simulate 38–108;
-8. regression-test crisis/Ash/reset;
-9. only then freeze Timeline #1 numeric v2.
+1. implement/rebalance 10–18 Cell / Metabolism / first branch;
+2. simulate biological 0–40 end-to-end;
+3. retune civilization start and population thresholds;
+4. simulate 38–108;
+5. regression-test crisis / Ash / reset;
+6. retune Timeline #2 acceleration against the corrected Timeline #1;
+7. run cross-document consistency / design freeze pass;
+8. only then freeze full Timeline #1 numeric v2.
 
-Do not tune old E/I numbers further.
+Do not reopen biological 0–10 without regression or playtest evidence. Do not tune old E/I numbers further.
