@@ -2,14 +2,8 @@ import { createRulesetIndexes } from '../../config/index.js';
 import { addResource } from './resources.js';
 import { isAutoProductionUnlocked } from './modifiers.js';
 
-const PRODUCER_MILESTONES = [
-  { count: 50, multiplier: 2.5 },
-  { count: 25, multiplier: 2 },
-  { count: 10, multiplier: 2 },
-];
-
-export function producerMilestoneMultiplier(count) {
-  return PRODUCER_MILESTONES.reduce((multiplier, milestone) => {
+export function producerMilestoneMultiplier(count, milestones = []) {
+  return milestones.reduce((multiplier, milestone) => {
     return count >= milestone.count ? multiplier * milestone.multiplier : multiplier;
   }, 1);
 }
@@ -41,8 +35,7 @@ export function calculateProductionRates(state, ruleset) {
       continue;
     }
 
-    const milestoneMultiplier =
-      producer.enableMilestoneMultipliers === true ? producerMilestoneMultiplier(producerState.count) : 1;
+    const milestoneMultiplier = producerMilestoneMultiplier(producerState.count, producer.milestones);
     for (const [resourceId, output] of Object.entries(producer.output)) {
       const resourceMultiplier = productionMultiplierForResource(state, resourceId);
       rates[resourceId] =

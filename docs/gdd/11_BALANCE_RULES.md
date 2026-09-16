@@ -170,6 +170,7 @@ It does not have to be another producer multiplier.
 ## INV-07 — Producer milestones must be legible
 
 Count-based producer/process milestone bonuses are permitted only when the player can understand why production changed.
+Milestone thresholds and multipliers must be declared on the specific producer/process config. Runtime must not grant implicit global `10/25/50` bonuses.
 
 For each repeatable process that uses milestone bonuses, define:
 
@@ -178,6 +179,14 @@ For each repeatable process that uses milestone bonuses, define:
 - short explanation;
 - affected resource/output;
 - whether the bonus is shown in UI/tooltip/log.
+
+For biological 0–10, the only canonical repeatable-process milestone is currently:
+
+```text
+count 10 -> explicit qualitative transition -> x1.15
+```
+
+`25` and `50` are not canonical thresholds for this slice.
 
 Biological examples:
 

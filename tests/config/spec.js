@@ -16,6 +16,15 @@ assert.equal(ruleset.resources.some((resource) => resource.id === 'information')
 assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_CHEMICAL_GRADIENT'), false);
 assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_CATALYTIC_FOLD'), false);
 assert.equal(ruleset.producers.some((producer) => producer.id === 'GEN_ENERGY_POCKET'), false);
+for (const producer of ruleset.producers.filter((candidate) => candidate.id.startsWith('PROC_'))) {
+  assert.deepEqual(
+    producer.milestones.map((milestone) => milestone.count),
+    [10]
+  );
+  assert.equal(producer.milestones[0].multiplier, 1.15);
+  assert.equal(Boolean(producer.milestones[0].label), true);
+  assert.equal(Boolean(producer.milestones[0].description), true);
+}
 assert.equal(ruleset.nodes.find((node) => node.id === 'M04').type, 'OPTIONAL');
 assert.deepEqual(ruleset.nodes.find((node) => node.id === 'M05').requiresNodes, ['M03']);
 assert.equal(ruleset.goals.find((goal) => goal.id === 'G002').highlight.targetId, 'PROC_RNA_REPLICATION');

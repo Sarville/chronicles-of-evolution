@@ -6,11 +6,17 @@ export const producers = [
     unlocksAtStart: true,
     tags: ['rna', 'process'],
     baseCost: { rna: 5 },
-    growth: 1.14,
+    growth: 1.35,
     output: { rna: 0.22 },
     producesBeforeAutoUnlock: true,
-    enableMilestoneMultipliers: true,
-    milestoneNarrative: 'At 10, isolated reactions link into a cooperative RNA reaction network.',
+    milestones: [
+      {
+        count: 10,
+        multiplier: 1.15,
+        label: 'Reaction network',
+        description: 'Isolated reactions link into a cooperative RNA reaction network.',
+      },
+    ],
   },
   {
     id: 'PROC_RNA_REPLICATION',
@@ -19,10 +25,16 @@ export const producers = [
     requiresNodes: ['M02'],
     tags: ['rna', 'process', 'replication'],
     baseCost: { rna: 34 },
-    growth: 1.16,
+    growth: 1.35,
     output: { rna: 0.58 },
-    enableMilestoneMultipliers: true,
-    milestoneNarrative: 'At 10, copies start reinforcing the replication loop as a shared template pool.',
+    milestones: [
+      {
+        count: 10,
+        multiplier: 1.15,
+        label: 'Shared template pool',
+        description: 'Copies reinforce the replication loop as a shared template pool.',
+      },
+    ],
   },
   {
     id: 'PROC_DNA_SYNTHESIS',
@@ -31,9 +43,15 @@ export const producers = [
     requiresNodes: ['M03'],
     tags: ['dna', 'process'],
     baseCost: { rna: 78 },
-    growth: 1.15,
+    growth: 1.35,
     output: { dna: 0.24 },
-    enableMilestoneMultipliers: true,
-    milestoneNarrative: 'At 10, synthesis stabilizes into a reusable genetic assembly chain.',
+    milestones: [
+      {
+        count: 10,
+        multiplier: 1.15,
+        label: 'Genetic assembly chain',
+        description: 'Synthesis stabilizes into a reusable genetic assembly chain.',
+      },
+    ],
   },
 ];

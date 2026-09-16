@@ -103,6 +103,17 @@ export function validateRuleset(ruleset) {
         errors.push(`${producer.id} outputs unknown resource ${resourceId}`);
       }
     }
+    for (const milestone of producer.milestones || []) {
+      if (!Number.isFinite(milestone.count) || milestone.count <= 0) {
+        errors.push(`${producer.id} has invalid milestone count`);
+      }
+      if (!Number.isFinite(milestone.multiplier) || milestone.multiplier < 1) {
+        errors.push(`${producer.id} has invalid milestone multiplier`);
+      }
+      if (!milestone.label || !milestone.description) {
+        errors.push(`${producer.id} milestone must include label and description`);
+      }
+    }
   }
 
   for (const building of ruleset.buildings) {

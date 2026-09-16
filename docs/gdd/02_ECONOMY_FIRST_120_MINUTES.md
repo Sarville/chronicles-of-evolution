@@ -97,21 +97,24 @@ Count is included only for actual repeatable entities.
 
 Implementation currently supports count-based production milestone bonuses for repeatable processes/producers.
 These bonuses are allowed only when they are player-facing and fiction-backed, not hidden math.
+Milestone thresholds are producer-specific and data-driven. There are no implicit global `10/25/50` bonuses.
 
 Design finding from the 0–10 playable rework:
 
 - the `10` count threshold should read as a qualitative process transition, not as an arbitrary multiplier;
+- `25` and `50` are not canonical biological 0–10 milestone thresholds;
 - biological process bonuses need scenario names such as reaction network, shared template pool or genetic assembly chain;
 - every future repeatable biological process with milestone bonuses needs its own narrative justification;
 - if a process cannot be explained as a real qualitative transition, disable its milestone bonus instead of keeping a silent multiplier.
+- `×2 @ 10` was tested and rejected for biological 0–10 because milestone-seeking reached Cell far too early.
 
 Current early examples:
 
-| Process | First milestone interpretation |
-|---|---|
-| Primordial Reaction | isolated reactions link into a cooperative RNA reaction network |
-| RNA Replication | copies reinforce a shared template pool |
-| DNA Synthesis | synthesis stabilizes into a reusable genetic assembly chain |
+| Process | Threshold | Multiplier | First milestone interpretation |
+|---|---:|---:|---|
+| Primordial Reaction | 10 | ×1.15 | isolated reactions link into a cooperative RNA reaction network |
+| RNA Replication | 10 | ×1.15 | copies reinforce a shared template pool |
+| DNA Synthesis | 10 | ×1.15 | synthesis stabilizes into a reusable genetic assembly chain |
 
 ## Manual onboarding
 

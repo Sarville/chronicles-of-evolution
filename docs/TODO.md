@@ -121,7 +121,8 @@ Codex tasks:
 
 ### Findings from 0–10 playtest
 
-- [ ] Document all repeatable process milestone bonuses with scenario justification, threshold labels and UI wording before expanding the biological economy beyond Cell.
+- [x] Document repeatable process milestone bonuses with scenario justification, threshold labels and UI wording for the current 0–10 slice.
+- [ ] Before expanding biological economy beyond Cell, define any new repeatable-process milestones per producer; no implicit global `10/25/50` thresholds.
 
 ---
 

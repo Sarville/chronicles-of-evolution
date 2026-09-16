@@ -186,19 +186,26 @@ tick = stalledEngine.tick(1000);
 assert.equal(stalledEngine.state.run.goals.states.G001.rewardAppliedAtMs, rewardAppliedAtMs);
 assert.equal(tick.events.filter((event) => event.type === 'goal_completed' && event.payload.goalId === 'G001').length, 0);
 
-assert.equal(producerMilestoneMultiplier(9), 1);
-assert.equal(producerMilestoneMultiplier(10), 2);
-assert.equal(producerMilestoneMultiplier(25), 4);
-assert.equal(producerMilestoneMultiplier(50), 10);
+const primordialMilestones = ruleset.producers.find((producer) => producer.id === 'PROC_PRIMORDIAL_REACTION').milestones;
+assert.equal(producerMilestoneMultiplier(9, primordialMilestones), 1);
+assert.equal(producerMilestoneMultiplier(10, primordialMilestones), 1.15);
+assert.equal(producerMilestoneMultiplier(11, primordialMilestones), 1.15);
+assert.equal(producerMilestoneMultiplier(24, primordialMilestones), 1.15);
+assert.equal(producerMilestoneMultiplier(25, primordialMilestones), 1.15);
+assert.equal(producerMilestoneMultiplier(49, primordialMilestones), 1.15);
+assert.equal(producerMilestoneMultiplier(50, primordialMilestones), 1.15);
+for (let count = 1; count <= 100; count += 1) {
+  assert.equal(producerMilestoneMultiplier(count), 1);
+}
 
 const explicitMilestoneEngine = createChroniclesEngine({ ruleset });
-explicitMilestoneEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 200 });
+explicitMilestoneEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 1000 });
 for (let index = 0; index < 10; index += 1) {
   result = explicitMilestoneEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });
   assert.equal(result.ok, true);
 }
-assert.equal(ruleset.producers.find((producer) => producer.id === 'PROC_PRIMORDIAL_REACTION').enableMilestoneMultipliers, true);
-assert.equal(selectProductionRates(explicitMilestoneEngine.state, ruleset).rna, 4.4);
+assert.equal(primordialMilestones.length, 1);
+assert.equal(selectProductionRates(explicitMilestoneEngine.state, ruleset).rna, 2.53);
 
 const customRuleset = {
   ...ruleset,

@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { runHeadlessSimulation } from '../../src/chronicles/dev/simulation.js';
+import { ruleset } from '../../src/chronicles/config/index.js';
+import { createChroniclesEngine } from '../../src/chronicles/domain/engine.js';
+import { estimateProducerPurchasePayback, runHeadlessSimulation } from '../../src/chronicles/dev/simulation.js';
 
 function between(value, min, max, label) {
   assert.equal(value >= min && value <= max, true, `${label}: expected ${value} between ${min} and ${max}`);
@@ -42,5 +44,24 @@ assert.equal(withM04.ok, true);
 assert.equal(withM04.state.run.nodes.completed.M04 !== undefined, true);
 assert.equal(withM04.timings.cellAtMs <= competent.timings.cellAtMs + 60000, true);
 assert.equal(withM04.finalRates.dna > competent.finalRates.dna, true);
+
+const milestoneSeeker = runHeadlessSimulation({ seed: 7, profile: 'milestone_seeker' });
+assert.equal(milestoneSeeker.ok, true);
+assert.equal(milestoneSeeker.producerCounts.PROC_PRIMORDIAL_REACTION, 10);
+assert.equal(milestoneSeeker.producerCounts.PROC_RNA_REPLICATION >= 5, true);
+assert.equal(milestoneSeeker.timings.cellAtMs >= 480000, true);
+assert.equal(milestoneSeeker.timings.cellAtMs <= 660000, true);
+assert.equal(milestoneSeeker.manual.economicsAtThreeMinutes.contributionRatio < 0.05, true);
+
+const paybackEngine = createChroniclesEngine({ ruleset });
+paybackEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 500 });
+for (let index = 0; index < 9; index += 1) {
+  const buy = paybackEngine.dispatch({ type: 'BUY_PRODUCER', producerId: 'PROC_PRIMORDIAL_REACTION' });
+  assert.equal(buy.ok, true);
+}
+const tenthPrimordial = estimateProducerPurchasePayback(paybackEngine.state, ruleset, 'PROC_PRIMORDIAL_REACTION');
+between(tenthPrimordial.cost.rna, 73, 75, '10th Primordial Reaction cost');
+between(tenthPrimordial.outputDelta.rna, 0.54, 0.56, '10th Primordial Reaction RNA/s gain');
+between(tenthPrimordial.paybackSecondsByResource.rna, 130, 138, '10th Primordial Reaction payback seconds');
 
 console.log('headless simulation ok');

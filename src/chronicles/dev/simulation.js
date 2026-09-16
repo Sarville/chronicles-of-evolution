@@ -4,6 +4,7 @@ import { createSeededRng } from '../adapters/rng.js';
 import { createChroniclesEngine } from '../domain/engine.js';
 import { selectNodeStatus, selectProducerPrice, selectProducerStatus, selectProductionRates } from '../domain/selectors.js';
 import { calculateManualReward, manualProcessCooldownMs } from '../domain/services/manualProcesses.js';
+import { producerMilestoneMultiplier, productionMultiplierForResource } from '../domain/services/production.js';
 
 const MAIN_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M06'];
 const OPTIONAL_NODE_ORDER = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06'];
@@ -11,7 +12,7 @@ const MANUAL_PROCESS_ID = 'MANUAL_PRIMORDIAL_PULSE';
 
 export const simulationProfiles = {
   optimized: {
-    decisionIntervalMs: 1000,
+    decisionIntervalMs: 2500,
     manualEfficiencyThreshold: 0.05,
     manualSafetyUntilMs: 12 * 60 * 1000,
     maxActionsPerDecision: 12,
@@ -41,7 +42,7 @@ export const simulationProfiles = {
     rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
   },
   slow: {
-    decisionIntervalMs: 9000,
+    decisionIntervalMs: 5000,
     manualEfficiencyThreshold: 0.05,
     manualSafetyUntilMs: 12 * 60 * 1000,
     maxActionsPerDecision: 2,
@@ -49,10 +50,25 @@ export const simulationProfiles = {
       M01: { PROC_PRIMORDIAL_REACTION: 1, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
       M02: { PROC_PRIMORDIAL_REACTION: 3, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
       M03: { PROC_PRIMORDIAL_REACTION: 4, PROC_RNA_REPLICATION: 1, PROC_DNA_SYNTHESIS: 0 },
-      M05: { PROC_PRIMORDIAL_REACTION: 6, PROC_RNA_REPLICATION: 4, PROC_DNA_SYNTHESIS: 3 },
-      M06: { PROC_PRIMORDIAL_REACTION: 7, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 5 },
+      M05: { PROC_PRIMORDIAL_REACTION: 8, PROC_RNA_REPLICATION: 5, PROC_DNA_SYNTHESIS: 4 },
+      M06: { PROC_PRIMORDIAL_REACTION: 9, PROC_RNA_REPLICATION: 6, PROC_DNA_SYNTHESIS: 6 },
     },
     dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION'],
+    rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
+  },
+  milestone_seeker: {
+    decisionIntervalMs: 2000,
+    manualEfficiencyThreshold: 0.05,
+    manualSafetyUntilMs: 12 * 60 * 1000,
+    maxActionsPerDecision: 6,
+    phaseProducerTargets: {
+      M01: { PROC_PRIMORDIAL_REACTION: 1, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M02: { PROC_PRIMORDIAL_REACTION: 10, PROC_RNA_REPLICATION: 0, PROC_DNA_SYNTHESIS: 0 },
+      M03: { PROC_PRIMORDIAL_REACTION: 10, PROC_RNA_REPLICATION: 10, PROC_DNA_SYNTHESIS: 0 },
+      M05: { PROC_PRIMORDIAL_REACTION: 10, PROC_RNA_REPLICATION: 10, PROC_DNA_SYNTHESIS: 10 },
+      M06: { PROC_PRIMORDIAL_REACTION: 10, PROC_RNA_REPLICATION: 10, PROC_DNA_SYNTHESIS: 10 },
+    },
+    dnaOrder: ['PROC_DNA_SYNTHESIS', 'PROC_RNA_REPLICATION', 'PROC_PRIMORDIAL_REACTION'],
     rnaOrder: ['PROC_PRIMORDIAL_REACTION', 'PROC_RNA_REPLICATION', 'PROC_DNA_SYNTHESIS'],
   },
 };
@@ -85,6 +101,40 @@ function createSnapshot(engine, profile) {
     rates: selectProductionRates(engine.state, engine.ruleset),
     resources: Object.fromEntries(Object.entries(engine.state.run.resources).map(([id, value]) => [id, value.amount])),
     totalEarned: { ...engine.state.run.stats.totalEarned },
+  };
+}
+
+export function estimateProducerPurchasePayback(state, sourceRuleset, producerId) {
+  const producer = sourceRuleset.producers.find((candidate) => candidate.id === producerId);
+  if (!producer) {
+    return null;
+  }
+  const count = state.run.producers[producerId]?.count || 0;
+  const cost = selectProducerPrice(state, sourceRuleset, producerId);
+  const beforeMilestone = producerMilestoneMultiplier(count, producer.milestones);
+  const afterMilestone = producerMilestoneMultiplier(count + 1, producer.milestones);
+  const outputDelta = {};
+  for (const [resourceId, output] of Object.entries(producer.output || {})) {
+    const multiplier = productionMultiplierForResource(state, resourceId);
+    const before = count * output * beforeMilestone * multiplier;
+    const after = (count + 1) * output * afterMilestone * multiplier;
+    outputDelta[resourceId] = after - before;
+  }
+  const paybackSecondsByResource = {};
+  for (const [resourceId, amount] of Object.entries(cost)) {
+    if (outputDelta[resourceId] > 0) {
+      paybackSecondsByResource[resourceId] = amount / outputDelta[resourceId];
+    }
+  }
+  return {
+    producerId,
+    currentCount: count,
+    nextCount: count + 1,
+    cost,
+    beforeMilestone,
+    afterMilestone,
+    outputDelta,
+    paybackSecondsByResource,
   };
 }
 
