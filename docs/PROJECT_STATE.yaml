@@ -3,7 +3,7 @@ project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
   scope: "Timeline #1 vertical slice: life -> sapience -> civilization -> industry -> modern -> atomic crisis -> Ash -> reset -> Timeline #2 teaser"
-  work_mode: "ds05_ready_for_review"
+  work_mode: "ds05_5_ready_for_review"
   last_updated: "2026-09-16"
 
 authority:
@@ -25,6 +25,8 @@ authority:
   narrative_flags: "docs/scenario/05_NARRATIVE_FLAGS.md"
   endings_copy: "docs/scenario/06_ENDINGS_COPY.md"
   copy_guide: "docs/scenario/07_COPY_GUIDE.md"
+  timeline_presentation_map: "docs/ux/00_TIMELINE_PRESENTATION_MAP.md"
+  visual_state_map: "docs/art/00_VISUAL_STATE_MAP.md"
   design_session_plan: "docs/production/DESIGN_SESSION_PLAN.md"
   implementation_plan: "docs/production/IMPLEMENTATION_ITERATION_PLAN.md"
   implementation_handoff: "docs/production/RECONCILIATION_CODEX_HANDOFF.md"
@@ -38,9 +40,9 @@ workflow:
   no_game_code_during_design_sessions: true
 
 design:
-  current_session: "DS-05"
+  current_session: "DS-05.5"
   status: "ready_for_user_review"
-  objective: "Create the complete Timeline #1 narrative package on top of the reconciled gameplay canon without changing mechanics, economy or progression rules"
+  objective: "Bind Timeline #1 gameplay and narrative beats to semantic UX surfaces, diorama states, creature continuity and era transitions before detailed UX/art design"
   accepted_reconciliation:
     - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
     - "Information removed as player-facing spendable resource"
@@ -74,6 +76,21 @@ design:
     - "docs/scenario/05_NARRATIVE_FLAGS.md"
     - "docs/scenario/06_ENDINGS_COPY.md"
     - "docs/scenario/07_COPY_GUIDE.md"
+  presentation_review_documents:
+    - "docs/ux/00_TIMELINE_PRESENTATION_MAP.md"
+    - "docs/art/00_VISUAL_STATE_MAP.md"
+  presentation_contract:
+    world_states: "V0 Primordial -> V1 Cellular -> V2 Creature -> V3 Sapient Tribe -> V4 Settlement -> V5 City -> V6 Industrial -> V7 Modern -> V8 Atomic -> V9 Ash"
+    creature_states: "C0 Proto-chemistry -> C1 Protocell -> C2 Cell -> C2A/B/C Primary Trait -> C3 Early Multicellular -> C4 Multicellular Organism -> C5 Adapted Organism -> C6 Cognitive Organism -> C7 Sapient Species"
+    presentation_beats: "PB00-PB30"
+    hard_rules:
+      - "AP UI appears only from G008, not in Iteration 4"
+      - "Cognition appears only after Nervous System"
+      - "Power appears only in Industry"
+      - "Modern is a distinct full visual state"
+      - "World Tension appears only after Atomic transition"
+      - "Ash derives visually from the player's own V8 world"
+      - "Sapience explicitly changes scale from individual organism to small group"
   sessions:
     DS-00: { name: "Documentation orchestration and repository structure", status: done }
     DS-01: { name: "Civilization gameplay contract", status: reconciled }
@@ -82,8 +99,9 @@ design:
     DS-04: { name: "Meta progression and balance rules", status: reconciled }
     RECONCILIATION: { name: "Original GDD design reconciliation", status: accepted }
     DS-05: { name: "Timeline #1 full narrative package", status: ready_for_user_review }
-    DS-06: { name: "UX architecture and wireframes", status: unlocked }
-    DS-07: { name: "Art direction, locations and era transitions", status: blocked_by_ds05_ds06 }
+    DS-05.5: { name: "Timeline presentation contract", status: ready_for_user_review }
+    DS-06: { name: "UX architecture and wireframes", status: unlocked_pending_presentation_review }
+    DS-07: { name: "Art direction, creature evolution, locations and era transitions", status: blocked_by_ds05_ds06 }
     DS-08: { name: "Art production manifest and generation prompts", status: blocked_by_ds07 }
     DS-09: { name: "Audio design and generation package", status: blocked_by_ds05_ds07 }
     DS-10: { name: "Analytics, platform and production readiness", status: blocked_by_gameplay_ux_stability }
@@ -180,5 +198,5 @@ open_decisions:
 
 next_action:
   owner: "User"
-  session: "DS-05 review"
-  description: "Review the Timeline #1 narrative package. On approval, mark DS-05 accepted and proceed to DS-06 UX architecture."
+  session: "DS-05 + DS-05.5 review"
+  description: "Review the Timeline #1 narrative package together with the presentation/visual-state bridge. On approval, mark both accepted and proceed to DS-06 UX architecture using PB00-PB30 and V0-V9/C0-C7 as inputs."
