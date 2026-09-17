@@ -58,15 +58,15 @@ export function adjustCrisisStability(state, amount) {
   state.run.crisis.minStability = Math.min(state.run.crisis.minStability ?? state.run.crisis.stability, state.run.crisis.stability);
 }
 
-export function completeAshEnding(state, subtype) {
-  const endingSubtype = subtype || 'ash_too_late';
-  state.run.crisis ||= createInitialCrisisState();
-  state.run.crisis.active = false;
-  state.run.crisis.phase = 'ENDED';
-  state.run.flags['run.ending.id'] = 'ENDING_ASH';
-  state.run.flags['run.ending.subtype'] = endingSubtype;
-  state.run.ending = { id: 'ENDING_ASH', subtype: endingSubtype, completedAtMs: state.run.clock.simulationMs };
+export function completeEnding(state, endingId, subtype) {
+  if (state.run.crisis) {
+    state.run.crisis.active = false;
+    state.run.crisis.phase = 'ENDED';
+  }
+  state.run.flags['run.ending.id'] = endingId;
+  state.run.flags['run.ending.subtype'] = subtype;
+  state.run.ending = { id: endingId, subtype, completedAtMs: state.run.clock.simulationMs };
   state.run.lifecycle = 'ended';
   state.meta.persistentFlags ||= {};
-  state.meta.persistentFlags['meta.endings.first_ending'] ||= 'ENDING_ASH';
+  state.meta.persistentFlags['meta.endings.first_ending'] ||= endingId;
 }

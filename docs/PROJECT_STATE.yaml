@@ -4,7 +4,7 @@ project:
   repository: "Sarville/chronicles-of-evolution"
   scope: "Release 1: three-act structure per docs/DECISIONS_ACT_STRUCTURE.md (2026-09-17) -- Act 1 T1-T5 as five short causally-linked chapters (~3-4h total, life -> Ash -> Archive), Act 2 P1-P3 pre-built lopsided-civilization runs, Act 3 the adapted full original Evolve mechanic set. Supersedes the prior 'T1 Origin through T5 Exodus / first Bioseed in 8-12h' framing. Existing T1-0..T1-6 implementation (below) is the reuse baseline for Act 1's chapters, not a discarded build."
   work_mode: "act_structure_redesign_planning"
-  last_updated: "2026-09-17"
+  last_updated: "2026-09-18"
   documentation_language: "Описания по умолчанию пишутся на русском. Английский допустим только для стабильных идентификаторов, имён файлов, кодовых состояний, enum-подобных меток и закреплённых названий фич."
 
 authority:
@@ -172,10 +172,20 @@ implementation:
     T1-6: { name: "Great Filter, Ash, Archive and reset", status: implemented_pending_manual_playtest, delivered: "Active-play crisis phases, Last Protocol subtypes, inevitable Ash and idempotent Archive reset wiring are implemented." }
     T1-7: { name: "Full-run closeout and release gate", status: manual_playtest_0_180 }
 
+act1_chapters:
+  authority: "docs/production/TIMELINE_01_REBUILD_PLAN.md §4/§7"
+  packages:
+    T1_origin_retrofit: { status: done, delivered: "G025/G026, EV-NAR-04/EV-CR-T1, ENDING_BLIGHT implemented 2026-09-18. T1 now ends at Tribe (T05/G015) with the mandatory Мор collapse instead of auto-advancing into the old G016+ Settlement continuation; that content is untouched in config, reused later by T2-T5. Generalized the previously-Ash-only ending/reset machinery (domain/services/crisis.js completeEnding, domain/commands.js ENDING_RESET_PROFILES) so it now supports multiple endings. Ruleset timeline1-v13-t1-blight-collapse." }
+    T2_dispersed: { status: not_started }
+    T3_fortress: { status: not_started }
+    T4_big_brain: { status: not_started }
+    T5_synthesis_reframe: { status: not_started, note: "existing Modern->Atomic->Ash content (G016-G024, T07-T18, A01-A04, crisis flow) is reused here unchanged, plus the new t5_synthesis procedural deck" }
+    act1_closeout: { status: not_started }
+
 timeline_01_rebuild:
   status: "manual_playtest_0_180"
-  superseded_by: "docs/DECISIONS_ACT_STRUCTURE.md (2026-09-17) -- this block describes the pre-redesign single-180min-run plan, kept as history/reuse baseline for Act 1's five chapters, not the current execution order"
-  target_ruleset: "timeline1-v11-branch-cost-fix"
+  superseded_by: "docs/DECISIONS_ACT_STRUCTURE.md (2026-09-17) -- this block describes the pre-redesign single-180min-run plan, kept as history/reuse baseline for Act 1's five chapters, not the current execution order. See act1_chapters above for current package status."
+  target_ruleset: "timeline1-v13-t1-blight-collapse"
   scope: "RNA to mandatory first Ash/Archive/reset, target 179-186 active minutes for a competent run"
   first_package: "T1 full route implemented; begin manual fresh-state playtest 0-180. 180 minutes is the current pacing target, subject to playtest evidence."
   canonical_plan: "docs/production/TIMELINE_01_REBUILD_PLAN.md"
@@ -202,7 +212,7 @@ iteration_4:
   note: "Closed by direct user confirmation on 2026-09-16, ahead of a manual 10-18 playtest pass. Automated tests/simulation/build back the implementation, and goal-ID alignment with GDD/DS-05 canon is now verified; treat exact 10-18 numbers as provisional (see balance.biological_10_18) until an actual playtest happens."
 
 balance:
-  ruleset_target: "timeline1-v11-branch-cost-fix"
+  ruleset_target: "timeline1-v13-t1-blight-collapse"
   old_0_10_ei_balance: "historical_superseded"
   biological_numbers: "0_10_original_resource_flow_corrected"
   post_cell_numbers: "implemented_pending_manual_0_180_validation"
@@ -210,7 +220,7 @@ balance:
   full_t1_simulation:
     status: "headless_baseline_pending_manual_0_180"
     profile: "optimized, competent and slow / seed 7"
-    result: "2026-09-17 playtest found B02A-D and N02A-C priced below the core node that gates them (C06 and B05 respectively); fixed to cost at least as much as their gate, which pushed every later checkpoint out by roughly 3-4m. Updated baseline: optimized 181.7m, competent 183.4m, slow 183.9m. Competent anchors: Sapience 42.1m, Settlement 86.1m, City 112.3m, Industry 127.3m, Modern 138.8m, Atomic 171.4m."
+    result: "2026-09-18: added multicellularityAtMs (C07) and tribeAtMs (T05) windows to the full-timeline headless test, closing the 18-40m/38-120m coverage gap flagged in docs/TODO.md T1-1. Found C07 resolving at ~19-21m against its canonical 24-28m window (docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md sec.7); repriced C07 to 930 biomass/520 atp/720 dna, landing 24.1-27.6m across profiles, which pushed every later checkpoint out by roughly 6-7m. Updated baseline: optimized 186.8m, competent 188.8m, slow 188.9m. Competent anchors: Multicellularity 27.6m, Sapience 47.4m, Tribe 63.8m, Settlement 91.4m, City 117.6m, Industry 132.7m, Modern 144.2m, Atomic 176.8m. Prior (2026-09-17) B02A-D/N02A-C cost-monotonicity fix baseline superseded by this pass."
   crisis_contract: "implemented_pending_manual_0_180"
   biological_0_10:
     status: "accepted_with_original_resource_flow_and_storage_caps"
@@ -245,5 +255,5 @@ open_decisions:
 next_action:
   owner: "Codex"
   session: "ACT-STRUCTURE-REDESIGN"
-  description: "All GDD/scenario docs for all three acts are now complete, including the detailed Act 3 system design (docs/DECISIONS_ACT_STRUCTURE.md ACT-001..ACT-013): Act 1 T1-T5 five-chapter map + t5_synthesis echo deck (docs/gdd/13_ACT_ONE_CHAPTERS.md), Act 2 P1-P3 unified observer script + reveal, Act 3 system-entry lines + first-reset finale + 100%-Archive grand finale (docs/scenario/02_ACT2_ACT3_SCRIPT.md), global Archive Completion/achievement mechanic (docs/gdd/14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md), Act 3 system-by-system design + finite 39-item achievement list (docs/gdd/15_ACT_THREE_SYSTEMS.md, 2026-09-18). Nothing left to write before code. Next session: turn ACT-006/ACT-012 remaining open questions (per-chapter minute budget, P1-P3 naming, T2/T4 skin swap mechanics) into a concrete T1 chapter implementation plan and start coding Мор/Катаклизм/Раскол/Авария + t5_synthesis (docs/production/TIMELINE_01_REBUILD_PLAN.md Package B/C/D). Separately: this worktree also carries pre-existing uncommitted gameplay-code changes (src/chronicles/config/*, domain/*, tests/*, evolve/chronicles.js) from the prior T1 manual-playtest session, left untouched by the 2026-09-17/18 docs commits -- review/commit that stream separately."
-  previous_next_action: "owner Codex, session ACT-STRUCTURE-REDESIGN (2026-09-17): GDD/scenario docs for all three acts complete except detailed Act 3 system design; pick (a) T1 chapter implementation plan or (b) detailed Act 3 GDD (superseded 2026-09-18 -- (b) is now done, see current next_action)"
+  description: "T1 origin retrofit (Package per TIMELINE_01_REBUILD_PLAN.md §7) is implemented and tested 2026-09-18: G025/G026, EV-NAR-04/EV-CR-T1, ENDING_BLIGHT; T1 now ends at Tribe with Мор instead of auto-continuing into the old Settlement+ route (see act1_chapters.T1_origin_retrofit above). Next session per §7 execution order: T2 -- Одиночки (dispersed-start modifier, species skin #1, coordination-vs-isolation choice, Катаклизм/ENDING_CATACLYSM collapse), reusing truncated T1-3/T1-4 Settlement content. After that: T3 (Раскол), T4 (Авария), T5 reframe + t5_synthesis deck, then Act 1 closeout full regression. No manual playtest of the new Мор flow has happened yet -- do that before treating T1_origin_retrofit as fully closed, not just before Act 1 closeout."
+  previous_next_action: "owner Codex, session ACT-STRUCTURE-REDESIGN (2026-09-17/18): GDD/scenario docs for all three acts complete; pick (a) T1 chapter implementation plan or (b) detailed Act 3 GDD (superseded 2026-09-18 -- (b) done, then (a)'s first package [Мор] also done, see current next_action)"

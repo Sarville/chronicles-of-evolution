@@ -5,5 +5,11 @@ export const endings = [
     requiresEra: 'ATOMIC',
     targetTimeMs: 6960000,
   },
+  {
+    id: 'ENDING_BLIGHT',
+    type: 'scripted_chapter_collapse',
+    requiresEra: 'TRIBE',
+    targetTimeMs: 3420000,
+  },
 ];
 

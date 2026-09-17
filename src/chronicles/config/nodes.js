@@ -235,7 +235,7 @@ export const nodes = [
   },
   {
     id: 'C07', entityType: 'node', type: 'CONVERGENCE', semanticRole: 'breakthrough', labelKey: 'node.C07',
-    cost: { biomass: 250, atp: 140, dna: 210 }, requiresNodes: ['C06'], effects: [], transition: 'MULTICELLULAR', goalId: 'G009',
+    cost: { biomass: 930, atp: 520, dna: 720 }, requiresNodes: ['C06'], effects: [], transition: 'MULTICELLULAR', goalId: 'G009',
   },
   { id: 'B03', entityType: 'node', type: 'CORE', semanticRole: 'core_tech', labelKey: 'node.B03', cost: { biomass: 320, atp: 180, dna: 260 }, requiresNodes: ['C07'], effects: [] },
   { id: 'B04', entityType: 'node', type: 'CORE', semanticRole: 'core_tech', labelKey: 'node.B04', cost: { biomass: 390, atp: 220, dna: 310 }, requiresNodes: ['B03'], effects: [], cognitionContribution: 20 },

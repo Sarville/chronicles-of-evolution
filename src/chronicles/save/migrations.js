@@ -242,5 +242,15 @@ export function migrateEnvelope(envelope) {
     migrated.run.rulesetVersion = 'timeline1-v11-branch-cost-fix';
     migrated.run.migrationNotice = 'T1-1 fix: B02A-D and N02A-C no longer cost less than the core node that unlocks them.';
   }
+  if (migrated.rulesetVersion === 'timeline1-v11-branch-cost-fix') {
+    migrated.rulesetVersion = 'timeline1-v12-multicellularity-cost-fix';
+    migrated.run.rulesetVersion = 'timeline1-v12-multicellularity-cost-fix';
+    migrated.run.migrationNotice = 'T1-1 fix: C07 Multicellularity repriced to the canonical 24-28min window instead of resolving in ~19-21min.';
+  }
+  if (migrated.rulesetVersion === 'timeline1-v12-multicellularity-cost-fix') {
+    migrated.rulesetVersion = 'timeline1-v13-t1-blight-collapse';
+    migrated.run.rulesetVersion = 'timeline1-v13-t1-blight-collapse';
+    migrated.run.migrationNotice = 'Act 1 redesign: T1 now ends at Tribe with the Мор collapse (ENDING_BLIGHT) instead of continuing into Settlement/City/.../Ash.';
+  }
   return migrated;
 }

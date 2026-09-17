@@ -670,7 +670,7 @@ export function runHeadlessSimulation(options = {}) {
 
   const ending = engine.state.run.ending ? { ...engine.state.run.ending } : null;
   let archiveReset = null;
-  if (fullTimeline && ending?.id === 'ENDING_ASH') {
+  if (fullTimeline && ending?.id) {
     archiveReset = engine.dispatch({ type: 'ARCHIVE_RESET' });
     if (archiveReset.ok) log.push({ atMs: engine.state.run.clock.simulationMs, action: 'archive_reset', endingId: ending.id });
   }

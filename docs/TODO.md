@@ -70,7 +70,7 @@ only after the unified 0–180 simulation and playtest pass.
 - [x] implement active-play crisis phases, Last Protocol subtypes, Ash and Archive-reset handoff.
 - [x] run 0–180 simulation profiles and establish the first costs/rates/threshold baseline; manual playtest remains.
 - [x] extend headless runner through Sapience, jobs/buildings, all eras, crisis and Archive reset; it now reports structured balance stalls.
-- [ ] resolve first full-run finding: A03 is unreachable in the competent seed-7 profile because Materials/Knowledge/Power storage caps land below the atomic program costs.
+- [x] resolve first full-run finding: A03 is unreachable in the competent seed-7 profile because Materials/Knowledge/Power storage caps land below the atomic program costs. Stale as of 2026-09-18: verified against the current baseline (`after_A03`/`after_A04` snapshots both present, `A04` completes at 176.8m competent) — superseded by the T1-4/T1-5 storage-gate work committed after this finding was logged.
 
 ### T1-1 — Organism foundation (2026-09-17)
 
@@ -78,7 +78,7 @@ only after the unified 0–180 simulation and playtest pass.
 - [x] G007 grants the first AP; G008 requires one selected optional body adaptation.
 - [x] B02A–D optional adaptations and C07 Multicellularity / G009 transition are in the ruleset.
 - [x] add Nervous System, Cognition, behavior choice and Sapience transition package.
-- [ ] add 18–40 and 38–120 headless profiles, then tune the route as one balance pass.
+- [x] add 18–40 and 38–120 headless windows, then tune the route as one balance pass.
 - [x] manual playtest finding (2026-09-17), fixed: `EV-BIO-02` now fires on `C06`
   completion as its own branch-style modal (same presentation as `EV-BIO-01`/C02),
   `G008` points its cta/highlight at the event, and `B02A`–`D` got a
@@ -113,6 +113,19 @@ only after the unified 0–180 simulation and playtest pass.
   introduced by new event `EV-BIO-04` (so the counter's appearance is never a
   surprise), archives at Cognition 100. Goal taxonomy (standard / progressive
   / super-global) documented in `docs/gdd/07_GOALS_AND_MILESTONES.md` §2.
+- [x] manual playtest finding (2026-09-18), fixed: adding `multicellularityAtMs`
+  (`C07`) and `tribeAtMs` (`T05`) windows to the full-timeline headless test
+  (the 18–40m/38–120m ranges the audit above hadn't covered) found `C07`
+  resolving at ~19–21m across all profiles against the canonical 24–28m window
+  (`docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md` §7) — post-`C06` production was
+  already strong enough that `C07`'s 250 biomass/140 atp/210 dna and one
+  `B02A`-D pick barely added a minute. Repriced `C07` to 930 biomass/520
+  atp/720 dna, landing all three profiles at 24.1–27.6m. Ruleset bumped to
+  `timeline1-v12-multicellularity-cost-fix` with a migration entry. This
+  pushes every later checkpoint out ~6–7m; updated headless baseline:
+  optimized 186.8m / competent 188.8m / slow 188.9m, and
+  `tests/simulation/spec.js` windows moved to match (see
+  `balance.full_t1_simulation` in PROJECT_STATE.yaml for exact anchors).
 - [ ] World Tension / Crisis Stability (Atomic era, C1–C4) is the next
   progressive goal in the route and has the same gap Cognition had — zero
   player-visible representation anywhere, not even the diorama — plus it
@@ -425,6 +438,57 @@ no code changes):
   item above).
 - [ ] species skin swap presentation (art/UI), not just the flag.
 - [ ] balance pass for `T2–T4` numeric targets (currently provisional).
+
+---
+
+# T1 retrofit: Мор collapse (2026-09-18)
+
+**Status:** DONE — first package of `docs/production/TIMELINE_01_REBUILD_PLAN.md`
+§7 execution order (`Мор` for `T1`, before `T2–T4`/`T5` reframe).
+
+- [x] `G025`/`G026` added to `config/goals.js`: `G025` "Заметьте первых
+  больных" (narrative gate, no reward, active once `T05` Tribe completes),
+  `G026` "Переживите Мор" (completes on `run.ending.id = ENDING_BLIGHT`,
+  same pattern as `G024`/Ash). `G015.sequence.nextGoalId` repointed from
+  `G016` to `G025` — the old Settlement+ continuation (`G016–G024`) is no
+  longer the auto-advance target after Tribe; that content is preserved
+  unchanged in config for reuse by `T2–T5`, not deleted.
+- [x] `EV-NAR-04`/`EV-CR-T1` added to `config/events.js` per
+  `docs/scenario/04_STORY_EVENTS.md` §`T1` — anomaly gate then mandatory
+  3-choice ending event, reusing the existing generic event/goal contract
+  (no bespoke crisis engine, per `docs/gdd/13_ACT_ONE_CHAPTERS.md` §2).
+- [x] `ENDING_BLIGHT` added to `config/endings.js`.
+- [x] generalized the previously Ash-only ending machinery so any ending can
+  complete/reset: `completeAshEnding` → `completeEnding(state, endingId,
+  subtype)` in `domain/services/crisis.js`; `complete_ending` effects now
+  carry an explicit `endingId` (validated against `ruleset.endings`);
+  `archiveReset` in `domain/commands.js` now looks up a per-ending
+  `ENDING_RESET_PROFILES` entry (reward + Chronicle summary) instead of
+  hardcoding `ENDING_ASH`. `ENDING_ASH`'s own reward formula/range (14–18 AF)
+  is untouched — `tests/domain/spec.js`'s full Ash route (unaffected, it
+  starts mid-route at `CITY` era and never touches `G015`) still passes
+  unchanged. `ENDING_BLIGHT` gets a flat 3 AF ("малый AF-пакет" per
+  `docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` — provisional,
+  no exact number was specified there).
+- [x] consequence accepted, not worked around: since `G015`'s auto-advance
+  now points at the collapse instead of `G016`, and `Мор` sets
+  `run.lifecycle = 'ended'` (freezing further `BUY_NODE`/etc., the same
+  generic freeze `ENDING_ASH` already used), the full single-continuous-run
+  headless simulation (`runFullTimelineSimulation`) now genuinely stops at
+  Tribe with `ENDING_BLIGHT` instead of continuing to Settlement/City/
+  Industry/Modern/Atomic/`ENDING_ASH`. This is the intended Act 1 redesign
+  behavior, not a regression — that later content isn't discarded, it's
+  reused by `T2–T5` (not yet implemented) via their own start grants, not by
+  continuing this same `T1` run. Updated `tests/simulation/spec.js`'s
+  full-timeline assertions accordingly (drops Settlement→Ash windows, keeps
+  Multicellularity/Sapience/Tribe).
+- [x] Ruleset bumped to `timeline1-v13-t1-blight-collapse` with a migration
+  entry. `npm test`, `npm run test:sim`, `npm run smoke`, `npm run build` all
+  pass.
+- [ ] not done (later packages per `TIMELINE_01_REBUILD_PLAN.md` §7):
+  `T2` dispersed-start + skin swap #1 + `Катаклизм`, `T3` defense-start +
+  policy-lite + `Раскол`, `T4` Cognition-bias start + skin swap #2 +
+  `Авария`, `T5` reframe + `t5_synthesis` deck, Act 1 closeout regression.
 
 ---
 

@@ -320,6 +320,7 @@ export function validateRuleset(ruleset) {
   }
 
   const eventEffectTypes = new Set(['grant_resource', 'set_flag', 'set_meta_flag', 'unlock_meta', 'grant_cognition', 'adjust_crisis_stability', 'complete_ending']);
+  const endingIds = new Set((ruleset.endings || []).map((ending) => ending.id));
   for (const event of ruleset.events) {
     if (!event.type || !event.deck || !event.trigger?.type || !Array.isArray(event.choices) || event.choices.length === 0) {
       errors.push(`${event.id} must define type, deck, trigger and choices`);
@@ -350,6 +351,9 @@ export function validateRuleset(ruleset) {
         }
         if (effect.type === 'complete_ending' && !effect.subtype) {
           errors.push(`${event.id} completes ending without subtype`);
+        }
+        if (effect.type === 'complete_ending' && !endingIds.has(effect.endingId)) {
+          errors.push(`${event.id} completes unknown ending ${effect.endingId}`);
         }
       }
     }

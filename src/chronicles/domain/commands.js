@@ -90,27 +90,50 @@ function assignJob(state, ruleset, jobId, amount, ports) {
   return ok(state, [createDomainEvent('job_assigned', { jobId, previous: current, amount }, state, ports)]);
 }
 
+// Every T1-T5 chapter ends with its own reset (Ash is only mandatory on T5);
+// see docs/gdd/13_ACT_ONE_CHAPTERS.md. Each entry describes that ending's
+// Archive Fragment reward and Chronicle summary for the shared reset flow.
+const ENDING_RESET_PROFILES = {
+  ENDING_ASH: {
+    reward(state) {
+      const nodeCount = Object.keys(state.run.nodes.completed || {}).length;
+      const peakPopulation = state.run.population?.peak || 0;
+      const stabilityBonus = Math.max(0, Math.min(3, Math.floor((state.run.crisis?.minStability || 0) / 30)));
+      return Math.max(14, Math.min(18, 14 + Math.floor(nodeCount / 15) + (peakPopulation >= 60 ? 1 : 0) + stabilityBonus));
+    },
+    chronicleSummary: 'Timeline #1 завершён: Пепел сохранён в Архиве.',
+  },
+  // "Малый AF-пакет" per docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md
+  // §T1 row — deliberately far below Ash's 14-18 full award; exact number is
+  // provisional pending the Act 1 balance pass.
+  ENDING_BLIGHT: {
+    reward() {
+      return 3;
+    },
+    chronicleSummary: 'Цивилизация №1 завершена: Мор сохранён в Архиве.',
+  },
+};
+
 function archiveReset(state, ruleset, command, ports) {
-  if (state.run.lifecycle !== 'ended' || state.run.ending?.id !== 'ENDING_ASH') {
+  const endingId = state.run.ending?.id;
+  const profile = ENDING_RESET_PROFILES[endingId];
+  if (state.run.lifecycle !== 'ended' || !profile) {
     return rejected('ENDING_NOT_READY_FOR_ARCHIVE');
   }
-  const nodeCount = Object.keys(state.run.nodes.completed || {}).length;
-  const peakPopulation = state.run.population?.peak || 0;
-  const stabilityBonus = Math.max(0, Math.min(3, Math.floor((state.run.crisis?.minStability || 0) / 30)));
-  const archiveFragments = Math.max(14, Math.min(18, 14 + Math.floor(nodeCount / 15) + (peakPopulation >= 60 ? 1 : 0) + stabilityBonus));
+  const archiveFragments = profile.reward(state);
   const transaction = prepareResetTransaction(state, {
     transactionId: command.transactionId,
-    endingId: 'ENDING_ASH',
+    endingId,
     reward: { archiveFragments },
     chronicleRecord: {
       id: `${state.run.id}:ending`,
       kind: 'ending',
-      endingId: 'ENDING_ASH',
+      endingId,
       subtype: state.run.ending.subtype,
       durationMs: state.run.clock.activeMs,
-      peakPopulation,
+      peakPopulation: state.run.population?.peak || 0,
       minimumStability: state.run.crisis?.minStability ?? 100,
-      summary: 'Timeline #1 завершён: Пепел сохранён в Архиве.',
+      summary: profile.chronicleSummary,
     },
   });
   const applied = applyPreparedResetTransaction(state, transaction, { ruleset, nextRunId: command.nextRunId });

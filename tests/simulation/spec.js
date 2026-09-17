@@ -132,29 +132,32 @@ between(tenthPrimordial.cost.rna, 73, 75, '10th Primordial Reaction cost');
 between(tenthPrimordial.outputDelta.rna, 0.54, 0.56, '10th Primordial Reaction RNA/s gain');
 between(tenthPrimordial.paybackSecondsByResource.rna, 130, 138, '10th Primordial Reaction payback seconds');
 
-// The full-run runner owns jobs, buildings, all era transitions, authored
-// events, crisis and Archive reset. Until balance is accepted it may report a
+// Act 1 redesign (2026-09-18, docs/gdd/13_ACT_ONE_CHAPTERS.md): the T1
+// chapter now ends at Tribe with the mandatory Мор collapse (ENDING_BLIGHT),
+// not by continuing into Settlement/City/.../Ash — that content is reused
+// later by chapters T2-T5, not replayed inside this same run. The full-run
+// runner still owns jobs, buildings, era transitions, authored events and
+// Archive reset up to that point. Until balance is accepted it may report a
 // deterministic stall instead of hiding it behind a successful early slice.
 const fullTimeline = runFullTimelineSimulation({ seed: 7, profile: 'competent' });
 assert.equal(fullTimeline.fullTimeline, true);
 if (fullTimeline.ok) {
-  assert.equal(fullTimeline.ending.id, 'ENDING_ASH');
+  assert.equal(fullTimeline.ending.id, 'ENDING_BLIGHT');
   assert.equal(fullTimeline.archiveReset.ok, true);
-  // Windows shifted after the 2026-09-17 B02x/N02x cost-monotonicity fix
-  // (both were priced below their gating node, C06 and B05 respectively;
-  // correcting them adds real gathering time before Multicellularity and
-  // Sapience, so every later checkpoint moves out by roughly the same
-  // amount). See docs/TODO.md T1-1 for the audit that found this.
-  between(fullTimeline.timings.sapienceAtMs, 38 * 60000, 44 * 60000, 'full T1 Sapience');
-  between(fullTimeline.timings.settlementAtMs, 82 * 60000, 89 * 60000, 'full T1 Settlement');
-  between(fullTimeline.timings.cityAtMs, 108 * 60000, 115 * 60000, 'full T1 City');
-  between(fullTimeline.timings.industryAtMs, 123 * 60000, 130 * 60000, 'full T1 Industry');
-  between(fullTimeline.timings.modernAtMs, 135 * 60000, 142 * 60000, 'full T1 Modern');
-  between(fullTimeline.timings.atomicAtMs, 167 * 60000, 174 * 60000, 'full T1 Atomic');
-  between(fullTimeline.timings.ashAtMs, 179 * 60000, 186 * 60000, 'full T1 Ash');
+  // Windows from the 2026-09-18 C07 Multicellularity cost fix (docs/TODO.md
+  // T1-1): it was priced so low relative to C06's already-established economy
+  // that it completed at ~19-21m instead of the canonical 24-28m window
+  // (docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md §7); correcting it adds real
+  // gathering time there, so Sapience/Tribe move out by roughly 6-7m too.
+  // Tribe itself (~62-65m) is far past the chapter's ~20min target budget
+  // (docs/gdd/13_ACT_ONE_CHAPTERS.md §3) — that gap is a known, provisional,
+  // separate balance-pass item, not something this package's gate requires
+  // fixing (the gate is Мор reachability/save-safety, not chapter pacing).
+  between(fullTimeline.timings.multicellularityAtMs, 23 * 60000, 29 * 60000, 'full T1 Multicellularity');
+  between(fullTimeline.timings.sapienceAtMs, 44 * 60000, 49 * 60000, 'full T1 Sapience');
+  between(fullTimeline.timings.tribeAtMs, 60 * 60000, 66 * 60000, 'full T1 Tribe');
 } else {
   assert.equal(fullTimeline.state.run.nodes.completed.N07 !== undefined, true);
-  assert.equal(fullTimeline.state.run.nodes.completed.T18 !== undefined, true);
   assert.equal(typeof fullTimeline.stall?.nodeId, 'string');
   assert.equal(Array.isArray(fullTimeline.stall?.resources), true);
 }

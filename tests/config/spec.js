@@ -5,7 +5,7 @@ import { validateRuleset } from '../../src/chronicles/domain/validation.js';
 const result = validateRuleset(ruleset);
 assert.deepEqual(result.errors, []);
 assert.equal(result.ok, true);
-assert.equal(JSON.parse(JSON.stringify(ruleset)).version, 'timeline1-v11-branch-cost-fix');
+assert.equal(JSON.parse(JSON.stringify(ruleset)).version, 'timeline1-v13-t1-blight-collapse');
 assert.equal(ruleset.events.some((event) => event.id === 'EV-BIO-01' && event.trigger.nodeId === 'C01'), true);
 assert.equal(ruleset.events.some((event) => event.id === 'EV-RNA-RESONANCE' && event.deck === 'early_biology'), true);
 assert.equal(ruleset.allowedEffectTypes.includes('manual_gain_multiplier'), true);

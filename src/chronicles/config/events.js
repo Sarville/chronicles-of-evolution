@@ -125,6 +125,40 @@ export const events = [
     choices: [{ id: 'continue', label: 'Продолжить', effects: [] }],
   },
   {
+    // Act 1 redesign: T1 ends here, not at Settlement — see docs/gdd/13_ACT_ONE_CHAPTERS.md.
+    id: 'EV-NAR-04', type: 'anomaly', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G015' },
+    phaseWindow: { eraIds: ['TRIBE'] }, priority: 58, telemetryKey: 'event_blight_noticed', title: 'Заметьте первых больных',
+    body: 'Часть группы не встаёт с места отдыха дольше обычного. Симптомы не совпадают с усталостью.',
+    chronicleSummary: 'Отклонение зафиксировано в плотном лагере. Причина: неизвестна.',
+    choices: [{ id: 'continue', label: 'Продолжить', effects: [{ type: 'set_flag', flag: 'run.chapter1.blight_noticed', value: true }] }],
+  },
+  {
+    id: 'EV-CR-T1', type: 'ending', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G025' },
+    phaseWindow: { eraIds: ['TRIBE'] }, priority: 100, telemetryKey: 'event_blight_choice', title: 'Мор',
+    body: 'Плотная жизнь одного лагеря не оставляет для отклонения свободного пространства. Решение необходимо сейчас, не после подтверждения причины.',
+    chronicleSummary: 'Первая цивилизация не пережила собственную плотность. Архив зафиксировал: это уже происходило.',
+    choices: [
+      { id: 'isolate', label: 'Изолировать больных', effects: [
+        { type: 'set_flag', flag: 'run.chapter1.response', value: 'isolate' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter1_subtype', value: 'blight_isolated' },
+        { type: 'set_meta_flag', flag: 'meta.archive.heard_before_seen', value: true },
+        { type: 'complete_ending', endingId: 'ENDING_BLIGHT', subtype: 'blight_isolated' },
+      ] },
+      { id: 'stay_together', label: 'Держаться вместе', effects: [
+        { type: 'set_flag', flag: 'run.chapter1.response', value: 'stay_together' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter1_subtype', value: 'blight_unified' },
+        { type: 'set_meta_flag', flag: 'meta.archive.heard_before_seen', value: true },
+        { type: 'complete_ending', endingId: 'ENDING_BLIGHT', subtype: 'blight_unified' },
+      ] },
+      { id: 'healer', label: 'Довериться целителю', effects: [
+        { type: 'set_flag', flag: 'run.chapter1.response', value: 'healer' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter1_subtype', value: 'blight_early_medicine' },
+        { type: 'set_meta_flag', flag: 'meta.archive.heard_before_seen', value: true },
+        { type: 'complete_ending', endingId: 'ENDING_BLIGHT', subtype: 'blight_early_medicine' },
+      ] },
+    ],
+  },
+  {
     id: 'EV-CIV-03', type: 'flavor', deck: 'authored', trigger: { type: 'node_completed', nodeId: 'T08' },
     phaseWindow: { eraIds: ['SETTLEMENT_EARLY'] }, priority: 35, telemetryKey: 'event_settlement_profile', title: 'Первое поле',
     body: 'Земля начинает отвечать на повторяющийся труд.', chronicleSummary: 'Племя выбрало путь постоянного труда на земле.',
@@ -200,9 +234,9 @@ export const events = [
     phaseWindow: { eraIds: ['ATOMIC'] }, priority: 100, telemetryKey: 'event_last_protocol', title: 'ПОСЛЕДНИЙ ПРОТОКОЛ',
     body: 'Несколько систем требуют окончательного решения. Полной информации нет. Времени на новый цикл проверки не осталось.', chronicleSummary: 'Последний протокол был подтверждён.',
     choices: [
-      { id: 'retaliate', label: 'Ответить ударом', effects: [{ type: 'set_flag', flag: 'run.crisis.last_protocol', value: 'retaliate' }, { type: 'complete_ending', subtype: 'ash_fire' }] },
-      { id: 'disarm', label: 'Попытаться разоружить систему', effects: [{ type: 'set_flag', flag: 'run.crisis.last_protocol', value: 'disarm' }, { type: 'complete_ending', subtype: 'ash_too_late' }] },
-      { id: 'delegate_system', label: 'Передать решение системе', effects: [{ type: 'set_flag', flag: 'run.crisis.last_protocol', value: 'delegate_system' }, { type: 'complete_ending', subtype: 'ash_system' }] },
+      { id: 'retaliate', label: 'Ответить ударом', effects: [{ type: 'set_flag', flag: 'run.crisis.last_protocol', value: 'retaliate' }, { type: 'complete_ending', endingId: 'ENDING_ASH', subtype: 'ash_fire' }] },
+      { id: 'disarm', label: 'Попытаться разоружить систему', effects: [{ type: 'set_flag', flag: 'run.crisis.last_protocol', value: 'disarm' }, { type: 'complete_ending', endingId: 'ENDING_ASH', subtype: 'ash_too_late' }] },
+      { id: 'delegate_system', label: 'Передать решение системе', effects: [{ type: 'set_flag', flag: 'run.crisis.last_protocol', value: 'delegate_system' }, { type: 'complete_ending', endingId: 'ENDING_ASH', subtype: 'ash_system' }] },
     ],
   },
 ];
