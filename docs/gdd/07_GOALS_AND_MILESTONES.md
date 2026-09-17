@@ -42,6 +42,42 @@ Create Life
 → Face Great Filter
 ```
 
+## Goal kinds (structural — 2026-09-17 playtest finding)
+
+The horizon split above (Current/Chapter/Destiny) says nothing about *shape*.
+In practice a goal is one of three kinds, and each needs different
+presentation:
+
+- **Standard** — one concrete target (build/buy a specific node or building),
+  one condition, resolved by a single direct action. Most `G0xx` chapter
+  goals and every `*_OPTIONAL` side goal.
+- **Progressive** — a derived counter accumulated from several distinct
+  sources (multiple node completions and/or event choices) across more than
+  one chapter goal, rather than a single purchase. It is not optional side
+  content and must not be treated as one: it needs (a) its own always-visible
+  slot shown alongside the current chapter goal, on par with it, not folded
+  into a collapsed side-goals list; (b) an introducing event fired at the
+  *first* contributing source, so the counter is never seen already
+  half-full with no explanation. Implemented as `slot: 'progressive'` goals
+  (see `isParallelGoal`/`selectProgressiveGoals` in the domain layer).
+  - **Cognition** — first contributor is `B04` (worth 20/100 alone), tracked
+    by `G011_COGNITION_TRACK`, introduced by `EV-BIO-04` on `B04` completion,
+    archives once Cognition reaches 100 (at `N05`, before `N07` is actually
+    bought).
+  - **World Tension / Crisis Stability** — the next instance in the route.
+    `state.run.crisis.stability` accumulates across the C1–C4 crisis event
+    choices (bloc conflict, false warning) during the Atomic era. It
+    currently has *no* player-visible representation anywhere (not even the
+    diorama), which is the same gap Cognition had. It is also not purely
+    narrative flavor: `minStability` buys 0–3 bonus Archive Fragments carried
+    into the meta-run (see `prepareResetTransaction` in `commands.js`), so it
+    already reaches into the super-global tier below. Not fixed yet — needs
+    an introducing event at crisis start plus a progressive-goal slot, once
+    the Archive/meta-progression design (below) is settled.
+- **Super-global** — spans beyond a single run (Archive / meta-progression
+  across Timelines). Not yet documented here; deferred pending a dedicated
+  design pass.
+
 ---
 
 # 3. Corrected chapters
@@ -188,6 +224,19 @@ Reward:
 
 - stronger sensory interaction;
 - Cognition contributors begin appearing.
+
+### Presentation fix (2026-09-17 playtest finding)
+
+Cognition starts accumulating the moment B04 completes (B04 alone already
+contributes 20/100), not at G012/B05. A player-visible tracker must therefore
+appear from G011 onward, not only once G013 becomes the active chapter goal —
+otherwise the player first sees the goal already partway (or, if it only
+renders at the B05→N07 stretch, halfway) full with no explanation. Implemented
+as a side goal (`G011_COGNITION_TRACK`, revealed on B04, archived once
+Cognition reaches 100) running alongside the chapter goals through
+G011→G012→G013 rather than folded into any single chapter goal, since the
+main chapter objective still needs to say "build B04" / "build B05" — a
+concrete node target — separately from the cognition threshold.
 
 ## G012 — Создайте нервную систему
 

@@ -180,9 +180,9 @@ No exclusive branch semantics.
 
 # 5. EV-BIO-02 — Адаптации тела
 
-**Trigger area:** post-AP / Multicellularity development.  
-**Type:** profile/adaptation layer.  
-**Blocking:** no.
+**Trigger area:** post-AP / Multicellularity development (fires on `C06` completion, same moment AP is granted).  
+**Type:** profile/adaptation layer, presented as its own modal like `EV-BIO-01`.  
+**Blocking:** narrow — only blocks direct `B02A`–`D` purchases while the modal is pending, so the tech tree cannot silently resolve the choice outside the window. Nothing else is paused, and once one adaptation is picked the rest stay freely purchasable (no exclusive-branch penalty).
 
 Первое открытие Adaptation Points:
 

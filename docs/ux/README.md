@@ -16,6 +16,7 @@ DS-06 может менять layout и interaction pattern, но не долж�
 - `03_DESKTOP_WIREFRAMES.md` — responsive adaptation, а не отдельная логика игры.
 - `04_COMPONENT_STATES.md` — состояния goal cards, resources, nodes, jobs, events, crisis, ending.
 - `05_TUTORIAL_AND_HINTS.md` — contextual onboarding, bottleneck hints, recovery UX.
+- `06_PERSISTENT_LAYOUT_CONCEPTS.md` — DS-08 варианты постоянной desktop/mobile компоновки для global layout approval.
 
 ## Source inputs
 

@@ -79,6 +79,47 @@ only after the unified 0–180 simulation and playtest pass.
 - [x] B02A–D optional adaptations and C07 Multicellularity / G009 transition are in the ruleset.
 - [x] add Nervous System, Cognition, behavior choice and Sapience transition package.
 - [ ] add 18–40 and 38–120 headless profiles, then tune the route as one balance pass.
+- [x] manual playtest finding (2026-09-17), fixed: `EV-BIO-02` now fires on `C06`
+  completion as its own branch-style modal (same presentation as `EV-BIO-01`/C02),
+  `G008` points its cta/highlight at the event, and `B02A`–`D` got a
+  `body_adaptation_1` branch group so the tech tree can't silently resolve the
+  choice outside the modal; `allowAdditionalBranches: true` keeps the pick
+  non-exclusive once resolved. Full 0–180 simulation timings unchanged
+  (optimized 177.3m / competent 179.8m / slow 179.4m).
+- [x] manual playtest finding (2026-09-17), fixed: cost-monotonicity audit across
+  the whole node chain found `B02A`–`D` (45–85 biomass/25–40 atp) costing far
+  less than their gate `C06` (170/100/160), and `N02A`–`C` (90/45) costing far
+  less than their gate `B05` (460/270/380) — old numbers never rescaled when
+  the trunk got more expensive in later balance passes. Repriced both groups
+  to sit at or above their gate (`B02A`-D now 175–225 biomass/105–135
+  atp/175 dna on `B02D`; `N02A`-C now 480 biomass/285 atp, uniform like the
+  `C02A`-C branch). Ruleset bumped to `timeline1-v11-branch-cost-fix` with a
+  migration entry. This pushes every later checkpoint out ~3–4m; updated
+  headless baseline: optimized 181.7m / competent 183.4m / slow 183.9m, and
+  `tests/simulation/spec.js` windows moved to match (see
+  `balance.full_t1_simulation` in PROJECT_STATE.yaml for exact anchors).
+- [x] manual playtest finding (2026-09-17), GDD gap fixed: Cognition starts
+  accumulating at B04 (contributes 20/100 alone), but no goal/UI surfaced it
+  before G013 became current at B05 — first sighting showed an already
+  half-full counter with no buildup, which read as broken. `docs/gdd/07_...`
+  only said "contributors begin appearing" (G011) / "unlock Cognition 0–100"
+  (G012) without a concrete player-visible tracker. Also: Cognition is not
+  optional side content, it's a *progressive* goal (derived multi-source
+  counter spanning several chapter goals) and must read as global, on par
+  with the current chapter goal, not folded into the collapsed side-goals
+  list — added a new `slot: 'progressive'` goal kind
+  (`isParallelGoal`/`selectProgressiveGoals`, its own panel in `app.js`)
+  distinct from `side`. `G011_COGNITION_TRACK` uses it, revealed on `B04`,
+  introduced by new event `EV-BIO-04` (so the counter's appearance is never a
+  surprise), archives at Cognition 100. Goal taxonomy (standard / progressive
+  / super-global) documented in `docs/gdd/07_GOALS_AND_MILESTONES.md` §2.
+- [ ] World Tension / Crisis Stability (Atomic era, C1–C4) is the next
+  progressive goal in the route and has the same gap Cognition had — zero
+  player-visible representation anywhere, not even the diorama — plus it
+  already feeds 0–3 bonus Archive Fragments into the meta-run via
+  `minStability`. Needs an introducing event at crisis start and a
+  progressive-goal slot; deferred until the Archive/meta-progression
+  (super-global goal) design pass.
 
 ---
 
@@ -248,8 +289,24 @@ all tracks + balance/regression
 
 # Timeline #1 — полная пересборка 0–180 минут
 
-**Status:** MANUAL PLAYTEST 0–180. Full code route and headless baseline are
-ready; release closeout awaits fresh-state manual verification.
+**(2026-09-17) SUPERSEDED DIRECTION — see `docs/DECISIONS_ACT_STRUCTURE.md`
+before continuing any work below.** The single 105–180-minute Timeline #1 is
+being replaced by a three-act structure: `T1–T5` become five short, causally
+linked chapters totaling ~3–4h (not five separate long Timelines), `P1–P3`
+become short pre-built lopsided-civilization runs, and the original Evolve's
+full mechanic set (races, multi-currency prestige, universes) opens after
+that as Act 3. The items below (`T1-0`…`T1-7`, their gates, and the
+`docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` / `docs/production/
+TIMELINE_01_REBUILD_PLAN.md` authority they cite) reflect the pre-redesign
+plan and are kept as history + reusable implementation baseline (see
+`ACT-005` in the new decision doc for how `T1-0…T1-6` map onto the new
+chapters) — they are not the current execution order. Next session: turn
+`docs/DECISIONS_ACT_STRUCTURE.md` §ACT-006 open questions into a concrete
+`T1` chapter implementation plan before writing gameplay code.
+
+**Status (pre-redesign, kept for history):** MANUAL PLAYTEST 0–180. Full code
+route and headless baseline are ready; release closeout awaits fresh-state
+manual verification.
 2026-09-16. Authority: `docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md`
 and `docs/production/TIMELINE_01_REBUILD_PLAN.md`.
 
@@ -263,6 +320,13 @@ and `docs/production/TIMELINE_01_REBUILD_PLAN.md`.
 - [x] `T1-2` — Cognition 28–40: Nervous System, Cognition `0..100` and Sapience are implemented.
 - [x] `T1-3` — First civilization 38–84: Population start, Tribe, Settlement,
   jobs, Food loop and recovery behaviour are implemented.
+- [ ] (2026-09-17) Docs desync: `docs/production/TIMELINE_01_REBUILD_PLAN.md:72`
+  still lists `T1-3` deliverable as "Food/Morale/Knowledge loop", but Morale
+  was never implemented, has no row in the mechanics-fate table
+  (`docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` §6) and isn't
+  mentioned in any other GDD. Either drop "Morale" from the plan line as
+  stale, or make an explicit balance decision to add it and give it a row/era
+  in the roadmap table.
 - [x] `T1-4` — City and Industry 84–128: city infrastructure, Power and contextual resources are implemented.
 - [x] `T1-5` — Modern and Atomic programme 128–168: Modern bridge, World Tension,
   Error 17, `Again` and late event deck are implemented.
@@ -278,6 +342,9 @@ Guardrails:
 - [ ] keep accepted `0–10` numbers unless an explicit balance decision records
   a change;
 - [ ] do not create late-game placeholder screens instead of a real epoch GDD.
+- [ ] manual playtest rule (2026-09-17): every key branch point must be presented as
+  its own explicit event/modal with a dedicated goal — never only inside a general
+  discoveries/unlock list.
 
 ---
 

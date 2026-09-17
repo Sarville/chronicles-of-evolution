@@ -3,7 +3,7 @@
 **Документ:** DS-08  
 **Статус:** draft for user review  
 **Область:** практический процесс approval постоянной компоновки, эпохальных диорам, чек-листов и handoff для ассетов/анимаций  
-**Входы:** `05_ASSET_MANIFEST.md`, `06_GENERATION_PROMPTS.md`, `../ux/02_MOBILE_WIREFRAMES.md`, `../ux/03_DESKTOP_WIREFRAMES.md`
+**Входы:** `05_ASSET_MANIFEST.md`, `06_GENERATION_PROMPTS.md`, `../ux/02_MOBILE_WIREFRAMES.md`, `../ux/03_DESKTOP_WIREFRAMES.md`, `../ux/06_PERSISTENT_LAYOUT_CONCEPTS.md`
 
 ---
 
@@ -13,8 +13,8 @@
 
 ```text
 global shell
-→ 3-4 desktop layout concepts
-→ 3-4 mobile layout concepts
+→ 3-4 desktop layout concepts from `../ux/06_PERSISTENT_LAYOUT_CONCEPTS.md`
+→ 3-4 mobile layout concepts from `../ux/06_PERSISTENT_LAYOUT_CONCEPTS.md`
 → review пользователя
 → выбранный desktop/mobile shell становится постоянным
 
@@ -45,7 +45,7 @@ global shell
 | Mobile layout concepts | 3-4 варианта | постоянный shell 360x800: статус, диорама, goal card, нижняя панель/sheet |
 | Global UI component sheet | 1 лист | базовый язык панелей, кнопок, вкладок, карточек цели и статусов |
 
-Layout concept не является финальным UI mockup. Он нужен, чтобы один раз понять постоянные места управления и пропорции диорамы.
+Layout concept не является финальным UI mockup. Он нужен, чтобы один раз понять постоянные места управления и пропорции диорамы. Подготовленные варианты и recommended short list зафиксированы в `../ux/06_PERSISTENT_LAYOUT_CONCEPTS.md`.
 
 ## Per-block diorama approval
 
@@ -62,7 +62,7 @@ Shell preview нужен только для проверки occlusion/readabil
 
 # 3. Global Layout Варианты
 
-Готовить один раз 3-4 варианта постоянного shell. Они различаются пропорцией диорамы и панелей, а не эпохальным стилем.
+Готовить один раз 3-4 варианта постоянного shell. Они различаются пропорцией диорамы и панелей, а не эпохальным стилем. Детальные варианты desktop/mobile и таблица решений находятся в `../ux/06_PERSISTENT_LAYOUT_CONCEPTS.md`.
 
 ## Variant A — Diorama Dominant
 
@@ -89,6 +89,8 @@ Shell preview нужен только для проверки occlusion/readabil
 - риск: может выглядеть слишком утилитарно.
 
 Пользователь выбирает один layout direction или смешивает два. После выбора компоновка считается постоянной для всех эпох, а milestone/cinematic states становятся временными overlays внутри той же системы.
+
+Рекомендуемый short list на момент подготовки: `LAYOUT_B` как balanced default или `LAYOUT_HYBRID` как production-safe гибрид (`D-B` desktop, `M-A` mobile, раскрытые `M-C` sheets и временные cinematic simplifications).
 
 ---
 
@@ -187,8 +189,8 @@ Production делится на логически законченные бло�
 
 До первого эпохального блока:
 
-- [ ] 3-4 desktop layout concepts;
-- [ ] 3-4 mobile layout concepts;
+- [x] 3-4 desktop layout concepts;
+- [x] 3-4 mobile layout concepts;
 - [ ] 1 global UI component sheet;
 - [ ] selected desktop shell;
 - [ ] selected mobile shell;

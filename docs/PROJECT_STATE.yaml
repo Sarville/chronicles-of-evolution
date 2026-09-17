@@ -2,8 +2,8 @@ schema_version: 1
 project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
-  scope: "Release 1: T1 Origin (life -> Ash -> Archive) through T5 Exodus / first Bioseed, followed by optional Worlds and Beyond depth. Current delivery: full T1 rebuild, 0-180 minutes."
-  work_mode: "timeline_01_full_rebuild_planning"
+  scope: "Release 1: three-act structure per docs/DECISIONS_ACT_STRUCTURE.md (2026-09-17) -- Act 1 T1-T5 as five short causally-linked chapters (~3-4h total, life -> Ash -> Archive), Act 2 P1-P3 pre-built lopsided-civilization runs, Act 3 the adapted full original Evolve mechanic set. Supersedes the prior 'T1 Origin through T5 Exodus / first Bioseed in 8-12h' framing. Existing T1-0..T1-6 implementation (below) is the reuse baseline for Act 1's chapters, not a discarded build."
+  work_mode: "act_structure_redesign_planning"
   last_updated: "2026-09-17"
   documentation_language: "Описания по умолчанию пишутся на русском. Английский допустим только для стабильных идентификаторов, имён файлов, кодовых состояний, enum-подобных меток и закреплённых названий фич."
 
@@ -15,6 +15,8 @@ authority:
     - "docs/DECISIONS_DS03.md"
     - "docs/DECISIONS_DS04.md"
     - "docs/DECISIONS_RECONCILIATION.md"
+    - "docs/DECISIONS_ACT_STRUCTURE.md"
+  act_structure_redesign: "docs/DECISIONS_ACT_STRUCTURE.md"
   gameplay_canon: "docs/gdd/01_FIRST_120_MINUTES.md"
   long_term_progression: "docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md"
   economy: "docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md"
@@ -43,9 +45,10 @@ workflow:
   no_game_code_during_design_sessions: true
 
 design:
-  current_session: "T1-REBUILD"
-  status: "implementation_program_approved"
-  objective: "Rebuild the complete T1 Origin from RNA to mandatory Ash/reset; begin with T1-0 Event Engine and 0-18 audit"
+  current_session: "ACT-STRUCTURE-REDESIGN"
+  status: "act_structure_direction_accepted_pending_chapter_design"
+  objective: "Resolve docs/DECISIONS_ACT_STRUCTURE.md ACT-006 open questions (per-chapter minute budget, Bioseed's fate, T2/T4 skin-swap mechanics, P1-P3 naming) into a concrete T1-T5 chapter implementation plan, then rewrite ACT-007's document list (12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md, TIMELINE_01_REBUILD_PLAN.md, scenario/*, 07_GOALS_AND_MILESTONES.md). Prior objective (rebuild T1 Origin RNA->Ash as one 180min run) is superseded, not deleted: see 'previous_design_objective' below and ACT-005 for how it's reused."
+  previous_design_objective: "Rebuild the complete T1 Origin from RNA to mandatory Ash/reset; begin with T1-0 Event Engine and 0-18 audit (superseded 2026-09-17 by docs/DECISIONS_ACT_STRUCTURE.md; T1-0..T1-6 delivery below remains valid as Act 1's reuse baseline)"
   accepted_reconciliation:
     - "RNA -> replication -> DNA -> membrane -> Cell restored as early gameplay language"
     - "Information removed as player-facing spendable resource"
@@ -157,7 +160,7 @@ implementation:
       status: implemented_pending_manual_playtest
       delivered: "Event Engine core, original RNA→DNA resource-flow correction, finite storage caps with mandatory storage gates, ATP rename, rebalanced C03/C05/C06 costs and save migrations. Discoveries no longer expand capacity. Included in the 0-180 manual fresh-state playtest."
       plan: "docs/production/TIMELINE_01_REBUILD_PLAN.md"
-    T1-1: { name: "Organism: AP and Multicellularity", status: implemented_pending_manual_playtest, delivered: "Run-local Adaptation Points, atomic optional B02A-D purchases, G008 and C07/G009 Multicellularity transition implemented." }
+    T1-1: { name: "Organism: AP and Multicellularity", status: implemented_pending_manual_playtest, delivered: "Run-local Adaptation Points, atomic optional B02A-D purchases, G008 and C07/G009 Multicellularity transition implemented. EV-BIO-02 now presents the B02 pick as its own branch-style modal (2026-09-17 playtest fix), same treatment as EV-BIO-01/C02. B02A-D and N02A-C costs corrected to no longer undercut their gating node (C06/B05); see balance.full_t1_simulation." }
     T1-2: { name: "Cognition: Nervous System through Sapience", status: implemented_pending_manual_playtest, delivered: "Derived Cognition, two small Cognition events, behavior branch event and transactional Sapience start are in the active ruleset." }
     T1-3: { name: "First civilization: Tribe through Settlement", status: implemented_pending_manual_playtest, delivered: "Sapience→EARLY_CIV, jobs/Food loops, Tribe, Agriculture, permanent Settlement and lineage-safe job remapping are implemented." }
     T1-4: { name: "City and Industry", status: implemented_pending_manual_playtest, delivered: "Writing, City, Mechanization, Steam, Electrification, infrastructure gates and Power are implemented." }
@@ -167,8 +170,9 @@ implementation:
 
 timeline_01_rebuild:
   status: "manual_playtest_0_180"
-  target_ruleset: "timeline1-v10-adaptation-repair"
-  scope: "RNA to mandatory first Ash/Archive/reset, target 177-183 active minutes for a competent run"
+  superseded_by: "docs/DECISIONS_ACT_STRUCTURE.md (2026-09-17) -- this block describes the pre-redesign single-180min-run plan, kept as history/reuse baseline for Act 1's five chapters, not the current execution order"
+  target_ruleset: "timeline1-v11-branch-cost-fix"
+  scope: "RNA to mandatory first Ash/Archive/reset, target 179-186 active minutes for a competent run"
   first_package: "T1 full route implemented; begin manual fresh-state playtest 0-180. 180 minutes is the current pacing target, subject to playtest evidence."
   canonical_plan: "docs/production/TIMELINE_01_REBUILD_PLAN.md"
   preserved_baseline: "timeline1-v2-reconciled biological 0-18, subject to explicit full-run validation"
@@ -194,7 +198,7 @@ iteration_4:
   note: "Closed by direct user confirmation on 2026-09-16, ahead of a manual 10-18 playtest pass. Automated tests/simulation/build back the implementation, and goal-ID alignment with GDD/DS-05 canon is now verified; treat exact 10-18 numbers as provisional (see balance.biological_10_18) until an actual playtest happens."
 
 balance:
-  ruleset_target: "timeline1-v10-adaptation-repair"
+  ruleset_target: "timeline1-v11-branch-cost-fix"
   old_0_10_ei_balance: "historical_superseded"
   biological_numbers: "0_10_original_resource_flow_corrected"
   post_cell_numbers: "implemented_pending_manual_0_180_validation"
@@ -202,7 +206,7 @@ balance:
   full_t1_simulation:
     status: "headless_baseline_pending_manual_0_180"
     profile: "optimized, competent and slow / seed 7"
-    result: "All profiles complete Ash plus Archive reset: optimized 177.3m, competent 179.8m, slow 179.4m. Competent anchors: Sapience 38.4m, Settlement 82.4m, City 108.6m, Industry 123.7m, Modern 135.2m, Atomic 167.8m."
+    result: "2026-09-17 playtest found B02A-D and N02A-C priced below the core node that gates them (C06 and B05 respectively); fixed to cost at least as much as their gate, which pushed every later checkpoint out by roughly 3-4m. Updated baseline: optimized 181.7m, competent 183.4m, slow 183.9m. Competent anchors: Sapience 42.1m, Settlement 86.1m, City 112.3m, Industry 127.3m, Modern 138.8m, Atomic 171.4m."
   crisis_contract: "implemented_pending_manual_0_180"
   biological_0_10:
     status: "accepted_with_original_resource_flow_and_storage_caps"
@@ -236,5 +240,6 @@ open_decisions:
 
 next_action:
   owner: "Codex"
-  session: "T1-7"
-  description: "Use the complete full-T1 simulator to rebalance storage capacity/costs, population thresholds and civilization pacing without reopening the frozen 0-10 baseline."
+  session: "ACT-STRUCTURE-REDESIGN"
+  description: "Turn docs/DECISIONS_ACT_STRUCTURE.md ACT-006 open questions into a concrete T1-T5 chapter plan (era cutoffs, per-chapter minute budget, T2/T4 skin swap scope), then rework ACT-007's document list. Do this before resuming any T1-7 rebalance work."
+  previous_next_action: "owner Codex, session T1-7: use the complete full-T1 simulator to rebalance storage capacity/costs, population thresholds and civilization pacing without reopening the frozen 0-10 baseline (superseded 2026-09-17, resume only if the redesign is later rolled back)"

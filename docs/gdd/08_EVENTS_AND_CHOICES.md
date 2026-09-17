@@ -26,6 +26,13 @@ ending/crisis > blocking branch > milestone > required narrative > anomaly > sid
 
 No two blocking modal choices at once.
 
+Manual playtest rule (2026-09-17): every key branch/choice point must be
+surfaced as its own explicit event/modal with a dedicated goal, the same way
+`EV-BIO-01` is. It must never be reachable only through a general
+adaptation/unlock/discoveries list — non-exclusive choices (like body
+adaptations) still need an explicit presentation, even if the player can pick
+more than one over time.
+
 ---
 
 # 2. Corrected event sequence
@@ -147,6 +154,15 @@ Player may combine several depending on AP budget.
 The primary Absorption/Symbiosis/Shell trait remains visually important and may modify adaptation effects.
 
 Chronicle records purchased adaptations.
+
+Presentation (2026-09-17 playtest finding, implemented): `EV-BIO-02` fires
+on `C06` completion as its own branch-style modal, the same window treatment
+as `EV-BIO-01`, and `G008` points at it directly (`cta`/`highlight` type
+`event`). It only blocks direct `B02A`–`D` purchases while pending, so a
+player cannot silently complete the choice from the tech tree without seeing
+the window; once one pick resolves the event, the remaining adaptations stay
+freely purchasable (`body_adaptation_1` branch group with
+`allowAdditionalBranches: true` — no exclusivity, no cost penalty).
 
 ---
 
