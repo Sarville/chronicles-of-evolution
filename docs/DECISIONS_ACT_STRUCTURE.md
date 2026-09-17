@@ -375,11 +375,37 @@ player has to learn, consistent with ACT-002's single-currency rule.
   new non-`ENDING_`-id resolution scenes (`P` reveal, Act 3 finales) that
   live in `02_ACT2_ACT3_SCRIPT.md` instead of the collapse-ending table.
 
-### Still open (unchanged from ACT-006)
+### Still open (unchanged from ACT-006, updated 2026-09-18)
 
 - Naming for `P1–P3`.
-- Exact achievement list/count per chapter — provisional in
-  `14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md` §4, finalized after Act 2/3 are
-  implemented.
-- Exact per-act completion weighting (§3 of the same doc) — needs
-  telemetry/playtest like every other numeric target in this project.
+- Exact achievement list/count is now fixed by
+  `docs/gdd/15_ACT_THREE_SYSTEMS.md` §7 (39 Act 3 content-collection
+  achievements across `races`/`prestige`/`universes`/`arpa`) — what remains
+  open is only the numeric tuning inside each system (§9 of that doc), not
+  the list itself.
+- Exact per-act completion weighting (§3 of `14_GLOBAL_ARCHIVE_AND_
+  ACHIEVEMENTS.md`) — needs telemetry/playtest like every other numeric
+  target in this project.
+
+---
+
+## ACT-013 — Act 3 system-by-system design (2026-09-18 extension)
+
+### Decision
+
+`docs/gdd/15_ACT_THREE_SYSTEMS.md` resolves `ACT-006`'s "detailed Act 3
+GDD" item: it maps every family from the old `12_LONG_TERM_PROGRESSION_
+AND_RESET_ROADMAP.md` §6 catalog onto one of the four `ACT-009` entry-reveal
+systems (`races`, `prestige`, `universes`, `arpa`) or an explicit "already
+covered by Act 1/2 depth, no separate Act 3 slot" note — nothing from the
+PRD's promised mechanic families is left unassigned. It also fixes the
+finite Act 3 content-collection achievement list required by `ACT-011`
+(`14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md` §4.5): 10 races, 7 prestige
+currencies, 8 universe types, 6 challenge modifiers, 8 ARPA mega-projects —
+39 total.
+
+### Reason
+
+`ACT-006`/`ACT-012` explicitly named this as a blocker for §4.5's finite
+list. Docs-only, no code changes; exact numeric tuning inside each system
+stays open per `15_...md` §9.

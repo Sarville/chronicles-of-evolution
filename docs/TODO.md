@@ -302,28 +302,28 @@ plan and are kept as history + reusable implementation baseline (see
 `ACT-005` in the new decision doc for how `T1-0…T1-6` map onto the new
 chapters) — they are not the current execution order.
 
-**(2026-09-17, updated) Next session:** GDD/scenario docs for the full
-three-act structure (Act 1 `T1–T5`, Act 2 `P1–P3`, Act 3 + both finales +
-global Archive/achievements) are now complete — see the two entries below.
-Nothing left to write before code. Pick one of two next steps:
+**(2026-09-18) Act 3 detailed GDD done:** `docs/gdd/15_ACT_THREE_SYSTEMS.md`
+resolves `ACT-006`/`ACT-012`'s "detailed Act 3 GDD" item — system-by-system
+map (`races`/`prestige`/`universes`/`arpa`) and the finite 39-item Act 3
+content-collection achievement list for `14_GLOBAL_ARCHIVE_AND_
+ACHIEVEMENTS.md` §4.5. See `DECISIONS_ACT_STRUCTURE.md` `ACT-013`. Docs-only.
+
+**Next session:** one item left before code, plus one unrelated cleanup:
 
 1. Turn `docs/DECISIONS_ACT_STRUCTURE.md` §ACT-006/§ACT-012 "still open"
    items (per-chapter minute budget, `P1–P3` naming, `T2`/`T4` swap
    mechanics) into a concrete `T1`-chapter implementation plan, then start
    coding `Мор`/`Катаклизм`/`Раскол`/`Авария` + `t5_synthesis`
    (`docs/production/TIMELINE_01_REBUILD_PLAN.md` Package B/C/D) — this is
-   the shortest path to a playable Act 1.
-2. Start the still-unwritten detailed Act 3 GDD (system-by-system design,
-   finite achievement list for `docs/gdd/14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md`
-   §4.5) — needed before Act 3 can be implemented, but Act 1 code can
-   proceed without it.
+   the shortest path to a playable Act 1. All GDD/scenario writing needed
+   before this is now complete (Act 1, Act 2, Act 3 all have canonical docs).
 
 Separately, unrelated to this doc track: this working tree also has
 uncommitted gameplay-code changes (`src/chronicles/config/*`,
 `src/chronicles/domain/*`, `tests/*`, `evolve/chronicles.js`) predating this
 session's docs work — see the manual-playtest status note below. Review and
 commit/discard that separately; it was intentionally left untouched by the
-2026-09-17 docs commits.
+2026-09-17/18 docs commits.
 
 **(2026-09-17) GDD/scenario rework for the five-chapter structure is done.**
 New: `docs/gdd/13_ACT_ONE_CHAPTERS.md` (canonical `T1–T5` chapter map: era
