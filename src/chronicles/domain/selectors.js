@@ -1,6 +1,7 @@
 import { createRulesetIndexes } from '../config/index.js';
 import { canAfford, multiplyCost, scaleCost } from './services/costs.js';
 import { branchAvailable, branchCostMultiplier, prerequisitesMet } from './services/evolution.js';
+import { eventBlocksNode } from './services/events.js';
 import { getGoalState, goalConditionsMet } from './services/goals.js';
 import {
   calculateManualReward,
@@ -94,7 +95,8 @@ export function timeUntilAffordable(state, ruleset, cost) {
       continue;
     }
     missing[resourceId] = deficit;
-    if ((rates[resourceId] || 0) <= 0) {
+    const cap = calculateCap(state, resourceId, ruleset);
+    if (amount > cap || (rates[resourceId] || 0) <= 0) {
       return { status: 'unavailable', resourceId, missing };
     }
     seconds = Math.max(seconds, deficit / rates[resourceId]);
@@ -145,6 +147,11 @@ export function selectCognition(state, ruleset) {
   return { value: cognitionValue(state, contributions), max: 100 };
 }
 
+function checkAffordability(state, cost) {
+  if (state.settings.testMode === true) return { ok: true };
+  return canAfford(state, cost);
+}
+
 export function selectNodeStatus(state, ruleset, nodeId) {
   const indexes = createRulesetIndexes(ruleset);
   const node = indexes.nodes[nodeId];
@@ -154,14 +161,14 @@ export function selectNodeStatus(state, ruleset, nodeId) {
   if (state.run.nodes.completed[nodeId]) {
     return 'completed';
   }
-  if (!prerequisitesMet(state, node) || !branchAvailable(state, ruleset, node)) {
+  if (!prerequisitesMet(state, node) || !branchAvailable(state, ruleset, node) || eventBlocksNode(state, ruleset, node)) {
     return 'locked';
   }
   if ((node.adaptationPointCost || 0) > (state.run.adaptation?.points || 0)) {
     return 'available_unaffordable';
   }
   const cost = selectNodeCost(state, ruleset, nodeId);
-  return canAfford(state, cost).ok ? 'available_affordable' : 'available_unaffordable';
+  return checkAffordability(state, cost).ok ? 'available_affordable' : 'available_unaffordable';
 }
 
 export function selectProducerPrice(state, ruleset, producerId) {
@@ -188,7 +195,9 @@ export function selectProducerStatus(state, ruleset, producerId) {
   if (!producer.unlocksAtStart && !prerequisitesMet(state, producer)) {
     return 'locked';
   }
-  return canAfford(state, selectProducerPrice(state, ruleset, producerId)).ok ? 'available_affordable' : 'available_unaffordable';
+  return checkAffordability(state, selectProducerPrice(state, ruleset, producerId)).ok
+    ? 'available_affordable'
+    : 'available_unaffordable';
 }
 
 export function selectBuildingPrice(state, ruleset, buildingId) {
@@ -204,9 +213,9 @@ export function selectBuildingStatus(state, ruleset, buildingId) {
   if (!prerequisitesMet(state, building)) return 'locked';
   const count = state.run.buildings[buildingId]?.count || 0;
   if (building.maxCount != null && count >= building.maxCount) return 'maxed';
-  return canAfford(state, selectBuildingPrice(state, ruleset, buildingId)).ok
-    ? 'available_affordable'
-    : 'available_unaffordable';
+  const price = selectBuildingPrice(state, ruleset, buildingId);
+  const affordability = checkAffordability(state, price);
+  return affordability.ok ? 'available_affordable' : 'available_unaffordable';
 }
 
 export function selectProducerOutputView(state, ruleset, producerId) {
@@ -272,12 +281,23 @@ export function selectCurrentGoal(state, ruleset) {
   };
 }
 
-export function selectSideGoals(state, ruleset) {
+function activeParallelGoals(state, ruleset) {
   const indexes = createRulesetIndexes(ruleset);
   return state.run.goals.side.activeIds
     .map((goalId) => indexes.goals[goalId])
     .filter(Boolean)
     .map((goal) => ({ ...goal, state: getGoalState(state, goal.id), completed: goalConditionsMet(state, goal) }));
+}
+
+export function selectSideGoals(state, ruleset) {
+  return activeParallelGoals(state, ruleset).filter((goal) => goal.slot !== 'progressive');
+}
+
+// Progressive goals (Cognition, later World Tension) track a derived
+// multi-source counter alongside the current chapter goal; they're shown in
+// their own global slot rather than folded into optional side content.
+export function selectProgressiveGoals(state, ruleset) {
+  return activeParallelGoals(state, ruleset).filter((goal) => goal.slot === 'progressive');
 }
 
 export function selectManualProcessView(state, ruleset, processId) {

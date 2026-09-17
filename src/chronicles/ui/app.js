@@ -1,5 +1,6 @@
 import { createBrowserStorage } from '../adapters/storageAdapter.js';
 import { ruleset, createRulesetIndexes } from '../config/index.js';
+import { calculateCap } from '../domain/services/resources.js';
 import {
   selectCurrentGoal,
   formatEta,
@@ -16,6 +17,7 @@ import {
   selectBuildingStatus,
   selectProductionRates,
   selectSideGoals,
+  selectProgressiveGoals,
   selectVisibleResources,
   selectPopulation,
   selectCognition,
@@ -130,9 +132,22 @@ function formatCost(cost) {
     .join(' + ');
 }
 
+function shortfallColor(resourceId, amount) {
+  const current = engine().state.run.resources[resourceId]?.amount || 0;
+  if (current >= amount) {
+    return null;
+  }
+  const cap = calculateCap(engine().state, resourceId, ruleset);
+  return amount > cap ? 'red' : 'lightcoral';
+}
+
 function formatWholeCost(cost) {
   return Object.entries(cost)
-    .map(([resourceId, amount]) => `${formatResourceAmount(amount)} ${RESOURCE_NAMES[resourceId] || resourceId}`)
+    .map(([resourceId, amount]) => {
+      const label = `${formatResourceAmount(amount)} ${RESOURCE_NAMES[resourceId] || resourceId}`;
+      const color = shortfallColor(resourceId, amount);
+      return color ? `<span style="color:${color}">${label}</span>` : label;
+    })
     .join(' + ');
 }
 
@@ -173,14 +188,34 @@ function goalProgress(goal) {
   if (!goal) return '';
   if (goal.nodeId) {
     const node = indexes.nodes[goal.nodeId];
-    return Object.entries(selectNodeCost(engine().state, ruleset, goal.nodeId))
+    const lines = Object.entries(selectNodeCost(engine().state, ruleset, goal.nodeId))
       .map(([resourceId, amount]) => {
         const current = engine().state.run.resources[resourceId]?.amount || 0;
-        return `${RESOURCE_NAMES[resourceId] || resourceId}: ${formatResourceAmount(Math.min(current, amount))} / ${formatResourceAmount(amount)}`;
-      })
-      .join('<br>');
+        const line = `${RESOURCE_NAMES[resourceId] || resourceId}: ${formatResourceAmount(Math.min(current, amount))} / ${formatResourceAmount(amount)}`;
+        const color = shortfallColor(resourceId, amount);
+        return color ? `<span style="color:${color}">${line}</span>` : line;
+      });
+    if (node?.cognitionMin != null) {
+      const cognition = selectCognition(engine().state, ruleset);
+      lines.push(`Cognition: ${formatNumber(cognition.value)} / ${cognition.max}`);
+    }
+    return lines.join('<br>');
+  }
+  const cognitionCondition = goal.conditions?.find((condition) => condition.type === 'cognition_at_least');
+  if (cognitionCondition) {
+    const cognition = selectCognition(engine().state, ruleset);
+    return `Cognition: ${formatNumber(cognition.value)} / ${cognitionCondition.value}`;
   }
   return goal.completed ? 'Complete' : 'In progress';
+}
+
+function goalEta(goal) {
+  if (!goal?.nodeId) {
+    return '';
+  }
+  const status = selectNodeStatus(engine().state, ruleset, goal.nodeId);
+  const cost = selectNodeCost(engine().state, ruleset, goal.nodeId);
+  return etaText(status, cost);
 }
 
 function renderResources() {
@@ -203,18 +238,33 @@ function renderObjective() {
   }
   const goalState = goal.state;
   const hint = goalState.hintShownAtMs != null ? `<p class="hint">${goal.hint}</p>` : '';
+  const eta = goalEta(goal);
   const side = sideGoals
-    .map((sideGoal) => `<div class="side-goal"><strong>${sideGoal.title}</strong><span>${sideGoal.description}</span></div>`)
+    .map((sideGoal) => {
+      const progress = goalProgress(sideGoal);
+      return `<div class="side-goal"><strong>${sideGoal.title}</strong><span>${sideGoal.description}</span>${progress ? `<span>${progress}</span>` : ''}</div>`;
+    })
     .join('');
   return `<section class="panel objective">
     <h2>Objective</h2>
     <h3>${goal.title}</h3>
     <p>${goal.description}</p>
     <div class="progress">${goalProgress(goal)}</div>
+    ${eta ? `<p>${eta}</p>` : ''}
     ${hint}
     <button data-action="focus" data-target="${goal.cta?.targetId || ''}">${goal.cta?.label || 'Continue'}</button>
     ${side ? `<div class="side-goals">${side}</div>` : ''}
   </section>`;
+}
+
+function renderProgressiveGoals() {
+  return selectProgressiveGoals(engine().state, ruleset)
+    .map((goal) => `<section class="panel progressive-goal">
+      <h2>${goal.title}</h2>
+      <p>${goal.description}</p>
+      <div class="progress">${goalProgress(goal)}</div>
+    </section>`)
+    .join('');
 }
 
 function renderPendingEvent() {
@@ -364,12 +414,13 @@ function renderEvolution() {
     const status = selectNodeStatus(engine().state, ruleset, nodeId);
     const optional = node.type === 'OPTIONAL' ? '<small class="optional">OPTIONAL</small>' : '';
     const cost = selectNodeCost(engine().state, ruleset, nodeId);
+    const completed = status === 'completed';
     const eta = etaText(status, cost);
-    const etaLabel = eta || (status === 'completed' ? 'Готово' : status === 'locked' ? 'Недоступно' : 'Сейчас');
+    const etaLabel = eta || `ETA ${status === 'locked' ? 'Недоступно' : 'Сейчас'}`;
     return `<button class="node ${status} ${focusedEntityId === nodeId ? 'focused' : ''}" data-entity-id="${nodeId}" data-action="node" data-id="${nodeId}" ${status === 'available_affordable' ? '' : 'disabled'}>
       <span><strong>${nodeId} — ${NODE_NAMES[nodeId] || node.labelKey || nodeId}</strong>${optional}</span>
-      <span>${status.replaceAll('_', ' ')}<small>ETA ${etaLabel}</small></span>
-      <small>${formatNodeCost(node, cost)}</small>
+      <span>${status.replaceAll('_', ' ')}${completed ? '' : `<small>${etaLabel}</small>`}</span>
+      ${completed ? '' : `<small>${formatNodeCost(node, cost)}</small>`}
     </button>`;
   }).join('');
   const adaptationPoints = engine().state.run.adaptation?.points || 0;
@@ -377,7 +428,8 @@ function renderEvolution() {
 }
 
 function renderDiorama() {
-  const cognition = engine().state.run.nodes.completed.B05 ? `<span>Cognition ${selectCognition(engine().state, ruleset).value}/100</span>` : '';
+  const cognitionValue = selectCognition(engine().state, ruleset).value;
+  const cognition = cognitionValue > 0 ? `<span>Cognition ${cognitionValue}/100</span>` : '';
   return `<section class="diorama" aria-label="World state">
     <div class="orbital orbital-a"></div>
     <div class="orbital orbital-b"></div>
@@ -406,6 +458,7 @@ const renderDevPanel = DEV
       <button data-action="grant" data-resource="dna">+25 DNA</button>
       <button data-action="grant" data-resource="biomass">+25 Biomass</button>
       <button data-action="grant" data-resource="atp">+25 ATP</button>
+      <button data-action="toggle-test-mode">Test mode: ${engine().state.settings.testMode ? 'ON' : 'OFF'}</button>
       <button data-action="dev-reset">Dev reset</button>
       <button data-action="dump">Dump state</button>
     </div>
@@ -452,6 +505,7 @@ function render() {
       </div>
       <aside>
         ${renderEnding() || renderObjective()}
+        ${renderProgressiveGoals()}
         <section class="panel status"><h2>Save</h2><p>${lastSaveMessage}</p>${engine().state.run.migrationNotice ? `<p class="hint">${engine().state.run.migrationNotice}</p>` : ''}<button data-action="save">Save now</button><button data-action="new-run">New run</button></section>
         ${renderDevPanel()}
       </aside>
@@ -517,6 +571,7 @@ function handleAction(target) {
   }
   if (DEV && action === 'speed') debugApi().setTimeScale(Number(button.dataset.scale));
   if (DEV && action === 'grant') debugApi().grant(button.dataset.resource, button.dataset.resource === 'rna' ? 100 : 25);
+  if (DEV && action === 'toggle-test-mode') debugApi().toggleTestMode();
   if (DEV && action === 'dev-reset') debugApi().manualDevReset({ runId: `run_dev_${Date.now()}` });
   if (DEV && action === 'dump') document.getElementById('dev-dump').textContent = JSON.stringify(debugApi().dumpState(), null, 2);
   render();
@@ -567,6 +622,8 @@ function installStyles() {
     .hint { border-left: 3px solid #f0c36a; padding-left: 10px; color: #f0d99a !important; }
     .side-goal { border-top: 1px solid #2d383c; padding-top: 10px; margin-top: 10px; }
     .side-goal span { display: block; color: #c0cbc8; margin-top: 3px; }
+    .progressive-goal { border-color: #4a6a7a; }
+    .progressive-goal h2 { color: #9fd0e6; }
     .status button { width: 100%; margin-top: 8px; text-align: center; }
     .event-panel { margin: 0 0 12px; padding: 16px; border: 1px solid #66d0a5; border-radius: 8px; background: #18302c; box-shadow: 0 8px 30px rgba(0,0,0,.2); }
     .event-panel.blocking { border-color: #f0c36a; background: #332d1f; }

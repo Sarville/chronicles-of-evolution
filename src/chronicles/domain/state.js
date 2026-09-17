@@ -69,6 +69,7 @@ export function createInitialGameState(options = {}) {
     settings: {
       locale: 'ru',
       autosave: true,
+      testMode: false,
     },
     session: {
       dirty: false,

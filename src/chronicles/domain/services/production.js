@@ -111,6 +111,12 @@ export function applyProduction(state, ruleset, deltaMs, ports) {
     for (const [resourceId, rate] of Object.entries(flow.input)) available[resourceId] = Math.max(0, (available[resourceId] || 0) - rate * seconds * scale);
     return { ...flow, scale };
   });
+  // Inputs are applied for every flow before any output: a resource that is
+  // both produced and consumed within the same tick (RNA -> DNA Synthesis,
+  // Biomass -> Respiration) must still land on its cap at the end of the
+  // tick. Interleaving input/output per flow let a later flow's consumption
+  // permanently shave off whatever an earlier flow had just topped up to
+  // the cap, so the stock could never visibly reach it.
   const events = [];
   for (const flow of appliedFlows) {
     for (const [resourceId, rate] of Object.entries(flow.input)) {
@@ -118,6 +124,8 @@ export function applyProduction(state, ruleset, deltaMs, ports) {
       actualRates[resourceId] = (actualRates[resourceId] || 0) - appliedRate;
       events.push(...addResource(state, resourceId, -appliedRate * seconds, ruleset, ports));
     }
+  }
+  for (const flow of appliedFlows) {
     for (const [resourceId, rate] of Object.entries(flow.output)) {
       const appliedRate = rate * flow.scale;
       actualRates[resourceId] = (actualRates[resourceId] || 0) + appliedRate;

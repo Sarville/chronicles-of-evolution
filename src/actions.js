@@ -7552,7 +7552,9 @@ export function payCosts(c_action, costs){
             }
             else if (res !== 'Morale' && res !== 'Army' && res !== 'HellArmy' && res !== 'Troops' && res !== 'Structs' && res !== 'Bool' && res !== 'Custom'){
                 let cost = costs[res]();
-                global.resource[res].amount -= cost;
+                if (!global.settings.expose){
+                    global.resource[res].amount -= cost;
+                }
                 if (res === 'Knowledge'){
                     global.stats.know += cost;
                 }
@@ -7742,7 +7744,8 @@ export function checkCosts(costs){
                 return;
             }
             let f_res = res === 'Species' ? global.race.species : res;
-            if (testCost > Number(global.resource[f_res].amount) || (global.resource[f_res].max >= 0 && testCost > global.resource[f_res].max)){
+            // Test mode: skip the current-amount check, but still respect the resource cap.
+            if ((!global.settings.expose && testCost > Number(global.resource[f_res].amount)) || (global.resource[f_res].max >= 0 && testCost > global.resource[f_res].max)){
                 test = false;
                 return;
             }

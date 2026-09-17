@@ -59,6 +59,27 @@ export const events = [
     ],
   },
   {
+    id: 'EV-BIO-02', type: 'branch', deck: 'authored',
+    trigger: { type: 'node_completed', nodeId: 'C06' }, phaseWindow: { eraIds: ['CELLULAR'] }, priority: 75,
+    blocks: { branchGroup: 'body_adaptation_1' }, telemetryKey: 'event_body_adaptation', title: 'Адаптации тела',
+    body: 'Некоторые изменения не обязательны для следующего шага. Они определят, каким станет организм.',
+    chronicleSummary: 'Адаптация сохранена в истории вида.',
+    choices: [
+      { id: 'mobility', label: 'Подвижность', purchaseNodeId: 'B02A' },
+      { id: 'sensory', label: 'Чувствительные клетки', purchaseNodeId: 'B02B' },
+      { id: 'digestion', label: 'Пищеварение', purchaseNodeId: 'B02C' },
+      { id: 'structural', label: 'Опорные ткани', purchaseNodeId: 'B02D' },
+    ],
+  },
+  {
+    id: 'EV-BIO-04', type: 'milestone', deck: 'authored',
+    trigger: { type: 'node_completed', nodeId: 'B04' }, phaseWindow: { eraIds: ['MULTICELLULAR'] }, priority: 60,
+    telemetryKey: 'event_cognition_begins', title: 'Проблеск разума',
+    body: 'Нервная ткань впервые связывает прошлое с настоящим: то, что уже случилось, начинает менять то, что происходит сейчас.',
+    chronicleSummary: 'Вид начал накапливать когнитивную сложность.',
+    choices: [{ id: 'continue', label: 'Продолжить', effects: [] }],
+  },
+  {
     id: 'EV-BIO-03', type: 'branch', deck: 'authored',
     trigger: { type: 'node_completed', nodeId: 'B05' }, phaseWindow: { eraIds: ['MULTICELLULAR'] }, priority: 80,
     blocks: { branchGroup: 'behavior_1' }, telemetryKey: 'event_behavior_strategy', title: 'Поведение',

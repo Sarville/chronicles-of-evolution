@@ -140,13 +140,18 @@ assert.equal(fullTimeline.fullTimeline, true);
 if (fullTimeline.ok) {
   assert.equal(fullTimeline.ending.id, 'ENDING_ASH');
   assert.equal(fullTimeline.archiveReset.ok, true);
-  between(fullTimeline.timings.sapienceAtMs, 36 * 60000, 41 * 60000, 'full T1 Sapience');
-  between(fullTimeline.timings.settlementAtMs, 78 * 60000, 86 * 60000, 'full T1 Settlement');
-  between(fullTimeline.timings.cityAtMs, 104 * 60000, 112 * 60000, 'full T1 City');
-  between(fullTimeline.timings.industryAtMs, 120 * 60000, 128 * 60000, 'full T1 Industry');
-  between(fullTimeline.timings.modernAtMs, 132 * 60000, 140 * 60000, 'full T1 Modern');
-  between(fullTimeline.timings.atomicAtMs, 165 * 60000, 172 * 60000, 'full T1 Atomic');
-  between(fullTimeline.timings.ashAtMs, 177 * 60000, 183 * 60000, 'full T1 Ash');
+  // Windows shifted after the 2026-09-17 B02x/N02x cost-monotonicity fix
+  // (both were priced below their gating node, C06 and B05 respectively;
+  // correcting them adds real gathering time before Multicellularity and
+  // Sapience, so every later checkpoint moves out by roughly the same
+  // amount). See docs/TODO.md T1-1 for the audit that found this.
+  between(fullTimeline.timings.sapienceAtMs, 38 * 60000, 44 * 60000, 'full T1 Sapience');
+  between(fullTimeline.timings.settlementAtMs, 82 * 60000, 89 * 60000, 'full T1 Settlement');
+  between(fullTimeline.timings.cityAtMs, 108 * 60000, 115 * 60000, 'full T1 City');
+  between(fullTimeline.timings.industryAtMs, 123 * 60000, 130 * 60000, 'full T1 Industry');
+  between(fullTimeline.timings.modernAtMs, 135 * 60000, 142 * 60000, 'full T1 Modern');
+  between(fullTimeline.timings.atomicAtMs, 167 * 60000, 174 * 60000, 'full T1 Atomic');
+  between(fullTimeline.timings.ashAtMs, 179 * 60000, 186 * 60000, 'full T1 Ash');
 } else {
   assert.equal(fullTimeline.state.run.nodes.completed.N07 !== undefined, true);
   assert.equal(fullTimeline.state.run.nodes.completed.T18 !== undefined, true);

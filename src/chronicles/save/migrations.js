@@ -175,6 +175,7 @@ export function normalizeEnvelope(envelope) {
     settings: {
       locale: 'ru',
       autosave: true,
+      testMode: false,
       ...(envelope.settings || {}),
     },
     transactions: {
@@ -235,6 +236,11 @@ export function migrateEnvelope(envelope) {
     migrated.rulesetVersion = 'timeline1-v10-adaptation-repair';
     migrated.run.rulesetVersion = 'timeline1-v10-adaptation-repair';
     migrated.run.migrationNotice = 'T1-7: Adaptation Points restored for completed Cell Coordination.';
+  }
+  if (migrated.rulesetVersion === 'timeline1-v10-adaptation-repair') {
+    migrated.rulesetVersion = 'timeline1-v11-branch-cost-fix';
+    migrated.run.rulesetVersion = 'timeline1-v11-branch-cost-fix';
+    migrated.run.migrationNotice = 'T1-1 fix: B02A-D and N02A-C no longer cost less than the core node that unlocks them.';
   }
   return migrated;
 }

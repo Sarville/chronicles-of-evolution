@@ -22,6 +22,8 @@ import {
   selectCognition,
   selectResourceAmounts,
   selectVisibleResources,
+  selectSideGoals,
+  selectProgressiveGoals,
   timeUntilAffordable,
 } from '../../src/chronicles/domain/selectors.js';
 import { createInitialGameState } from '../../src/chronicles/domain/state.js';
@@ -32,7 +34,7 @@ const clock = createFakeClock(1000);
 const rng = createSeededRng(42);
 const engine = createChroniclesEngine({ ruleset, ports: { clock, rng } });
 
-assert.equal(engine.state.run.rulesetVersion, 'timeline1-v10-adaptation-repair');
+assert.equal(engine.state.run.rulesetVersion, 'timeline1-v11-branch-cost-fix');
 assert.equal(engine.state.run.eraId, 'MOLECULAR');
 assert.deepEqual(selectResourceAmounts(engine.state), { rna: 0 });
 assert.deepEqual(selectVisibleResources(engine.state, ruleset).map((resource) => resource.id), ['rna']);
@@ -60,6 +62,19 @@ conversionEngine.state.run.resources.rna.amount = 0;
 conversionTick = conversionEngine.tick(1000);
 assert.equal(conversionTick.rates.dna, 0);
 assert.equal(conversionEngine.state.run.resources.dna.amount, 0.26);
+
+// A resource that is both produced and consumed within the same tick (RNA
+// feeds DNA Synthesis, Biomass feeds Respiration) must still land exactly on
+// its cap once net production is positive, instead of permanently sitting
+// one consumption-step below it.
+const capSaturationEngine = createChroniclesEngine({ ruleset });
+capSaturationEngine.state.run.modifiers.active.test = { type: 'unlock_auto_production' };
+capSaturationEngine.state.run.resources.rna.capOverride = 10;
+capSaturationEngine.state.run.resources.rna.amount = 9;
+capSaturationEngine.state.run.producers.PROC_PRIMORDIAL_REACTION = { count: 20 };
+capSaturationEngine.state.run.producers.PROC_DNA_SYNTHESIS = { count: 1 };
+capSaturationEngine.tick(1000);
+assert.equal(capSaturationEngine.state.run.resources.rna.amount, 10);
 assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M01'), 0);
 assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M02'), 1);
 assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M03'), 2);
@@ -170,6 +185,7 @@ storageGateEngine.state.run.resources.dna = { amount: 100 };
 assert.equal(storageGateEngine.dispatch({ type: 'BUY_BUILDING', buildingId: 'BLD_GENETIC_STORE' }).ok, true);
 assert.equal(calculateCap(storageGateEngine.state, 'dna', ruleset), 250);
 storageGateEngine.state.run.nodes.completed.M06 = { completedAtMs: 0 };
+storageGateEngine.state.run.eraId = 'CELLULAR';
 storageGateEngine.state.run.resources.dna.amount = 100;
 assert.equal(storageGateEngine.dispatch({ type: 'BUY_BUILDING', buildingId: 'BLD_BIOMASS_STORE' }).ok, true);
 assert.equal(calculateCap(storageGateEngine.state, 'biomass', ruleset), 240);
@@ -263,17 +279,47 @@ assert.equal(result.ok, true);
 assert.equal(branchEngine.state.run.resources.ap, undefined);
 assert.equal(branchEngine.state.run.goals.states.G007.status, 'archived');
 assert.equal(branchEngine.state.run.adaptation.points, 2);
+assert.equal(branchEngine.state.run.events.pendingId, 'EV-BIO-02');
+assert.equal(selectNodeStatus(branchEngine.state, ruleset, 'B02A'), 'locked');
+assert.equal(selectNodeStatus(branchEngine.state, ruleset, 'B02D'), 'locked');
 result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'B02A' });
+assert.equal(result.reason, 'BLOCKED_BY_EVENT');
+result = branchEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-BIO-02', choiceId: 'mobility' });
 assert.equal(result.ok, true);
 assert.equal(branchEngine.state.run.adaptation.points, 1);
 assert.deepEqual(branchEngine.state.run.adaptation.selectedOptionalNodes, ['B02A']);
 assert.equal(branchEngine.state.run.goals.states.G008.status, 'archived');
+result = branchEngine.dispatch({ type: 'BUY_NODE', nodeId: 'B02B' });
+assert.equal(result.ok, true);
+assert.deepEqual(branchEngine.state.run.adaptation.selectedOptionalNodes, ['B02A', 'B02B']);
 
 const adaptationGateEngine = createChroniclesEngine({ ruleset });
 adaptationGateEngine.state.run.eraId = 'MULTICELLULAR';
 adaptationGateEngine.state.run.nodes.completed.C06 = { completedAtMs: 0 };
 adaptationGateEngine.state.run.resources = { biomass: { amount: 100 }, atp: { amount: 100 }, dna: { amount: 100 } };
 assert.equal(selectNodeStatus(adaptationGateEngine.state, ruleset, 'B02A'), 'available_unaffordable');
+
+// Cognition is a "progressive" goal: it starts accumulating at B04 (alone
+// worth 20/100) and must surface as its own global-goal slot from that first
+// contributor, introduced by EV-BIO-04, not folded into optional side goals.
+const cognitionTrackEngine = createChroniclesEngine({ ruleset });
+for (const r of ['rna', 'dna', 'biomass', 'atp']) cognitionTrackEngine.state.run.resources[r] = { amount: 0, capOverride: 1e7 };
+for (const r of ['rna', 'dna', 'biomass', 'atp']) cognitionTrackEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: r, amount: 1e6 });
+for (const nodeId of ['M01', 'M02', 'M03', 'M05', 'M06', 'C01']) {
+  cognitionTrackEngine.dispatch({ type: 'BUY_NODE', nodeId });
+  const pid = cognitionTrackEngine.state.run.events.pendingId;
+  if (pid) cognitionTrackEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: pid, choiceId: 'continue' });
+}
+cognitionTrackEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-BIO-01', choiceId: 'absorption' });
+for (const nodeId of ['C03', 'C05', 'C06']) cognitionTrackEngine.dispatch({ type: 'BUY_NODE', nodeId });
+cognitionTrackEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-BIO-02', choiceId: 'mobility' });
+for (const nodeId of ['C07', 'B03']) cognitionTrackEngine.dispatch({ type: 'BUY_NODE', nodeId });
+cognitionTrackEngine.dispatch({ type: 'BUY_NODE', nodeId: 'B04' });
+assert.equal(cognitionTrackEngine.state.run.events.pendingId, 'EV-BIO-04');
+assert.deepEqual(selectProgressiveGoals(cognitionTrackEngine.state, ruleset).map((goal) => goal.id), ['G011_COGNITION_TRACK']);
+assert.equal(selectSideGoals(cognitionTrackEngine.state, ruleset).some((goal) => goal.id === 'G011_COGNITION_TRACK'), false);
+result = cognitionTrackEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-BIO-04', choiceId: 'continue' });
+assert.equal(result.ok, true);
 
 // Cognition is derived from neural progress. Sapience has no spendable price:
 // it becomes available only at 100 and performs the civilization-start transaction.
@@ -378,6 +424,9 @@ assert.equal(formatEta(eta), 'Недоступно');
 assert.equal(formatEta(selectPurchaseEta(etaEngine.state, ruleset, 'locked', { rna: 100 })), 'Недоступно');
 assert.equal(selectPurchaseEta(etaEngine.state, ruleset, 'completed', { rna: 100 }), null);
 assert.equal(timeUntilAffordable(etaEngine.state, ruleset, { rna: 2.2 }).status, 'now');
+const rnaCap = calculateCap(etaEngine.state, 'rna', ruleset);
+const capEta = timeUntilAffordable(etaEngine.state, ruleset, { rna: rnaCap + 1000 });
+assert.equal(capEta.status, 'unavailable');
 
 const stalledEngine = createChroniclesEngine({ ruleset });
 let initialStartedEvents = stalledEngine.state.session.lastEvents.filter((event) => event.type === 'goal_started');

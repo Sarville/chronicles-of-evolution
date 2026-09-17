@@ -5,6 +5,14 @@ import { cognitionValue } from './evolution.js';
 
 const TERMINAL_STATUSES = new Set(['archived', 'skipped_by_archive', 'failed_soft']);
 
+// `progressive` goals (Cognition, later World Tension) track a derived
+// multi-source counter alongside the current chapter goal rather than
+// replacing it; they share the side-goal bucket/lifecycle but get their own
+// selector/render slot so they read as global, not optional side content.
+function isParallelGoal(goal) {
+  return Boolean(goal.optional || goal.slot === 'side' || goal.slot === 'progressive');
+}
+
 export function getGoalState(state, goalId) {
   return state.run.goals.states[goalId] || { status: 'hidden' };
 }
@@ -59,7 +67,7 @@ function activateGoal(state, goal, ports) {
     startedAtMs: current.startedAtMs ?? state.run.clock.simulationMs,
     lastProgressAtMs: current.lastProgressAtMs ?? state.run.clock.simulationMs,
   });
-  if (goal.optional || goal.slot === 'side') {
+  if (isParallelGoal(goal)) {
     if (!state.run.goals.side.activeIds.includes(goal.id)) {
       state.run.goals.side.activeIds.push(goal.id);
     }
@@ -108,7 +116,7 @@ function applyGoalRewards(state, ruleset, goal, ports) {
     rewardAppliedAtMs: state.run.clock.simulationMs,
     archivedAtMs: state.run.clock.simulationMs,
   });
-  if (goal.optional || goal.slot === 'side') {
+  if (isParallelGoal(goal)) {
     state.run.goals.side.activeIds = state.run.goals.side.activeIds.filter((goalId) => goalId !== goal.id);
   }
   return events;
@@ -140,7 +148,7 @@ function maybeShowHint(state, goal, ports) {
 }
 
 function canActivateMainGoal(state, goal) {
-  if (goal.optional || goal.slot === 'side') {
+  if (isParallelGoal(goal)) {
     return false;
   }
   if (!state.run.goals.currentId || state.run.goals.currentId === goal.id) {
@@ -166,7 +174,7 @@ export function evaluateGoals(state, ruleset, ports = {}) {
       continue;
     }
     const canActivate =
-      goalPrerequisitesMet(state, goal) && (goal.optional || goal.slot === 'side' || canActivateMainGoal(state, goal));
+      goalPrerequisitesMet(state, goal) && (isParallelGoal(goal) || canActivateMainGoal(state, goal));
     if (canActivate && ['hidden', 'revealed'].includes(goalState.status)) {
       events.push(...activateGoal(state, goal, ports));
     }

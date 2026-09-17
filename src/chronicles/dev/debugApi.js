@@ -32,6 +32,12 @@ export function createDebugApi(options = {}) {
       assertDevEnabled();
       return engine.dispatch({ type: 'ADD_RESOURCE', resourceId, amount });
     },
+    toggleTestMode() {
+      assertDevEnabled();
+      engine.state.settings.testMode = !engine.state.settings.testMode;
+      engine.state.session.dirty = true;
+      return { ok: true, testMode: engine.state.settings.testMode };
+    },
     jumpToEra(eraId) {
       assertDevEnabled();
       const era = indexes.eras[eraId];

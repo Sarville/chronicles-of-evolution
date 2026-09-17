@@ -36,7 +36,14 @@ export function canAfford(state, cost) {
   return { ok: true };
 }
 
+// Test mode: every purchase (buildings, producers, nodes) is free. Centralized
+// here so every caller of payCost gets it, instead of each command
+// re-implementing the test-mode branch.
 export function payCost(state, cost, ruleset, ports) {
+  if (state.settings.testMode === true) {
+    return { ok: true, events: [] };
+  }
+
   const affordability = canAfford(state, cost);
   if (!affordability.ok) {
     return {

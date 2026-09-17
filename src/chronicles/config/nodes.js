@@ -2,11 +2,15 @@ export const branchGroups = {
   cell_identity_1: ['C02A', 'C02B', 'C02C'],
   behavior_1: ['N02A', 'N02B', 'N02C'],
   culture_1: ['T01A', 'T01B', 'T01C'],
+  body_adaptation_1: ['B02A', 'B02B', 'B02C', 'B02D'],
 };
 
 export const branchCostRules = {
   cell_identity_1: {
     allowAdditionalBranches: false,
+  },
+  body_adaptation_1: {
+    allowAdditionalBranches: true,
   },
 };
 
@@ -210,23 +214,23 @@ export const nodes = [
     goalId: 'G007',
   },
   {
-    id: 'B02A', entityType: 'node', type: 'OPTIONAL', semanticRole: 'adaptation', labelKey: 'node.B02A',
-    adaptationPointCost: 1, cost: { biomass: 55, atp: 30 }, requiresNodes: ['C06'],
+    id: 'B02A', entityType: 'node', type: 'OPTIONAL', semanticRole: 'adaptation', branchGroup: 'body_adaptation_1', labelKey: 'node.B02A',
+    adaptationPointCost: 1, cost: { biomass: 185, atp: 115 }, requiresNodes: ['C06'],
     effects: [{ type: 'resource_production_multiplier', resourceId: 'biomass', value: 1.12 }],
   },
   {
-    id: 'B02B', entityType: 'node', type: 'OPTIONAL', semanticRole: 'adaptation', labelKey: 'node.B02B',
-    adaptationPointCost: 1, cost: { biomass: 45, atp: 35 }, requiresNodes: ['C06'],
+    id: 'B02B', entityType: 'node', type: 'OPTIONAL', semanticRole: 'adaptation', branchGroup: 'body_adaptation_1', labelKey: 'node.B02B',
+    adaptationPointCost: 1, cost: { biomass: 175, atp: 125 }, requiresNodes: ['C06'],
     effects: [{ type: 'resource_production_multiplier', resourceId: 'atp', value: 1.12 }],
   },
   {
-    id: 'B02C', entityType: 'node', type: 'OPTIONAL', semanticRole: 'adaptation', labelKey: 'node.B02C',
-    adaptationPointCost: 1, cost: { biomass: 65, atp: 25 }, requiresNodes: ['C06'],
+    id: 'B02C', entityType: 'node', type: 'OPTIONAL', semanticRole: 'adaptation', branchGroup: 'body_adaptation_1', labelKey: 'node.B02C',
+    adaptationPointCost: 1, cost: { biomass: 195, atp: 105 }, requiresNodes: ['C06'],
     effects: [{ type: 'global_production_multiplier', value: 1.06 }],
   },
   {
-    id: 'B02D', entityType: 'node', type: 'OPTIONAL', semanticRole: 'adaptation', labelKey: 'node.B02D',
-    adaptationPointCost: 2, cost: { biomass: 85, atp: 40, dna: 30 }, requiresNodes: ['C06'],
+    id: 'B02D', entityType: 'node', type: 'OPTIONAL', semanticRole: 'adaptation', branchGroup: 'body_adaptation_1', labelKey: 'node.B02D',
+    adaptationPointCost: 2, cost: { biomass: 225, atp: 135, dna: 175 }, requiresNodes: ['C06'],
     effects: [{ type: 'resource_production_multiplier', resourceId: 'biomass', value: 1.1 }],
   },
   {
@@ -236,9 +240,9 @@ export const nodes = [
   { id: 'B03', entityType: 'node', type: 'CORE', semanticRole: 'core_tech', labelKey: 'node.B03', cost: { biomass: 320, atp: 180, dna: 260 }, requiresNodes: ['C07'], effects: [] },
   { id: 'B04', entityType: 'node', type: 'CORE', semanticRole: 'core_tech', labelKey: 'node.B04', cost: { biomass: 390, atp: 220, dna: 310 }, requiresNodes: ['B03'], effects: [], cognitionContribution: 20 },
   { id: 'B05', entityType: 'node', type: 'CONVERGENCE', semanticRole: 'breakthrough', labelKey: 'node.B05', cost: { biomass: 460, atp: 270, dna: 380 }, requiresNodes: ['B04'], effects: [], cognitionContribution: 25 },
-  { id: 'N02A', entityType: 'node', type: 'BRANCH', semanticRole: 'branch', branchGroup: 'behavior_1', labelKey: 'node.N02A', cost: { biomass: 90, atp: 45 }, requiresNodes: ['B05'], effects: [{ type: 'set_flag', flag: 'run.bio.behavior', value: 'solitary' }] },
-  { id: 'N02B', entityType: 'node', type: 'BRANCH', semanticRole: 'branch', branchGroup: 'behavior_1', labelKey: 'node.N02B', cost: { biomass: 90, atp: 45 }, requiresNodes: ['B05'], effects: [{ type: 'set_flag', flag: 'run.bio.behavior', value: 'social' }] },
-  { id: 'N02C', entityType: 'node', type: 'BRANCH', semanticRole: 'branch', branchGroup: 'behavior_1', labelKey: 'node.N02C', cost: { biomass: 90, atp: 45 }, requiresNodes: ['B05'], effects: [{ type: 'set_flag', flag: 'run.bio.behavior', value: 'tool_use' }] },
+  { id: 'N02A', entityType: 'node', type: 'BRANCH', semanticRole: 'branch', branchGroup: 'behavior_1', labelKey: 'node.N02A', cost: { biomass: 480, atp: 285 }, requiresNodes: ['B05'], effects: [{ type: 'set_flag', flag: 'run.bio.behavior', value: 'solitary' }] },
+  { id: 'N02B', entityType: 'node', type: 'BRANCH', semanticRole: 'branch', branchGroup: 'behavior_1', labelKey: 'node.N02B', cost: { biomass: 480, atp: 285 }, requiresNodes: ['B05'], effects: [{ type: 'set_flag', flag: 'run.bio.behavior', value: 'social' }] },
+  { id: 'N02C', entityType: 'node', type: 'BRANCH', semanticRole: 'branch', branchGroup: 'behavior_1', labelKey: 'node.N02C', cost: { biomass: 480, atp: 285 }, requiresNodes: ['B05'], effects: [{ type: 'set_flag', flag: 'run.bio.behavior', value: 'tool_use' }] },
   { id: 'N03', entityType: 'node', type: 'CORE', semanticRole: 'core_tech', labelKey: 'node.N03', cost: { biomass: 500, atp: 300, dna: 440 }, requiresNodes: ['B05'], requiresAnyBranchGroup: 'behavior_1', effects: [], cognitionContribution: 30 },
   { id: 'N05', entityType: 'node', type: 'CORE', semanticRole: 'core_tech', labelKey: 'node.N05', cost: { biomass: 560, atp: 340, dna: 500 }, requiresNodes: ['N03'], effects: [], cognitionContribution: 25 },
   { id: 'N07', entityType: 'node', type: 'CONVERGENCE', semanticRole: 'breakthrough', labelKey: 'node.N07', cost: {}, requiresNodes: ['N05'], cognitionMin: 100, cognitionContributions: [{ nodeId: 'B04', value: 20 }, { nodeId: 'B05', value: 25 }, { nodeId: 'N03', value: 30 }, { nodeId: 'N05', value: 25 }], effects: [], transition: 'EARLY_CIV', goalId: 'G013' },
