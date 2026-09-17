@@ -18,6 +18,8 @@ authority:
     - "docs/DECISIONS_ACT_STRUCTURE.md"
   act_structure_redesign: "docs/DECISIONS_ACT_STRUCTURE.md"
   gameplay_canon: "docs/gdd/01_FIRST_120_MINUTES.md"
+  act_one_chapters: "docs/gdd/13_ACT_ONE_CHAPTERS.md"
+  global_archive_and_achievements: "docs/gdd/14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md"
   long_term_progression: "docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md"
   economy: "docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md"
   evolution_tree: "docs/gdd/03_EVOLUTION_TREE.md"
@@ -25,6 +27,7 @@ authority:
   glossary: "docs/GLOSSARY.md"
   narrative_bible: "docs/scenario/00_NARRATIVE_BIBLE.md"
   timeline_01_script: "docs/scenario/01_TIMELINE_01_SCRIPT.md"
+  act2_act3_script: "docs/scenario/02_ACT2_ACT3_SCRIPT.md"
   story_events: "docs/scenario/04_STORY_EVENTS.md"
   narrative_flags: "docs/scenario/05_NARRATIVE_FLAGS.md"
   endings_copy: "docs/scenario/06_ENDINGS_COPY.md"
@@ -241,5 +244,5 @@ open_decisions:
 next_action:
   owner: "Codex"
   session: "ACT-STRUCTURE-REDESIGN"
-  description: "Turn docs/DECISIONS_ACT_STRUCTURE.md ACT-006 open questions into a concrete T1-T5 chapter plan (era cutoffs, per-chapter minute budget, T2/T4 skin swap scope), then rework ACT-007's document list. Do this before resuming any T1-7 rebalance work."
+  description: "GDD/scenario docs for all three acts are now complete (docs/DECISIONS_ACT_STRUCTURE.md ACT-001..ACT-012): Act 1 T1-T5 five-chapter map + t5_synthesis echo deck (docs/gdd/13_ACT_ONE_CHAPTERS.md), Act 2 P1-P3 unified observer script + reveal, Act 3 system-entry lines + first-reset finale + 100%-Archive grand finale (docs/scenario/02_ACT2_ACT3_SCRIPT.md), global Archive Completion/achievement mechanic (docs/gdd/14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md). Nothing left to write before code. Next session: either (a) turn ACT-006/ACT-012 remaining open questions (per-chapter minute budget, P1-P3 naming, T2/T4 skin swap mechanics) into a concrete T1 chapter implementation plan and start coding Мор/Катаклизм/Раскол/Авария + t5_synthesis (docs/production/TIMELINE_01_REBUILD_PLAN.md Package B/C/D), or (b) write the detailed Act 3 GDD (system-by-system design + finite achievement list needed by 14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md §4.5). Separately: this worktree also carries pre-existing uncommitted gameplay-code changes (src/chronicles/config/*, domain/*, tests/*, evolve/chronicles.js) from the prior T1 manual-playtest session, left untouched by the 2026-09-17 docs commits -- review/commit that stream separately."
   previous_next_action: "owner Codex, session T1-7: use the complete full-T1 simulator to rebalance storage capacity/costs, population thresholds and civilization pacing without reopening the frozen 0-10 baseline (superseded 2026-09-17, resume only if the redesign is later rolled back)"

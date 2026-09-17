@@ -5,6 +5,15 @@
 **Область:** от Sapience (~38–40 min) до Atomic (~108 min).  
 **Authority:** `DECISIONS_RECONCILIATION.md`, `01_FIRST_120_MINUTES.md`, `02_ECONOMY_FIRST_120_MINUTES.md`.
 
+> **(2026-09-17) Act-structure note:** этот документ описывает
+> переиспользуемый civilization-контент-пакет, а не единственный забег.
+> Только `T1` доходит здесь до Tribe (~era 5); `T2` доходит до Settlement,
+> `T3` до City, `T4` до Industry/Modern, `T5` — единственная, что доходит
+> до Atomic, начиная не с нуля, а со стартовым грантом «синтез уроков
+> `T1–T4`». Полная нарезка по главам — `docs/gdd/13_ACT_ONE_CHAPTERS.md`;
+> per-chapter темп и стартовые условия — `docs/gdd/01_FIRST_120_MINUTES.md`
+> §3–7.
+
 ---
 
 # 1. Design intent

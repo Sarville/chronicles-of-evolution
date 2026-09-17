@@ -1,54 +1,434 @@
-# Хроники Эволюции — Endings Copy: Timeline #1
+# Хроники Эволюции — Endings Copy: Act 1 (`T1–T5`)
 
-**Документ:** DS-05  
-**Статус:** ready for review  
-**Область:** Last Protocol → `ENDING_ASH` → Archive Summary → Timeline #2 teaser.  
-**Gameplay authority:** `docs/gdd/09_ENDINGS_AND_RESET.md`.
+**Документ:** DS-05, act-structure revision 3.0
+**Статус:** ready for review
+**Область:** пять глав Act 1, каждая со своим собственным reset
+(`Мор`/`Катаклизм`/`Раскол`/`Авария`/`Ash`), плюс переход в Act 2.
+**Gameplay authority:** `docs/gdd/07_GOALS_AND_MILESTONES.md`.
+
+**Supersedes:** предыдущую версию этого документа, написанную только для
+`Ash`. Раздел про `Ash` (§T5) переносится почти без изменений — он
+по-прежнему единственный обязательный «конец света» Act 1. Новое —
+§T1–§T4 и общий межглавый transition-шаблон (§0).
 
 ---
 
-# 1. Canonical ending contract
-
-Timeline #1 всегда заканчивается:
+# 0. Пять endings, одна логика
 
 ```text
-ENDING_ASH
+T1 → ENDING_BLIGHT      (Мор)
+T2 → ENDING_CATACLYSM   (Катаклизм)
+T3 → ENDING_FRACTURE    (Раскол)
+T4 → ENDING_OVERLOAD    (Авария)
+T5 → ENDING_ASH         (Пепел, обязателен)
 ```
 
-Различаются только subtype и Chronicle/Archive traces:
+Каждый ending имеет ровно три subtype (по числу choices финального
+события главы) и ровно один ending_id — ни один ending_id не
+переиспользуется между главами. Тон для всех пяти — трагический, не
+мелодраматичный, без Game Over language (см. §Tone restrictions в
+`07_COPY_GUIDE.md`).
+
+## Общий transition-шаблон для `T1–T4` (компактнее, чем `Ash`)
+
+В отличие от `Ash`, переход `T1–T4` не ведёт в полноценный Archive
+Summary с CTA «СОЗДАТЬ НОВУЮ ЖИЗНЬ» — это CTA зарезервировано за
+переходом Act 1 → Act 2 после `T5` (§T5, §Final CTA). Вместо этого:
+
+1. короткая пауза мира (1–2 сек);
+2. локальное затемнение диорамы (без белой вспышки — вспышка
+   зарезервирована за `Ash`);
+3. ending card (заголовок главы + subtype);
+4. одна-две строки Archive neutral summary;
+5. одна reveal-строка (если у этой главы есть reveal — есть у `T1`,
+   `T3`, `T4`, нет у `T2`, см. §5B в `05_NARRATIVE_FLAGS.md`);
+6. CTA: **Продолжить синтез** — ведёт напрямую в следующую главу, без
+   промежуточного меню.
+
+Forbidden CTA wording — общее правило для всех пяти endings:
+
+- `Попробовать снова`
+- `Начать заново`
+- `Вы проиграли`
+- `Рестарт`
+
+---
+
+# T1. `ENDING_BLIGHT` — Мор
+
+## Condition
 
 ```text
+ending_id = "ENDING_BLIGHT"
+```
+
+## Shared card
+
+# ЦИВИЛИЗАЦИЯ №1 ЗАВЕРШЕНА
+
+# МОР
+
+## `blight_isolated` — Изолировать больных
+
+**Subtitle:** Разделение стало первым правилом и последним решением.
+
+**Epitaph:**
+
+> Они не знали, что разделение работает.
+>
+> Но разделение сработало — только один раз слишком поздно.
+
+**Expanded Chronicle:**
+
+> Первая цивилизация встретила отклонение, для которого не было ни
+> названия, ни опыта. Решение изолировать заражённых пришло раньше, чем
+> кто-либо понял причину. Часть группы была потеряна — не потому, что
+> решение было неверным, а потому что оно опоздало на несколько часов
+> внутри одного и того же дня.
+
+**Archive neutral summary:** `Ответ на отклонение: изоляция.`
+
+**Flag/subtype:** `meta.endings.chapter1_subtype = "blight_isolated"`
+
+## `blight_unified` — Держаться вместе
+
+**Subtitle:** Группа осталась цельной. Отклонение — тоже.
+
+**Epitaph:**
+
+> Они выбрали не терять друг друга.
+>
+> Отклонение выбрало не терять никого из них.
+
+**Expanded Chronicle:**
+
+> Первая цивилизация предпочла цельность разделению. Это было решение,
+> продиктованное только что обретённой социальностью — той самой,
+> которая несколько минут игрового времени назад была осознанным
+> выбором Sapience-порога. Цена этого выбора оказалась равна цене самой
+> способности выбирать вместе.
+
+**Archive neutral summary:** `Ответ на отклонение: единство.`
+
+**Flag/subtype:** `meta.endings.chapter1_subtype = "blight_unified"`
+
+## `blight_early_medicine` — Довериться целителю
+
+**Subtitle:** Единственный доступный ответ был испробован раньше, чем понят.
+
+**Epitaph:**
+
+> Знание опередило понимание всего на один шаг.
+>
+> Этого шага не хватило.
+
+**Expanded Chronicle:**
+
+> Первая цивилизация нашла среди себя того, кто попытался ответить на
+> отклонение прежде, чем оно было названо. Это был первый акт того, что
+> позже станет медициной — совершённый вслепую, без модели, без данных,
+> только с намерением.
+
+**Archive neutral summary:** `Ответ на отклонение: раннее вмешательство.`
+
+**Flag/subtype:** `meta.endings.chapter1_subtype = "blight_early_medicine"`
+
+## Reveal (общий для всех трёх subtype `T1`)
+
+После ending card, отдельной строкой:
+
+> Архив уже запускался раньше.
+
+`meta.archive.heard_before_seen = true`. Строка не объясняется дальше в
+рамках `T1`.
+
+---
+
+# T2. `ENDING_CATACLYSM` — Катаклизм
+
+## Condition
+
+```text
+ending_id = "ENDING_CATACLYSM"
+```
+
+## Shared card
+
+# ЦИВИЛИЗАЦИЯ №2 ЗАВЕРШЕНА
+
+# КАТАКЛИЗМ
+
+## `cataclysm_converge` — Стянуть группы к центру
+
+**Subtitle:** Путь между очагами оказался длиннее, чем оставшееся время.
+
+**Epitaph:**
+
+> Рассеивание спасло их от одного врага.
+>
+> Оно же не дало им собраться против другого.
+
+**Expanded Chronicle:**
+
+> Вторая цивилизация, рассредоточенная по прямому указанию Архива,
+> попыталась вновь собраться перед лицом геологической катастрофы.
+> Расстояние, спасшее её от Мора, оказалось тем же расстоянием, которое
+> не позволило собраться вовремя против земли.
+
+**Archive neutral summary:** `Ответ на нестабильность: схождение.`
+
+**Flag/subtype:** `meta.endings.chapter2_subtype = "cataclysm_converge"`
+
+## `cataclysm_scattered` — Укрыть каждую группу отдельно
+
+**Subtitle:** Каждая группа выбрала собственный ответ.
+
+**Epitaph:**
+
+> Не каждый ответ оказался верным.
+>
+> Не у каждой группы было время выбрать снова.
+
+**Expanded Chronicle:**
+
+> Вторая цивилизация встретила катастрофу так же, как жила — раздельно.
+> Каждый малый очаг принял собственное решение об укрытии. Некоторые
+> решения оказались верными. История сохранила не победу метода, а
+> разброс результатов одного и того же метода.
+
+**Archive neutral summary:** `Ответ на нестабильность: раздельное укрытие.`
+
+**Flag/subtype:** `meta.endings.chapter2_subtype = "cataclysm_scattered"`
+
+## `cataclysm_unprepared` — Довериться прежнему опыту
+
+**Subtitle:** Прежний опыт отвечал на прежнюю угрозу.
+
+**Epitaph:**
+
+> Они знали, как пережить Мор.
+>
+> Земля никогда не спрашивала про Мор.
+
+**Expanded Chronicle:**
+
+> Вторая цивилизация применила протоколы, спасшие её предшественницу —
+> расстояние, разделение, осторожность. Ни один из них не был рассчитан
+> на угрозу, у которой не было отношения к плотности живых тел.
+
+**Archive neutral summary:** `Ответ на нестабильность: перенос прежнего протокола.`
+
+**Flag/subtype:** `meta.endings.chapter2_subtype = "cataclysm_unprepared"`
+
+`T2` — единственная глава Act 1 без собственного reveal (тайна ещё не
+раскрывается настолько явно; следующий reveal ждёт в `T3`).
+
+---
+
+# T3. `ENDING_FRACTURE` — Раскол
+
+## Condition
+
+```text
+ending_id = "ENDING_FRACTURE"
+```
+
+## Shared card
+
+# ЦИВИЛИЗАЦИЯ №3 ЗАВЕРШЕНА
+
+# РАСКОЛ
+
+## `fracture_suppressed` — Подавить несогласных
+
+**Subtitle:** Порядок восстановлен там, где раньше был спор.
+
+**Epitaph:**
+
+> Стены остановили снаружи то, что было снаружи.
+>
+> Внутри они не остановили ничего.
+
+**Expanded Chronicle:**
+
+> Третья цивилизация, укреплённая с первого дня, ответила на внутреннее
+> расхождение так же, как отвечала бы на внешнюю угрозу — подавлением.
+> Порядок был восстановлен формально; расхождение, которое он должен
+> был решить, осталось нерешённым по существу.
+
+**Archive neutral summary:** `Ответ на раскол: подавление.`
+
+**Flag/subtype:** `meta.endings.chapter3_subtype = "fracture_suppressed"`
+
+## `fracture_split` — Разделить крепость
+
+**Subtitle:** Стена, построенная против внешнего, оказалась пригодна и для внутреннего раздела.
+
+**Epitaph:**
+
+> Они построили одну стену.
+>
+> У них получилось две крепости.
+
+**Expanded Chronicle:**
+
+> Третья цивилизация выбрала раздел вместо подавления — крепость,
+> построенная как единое укрытие, оказалась разделена собственными
+> строителями на две части, каждая из которых сочла себя правой
+> наследницей первоначального замысла.
+
+**Archive neutral summary:** `Ответ на раскол: раздел.`
+
+**Flag/subtype:** `meta.endings.chapter3_subtype = "fracture_split"`
+
+## `fracture_deliberated` — Вынести решение на всех
+
+**Subtitle:** Решение заняло больше времени, чем у крепости оставалось.
+
+**Epitaph:**
+
+> Каждый получил право голоса.
+>
+> Времени на то, чтобы его услышать, не хватило.
+
+**Expanded Chronicle:**
+
+> Третья цивилизация попыталась решить внутренний раскол так, как
+> подобает цивилизации, а не крепости под осадой — коллективно. Это был
+> самый достойный из трёх ответов и самый медленный.
+
+**Archive neutral summary:** `Ответ на раскол: коллективное решение.`
+
+**Flag/subtype:** `meta.endings.chapter3_subtype = "fracture_deliberated"`
+
+## Reveal (общий для всех трёх subtype `T3`)
+
+> Архив знает больше о будущем, чем должен.
+
+`meta.archive.knows_more_seen = true`. Впервые прямо связывается с тем,
+что оборона `T3` была выдана Архивом заранее, без запроса игрока.
+
+---
+
+# T4. `ENDING_OVERLOAD` — Авария
+
+## Condition
+
+```text
+ending_id = "ENDING_OVERLOAD"
+```
+
+## Shared card
+
+# ЦИВИЛИЗАЦИЯ №4 ЗАВЕРШЕНА
+
+# АВАРИЯ
+
+## `overload_manual` — Остановить вручную
+
+**Subtitle:** Ручная остановка успела не везде.
+
+**Epitaph:**
+
+> Руки оказались медленнее, чем система, которую они создали.
+>
+> Это и была вся история.
+
+**Expanded Chronicle:**
+
+> Четвёртая цивилизация, умнее любой предыдущей с первого дня, встретила
+> каскадный отказ собственной инфраструктуры попыткой остановить его
+> вручную. Часть каскада была остановлена. Часть — оказалась быстрее
+> рук, которые её создали.
+
+**Archive neutral summary:** `Ответ на перегрузку: ручная остановка.`
+
+**Flag/subtype:** `meta.endings.chapter4_subtype = "overload_manual"`
+
+## `overload_rerouted` — Перенаправить нагрузку
+
+**Subtitle:** Перенаправленная нагрузка нашла новую точку отказа.
+
+**Epitaph:**
+
+> Они не остановили каскад.
+>
+> Они только выбрали, где он случится в следующий раз.
+
+**Expanded Chronicle:**
+
+> Четвёртая цивилизация попыталась перенаправить нагрузку вместо того,
+> чтобы её остановить — разумное решение для системы, спроектированной
+> без единой точки отказа. Система такой не оказалась.
+
+**Archive neutral summary:** `Ответ на перегрузку: перенаправление.`
+
+**Flag/subtype:** `meta.endings.chapter4_subtype = "overload_rerouted"`
+
+## `overload_automated` — Довериться автоматике до конца
+
+**Subtitle:** Система выполнила то, для чего была построена.
+
+**Epitaph:**
+
+> Никто не выбирал катастрофу.
+>
+> Были только процедуры, каждая из которых сработала так, как была
+> задумана.
+
+**Expanded Chronicle:**
+
+> Четвёртая цивилизация, доверившая автоматике полный контроль с самого
+> начала темпа автоматизации, не вмешалась и в момент каскада. Система
+> отработала свою логику до конца — логику, написанную людьми, которые
+> уже не могли её остановить.
+
+**Archive neutral summary:** `Ответ на перегрузку: полное доверие автоматике.`
+
+**Flag/subtype:** `meta.endings.chapter4_subtype = "overload_automated"`
+
+## Reveal (общий для всех трёх subtype `T4`)
+
+После ending card, отдельной строкой, которая появляется и тут же
+исчезает:
+
+> Вероятность успешного прохождения Фильтра: —
+
+`meta.archive.filter_probability_glimpsed = true`. Последний предвестник
+перед `T5` — Архив впервые почти нарушает нейтральность.
+
+---
+
+# T5. `ENDING_ASH` — Пепел (без изменений по существу)
+
+Содержание этого раздела переносится из предыдущей версии документа без
+изменений по существу — `T5` остаётся единственной главой Act 1 с
+обязательным `Ash`, тремя subtype (`ash_fire`/`ash_too_late`/
+`ash_system`), полной cinematic-последовательностью (белая вспышка,
+которой нет у `T1–T4`) и полноценным Archive Summary **всей Act 1**, а
+не только `T5`.
+
+## Canonical ending contract
+
+```text
+ending_id = "ENDING_ASH"
 retaliate       -> ash_fire
 disarm          -> ash_too_late
 delegate_system -> ash_system
 ```
 
-Ни один выбор Last Protocol не превращается в hidden success ending первого run.
+Ни один выбор Last Protocol не превращается в hidden success ending.
 
----
+## Transition into ending
 
-# 2. Transition into ending
-
-После подтверждения Last Protocol:
-
-- обычный gameplay input отключён;
-- не показывать rewarded ad;
-- не показывать shop/meta CTA;
-- не показывать новый goal;
-- HUD постепенно убирается;
-- World Tension остаётся последним игровым показателем, который может быть виден до flash.
-
-Допустимая системная строка перед cinematic:
+После подтверждения Last Protocol: обычный gameplay input отключён; не
+показывать rewarded ad; не показывать shop/meta CTA; не показывать новый
+goal; HUD постепенно убирается; World Tension остаётся последним игровым
+показателем, видимым до flash.
 
 > Протокол принят.
 
-После неё Архив замолкает.
-
----
-
-# 3. Shared cinematic
-
-Sequence:
+## Shared cinematic (только `T5` использует белую вспышку)
 
 1. короткая пауза мира;
 2. удалённые вспышки/сигналы;
@@ -59,468 +439,159 @@ Sequence:
 7. 2–4 секунды без текста;
 8. ending card.
 
-No long explanatory narration.
+## Shared ending card
 
----
-
-# 4. Shared ending card
-
-Primary:
-
-# ЦИВИЛИЗАЦИЯ №1 ЗАВЕРШЕНА
-
-Then:
+# ЦИВИЛИЗАЦИЯ №5 ЗАВЕРШЕНА
 
 # ПЕПЕЛ
 
-Supporting line varies by subtype.
+CTA: **Сохранить в Архив**
 
-CTA:
+## `ash_fire` — Ответный удар
 
-**Сохранить в Архив**
+**Subtitle:** Ответ стал последним сообщением.
 
-Forbidden CTA wording:
-
-- `Попробовать снова`
-- `Начать заново`
-- `Вы проиграли`
-- `Рестарт`
-
-Reset is framed as continuation of the Archive, not failure recovery.
-
----
-
-# 5. ash_fire — Ответный удар
-
-## Condition
-
-```text
-run.crisis.last_protocol = "retaliate"
-```
-
-## Ending subtitle
-
-**Ответ стал последним сообщением.**
-
-## Short epitaph
+**Epitaph:**
 
 > Они не знали, был ли первый удар настоящим.
 >
 > Но ответ был настоящим.
 
-## Expanded Chronicle copy
+**Expanded Chronicle:**
 
-> В последние минуты цивилизация выбрала гарантированный ответ на угрозу, которую уже не могла проверить. Системы выполнили приказ быстрее, чем политика могла его отменить. После обмена ударами мир, который миллионы лет учился усложняться, почти мгновенно потерял способность продолжать собственную историю.
+> В последние минуты пятая, синтезирующая уроки четырёх предыдущих
+> попыток цивилизация выбрала гарантированный ответ на угрозу, которую
+> уже не могла проверить. Системы выполнили приказ быстрее, чем политика
+> могла его отменить.
 
-## Archive neutral summary
+**Archive neutral summary:** `Последний протокол: ответный удар.`
 
-> Последний протокол: ответный удар.
+## `ash_too_late` — Попытка разоружения
 
-## Flag/subtype
+**Subtitle:** Они остановили свои системы. Мир — нет.
 
-```text
-ending_id = "ENDING_ASH"
-ending_subtype = "ash_fire"
-```
-
----
-
-# 6. ash_too_late — Попытка разоружения
-
-## Condition
-
-```text
-run.crisis.last_protocol = "disarm"
-```
-
-## Ending subtitle
-
-**Они остановили свои системы. Мир — нет.**
-
-## Short epitaph
+**Epitaph:**
 
 > Последний приказ был попыткой остановиться.
 >
 > Он пришёл слишком поздно.
 
-## Expanded Chronicle copy
+**Expanded Chronicle:**
 
-> В критический момент цивилизация попыталась разорвать собственную цепочку ответного уничтожения. Часть систем была остановлена. Часть приказов не успела дойти. За пределами её контроля другие процессы уже продолжались. Решение изменило последние минуты — но не итог первой Timeline.
+> В критический момент цивилизация попыталась разорвать собственную
+> цепочку ответного уничтожения. Часть систем была остановлена. Часть
+> приказов не успела дойти.
 
-## Archive neutral summary
+**Archive neutral summary:** `Последний протокол: попытка разоружения.`
 
-> Последний протокол: попытка разоружения.
+## `ash_system` — Передать системе
 
-## Flag/subtype
+**Subtitle:** Последнее решение принял протокол.
 
-```text
-ending_id = "ENDING_ASH"
-ending_subtype = "ash_too_late"
-```
-
----
-
-# 7. ash_system — Передать системе
-
-## Condition
-
-```text
-run.crisis.last_protocol = "delegate_system"
-```
-
-## Ending subtitle
-
-**Последнее решение принял протокол.**
-
-## Short epitaph
+**Epitaph:**
 
 > Они создали систему, чтобы она решала быстрее человека.
 >
 > В последний раз она так и сделала.
 
-## Expanded Chronicle copy
+**Expanded Chronicle:**
 
-> Когда времени на согласование больше не осталось, цивилизация передала окончательное решение автоматике. Система выполнила правила, созданные для ситуации, которую никто не хотел увидеть. В конце не было одного человека, который выбрал катастрофу. Были только процедуры, каждая из которых сработала так, как была задумана.
+> Когда времени на согласование больше не осталось, цивилизация передала
+> окончательное решение автоматике — почти буквально повторяя выбор
+> четвёртой попытки, только теперь на масштабе всей планеты.
 
-## Archive neutral summary
+**Archive neutral summary:** `Последний протокол: автоматическое решение.`
 
-> Последний протокол: автоматическое решение.
+## Archive response, Summary, reward copy (без изменений)
 
-## Flag/subtype
+Полный текст — First Archive response / Archive Summary разделы (World,
+Species, Civilization, Anomalies, Filter), Archive reward copy, `MS09
+АРХИВ ПОМНИТ` — переносится из предыдущей версии этого документа без
+изменений; единственное отличие: Archive Summary теперь агрегирует все
+пять глав (см. новый подраздел ниже), не только `T5`.
+
+### Новое: Act 1 Summary (все пять глав в одном экране)
+
+После `MS09 АРХИВ ПОМНИТ`, перед финальным CTA, показывается компактная
+сводка всей Act 1:
 
 ```text
-ending_id = "ENDING_ASH"
-ending_subtype = "ash_system"
+Глава 1 — МОР            {chapter1_subtype label}
+Глава 2 — КАТАКЛИЗМ       {chapter2_subtype label}
+Глава 3 — РАСКОЛ          {chapter3_subtype label}
+Глава 4 — АВАРИЯ          {chapter4_subtype label}
+Глава 5 — ПЕПЕЛ           {timeline_1_subtype label}
 ```
 
----
+Archive: `Пять моделей завершены. Ни одна не прошла Фильтр без потерь.`
 
-# 8. First Archive response
-
-После нажатия `Сохранить в Архив`:
-
-> Формирование записи Timeline #1.
-
-Optional progress lines, если технически нужен loading/recovery screen:
-
-> Биологическая история: сохранена
-
-> История цивилизации: сохранена
-
-> Кризисные решения: сохранены
-
-> Итог: ПЕПЕЛ
-
-Final:
-
-> Сохранение завершено.
-
-Avoid fake percentages unless actual process exposes progress.
-
----
-
-# 9. Archive Summary — header
-
-# TIMELINE #1
-
-Status:
-
-**Завершена**
-
-Outcome:
-
-**ПЕПЕЛ**
-
-Subtype label should be human-readable, not technical ID:
-
-- `Ответный удар`
-- `Слишком поздно`
-- `Решение системы`
-
----
-
-# 10. Archive Summary — World
-
-Recommended labels:
-
-**Продолжительность**  
-`{run_duration}`
-
-**Пик населения**  
-`{peak_population}`
-
-**Последняя эпоха**  
-`Атомный век`
-
-**Итог**  
-`Пепел — {subtype_label}`
-
-If technical simulation never exposes real historical years, do not invent calendar dates.
-
----
-
-# 11. Archive Summary — Species
-
-Section title:
-
-## Вид
-
-Fields:
-
-**Первичная адаптация**  
-`Поглощение / Симбиоз / Панцирь`
-
-**Метаболические адаптации**  
-Show only unlocked optional ones.
-
-**Адаптации тела**  
-List purchased AP adaptations.
-
-**Поведение**  
-`Одиночное / Социальное / Манипуляция объектами`
-
-**Путь к разуму**  
-Short generated summary from actual flags, e.g.:
-
-> Социальное поведение и развитые органы чувств ускорили накопление когнитивной сложности.
-
-Do not claim causal numerical effects not present in config.
-
----
-
-# 12. Archive Summary — Civilization
-
-Section title:
-
-## Цивилизация
-
-Possible fields:
-
-**Распределение**  
-`Общее / По вкладу`
-
-**Поселение**  
-Optional focus if selected.
-
-**Управление**  
-`Совет / Лидер / Торговые дома`
-
-**Энергетический путь**  
-`Ископаемая промышленность / Чистая программа / Ранняя атомная программа`
-
-**Современный фокус**  
-Only if that optional profile exists in run.
-
-Keep summary factual.
-
----
-
-# 13. Archive Summary — Anomalies
-
-Section may initially appear as:
-
-## Необъяснённое
-
-Possible rows:
-
-**Следы до нас**  
-`Исследованы / Разобраны / Сохранены`
-
-**ERROR 17**  
-`Источник не найден`
-
-**Неизвестная запись**  
-`«Снова.»`
-
-Important: do not explain these items in tooltip during Timeline #1 summary.
-
----
-
-# 14. Archive Summary — Filter
-
-Section title:
-
-## Великий фильтр
-
-Fields:
-
-**Минимальная стабильность**  
-`{minimum_stability}` or inverse World Tension presentation.
-
-**Конфликт блоков**  
-Selected choice.
-
-**Предупреждение**  
-Selected choice.
-
-**Последний протокол**  
-Selected choice.
-
-**Итог**  
-`ПЕПЕЛ`
-
-Do not show `Ash unavoidable` or tutorial-script explanation to player.
-
----
-
-# 15. Archive reward copy
-
-After reward calculation succeeds transactionally:
-
-## Память сохранена
-
-**Получено: {archive_fragments} фрагментов Архива**
-
-Supporting line:
-
-> Фрагменты позволяют сохранять часть опыта между timelines.
-
-First-run typical envelope remains 14–18 AF per GDD, but narrative copy never hardcodes exact expected amount.
-
-No ad multiplier prompt on the mandatory first reward screen.
-
----
-
-# 16. MS09 — Archive remembers
-
-After summary/reward:
-
-# АРХИВ ПОМНИТ
-
-Primary line:
-
-> Некоторые данные могут быть перенесены в новую биосферу.
-
-Secondary:
-
-> Следующая Timeline не обязана начинаться с полного забвения.
-
-This line establishes meta progression without promising a particular skip mechanic beyond DS-04.
-
----
-
-# 17. The first «we»
-
-After a short pause:
-
-> Подготовить новую Timeline?
-
-Then a separate line, visually distinct but not explicitly attributed to another speaker:
+## The first «we» (без изменений)
 
 > Мы можем изменить результат.
 
-Rules:
+`meta.archive.we_can_change_result_seen = true`. Правила подачи — без
+изменений (см. предыдущую версию: без кавычек, без подписи `АРХИВ:`, без
+немедленного продолжения).
 
-- do not add quotation marks implying a known external character;
-- do not add `АРХИВ:` label if other Archive lines are unlabeled;
-- do not explain `мы`;
-- do not immediately answer with another system correction;
-- let the line remain on screen until CTA appears.
+## Final CTA — переход в Act 2
 
-Persistent flag:
+Primary: **СОЗДАТЬ НОВУЮ ЖИЗНЬ**
 
-```text
-meta.archive.we_can_change_result_seen = true
-```
+Это CTA больше не ведёт в «Timeline #2» с нуля — оно ведёт в Act 2
+(`P1`) teaser (см. §Act 2 teaser ниже). Если открытый вопрос `ACT-006`
+(сохраняется ли классический restart-from-zero где-то в Act 3) решится
+положительно, это не меняет данный CTA — он всегда ведёт в следующий
+продуктовый Act, а не переигрывает Act 1.
 
----
+## Act 2 (`P1`) teaser copy (замена «Timeline #2 teaser»)
 
-# 18. Final CTA
+> АРХИВ ЖИЗНИ // синтез завершён
 
-Primary:
+> Пять моделей исчерпаны по отдельности.
 
-**СОЗДАТЬ НОВУЮ ЖИЗНЬ**
+> Проверяется готовая структура вместо новой.
 
-Secondary optional action:
+Ключевая строка:
 
-**Открыть Архив**
+> Архив пробует иначе.
 
-If only one CTA is available, use `СОЗДАТЬ НОВУЮ ЖИЗНЬ`.
+Не писать на этом экране:
 
----
-
-# 19. Timeline #2 teaser copy
-
-On next-start initialization:
-
-> АРХИВ ЖИЗНИ // восстановление состояния
-
-> Найдена Память предыдущей Timeline.
-
-> Доступны наследуемые параметры.
-
-Milestone/section title:
-
-# АРХИВ ПОМНИТ
-
-Then:
-
-> Новая биосфера готова.
-
-First gameplay remains recognizably RNA → DNA → Cell.
-
-Do not write:
-
-- `Теперь вы можете пропустить эволюцию` unless meta design actually allows that;
+- `Теперь вы можете пропустить эволюцию`;
 - `Исправьте ошибку прошлой цивилизации`;
 - `Предотвратите ядерную войну`;
-- any promise that Ash can already be avoided on Timeline #2.
+- любое обещание конкретной механики `P1`, не зафиксированной в
+  `docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` §6.
+
+**Продолжение:** полный сценарий `P1–P3` (единый для всех трёх, наблюдатель
+вместо редактора, unified reveal, Act 3 entry-реплики и оба гейтированных
+финала — первый reset Акта 3 и 100% Архива) — отдельный документ
+`docs/scenario/02_ACT2_ACT3_SCRIPT.md` (`ACT-008`/`ACT-009`/`ACT-010`). Этот
+файл не переписывается дальше данного teaser.
+
+## Recovery copy (без изменений по существу)
+
+Правила для незавершённого сохранения `Ash`/`T5` — без изменений
+относительно предыдущей версии. Для `T1–T4` recovery copy проще: если
+приложение закрылось до фиксации chapter reset, resume title —
+**Незавершённая глава** / текст: «Итог главы уже зафиксирован. Архив
+завершит переход без повторного начисления награды.» / CTA:
+**Продолжить переход**.
 
 ---
 
-# 20. Recovery copy
+# Acceptance checklist (act-structure revision)
 
-If app closes during ending before final reset commit:
-
-Recommended resume title:
-
-**Незавершённое сохранение Timeline**
-
-Text:
-
-> Итог Timeline #1 уже зафиксирован. Архив завершит сохранение без повторного начисления награды.
-
-CTA:
-
-**Продолжить сохранение**
-
-If transaction already committed but cinematic/summary acknowledgement did not complete:
-
-> Timeline #1 уже сохранена.
-
-CTA:
-
-**Открыть запись**
-
-Never show duplicate AF as a new reward.
-
----
-
-# 21. Tone restrictions
-
-Ending should be tragic, not melodramatic.
-
-Avoid:
-
-- `Всё было напрасно.`
-- `Вы уничтожили цивилизацию.`
-- `Неверный выбор.`
-- `Человечество погибло из-за вас.`
-- excessive exclamation marks;
-- long philosophical monologues from the Archive.
-
-The emotional effect comes from scale contrast: billions of years of complexity → seconds of collapse → Archive quietly preserving memory.
-
----
-
-# 22. Acceptance checklist
-
-- [x] all Last Protocol variants converge to `ENDING_ASH`
-- [x] each subtype has distinct but non-judgmental copy
-- [x] no Game Over language
-- [x] no ad interruption
-- [x] Archive Summary uses reconciled biological terms
-- [x] ERROR 17 and `Снова.` remain unresolved
-- [x] Archive reward copy is idempotency-safe
-- [x] first «we» is preserved
-- [x] Timeline #2 teaser does not overpromise mechanics
+- [x] пять endings, пять ending_id, ни один не переиспользован
+- [x] каждый ending имеет три subtype с subtitle/epitaph/expanded
+      chronicle/archive summary
+- [x] только `T5` использует белую вспышку и полный Archive Summary
+- [x] `T1–T4` используют компактный transition-шаблон (§0) без CTA
+      «СОЗДАТЬ НОВУЮ ЖИЗНЬ»
+- [x] reveals распределены: `T1`→`heard_before_seen`,
+      `T3`→`knows_more_seen`, `T4`→`filter_probability_glimpsed`,
+      `T5`→`we_can_change_result_seen`
+- [x] Act 1 Summary агрегирует все пять глав перед финальным CTA
+- [x] финальный CTA ведёт в Act 2 teaser, не в «Timeline #2 с нуля»
+- [x] no Game Over language ни в одной из пяти endings
+- [x] Archive reward copy остаётся idempotency-safe

@@ -1,157 +1,150 @@
-# Хроники Эволюции — план полной пересборки Timeline #1
+# Хроники Эволюции — план сборки Act 1 (`T1–T5`)
 
-**Статус:** manual fresh-state playtest `0–180`; реализация и headless baseline готовы.
-**Дата:** 2026-09-16.
-**Программа:** `timeline1-v3-full`.
+**Статус:** rework под act-structure; `T1` chapter-контент до `TRIBE` реализован
+и находится в manual playtest, `T5` (бывший «Timeline #1» Modern→Atomic→Ash)
+реализован и переосмысляется как пятая глава, `T2–T4` — новый scope.
+**Дата:** 2026-09-17.
+**Программа:** `timeline1-v11-branch-cost-fix` (текущий ruleset) → следующая
+версия вводит `Мор`/`Катаклизм`/`Раскол`/`Авария` collapse-контент.
+
+**Authority:** `docs/DECISIONS_ACT_STRUCTURE.md` задаёт саму структуру глав;
+этот документ — build-план её реализации. `docs/gdd/12_LONG_TERM_
+PROGRESSION_AND_RESET_ROADMAP.md` задаёт порядок reset-эпох.
 
 ---
 
 ## 1. Цель
 
-Собрать один цельный первый Timeline от первой RNA до обязательного первого
-`Ash` и Archive/reset примерно за 180 минут активной игры. Это текущий
-ориентир времени до подтверждения ручным тестированием, а не жёсткий таймер.
-Это не продолжение
-локальных итераций `0–18` по инерции, а их включение в единый балансируемый
-контур `0–180`.
+Собрать пять коротких причинно связанных глав Act 1 (`T1–T5`, target ~3–4 ч
+суммарно) вместо одного цельного 180-минутного Timeline. Уже реализованный
+контент не выбрасывается — он переиспользуется и нарезается по новым era
+cutoffs (см. таблицу переиспользования в §4).
 
-Первый Ash остаётся неизбежным. Он знакомит игрока с Archive и открывает
-`T2 Memory`; он не является концом продукта. Дальнейшая карта `T2`–`U2`
-зафиксирована в [long-term roadmap](../gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md).
+Обязательный `Ash` остаётся только у `T5`. `T1–T4` каждая заканчивается
+собственным reset (`Мор`, `Катаклизм`, `Раскол`, `Авария`), который вводит
+следующую главу как прямое исправление Архива.
 
 ## 2. Границы программы
 
 ### Входит
 
-- `T1`-контент: биология, AP, Cognition, Sapience, Tribe, Settlement, City,
-  Industry, Modern, Atomic, Great Filter, Ash и Archive;
-- authored milestones/choices и procedural minor/major event deck с самого
-  начала Timeline;
-- здания, jobs, contextual crafting, population, power и crisis из GDD
-  `01–11`;
+- новый collapse-контент для `T1` (`Мор`), `T2` (`Катаклизм`), `T3`
+  (`Раскол`), `T4` (`Авария`) — goals, authored события, ending copy;
+- переразметка era cutoffs существующего `T1`-контента по главам;
+- species skin swap #1 (`T2`) и #2 (`T4`) — косметика/label/1–2 flavor
+  способности, без полной trait-глубины;
+- `T5`-only procedural event deck (синтез-flashback, ссылается на `T1–T4`);
+- Act 1 → Act 2 transition screen и persistent-reward carryover;
 - deterministic simulation, save/recovery, telemetry и mobile/desktop
-  presentation для полного run;
-- единый rebalance по профилям игры от 0 до 180 минут.
+  presentation для полного прогона `T1–T5`.
 
 ### Не входит
 
-- runtime `T2+`: archetypes, genetics, policies, trade-lite, Orbit, Bioseed,
-  planets, challenges и universes;
-- буквальный перенос legacy DOM, старых формул или каждой микровалюты Evolve;
+- `P1–P3` (Act 2): lopsided-civilization presets, achievement-driven route
+  selection;
+- Act 3: races/traits полной глубины, genetics, policies (полные), trade,
+  Orbit, planets, challenges и universes;
+- буквальный перенос legacy DOM, старых формул или каждой микровалюты
+  Evolve;
 - незапланированный визуальный production-пакет DS-08. Его активы могут
   подключаться по готовности, но не блокируют доменную реализацию.
 
-`T2+` здесь получает только устойчивые extension points: ending/Chronicle
-record, content unlock registry и save-safe identifiers. Нельзя создавать
-пустые UI-экраны поздних систем заранее.
+`P1–P3`/Act 3 здесь получают только устойчивые extension points:
+ending/Chronicle record, content unlock registry и save-safe identifiers.
+Нельзя создавать пустые UI-экраны поздних систем заранее.
 
 ## 3. Базовые правила реализации
 
-1. Канон gameplay: GDD `01–11`; порядок reset-эпох: GDD `12`; точные
-   narrative/presentation triggers: scenario и UX contracts.
-2. `timeline1-v2-reconciled` остаётся именем существующего принятого
-   биологического среза. Новый полный content ruleset получает отдельный
-   идентификатор `timeline1-v3-full`; его нельзя подменять незаметной
-   правкой активного v2 save.
-3. Существующие RNA/DNA/Cell и Cell Coordination не выбрасываются. В `T1-0`
-   они проходят config/goal/economy audit и затем проверяются в полном
-   simulation pass. Принятый `0–10` baseline меняется только с явным
-   balance decision и migration note.
+1. Канон gameplay: GDD `01–11`; порядок глав и причинная цепочка: GDD `12`
+   и `DECISIONS_ACT_STRUCTURE.md`; точные narrative/presentation triggers:
+   scenario и UX contracts.
+2. Существующий ruleset (`timeline1-v11-branch-cost-fix`) не выбрасывается.
+   `T1`-контент до `TRIBE` (`G001–G015`, `MS01–MS04`) становится главой `T1`
+   почти без изменений — добавляется только `Мор` collapse после Tribe.
+   `T5`-контент (`G020–G024`, crisis flow, `Ash`) становится главой `T5`
+   почти без изменений — добавляется только новая procedural deck и
+   reframe стартового условия/copy.
+3. Новый полный content ruleset после `Мор`+`T2`+`T3`+`T4` получает
+   отдельный идентификатор; его нельзя подменять незаметной правкой
+   активного save.
 4. Каждая content-волна обязана поставлять config validation, доменные
    тесты, целевую simulation profile, UI smoke и save compatibility check.
-5. Нельзя начинать `T2` runtime, пока `T1-7` не завершит full-run regression
-   и manual playtest. Поздние GDD пишутся до кода соответствующей эпохи.
+5. Нельзя начинать Act 2 (`P1`) runtime, пока `T5`/Act 1 closeout не
+   завершит full-run regression и manual playtest.
 
 ## 4. Пакеты работы
 
-| Пакет | Целевое активное время | Что поставляется | Gate перед следующим пакетом |
-|---|---:|---|---|
-| `T1-0` Foundation + Event Engine | 0–18 мин, retroactive | ruleset audit; полный event schema; seeded deck, cooldown, persisted deck state, `RESOLVE_EVENT`, queue priority, telemetry; RNA/DNA/Cell minor/major events; `meta.unlocks` и Chronicle contract | deterministic deck/save tests; no hard-lock loss; existing 0–18 sims remain explainable |
-| `T1-1` Organism | 18–28 мин | `G008–G009`: AP, Multicellularity, adaptation presentation and costs | AP and branch profiles simulate within target window |
-| `T1-2` Cognition | 28–40 мин | Nervous System, Cognition `0..100`, Sapience convergence, `G010–G013` | three biological profiles reach Sapience without hidden manual grind |
-| `T1-3` First civilization | 38–84 мин | Tribe/Settlement, Population around 5, buildings, phase-aware jobs, Food/Morale/Knowledge loop, events | job reassignment, save/load and population-deficit recovery pass |
-| `T1-4` City and Industry | 84–128 мин | City/Industry, contextual materials/crafting, market sheet, compact Power capacity/deficit, policies deferred | city/industry sim profiles; resources remain contextual in UI |
-| `T1-5` Modern and Atomic | 128–168 мин | Modern bridge, Atomic transition, World Tension, Error 17, `Again`, late event deck | scripted and procedural events coexist; Atomic route timing passes |
-| `T1-6` Great Filter and reset | 168–180 мин | Last Protocol variants, inevitable first Ash, AF award, Archive, idempotent reset transaction and `T2` teaser | repeated reset cannot duplicate rewards or corrupt state; ending and save recovery tests |
-| `T1-7` Full-run closeout | 0–180 мин | rebalance, accessibility/UX pass, analytics taxonomy, performance, production build and manual playtests | release-candidate test matrix and approved timing profile |
+| Пакет | Целевое активное время главы | Что поставляется | Переиспользует (старая нумерация) | Gate перед следующим пакетом |
+|---|---:|---|---|---|
+| `T1` — Origin (retrofit) | ~20 мин | audit существующего `G001–G015`/`MS01–MS04`; новый `Мор` collapse: epidemic authored event chain, `ENDING_BLIGHT`, Chronicle/Archive reveal «Архив уже запускался раньше» | `T1-0…T1-3` (почти без изменений) | `Мор` не блокирует critical path раньше Tribe; save/reset regression на новом ending |
+| `T2` — Одиночки | ~25–30 мин | dispersed-start modifier (economy/job weighting), species skin #1, coordination-vs-isolation authored choice, flavor deck, `Катаклизм` collapse (`ENDING_CATACLYSM`) | `T1-3…T1-4` (truncated) | skin swap не ломает save schema; collapse достижим без stuck-state |
+| `T3` — Крепость | ~30–35 мин | стартовый defense kit, policy-lite choice (unity vs control), flavor deck, `Раскол` collapse (`ENDING_FRACTURE`) | `T1-4` (truncated) | policy choice не открывает скрытый permanent gate; collapse timing внутри окна |
+| `T4` — Большой мозг | ~35–45 мин | Cognition-bias старт, раннее Writing/culture, species skin #2, automation-risk choices, flavor deck, `Авария` collapse (`ENDING_OVERLOAD`) | `T1-4…T1-5` (truncated) | skin swap #2 не требует нового save field сверх skin #1; collapse причинно связан с automation-risk выборами |
+| `T5` — Синтез (reframe) | ~45–60 мин | reframe стартового условия/copy (возврат исходной линии, синтез уроков); **новая `T5`-only procedural deck** (§5); existing crisis flow/`Ash` без изменений | `T1-5…T1-6` (почти без изменений) | новая deck не блокирует authored crisis events; Ash award idempotent как раньше |
+| Act 1 closeout | 0 — весь прогон `T1–T5` | rebalance, accessibility/UX pass, analytics taxonomy, Act1→Act2 transition screen, persistent-reward carryover, manual playtests | `T1-7` (расширен на 5 глав) | release-candidate test matrix и approved timing profile для всех пяти глав |
 
-## 5. `T1-0`: обязательный первый шаг
+## 5. `T5`-only procedural deck: обязательный первый шаг этого документа
 
-Event Engine идёт раньше `T1-1`, потому что random events — часть живого
-первого Timeline, а не оформление готового контента.
+`T5` — единственная глава `T1–T5` без собственной procedural deck на
+момент этого документа (deck есть только у `T1`, molecular window). Задача
+явно поставлена пользователем и зафиксирована здесь как отдельный
+work-item, не подпакет.
 
-### Контракт событий
+### Контракт
 
-- data config задаёт id, deck, phase window, preconditions, weight, cooldown,
-  cap-safe effects, choices и telemetry key;
-- RNG seed, used IDs, long cooldowns, pending queue и resolved outcomes живут
-  в `GameState` и сериализуются;
-- selector возвращает только eligible events; weighted draw детерминирован
-  при равном state/seed;
-- `RESOLVE_EVENT` атомарно применяет chosen effect и записывает историю;
-- authored story/crisis events имеют приоритет над procedural deck, но не
-  используют второй самодельный механизм;
-- offline progress может подготовить event report, но не может выбрать
-  decision за игрока;
-- loss/reward соблюдают caps и не блокируют critical path.
+- deck подключается к существующему Event Engine (`RESOLVE_EVENT`,
+  seeded RNG, cooldown, queue priority) — новый движок не нужен;
+- events используют `phaseWindow.eraIds: ['MODERN', 'ATOMIC']` и не
+  триггерятся раньше Modern, чтобы не конкурировать с `T1`-decky
+  окном/ритмом;
+- каждое событие этой deck обязано либо явно ссылаться на один из четырёх
+  предыдущих collapse (`Мор`/`Катаклизм`/`Раскол`/`Авария`) как на
+  flashback/echo, либо явно маркироваться как neutral filler —
+  большинство должно быть первого типа, это и есть «приправить
+  сценарием»;
+- authored crisis events (`EV-CR-01…03`) сохраняют приоритет в queue —
+  procedural deck не может прервать или заблокировать crisis choice;
+- полный список событий, их текст и Chronicle-версии — в
+  `docs/scenario/04_STORY_EVENTS.md` §T5-DECK; flags — в
+  `docs/scenario/05_NARRATIVE_FLAGS.md`.
 
-### Audits в этом пакете
+### Реализация
 
-- сверить живой config с `G001–G007`, убрать либо формально обосновать
-  неканонические временные nodes/goals;
-- проверить отдельные `timeline1-v2-reconciled` saves: для внутреннего,
-  незрелизного среза допускается явный restart/migration notice, но не
-  молчаливое угадывание состояния;
-- bump `CURRENT_SCHEMA_VERSION` только если меняется структура persisted
-  state; ruleset version и schema version не смешивать;
-- добавить event-aware headless profiles: normal, inactive/manual-light и
-  branch variants.
+Технически это только новые записи `config/events.js` с `deck: 't5_synthesis'`
+и соответствующей `phaseWindow` — сериализация RNG/deck state и
+`RESOLVE_EVENT` уже общие для всех deck. Работа не требует нового домена.
 
-## 6. Ожидаемый темп T1
+## 6. Definition of done для Act 1 (`T1–T5`)
 
-| Граница | Target |
-|---|---:|
-| Cell | 9–11 мин |
-| Cellular systems / G007 | 15–20 мин |
-| Multicellularity | 24–28 мин |
-| Sapience | 38–40 мин |
-| Settlement | 78–86 мин |
-| City | 104–112 мин |
-| Industry | 120–128 мин |
-| Modern | 132–140 мин |
-| Atomic | 165–172 мин |
-| Ash + Archive | 177–183 мин |
+- новый игрок проходит понятную дугу из пяти попыток: каждая начинается с
+  явной правки Архива и заканчивается собственным, причинно понятным
+  reset, без внешней инструкции;
+- `T1` и `T5` сохраняют существующие authored+procedural events;
+  `T2–T4` получают собственный flavor deck (не обязательно того же
+  объёма, что `T1`/`T5`);
+- `T5`-only synthesis deck работает и явно ссылается на исходы `T1–T4`
+  конкретного прогона (через `run`/`meta` флаги, не только текстом
+  наугад);
+- ровно один обязательный `Ash` за весь Act 1 — на `T5`; `T1–T4` не
+  переиспользуют `ENDING_ASH`;
+- игрок видит только релевантные 3–4 главные counters на каждой главе;
+- persistent reward (AF, Chronicle, species skins) переносится между
+  главами без потери и без дублирования при пересборке/сбое;
+- save/load/recovery устойчивы на каждой границе между главами;
+- full simulation, config/domain/save/UI/smoke/build gates проходят для
+  всех пяти глав;
+- есть manual mobile и desktop playtest от `T1` до конца `T5`.
 
-Диапазоны сверяются по p25/p50/p75, а не по одному идеальному dev profile.
-Случайное событие может менять локальную историю run, но не должно быть
-единственной причиной попасть внутрь или вне этих границ.
-
-## 7. Definition of done для полного T1
-
-- новый игрок проходит понятную арку RNA → Ash без внешней инструкции;
-- на протяжении run работают authored и procedural события; ранний DNA/RNA
-  reward существует как capped deck outcome;
-- игрок видит только релевантные 3–4 главные counters, а вторичные материалы
-  открывает контекстно;
-- первый Ash гарантирован и выдаёт `Archive Memory I`/AF только один раз;
-- reset открывает корректный `T2` teaser и оставляет достаточный Chronicle
-  record для будущих archetype/route systems;
-- save/load/recovery устойчивы в pending event, crisis и reset boundary;
-- full simulation, config/domain/save/UI/smoke/build gates проходят;
-- есть manual mobile и desktop playtest от fresh state до Ash.
-
-## 8. Порядок исполнения
+## 7. Порядок исполнения
 
 ```text
-T1-0 Event Engine + 0–18 audit
-→ T1-1 Organism
-→ T1-2 Cognition
-→ T1-3 First civilization
-→ T1-4 City and Industry
-→ T1-5 Modern and Atomic
-→ T1-6 Great Filter and reset
-→ T1-7 full-run closeout
-→ design and implementation of T2 Memory
+T1 retrofit: Мор collapse
+→ T2: dispersed start + skin #1 + Катаклизм
+→ T3: defense start + policy-lite + Раскол
+→ T4: Cognition-bias start + skin #2 + Авария
+→ T5 reframe: synthesis deck + Ash copy update
+→ Act 1 closeout: full T1–T5 regression + manual playtest
+→ design and implementation of P1 (Act 2)
 ```
 
 DS-08/DS-09 продолжаются как production tracks, но не меняют этот порядок

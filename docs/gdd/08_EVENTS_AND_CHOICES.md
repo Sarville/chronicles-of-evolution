@@ -1,7 +1,16 @@
-# Хроники Эволюции — события, выборы и narrative flags первых 180 минут
+# Хроники Эволюции — события, выборы и narrative flags Act 1 (`T1–T5`)
 
-**Документ:** DS-02 / reconciliation revision 2.0  
-**Статус:** canonical event semantics.
+**Документ:** DS-02 / act-structure revision 3.0
+**Статус:** canonical event semantics для `T1`/`T5` (реализовано); `T2–T4` —
+новый scope, добавлен этой ревизией.
+**Authority:** `docs/DECISIONS_ACT_STRUCTURE.md`,
+`docs/gdd/13_ACT_ONE_CHAPTERS.md`.
+
+> Всё, что описано ниже под заголовками `EV-BIO-*`, `EV-FLAVOR-*`,
+> `EV-CIV-01..07`, `EV-NAR-01..03`, `EV-CR-01..03` — контент главы `T1`
+> (§3–17) и главы `T5` (§14–19, Modern/Atomic/crisis блок; `T5` начинает
+> играть именно с этой точки, минуя биологию). Новые секции 22–24 ниже
+> добавляют события `T2–T4` и `T5`-only procedural deck.
 
 ---
 
@@ -451,11 +460,16 @@ run.civ.*
 run.energy.*
 run.crisis.*
 run.anomaly.*
+run.chapter          // current chapter id, "T1".."T5"
+run.chapterN.*       // N=1..4: chapter-scoped collapse state (blight_noticed, response, ...)
 chronicle.timeline_*
 meta.archive.*
 meta.anomaly.*
-meta.endings.*
+meta.endings.*        // includes chapterN_subtype (T1–T4) and timeline_1_subtype (T5)
+meta.act1.*           // species_skin budget, Act 1 progress
 ```
+
+Полный контракт новых namespaces — `docs/scenario/05_NARRATIVE_FLAGS.md`.
 
 New biological flags must use restored terms and should not persist obsolete `metabolism=photosynthesis/chemosynthesis/absorption` as the primary first-branch identity.
 
@@ -495,3 +509,165 @@ C2 / false warning at 210 s, C3 at 330 s and C4 / Last Protocol at 435 s.
 Those checkpoints protect narrative order; their exact coefficients remain a
 balance-pass input. `EV-CR-03` is the only first-run path to `ENDING_ASH` and
 all three choices retain their distinct subtype.
+
+---
+
+# 23. Chapter collapse events (`T1–T4`)
+
+Каждая глава `T1–T4` заканчивается **двумя** событиями вместо полной
+4-фазной последовательности `EV-CR-01..03`: одно authored anomaly-событие
+(«rising» — вводит угрозу как факт, non-blocking) и одно mandatory
+choice-событие («final» — три варианта, определяет subtype, не отменяет
+коллапс). Копии текста — `docs/scenario/04_STORY_EVENTS.md`; здесь только
+gameplay-контракт. Priority-правило §1 применяется без изменений: final
+собятия имеют приоритет `ending/crisis`, rising — приоритет `anomaly`.
+
+**ID/flag authority:** exact choice IDs, subtype strings and flag
+namespace below are owned by `docs/scenario/04_STORY_EVENTS.md` §4–7 and
+`docs/scenario/05_NARRATIVE_FLAGS.md` §5A/5B — this table mirrors them,
+narrative doc wins on any future wording/ID drift.
+
+## `T1` — Мор
+
+| ID | Trigger | Type | Blocking | Goal |
+|---|---|---|---|---|
+| `EV-NAR-04` | Tribe milestone (`MS04`) reached + short delay | anomaly | no | `G025` |
+| `EV-CR-T1` | after `EV-NAR-04`, short delay | ending | yes, mandatory | `G026` |
+
+`EV-CR-T1` choices: `isolate` (Изолировать больных) / `stay_together`
+(Держаться вместе) / `healer` (Довериться целителю). Flags:
+
+```text
+run.chapter1.blight_noticed = boolean
+run.chapter1.response = "isolate" | "stay_together" | "healer"
+```
+
+All three converge to `ENDING_BLIGHT` with subtype
+`meta.endings.chapter1_subtype = "blight_isolated" | "blight_unified" | "blight_early_medicine"`.
+
+## `T2` — Катаклизм
+
+| ID | Trigger | Type | Blocking | Goal |
+|---|---|---|---|---|
+| `EV-NAR-05` | after Farming/`G028`, Settlement specialization | anomaly | no | `G029` |
+| `EV-CR-T2` | after `EV-NAR-05`, short delay | ending | yes, mandatory | `G030` |
+
+`EV-CR-T2` choices: `converge` (Стянуть группы к центру) /
+`shelter_separately` (Укрыть каждую группу отдельно) / `old_experience`
+(Довериться прежнему опыту). Flags:
+
+```text
+run.chapter2.tremor_noticed = boolean
+run.chapter2.response = "converge" | "shelter_separately" | "old_experience"
+```
+
+Converge to `ENDING_CATACLYSM`, `meta.endings.chapter2_subtype =
+"cataclysm_converge" | "cataclysm_scattered" | "cataclysm_unprepared"`.
+
+## `T3` — Раскол
+
+| ID | Trigger | Type | Blocking | Goal |
+|---|---|---|---|---|
+| `EV-CIV-04` (reused, unchanged text) | City-equivalent reached | narrative/profile | no, feeds into `EV-CR-T3` condition | `G032B` |
+| `EV-NAR-06` | after governance choice | anomaly | no | `G033` |
+| `EV-CR-T3` | after `EV-NAR-06`, short delay | ending | yes, mandatory | `G034` |
+
+`EV-CR-T3` choices: `suppress` (Подавить несогласных) / `split` (Разделить
+крепость) / `vote` (Вынести решение на всех). Flags:
+
+```text
+run.chapter3.fracture_noticed = boolean
+run.chapter3.response = "suppress" | "split" | "vote"
+```
+
+Converge to `ENDING_FRACTURE`, `meta.endings.chapter3_subtype =
+"fracture_suppressed" | "fracture_split" | "fracture_deliberated"`.
+`EV-CIV-04`'s prior choice (`council` / `leader` / `merchants`, see §12) is
+a condition input for `EV-CR-T3` framing, not a hard gate — all three final
+choices remain available regardless of governance pick.
+
+## `T4` — Авария
+
+| ID | Trigger | Type | Blocking | Goal |
+|---|---|---|---|---|
+| `EV-CIV-08` (new) | Machine Age milestone reached | branch/profile | no, feeds into `EV-CR-T4` condition | `G037` |
+| `EV-NAR-07` | after `EV-CIV-08` | anomaly | no | `G038` |
+| `EV-CR-T4` | after `EV-NAR-07`, short delay | ending | yes, mandatory | `G039` |
+
+`EV-CIV-08` choices: `cautious` (Осторожный темп) / `aggressive`
+(Агрессивный темп) / `delegated` (Делегировать полный контроль). Flag:
+
+```text
+run.chapter4.automation_pace = "cautious" | "aggressive" | "delegated"
+run.chapter4.overload_noticed = boolean
+```
+
+`EV-CR-T4` choices: `manual_stop` (Остановить вручную) / `reroute`
+(Перенаправить нагрузку) / `trust_automation` (Довериться автоматике до
+конца — automatic outcome when `automation_pace = "delegated"`, no manual
+choice offered). Flag:
+
+```text
+run.chapter4.response = "manual_stop" | "reroute" | "trust_automation"
+```
+
+Converge to `ENDING_OVERLOAD`, `meta.endings.chapter4_subtype =
+"overload_manual" | "overload_rerouted" | "overload_automated"`.
+
+## Hard rules (shared with `EV-CR-01..03`)
+
+- никакой choice не отменяет коллапс своей главы — тот же принцип, что уже
+  действует для `Ash`;
+- final-событие каждой главы не показывает rewarded ad и не открывает
+  shop/meta CTA — идентично правилу для Last Protocol (`09_ENDINGS_AND_
+  RESET.md` §2);
+- rising-событие не блокирует обычный gameplay input дольше короткого
+  toast/brief sheet (см. `12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md`
+  §7 fairness rules).
+
+---
+
+# 24. Chapter starting-condition events
+
+Каждая глава `T2–T5` открывается одной non-blocking intro-сценой, которая
+объявляет стартовый грант как прямое следствие смерти предыдущей главы —
+проигрывается автоматически при старте главы, до первого игрового действия,
+без choice кроме неявного `continue`. Полные тексты — `docs/scenario/
+01_TIMELINE_01_SCRIPT.md` §5.1/§6.1/§7.1, `04_STORY_EVENTS.md` §5–7.
+
+| Глава | Устанавливает |
+|---|---|
+| `T2` | `run.chapter = "T2"`, `meta.act1.species_skin = 1` |
+| `T3` | `run.chapter = "T3"` |
+| `T4` | `run.chapter = "T4"`, `meta.act1.species_skin = 2` |
+| `T5` (`EV-NAR-08` «Синтез») | `run.chapter = "T5"`, `meta.act1.species_skin = 0` (возврат к исходной линии) |
+
+`EV-NAR-08` — единственная из этих сцен, реализованная как полноценный
+event ID, т.к. она несёт значимый reveal (Архив впервые прямо говорит о
+предыдущих четырёх главах). Остальные три реализуются как intro-cutscene
+без отдельной записи в event deck — implementation detail. `run.chapter`/
+`meta.act1.species_skin` — namespace `docs/scenario/05_NARRATIVE_FLAGS.md`
+§5A.
+
+---
+
+# 25. `T5` — `t5_synthesis` procedural deck
+
+Поверх существующего Modern/Atomic/crisis-контента `T5` (§14–19)
+добавляется процедурный deck `deck: 't5_synthesis'` — тот же Event Engine
+контракт, что уже обслуживает `deck: 'early_biology'` в `T1` (weighted
+seeded draw, per-event cooldown, save-сериализуемое deck state), не новый
+движок. Полная спецификация и текст карточек — `docs/scenario/
+04_STORY_EVENTS.md` §T5-DECK.
+
+Восемь карточек, по паре (minor + major) на каждую из четырёх прошлых
+глав: `EV-T5-ECHO-BLIGHT-MINOR/MAJOR`, `EV-T5-ECHO-CATACLYSM-MINOR/MAJOR`,
+`EV-T5-ECHO-FRACTURE-MINOR/MAJOR`, `EV-T5-ECHO-OVERLOAD-MINOR/MAJOR`.
+Каждая пара читается через `meta.endings.chapterN_subtype` этого
+конкретного прогона (precondition — соответствующий флаг должен быть
+установлен; если предыдущая глава была пройдена по-другому или история не
+сохранилась при миграции, пара просто не входит в eligible pool — никаких
+generic заглушек). Major-карточка каждой пары доступна только после того,
+как её minor уже была разыграна в этом прогоне. Hard rule: ни одна
+карточка этой deck не может предотвратить обязательный первый `Ash` — тот
+же принцип, что уже действует для `EV-CR-01`/`EV-CR-02`.

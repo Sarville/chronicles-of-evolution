@@ -1,11 +1,14 @@
-# Хроники Эволюции — цели и вехи первых 180 минут
+# Хроники Эволюции — цели и вехи Act 1 (`T1–T5`)
 
-**Документ:** DS-02 / reconciliation revision 2.0  
-**Статус:** canonical goal semantics / exact balance conditions provisional.
+**Документ:** DS-02 / act-structure revision 3.0
+**Статус:** canonical goal semantics для `T1` и `T5` (реализовано); `T2–T4`
+goal design — новый scope, numeric targets provisional до balance pass.
+**Authority:** `docs/DECISIONS_ACT_STRUCTURE.md` задаёт причинную цепочку
+глав; этот документ переносит её в конкретные goals/milestones.
 
 ---
 
-# 1. Goal Engine contract
+# 1. Goal Engine contract (без изменений)
 
 Generic Goal Engine remains accepted.
 
@@ -19,9 +22,21 @@ Additional states such as `stalled`, `blocked_by_event`, `reward_pending` remain
 
 Target time is telemetry, never automatic completion.
 
+## Goal kinds (structural — 2026-09-17 playtest finding, unchanged)
+
+- **Standard** — one concrete target, one condition, resolved by a single
+  direct action. Большинство `G0xx` chapter goals и every `*_OPTIONAL` side
+  goal.
+- **Progressive** — a derived counter accumulated from several distinct
+  sources across more than one chapter goal (Cognition в `T1`; World
+  Tension/Crisis Stability в `T5`). Needs its own always-visible slot and an
+  introducing event at the first contributing source.
+- **Super-global** — spans beyond a single chapter/run (Archive/meta
+  progression across `T1–T5` and beyond). See §9.
+
 ---
 
-# 2. Goal hierarchy
+# 2. Goal hierarchy (без изменений, теперь явно вложена в главу)
 
 ## Current Goal
 
@@ -29,529 +44,384 @@ Target time is telemetry, never automatic completion.
 
 ## Chapter Goal
 
-10–25 min horizon.
+10–25 min horizon — теперь это подцель **внутри** одной из глав `T1–T5`,
+а не внутри единого 180-минутного run.
 
 ## Destiny Goal
 
-Run-scale direction:
+Направление внутри одной главы `T1–T5`:
 
 ```text
-Create Life
-→ Awaken Sapience
-→ Build Civilization
-→ Face Great Filter
+T1: Create Life → Awaken Sapience → Build a Tribe → Survive the Blight
+T2: Rebuild dispersed → Settle again → Survive the Cataclysm
+T3: Fortify → Hold together → Survive the Fracture
+T4: Outgrow the past → Industrialize → Survive the Overload
+T5: Synthesize → Reach the Atomic Age → Face the Great Filter
 ```
 
-## Goal kinds (structural — 2026-09-17 playtest finding)
-
-The horizon split above (Current/Chapter/Destiny) says nothing about *shape*.
-In practice a goal is one of three kinds, and each needs different
-presentation:
-
-- **Standard** — one concrete target (build/buy a specific node or building),
-  one condition, resolved by a single direct action. Most `G0xx` chapter
-  goals and every `*_OPTIONAL` side goal.
-- **Progressive** — a derived counter accumulated from several distinct
-  sources (multiple node completions and/or event choices) across more than
-  one chapter goal, rather than a single purchase. It is not optional side
-  content and must not be treated as one: it needs (a) its own always-visible
-  slot shown alongside the current chapter goal, on par with it, not folded
-  into a collapsed side-goals list; (b) an introducing event fired at the
-  *first* contributing source, so the counter is never seen already
-  half-full with no explanation. Implemented as `slot: 'progressive'` goals
-  (see `isParallelGoal`/`selectProgressiveGoals` in the domain layer).
-  - **Cognition** — first contributor is `B04` (worth 20/100 alone), tracked
-    by `G011_COGNITION_TRACK`, introduced by `EV-BIO-04` on `B04` completion,
-    archives once Cognition reaches 100 (at `N05`, before `N07` is actually
-    bought).
-  - **World Tension / Crisis Stability** — the next instance in the route.
-    `state.run.crisis.stability` accumulates across the C1–C4 crisis event
-    choices (bloc conflict, false warning) during the Atomic era. It
-    currently has *no* player-visible representation anywhere (not even the
-    diorama), which is the same gap Cognition had. It is also not purely
-    narrative flavor: `minStability` buys 0–3 bonus Archive Fragments carried
-    into the meta-run (see `prepareResetTransaction` in `commands.js`), so it
-    already reaches into the super-global tier below. Not fixed yet — needs
-    an introducing event at crisis start plus a progressive-goal slot, once
-    the Archive/meta-progression design (below) is settled.
-- **Super-global** — spans beyond a single run (Archive / meta-progression
-  across Timelines). Not yet documented here; deferred pending a dedicated
-  design pass.
-
----
-
-# 3. Corrected chapters
-
-| Chapter | Window | Chapter Goal |
-|---|---:|---|
-| CH01 Искра | 0–12 | Создайте клетку |
-| CH02 Организм | 10–28 | Станьте многоклеточным |
-| CH03 Разум | 28–40 | Преодолейте когнитивный порог |
-| CH04 Племя | 38–56 | Создайте устойчивое племя |
-| CH05 Поселение | 56–84 | Постройте постоянное поселение |
-| CH06 Город | 84–110 | Создайте город |
-| CH07 Машины | 110–138 | Начните индустриализацию и свяжите мир |
-| CH08 Атом | 138–180 | Завершите атомную программу и пройдите Великий фильтр |
-
----
-
-# 4. G001–G013 — biological goals
-
-## G001 — Создайте устойчивую РНК
-
-**Target:** ~00:45  
-**Node:** M01 Stable RNA.
-
-Reward:
-
-- passive RNA process;
-- `/s` production becomes visible;
-- first molecular visual stabilization.
-
-First meaningful action must happen <20 sec.
-
-## G002 — Запустите саморепликацию
-
-**Target:** ~02:00–03:00  
-**Node:** M02 Self Replication.
-
-Reward:
-
-- RNA becomes self-sustaining;
-- manual action stops being dominant;
-- narrative: `Информация научилась копировать себя.`
-
-## G003 — Создайте ДНК
-
-**Target:** ~04:00–06:00  
-**Node:** M03 DNA Synthesis.
-
-Reward:
-
-- DNA visible resource;
-- genetic progression preview;
-- M04 Error Correction optional node may appear.
-
-## G004 — Создайте мембрану
-
-**Target:** ~07:00–09:00  
-**Node:** M05 Membrane.
-
-Reward:
-
-- visual boundary around proto-life;
-- preview Cell → Biomass.
-
-## G005 — Создайте первую клетку
-
-**Target:** ~09:00–11:00  
-**Node:** M06 Cell.
-
-Reward:
-
-- Biomass;
-- cellular visual state;
-- Metabolism path;
-- milestone `MS01 ЖИЗНЬ`.
-
-## G006 — Стабилизируйте метаболизм
-
-**Target:** ~11:00–14:00.
-
-Completion is composite:
-
-- Metabolism unlocked;
-- Energy production active;
-- first primary biological branch resolved: Absorption / Symbiosis / Shell.
-
-Reward:
-
-- stable cellular economy;
-- organelle/protein progression.
-
-## G007 — Развейте клеточные системы
-
-**Target:** ~15:00–20:00.
-
-Checklist may include:
-
-- Protein Synthesis/Ribosome;
-- Organelles;
-- positive Biomass/Energy production.
-
-Photosynthesis/Chemosynthesis may be optional goals/nodes, not core prerequisites.
-
-## G008 — Освойте адаптации
-
-**Target:** ~20:00–24:00.
-
-Goal teaches Adaptation Points.
-
-Completion example:
-
-- earn AP from milestone/side objective;
-- buy at least one optional body adaptation.
-
-Reward:
-
-- additional AP or Chronicle/profile progress;
-- preview Multicellularity.
-
-## G009 — Станьте многоклеточным
-
-**Target:** ~24:00–28:00.
-
-Reward:
-
-- organism visual state;
-- body systems;
-- milestone `MS02 МНОГОКЛЕТОЧНОСТЬ`.
-
-## G010 — Специализируйте тело
-
-**Target:** ~28:00–31:00.
-
-Completion:
-
-- Tissue Specialization/core body system;
-- optional adaptations remain skippable.
-
-## G011 — Развейте органы чувств
-
-**Target:** ~31:00–33:00.
-
-Reward:
-
-- stronger sensory interaction;
-- Cognition contributors begin appearing.
-
-### Presentation fix (2026-09-17 playtest finding)
-
-Cognition starts accumulating the moment B04 completes (B04 alone already
-contributes 20/100), not at G012/B05. A player-visible tracker must therefore
-appear from G011 onward, not only once G013 becomes the active chapter goal —
-otherwise the player first sees the goal already partway (or, if it only
-renders at the B05→N07 stretch, halfway) full with no explanation. Implemented
-as a side goal (`G011_COGNITION_TRACK`, revealed on B04, archived once
-Cognition reaches 100) running alongside the chapter goals through
-G011→G012→G013 rather than folded into any single chapter goal, since the
-main chapter objective still needs to say "build B04" / "build B05" — a
-concrete node target — separately from the cognition threshold.
-
-## G012 — Создайте нервную систему
-
-**Target:** ~33:00–35:00.
-
-Reward:
-
-- unlock Behavior;
-- unlock Cognition 0–100;
-- short `Опасность` / `Другой` micro-events become eligible.
-
-## G013 — Пробудите разум
-
-**Target:** ~38:00–40:00.
-
-Completion:
+## Chapter-level Destiny (Act 1)
 
 ```text
-required nervous-system prerequisites
-AND cognition >= 100
+T1 Origin → T2 Одиночки → T3 Крепость → T4 Большой мозг → T5 Синтез
 ```
 
-No direct three-resource purchase.
-
-Reward:
-
-- milestone `MS03 РАЗУМ ПРОБУДИЛСЯ`;
-- civilization diorama;
-- Population ≈5;
-- Food / Materials / Knowledge / Population;
-- Destiny Goal → `Создайте цивилизацию`.
+Каждая стрелка — reset конкретной главы, а не generic «reset».
 
 ---
 
-# 5. G014–G019 — Tribe → City
+# 3. Главы Act 1 и их era cutoff
 
-## G014 — Обеспечьте первую группу
+| Глава | Era cutoff | Sub-chapters (`chapterId`) | Target active time | Reset goal |
+|---|---|---|---:|---|
+| `T1` — Origin | `TRIBE` | `CH01–CH04` | ~20 мин | `G025`/`G026` — `Мор` |
+| `T2` — Одиночки | `SETTLEMENT` | `CH05` (dispersed variant) | ~25–30 мин | `G029`/`G030` — `Катаклизм` |
+| `T3` — Крепость | `CITY` | `CH06` (fortified variant) | ~30–35 мин | `G033`/`G034` — `Раскол` |
+| `T4` — Большой мозг | `INDUSTRY/MODERN` | `CH07` (cognition-bias variant) | ~35–45 мин | `G038`/`G039` — `Авария` |
+| `T5` — Синтез | `ATOMIC` + Great Filter | `CH08` (synthesis variant) | ~45–60 мин | `G023`/`G024` — `Ash` (существующий) |
 
-**Target:** ~43–45 min.
-
-Teach:
-
-- job assignment;
-- Food balance;
-- Shelter/Hearth;
-- basic Materials/Knowledge.
-
-Reward:
-
-- first Population growth;
-- optional cultural profile content.
-
-## G015 — Создайте племя
-
-**Target:** ~48–50 min.
-
-Completion should combine:
-
-- sustainable Food;
-- Population target from new balance;
-- camp structures;
-- Tribe milestone.
-
-Reward:
-
-- `MS04 ПЛЕМЯ`;
-- event `Как делить добычу`;
-- Agriculture path.
-
-## G016 — Освойте земледелие
-
-**Target:** ~54–58 min.
-
-Reward:
-
-- Farmer;
-- Field;
-- reliable Food surplus;
-- permanent-settlement path.
-
-## G017 — Постройте постоянное поселение
-
-**Target:** ~62–65 min.
-
-Checklist is preferred over a single expensive node:
-
-- Houses;
-- Fields;
-- Workshop;
-- Population threshold;
-- settlement breakthrough.
-
-Reward:
-
-- `MS05 МЫ ОСТАЛИСЬ`;
-- permanent visual state;
-- `Следы до нас` anomaly.
-
-## G018 — Откройте письменность
-
-**Target:** ~70–74 min.
-
-Reward:
-
-- formal Knowledge scaling;
-- Chronicle visibility;
-- future locked/corrupted records preview.
-
-## G019 — Создайте город
-
-**Target:** ~78–80 min.
-
-Composite completion may require:
-
-- Writing;
-- School/research;
-- Market/trade-lite;
-- organized labor;
-- Population threshold;
-- City breakthrough.
-
-Reward:
-
-- City visual state;
-- government-lite event;
-- industry path.
-
-Power is not required to unlock City.
+Существующие `G001–G024` не переименовываются и не перенумеровываются —
+они реализованы и покрыты тестами. Новые goals для collapse-контента и
+per-chapter стартовых условий получают следующие свободные ID (`G025+`).
 
 ---
 
-# 6. G020–G023 — Industry → Atomic
+# 4. `T1` — Origin: `G001–G015` + `Мор` (`G025`, `G026`)
 
-## G020 — Механизируйте производство
+`G001–G015` остаются canonical без изменений — полное описание см. в
+истории этого документа (revision 2.0, сохранена ниже в §4.1 для
+справки). Здесь фиксируется только новое: collapse после `MS04 ПЛЕМЯ`.
 
-**Target:** ~85–88 min.
+## 4.1 Существующая цепочка (без изменений)
 
-Teach:
+```text
+G001 Создайте устойчивую РНК → G002 Запустите саморепликацию
+→ G003 Создайте ДНК → G004 Создайте мембрану → G005 Создайте клетку
+→ G006 Стабилизируйте метаболизм → G007 Развейте клеточные системы
+→ G008 Освойте адаптации → G009 Станьте многоклеточным
+→ G010 Специализируйте тело → G011 Развейте органы чувств
+→ G011_COGNITION_TRACK (progressive) → G012 Создайте нервную систему
+→ G013 Пробудите разум → G014 Обеспечьте первую группу
+→ G015 Создайте племя (MS04 ПЛЕМЯ)
+```
 
-- mechanization;
-- steam/factory production;
-- rail/logistics.
+Точные targetTimeMs/conditions — в реализованном `config/goals.js`, не
+дублируются здесь повторно.
 
-Reward:
+## 4.2 `G025` — Заметьте первых больных
 
-- electrification path;
-- Power preview.
+**Target:** ~16–18 мин (вскоре после `MS04`).
+**Trigger area:** Tribe, население ≥ порога плотности.
 
-## G021 — Войдите в эпоху машин
+Не progressive-счётчик — одно authored anomaly-событие (`EV-NAR-04`,
+см. `docs/scenario/04_STORY_EVENTS.md`), которое вводит Мор как факт, не
+как игровую механику с собственным UI-индикатором (в отличие от World
+Tension в `T5` — масштаб `T1` не требует отдельного meter).
 
-**Target:** ~93–95 min.
+Reward: нет — это narrative gate, не экономический payoff.
 
-Completion includes:
+## 4.3 `G026` — Переживите Мор
 
-- industrial infrastructure;
-- active Power generation;
-- mechanization/steam prerequisites.
+**Target:** Мор неизбежен ~18–20 мин, reset сразу после.
 
-Reward:
+Не purchase goal. Subflow:
 
-- `MS06 ЭПОХА МАШИН`;
-- Power becomes main active resource;
-- Energy Crisis event;
-- Modern path.
+1. `G025` вводит вспышку;
+2. одно mandatory choice-событие (`EV-CR-T1`, аналог `Last Protocol`, но
+   без multi-phase Stability — одно решение, не последовательность из
+   четырёх, потому что глава короче на порядок);
+3. решение меняет subtype/epitaph, но не сам факт `Мор` — как `Ash` в
+   `T5`, первый `Мор` неизбежен;
+4. `ENDING_BLIGHT`, Archive Summary, Chronicle, переход к `T2`.
 
-## G022 — Создайте современную глобальную цивилизацию
-
-**Target:** ~102–104 min.
-
-Composite checklist:
-
-- mature electrical grid;
-- research institutions;
-- communications/global connection;
-- stable Power surplus;
-- modern logistics/automation milestone.
-
-Reward:
-
-- Modern visual/global state;
-- `ERROR 17`;
-- Atomic Theory path.
-
-## G023 — Войдите в атомный век
-
-**Target:** ~107–108 min.
-
-Required conceptually:
-
-- Scientific Method;
-- Atomic Theory;
-- visible Reactor/Lab project;
-- late civilization threshold from new balance.
-
-Reward:
-
-- `MS07 МЫ РАСКОЛОЛИ МАТЕРИЮ`;
-- Stability=100;
-- World Tension UI;
-- crisis clock;
-- `Снова.` anomaly;
-- Destiny Goal → Great Filter.
+Reveal при переходе: `Архив уже запускался раньше` (перенесено из старой
+макро-Acт I bible — теперь это payoff конца `T1`, а не отложенная тайна
+на много часов позже).
 
 ---
 
-# 7. G024 — Пройдите Великий фильтр
+# 5. `T2` — Одиночки: `G027–G030`
 
-**Target:** Ash ~177–183, reset immediately after Ash.
+## 5.1 Стартовое условие (не goal, автоматический grant)
 
-Not a purchase goal.
+При входе в `T2` Архив применяет `dispersed_start`: население начинает
+рассредоточенным (несколько малых групп вместо одного лагеря), с
+соответствующим экономическим модификатором (медленнее локальный рост,
+меньше уязвимость к повторению `Мор`). Species skin #1 применяется здесь
+же — косметическая замена вида, 1–2 flavor-способности.
 
-Subflow:
+Archive line на входе: прямая отсылка к `Мор` — «Плотность более не
+единственная переменная модели.»
 
-1. sustain critical civilization systems;
-2. resolve bloc conflict;
-3. resolve false warning;
-4. use optional crisis responses;
-5. choose Last Protocol;
-6. see `ENDING_ASH`;
-7. save Archive Summary;
-8. reset.
+## 5.2 `G027` — Соедините первые группы
 
-First Ash remains unavoidable.
+**Target:** ~6–8 мин внутри `T2`.
+**Trigger area:** SETTLEMENT_EARLY.
 
----
+Переиспользует механику `G014` (job assignment, Food balance), но на
+рассредоточенном старте: несколько малых лагерей вместо одного.
 
-# 8. Branch/event integration
+## 5.3 `G028` — Освойте земледелие
 
-Corrected core event order:
+**Target:** ~12–15 мин внутри `T2`.
 
-| Event | Trigger area | Blocks core? |
-|---|---|---|
-| First biological branch: Absorption/Symbiosis/Shell | after Cell/Metabolism | yes, briefly |
-| Body/adaptation decisions | multicellular | no unless explicitly core |
-| Behavior strategy | after Nervous System | yes/short |
-| Danger / Other micro-events | Cognition | no |
-| Cultural profile | early Tribe | optional/short |
-| Distribution | Tribe | no |
-| Settlement specialization | Settlement | optional/profile by default |
-| Traces Before Us | Settlement | narrative queue only |
-| Governance | City | no |
-| City specialization | City | optional/profile by default |
-| Energy Crisis | Industry | major narrative choice |
-| Preatomic specialization | Modern | optional/profile by default |
-| Error 17 | Modern | persistent anomaly |
-| Again | Atomic | anomaly/milestone |
-| Crisis events | Atomic crisis | required final flow |
+Переиспользует существующий `G016`-контент (Farming/Field) без изменений
+в механике — новый ID только потому, что goal принадлежит другой главе с
+собственным reset-циклом.
 
----
+## 5.4 `G029` — Почувствуйте первый толчок
 
-# 9. Side goals
+**Target:** ~20–24 мин внутри `T2`.
 
-Side goals remain non-blocking.
+Authored anomaly-событие (`EV-NAR-05`), вводящее геологическую
+нестабильность как факт мира — параллель `G025` в `T1`.
 
-Biological side goals should preferentially reward:
+## 5.5 `G030` — Переживите Катаклизм
 
-- Adaptation Points;
-- Chronicle stamps;
-- temporary/local boosts;
-- discovery.
+**Target:** ~25–30 мин внутри `T2`, reset сразу после.
 
-Avoid introducing another permanent biological spendable currency.
+Тот же shape, что `G026`: одно mandatory choice-событие
+(`EV-CR-T2`) → `ENDING_CATACLYSM` → Archive Summary → переход к `T3`.
 
-Civilization side goals may reward small bursts or in-run modifiers, but their numeric value must be included in balance simulation.
+Разрозненные группы не могут скоординировать общий ответ — выбор в
+`EV-CR-T2` может смягчить subtype/epitaph, но не отменяет коллапс.
 
 ---
 
-# 10. Stall hints
+# 6. `T3` — Крепость: `G031–G034`
 
-Keep diagnostic Goal Engine behavior:
+## 6.1 Стартовое условие
+
+Архив выдаёт стартовый defense kit: базовые оборонительные структуры уже
+построены на входе в главу (прямой ответ на `Катаклизм` — укрытие вместо
+рассеивания). Species skin не меняется (та же линия, что и в `T2`).
+
+Archive line: «Рассеивание не защитило группу. Проверяется концентрация
+с укреплением.»
+
+## 6.2 `G031` — Заселите крепость
+
+**Target:** ~8–10 мин внутри `T3`.
+
+Переиспользует City-подобную механику (Population threshold + жильё), но
+стартует не с нуля, а с готовых укреплений.
+
+## 6.3 `G032` — Откройте письменность
+
+**Target:** ~14–18 мин внутри `T3`.
+
+Переиспользует существующий `G018`-контент (Writing) без изменений в
+механике.
+
+## 6.4 `G032B` — Выберите модель управления (policy-lite)
+
+Optional/profile goal, переиспользует существующее `EV-CIV-04`
+(«Кто принимает решения?»), но здесь оно явно на пути к `Раскол` —
+выбор governance напрямую входит в условие следующего события.
+
+## 6.5 `G033` — Заметьте раскол
+
+**Target:** ~24–28 мин внутри `T3`.
+
+Authored anomaly/tension-событие (`EV-NAR-06`), вводящее внутреннее
+напряжение как факт: концентрация населения внутри укреплений снова
+создаёт тесноту.
+
+## 6.6 `G034` — Переживите Раскол
+
+**Target:** ~30–35 мин внутри `T3`, reset сразу после.
+
+Тот же shape: одно mandatory choice-событие (`EV-CR-T3`) →
+`ENDING_FRACTURE` → Archive Summary → переход к `T4`.
+
+Внутренний конфликт, не внешняя угроза — это первый collapse Act 1, где
+причина смерти исходит изнутри цивилизации, а не из среды.
+
+---
+
+# 7. `T4` — Большой мозг: `G035–G039`
+
+## 7.1 Стартовое условие
+
+Архив выдаёт повышенный стартовый Cognition и раннее Writing/культуру —
+прямой ответ на `Раскол` (умная цивилизация должна лучше
+самоуправляться). Species skin #2 применяется здесь — второй и последний
+swap Act 1.
+
+Archive line: «Управление не удержало систему. Проверяется способность
+системы понимать себя.»
+
+## 7.2 `G035` — Механизируйте производство
+
+**Target:** ~10–14 мин внутри `T4`.
+
+Переиспользует существующий `G020`-контент (Mechanization) без изменений
+в механике.
+
+## 7.3 `G036` — Войдите в эпоху машин
+
+**Target:** ~18–22 мин внутри `T4`.
+
+Переиспользует существующий `G021`-контент (Power/Machine Age).
+
+## 7.4 `G037` — Automation-risk choice
+
+Authored branch-событие (`EV-CIV-08`, новое): цивилизация выбирает темп
+автоматизации (осторожный / агрессивный / делегированный) — выбор
+напрямую входит в условие `Авария`, аналогично governance-выбору в `T3`.
+
+## 7.5 `G038` — Заметьте перегрузку
+
+**Target:** ~30–34 мин внутри `T4`.
+
+Authored anomaly-событие (`EV-NAR-07`), вводящее каскадную
+перегрузку инфраструктуры/автоматики как факт.
+
+## 7.6 `G039` — Переживите Аварию
+
+**Target:** ~35–45 мин внутри `T4`, reset сразу после.
+
+Тот же shape: одно mandatory choice-событие (`EV-CR-T4`) →
+`ENDING_OVERLOAD` → Archive Summary → переход к `T5`.
+
+Reveal при переходе: строка из старой макро-bible «Вероятность успешного
+прохождения Фильтра: —» (Архив почти ломает нейтральность, затем
+удаляет строку) — теперь это payoff конца `T4`, последний перед `T5`.
+
+---
+
+# 8. `T5` — Синтез: `G020_T5`(reframe intro) + `G022–G024`
+
+`T5` переиспользует существующий Modern→Atomic→Great Filter контент
+(`G022–G024`, crisis flow `EV-CR-01…03`) почти без изменений — см.
+revision 2.0 §6–7 этого документа для деталей, не дублируются здесь.
+
+## 8.1 Новое стартовое условие (не отдельный goal)
+
+Архив вмешивается напрямую, возвращая исходную видовую линию (species
+swap budget исчерпан) и синтезируя уроки `T1–T4`. Реализуется как
+authored intro-событие (`EV-NAR-08 «Синтез»`), а не отдельный goal —
+Modern-стадия начинается сразу с этой сценой.
+
+## 8.2 Новое: `T5`-only procedural deck
+
+В отличие от `T1–T4`, `T5` не получает нового collapse-цикла — коллапс
+уже существует (`Ash`, `G024`). Новое здесь — procedural random event
+deck (`deck: 't5_synthesis'`) поверх существующего Modern/Atomic/crisis
+окна, флейвор-события которой явно ссылаются на исходы `T1–T4` этого
+конкретного прогона.
+
+Полный список событий — `docs/scenario/04_STORY_EVENTS.md` §T5-DECK;
+технический контракт — `docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_
+ROADMAP.md` §5, §7.
+
+---
+
+# 9. Milestones (`MS01–MS09` не перенумеровываются; новое — `MS10+`)
+
+`MS01–MS09` реализованы и покрыты regression-тестами под существующий
+ruleset — переименование/перенумерование уже отгруженных ID без
+технической необходимости создаёт риск без пользы, поэтому эта ревизия
+их не трогает. `МЫ ОСТАЛИСЬ` и `ЭПОХА МАШИН` остаются общими вехами «эта
+эра достигнута»: раньше их мог достичь только единственный прогон,
+теперь их достигает первая глава, которая реально проживает переход
+живьём (`T2` — первая, что доходит до Settlement live; `T4` — первая,
+что доходит до Industry live). Главы, которые входят в эру уже через
+грант (`T3+` для Settlement, `T5` для Industry), не переигрывают этот
+переход и не порождают повторный milestone-триггер.
+
+| ID | Глава | Trigger | Title |
+|---|---|---|---|
+| `MS01` | `T1` | `G005` | ЖИЗНЬ |
+| `MS02` | `T1` | `G009` | МНОГОКЛЕТОЧНОСТЬ |
+| `MS03` | `T1` | `G013` | РАЗУМ ПРОБУДИЛСЯ |
+| `MS04` | `T1` | `G015` | ПЛЕМЯ |
+| `MS05` | `T2` (первая живая) | settlement reached | МЫ ОСТАЛИСЬ |
+| `MS06` | `T4` (первая живая) | industry reached | ЭПОХА МАШИН |
+| `MS07` | `T5` | `G023` | МЫ РАСКОЛОЛИ МАТЕРИЮ |
+| `MS08` | `T5` | `G024` ending | ПЕПЕЛ |
+| `MS09` | `T5` | reset saved | АРХИВ ПОМНИТ / ACT 1 ЗАВЕРШЁН |
+| `MS10` | `T1` | `G026` ending | МОР |
+| `MS11` | `T2` | `G029` | ПЕРВЫЙ ТОЛЧОК |
+| `MS12` | `T2` | `G030` ending | КАТАКЛИЗМ |
+| `MS13` | `T3` | `G031` | КРЕПОСТЬ |
+| `MS14` | `T3` | `G034` ending | РАСКОЛ |
+| `MS15` | `T4` | `G039` ending | АВАРИЯ |
+
+Milestones остаются emotional payoffs, не currencies и не arbitrary locks.
+
+---
+
+# 10. Между-главовые Archive-переходы (не milestones, отдельный beat)
+
+После `Мор`/`Катаклизм`/`Раскол`/`Авария` игрок видит компактный
+Archive Summary конкретной главы (короче, чем финальный `T5` Summary) и
+короткую переходную сцену — аналог `АРХИВ ПОМНИТ`, но без полноценного
+CTA «СОЗДАТЬ НОВУЮ ЖИЗНЬ» (это CTA зарезервировано за переходом Act 1 →
+Act 2 после `T5`). Copy — `docs/scenario/06_ENDINGS_COPY.md` §per-chapter
+transition.
+
+---
+
+# 11. Branch/event integration (расширено на пять глав)
+
+| Event | Глава | Trigger area | Blocks core? |
+|---|---|---|---|
+| Первая биологическая ветвь | `T1` | after Cell/Metabolism | yes, briefly |
+| Behavior strategy | `T1` | after Nervous System | yes/short |
+| Danger / Other micro-events | `T1` | Cognition | no |
+| Distribution | `T1` | Tribe | no |
+| `EV-NAR-04` Заметьте первых больных | `T1` | Tribe | no |
+| `EV-CR-T1` Мор choice | `T1` | Tribe end | yes, mandatory |
+| Settlement specialization | `T2` | Settlement | optional/profile |
+| `EV-NAR-05` Первый толчок | `T2` | Settlement | no |
+| `EV-CR-T2` Катаклизм choice | `T2` | Settlement end | yes, mandatory |
+| Governance (`EV-CIV-04`) | `T3` | City | no, но входит в условие Раскол |
+| `EV-NAR-06` Заметьте раскол | `T3` | City | no |
+| `EV-CR-T3` Раскол choice | `T3` | City end | yes, mandatory |
+| Energy Crisis | `T4` | Industry | major narrative choice |
+| `EV-CIV-08` Automation-risk | `T4` | Industry/Modern | no, но входит в условие Аварии |
+| `EV-NAR-07` Заметьте перегрузку | `T4` | Modern | no |
+| `EV-CR-T4` Авария choice | `T4` | Modern end | yes, mandatory |
+| `EV-NAR-08` Синтез (intro) | `T5` | Modern start | no |
+| Error 17 | `T5` | Modern | persistent anomaly |
+| Again | `T5` | Atomic | anomaly/milestone |
+| T5-only synthesis deck | `T5` | Modern/Atomic | no, flavor only |
+| Crisis events (`EV-CR-01…03`) | `T5` | Atomic crisis | required final flow |
+
+---
+
+# 12. Side goals (без изменений)
+
+Side goals остаются non-blocking для всех пяти глав. Биологические side
+goals в `T1` продолжают преимущественно награждать Adaptation Points,
+Chronicle stamps и discovery — не вводить вторую постоянную биологическую
+валюту. Side goals в `T2–T4` (settlement specialization, governance,
+automation-risk) могут давать малые burst-бонусы или in-run modifiers, но
+их числовое значение обязано войти в balance simulation конкретной главы.
+
+---
+
+# 13. Stall hints (без изменений)
+
+Keep diagnostic Goal Engine behavior для каждой главы:
 
 - identify one primary bottleneck;
-- highlight relevant producer/job/building/node;
+- highlight relevant producer/job/building/node/event;
 - never auto-buy;
 - never use rewarded ad as default solution.
 
-Early biological hints must use restored vocabulary: RNA, DNA, Biomass, Energy/Metabolism, AP, Cognition.
-
-No hint may mention Information, Chemical Gradient, Catalytic Fold or Energy Pocket.
-
----
-
-# 11. Milestones
-
-| ID | Trigger | Title |
-|---|---|---|
-| MS01 | G005 | ЖИЗНЬ |
-| MS02 | G009 | МНОГОКЛЕТОЧНОСТЬ |
-| MS03 | G013 | РАЗУМ ПРОБУДИЛСЯ |
-| MS04 | G015 | ПЛЕМЯ |
-| MS05 | G017 | МЫ ОСТАЛИСЬ |
-| MS06 | G021 | ЭПОХА МАШИН |
-| MS07 | G023 | МЫ РАСКОЛОЛИ МАТЕРИЮ |
-| MS08 | G024 ending | ПЕПЕЛ |
-| MS09 | reset saved | АРХИВ ПОМНИТ |
-
-Milestones are emotional payoffs, not currencies or arbitrary locks.
+Ранние биологические hints используют восстановленную лексику: RNA, DNA,
+Biomass, Energy/Metabolism, AP, Cognition. Hints `T2–T4` используют
+canonical civilization-лексику из `docs/scenario/07_COPY_GUIDE.md`.
 
 ---
 
-# 12. Implementation status
+# 14. Implementation status
 
-Goal Engine implementation from Iteration 3 remains accepted. The `timeline1-v9-full-t1-route` ruleset now contains the complete first-run chain `G001–G024`:
-
-```text
-G001–G013 biology / Sapience
-→ G014–G015 group / Tribe
-→ G016–G017 agriculture / permanent Settlement
-→ G018–G019 writing / City
-→ G020–G021 mechanization / Industry
-→ G022 Modern
-→ G023 Atomic
-→ G024 crisis / Ash / Archive reset
-```
-
-Goals whose fantasy is composite are explicitly composite in config: Settlement checks field/house/workshop/population, City checks school/market/population, Industry checks factory/steam infrastructure, Modern checks grid/laboratory/rail, and Atomic requires Reactor/Lab.
-
-The route is implemented and regression-covered; all cost, rate and threshold values remain **provisional until the dedicated full-run simulation and balance pass**.
+`T1` (`G001–G015`, `MS01–MS04`) и `T5`-содержимое (`G020–G024` под старой
+нумерацией, `MS06–MS09` под старой нумерацией) реализованы и покрыты
+regression-тестами под ruleset `timeline1-v11-branch-cost-fix`. Новые
+goals `G025–G039` (collapse-контент `T1–T4`, стартовые условия `T2–T4`,
+`T5`-only procedural deck) — design-scope этого revision, numeric
+targets provisional до отдельного implementation + balance pass (см.
+`docs/production/TIMELINE_01_REBUILD_PLAN.md` §4 Package B/C/D).

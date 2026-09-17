@@ -1,14 +1,23 @@
-# Хроники Эволюции — Story Events Timeline #1
+# Хроники Эволюции — Story Events Act 1 (`T1–T5`)
 
-**Документ:** DS-05  
-**Статус:** ready for review  
-**Назначение:** implementation-ready narrative events and choices для Timeline #1.  
-**Gameplay authority:** `docs/gdd/08_EVENTS_AND_CHOICES.md`.  
+**Документ:** DS-05, act-structure revision 3.0
+**Статус:** ready for review
+**Назначение:** implementation-ready narrative events and choices для всех
+пяти глав Act 1.
+**Gameplay authority:** `docs/gdd/08_EVENTS_AND_CHOICES.md`,
+`docs/gdd/07_GOALS_AND_MILESTONES.md`.
 **Narrative order:** `docs/scenario/01_TIMELINE_01_SCRIPT.md`.
+
+**Supersedes:** предыдущую версию этого документа, написанную для единого
+0–120-минутного прогона. События `T1`-контента (§3–§9 ниже) не меняются
+по тексту — только по своей `phaseWindow`/`chapterId` принадлежности.
+Полностью новые: `EV-NAR-04..08`, `EV-CR-T1..T4`, `EV-CIV-08`, и
+T5-only procedural deck (§T5-DECK) — прямой ответ на запрос ввести
+случайные события в `T5`, приправленные сценарием.
 
 ---
 
-# 1. Event contract
+# 1. Event contract (без изменений)
 
 Каждое событие описывается через:
 
@@ -23,1079 +32,568 @@
 - flags;
 - gameplay-effect ownership.
 
-Этот файл задаёт **тексты и смысл**, но не придумывает скрытые numeric modifiers.
-
-Если GDD не задаёт число, implementation должен использовать config/provisional value, а не извлекать процент из narrative wording.
+Этот файл задаёт **тексты и смысл**, но не придумывает скрытые numeric
+modifiers. Если GDD не задаёт число, implementation использует
+config/provisional value, а не извлекает процент из narrative wording.
 
 ---
 
-# 2. Общие правила
+# 2. Общие правила (без изменений, +1 новое)
 
 1. Не более одного blocking choice одновременно.
 2. Обычное событие: 1–3 коротких абзаца.
-3. Кнопка — действие, а не оценка (`Исследовать`, а не `Правильный выбор`).
+3. Кнопка — действие, а не оценка.
 4. Archive response сообщает результат, но не хвалит и не осуждает.
-5. Все необязательные biological choices должны оставаться необязательными.
-6. Первый Ash неизбежен независимо от crisis choices.
-7. Persistent mystery flags не должны давать игроку прямое lore-объяснение в Timeline #1.
+5. Все необязательные biological choices остаются необязательными.
+6. Первый `Ash` (`T5`) неизбежен независимо от crisis choices; так же
+   неизбежны `Мор` (`T1`), `Катаклизм` (`T2`), `Раскол` (`T3`), `Авария`
+   (`T4`) — выбор меняет subtype/epitaph, не сам факт коллапса главы.
+7. Persistent mystery flags не должны давать игроку прямое
+   lore-объяснение до конца `T5`.
+8. **Новое:** событие T5-only deck обязано либо явно ссылаться на исход
+   одной из `T1–T4` этого конкретного прогона через `run`/`meta` флаг,
+   либо быть явно помечено как neutral filler — большинство обязано
+   быть первого типа.
 
 ---
 
-# 3. EV-BIO-01 — Первый эволюционный путь
+# 3. Карта событий по главам
 
-**Trigger:** Cell + active Metabolism.  
-**Type:** blocking branch.  
-**Blocks:** только ближайшее cellular progression до выбора.
+| Глава | Reused (текст не меняется) | Новое в этой revision |
+|---|---|---|
+| `T1` | `EV-RNA-01/DNA-01/CELL-01`, `EV-BIO-01/02/03/04`, `EV-FLAVOR-01/02`, `EV-CIV-01/02`, `EV-RNA-RESONANCE`, `EV-DNA-TRACE` | `EV-NAR-04`, `EV-CR-T1` |
+| `T2` | `EV-CIV-03` (settlement specialization), `EV-NAR-01` (Следы до нас) | `EV-NAR-05`, `EV-CR-T2` |
+| `T3` | `EV-CIV-04` (Кто принимает решения) | `EV-NAR-06`, `EV-CR-T3` |
+| `T4` | `EV-CIV-06` (Энергетический кризис), `EV-CIV-05` (city/industry profile, optional) | `EV-CIV-08`, `EV-NAR-07`, `EV-CR-T4` |
+| `T5` | `EV-CIV-07` (Preatomic specialization), `EV-NAR-02` (ERROR 17), `EV-NAR-03` (Снова), `EV-CR-01/02/03` | `EV-NAR-08`, T5-only procedural deck (§T5-DECK) |
 
-## Title
-
-**Первый путь**
-
-## Lead
-
-> Среда не предлагает правильного решения.
->
-> Только разные способы выжить.
-
-## Choice A — Поглощение
-
-Button:
-
-**Поглощение**
-
-Description:
-
-> Брать необходимое напрямую. Быстрый рост ценой большей зависимости от доступной добычи.
-
-Immediate Archive response:
-
-> Адаптация закреплена.
-
-Chronicle:
-
-> Вид выбрал активное получение ресурсов из окружающей среды как основной путь выживания.
-
-Flags:
-
-```text
-run.bio.primary_trait = "absorption"
-run.bio.absorption = true
-```
-
-## Choice B — Симбиоз
-
-Button:
-
-**Симбиоз**
-
-Description:
-
-> Выживать через совместную эффективность и устойчивые внутренние связи.
-
-Response:
-
-> Адаптация закреплена.
-
-Chronicle:
-
-> Ранний вид сделал взаимную выгоду и внутреннюю кооперацию частью своей биологии.
-
-Flags:
-
-```text
-run.bio.primary_trait = "symbiosis"
-run.bio.symbiosis = true
-```
-
-## Choice C — Панцирь
-
-Button:
-
-**Панцирь**
-
-Description:
-
-> Сохранить себя, когда среда становится враждебной. Устойчивость важнее скорости.
-
-Response:
-
-> Адаптация закреплена.
-
-Chronicle:
-
-> Вид сделал защиту и сохранение накопленного главным ранним преимуществом.
-
-Flags:
-
-```text
-run.bio.primary_trait = "shell"
-run.bio.shell = true
-```
-
-### Narrative rule
-
-Не использовать `Хищник / Мирный / Танк` как canonical terminology. Это могут быть internal art shorthand, но не player-facing labels.
+Полный текст reused-событий — в предыдущей версии этого документа
+(git history) и в реализованном `config/events.js`; он не дублируется
+здесь повторно. Ниже — только новое.
 
 ---
 
-# 4. Optional metabolism events
+# 4. `T1` — новое
 
-## Photosynthesis unlock
+## `EV-NAR-04` — Заметьте первых больных
 
-Type: non-blocking adaptation notification.
-
-Text:
-
-> Свет стал источником роста.
-
-Chronicle:
-
-> Часть метаболизма вида научилась напрямую использовать энергию света.
-
-Flag:
-
-```text
-run.bio.metabolism.photosynthesis = true
-```
-
-## Chemosynthesis unlock
-
-Text:
-
-> Жизнь научилась использовать энергию химических реакций среды.
-
-Chronicle:
-
-> Вид получил дополнительный путь питания там, где свет не был доступен.
-
-Flag:
-
-```text
-run.bio.metabolism.chemosynthesis = true
-```
-
-No exclusive branch semantics.
-
----
-
-# 5. EV-BIO-02 — Адаптации тела
-
-**Trigger area:** post-AP / Multicellularity development (fires on `C06` completion, same moment AP is granted).  
-**Type:** profile/adaptation layer, presented as its own modal like `EV-BIO-01`.  
-**Blocking:** narrow — only blocks direct `B02A`–`D` purchases while the modal is pending, so the tech tree cannot silently resolve the choice outside the window. Nothing else is paused, and once one adaptation is picked the rest stay freely purchasable (no exclusive-branch penalty).
-
-Первое открытие Adaptation Points:
-
-> Некоторые изменения не обязательны для следующего шага.
->
-> Они определят, каким станет организм.
-
-После первой покупки:
-
-> Адаптация сохранена в истории вида.
-
-Recommended adaptation copy:
-
-## Mobility
-
-Title: **Подвижность**  
-Description: `Организм быстрее меняет положение и активнее взаимодействует со средой.`
-
-## Sensory Cells
-
-Title: **Чувствительные клетки**  
-Description: `Изменения среды обнаруживаются раньше и точнее.`
-
-## Digestion
-
-Title: **Пищеварение**  
-Description: `Организм эффективнее извлекает полезное из поглощённой материи.`
-
-## Structural Tissue
-
-Title: **Опорные ткани**  
-Description: `Форма становится устойчивее и позволяет увеличивать размеры тела.`
-
-Exact AP cost/effect belongs to GDD/config.
-
----
-
-# 6. EV-BIO-03 — Поведенческая стратегия
-
-**Trigger:** Nervous System complete.  
-**Type:** short blocking branch.
-
-## Title
-
-**Поведение**
-
-## Lead
-
-> Сложное тело требует решений быстрее, чем их может дать случайность.
-
-## Choice A — Одиночная стратегия
-
-Description:
-
-> Полагаться на собственную эффективность и избегать лишней зависимости от других.
-
-Response:
-
-> Поведенческий паттерн закреплён.
-
-Chronicle:
-
-> Вид чаще решал задачи индивидуально, делая ставку на самостоятельность.
-
-Flag:
-
-```text
-run.bio.behavior = "solitary"
-```
-
-## Choice B — Социальное поведение
-
-Description:
-
-> Использовать других как часть общей стратегии выживания.
-
-Response:
-
-> Поведенческий паттерн закреплён.
-
-Chronicle:
-
-> Координация с другими особями стала устойчивой частью поведения вида.
-
-Flag:
-
-```text
-run.bio.behavior = "social"
-```
-
-## Choice C — Манипуляция объектами
-
-Description:
-
-> Изменять среду вместо того, чтобы только приспосабливаться к ней.
-
-Response:
-
-> Поведенческий паттерн закреплён.
-
-Chronicle:
-
-> Вид начал использовать предметы среды как продолжение собственных возможностей.
-
-Flag:
-
-```text
-run.bio.behavior = "tool_use"
-```
-
----
-
-# 7. EV-FLAVOR-01 — Опасность
-
-**Trigger:** Cognition phase.  
-**Type:** flavor / small profile event.  
-**Blocking:** no or very short queue lock.
-
-## Lead
-
-> Резкое движение. Незнакомый сигнал. Времени на анализ почти нет.
-
-### Choice: Отступить
-
-Response:
-
-> Организм сохраняет дистанцию и запоминает угрозу.
-
-Chronicle fragment:
-
-> Перед неизвестностью вид чаще выбирал осторожность.
-
-Suggested semantic flag:
-
-```text
-run.bio.encounters.danger = "flee"
-```
-
-### Choice: Встретить угрозу
-
-Response:
-
-> Организм приближается к источнику сигнала и запоминает результат.
-
-Chronicle:
-
-> Перед неизвестностью вид чаще отвечал прямым действием.
-
-Flag:
-
-```text
-run.bio.encounters.danger = "confront"
-```
-
-Do not imply one option yields Sapience and the other does not.
-
----
-
-# 8. EV-FLAVOR-02 — Другой
-
-**Trigger:** Cognition phase.  
-**Type:** flavor.
-
-## Lead
-
-> Перед организмом — другой представитель сложной жизни.
->
-> Он не нападает.
-
-### Choice: Приблизиться
-
-Response:
-
-> Контакт изменил поведенческую модель.
-
-Chronicle:
-
-> Встреча с другим существом стала опытом взаимодействия, а не только конкуренции.
-
-Flag:
-
-```text
-run.bio.encounters.other = "cooperate"
-```
-
-### Choice: Оттеснить
-
-Response:
-
-> Контакт изменил поведенческую модель.
-
-Chronicle:
-
-> Вид закрепил территориальный ответ на близость другого существа.
-
-Flag:
-
-```text
-run.bio.encounters.other = "conflict"
-```
-
----
-
-# 9. EV-CIV-01 — Культурная традиция
-
-**Trigger area:** early civilization.  
-**Type:** optional/profile.  
-**Blocking:** no by default.
-
-Если событие используется в build, recommended title:
-
-**Что стоит передавать дальше?**
+**Trigger:** Tribe milestone (`MS04`) + короткая задержка.
+**Type:** anomaly, non-blocking.
 
 Lead:
 
-> У группы появляется время учить молодых не только выживанию, но и повторяемым способам жить.
-
-Possible options retained from GDD:
-
-- Охотничья традиция
-- Сеть собирателей
-- Ритуал знания
-
-Response for all:
-
-> Традиция закреплена.
-
-Narrative rule: no strong numeric promise in text unless exact modifier is configured and shown elsewhere.
-
----
-
-# 10. EV-CIV-02 — Как делить добычу
-
-**Trigger:** Tribe milestone.  
-**Type:** narrative/profile.  
-**Blocking:** short.
-
-## Title
-
-**Как делить добычу?**
-
-## Lead
-
-> Удачная охота принесла больше пищи, чем нужно сегодня.
+> Часть группы не встаёт с места отдыха дольше обычного.
 >
-> Теперь важен не только ресурс, но и правило.
-
-### Choice A — Делить добычу
-
-Description:
-
-> Каждый получает долю независимо от личного результата.
-
-Response:
-
-> Социальное правило закреплено.
-
-Chronicle:
-
-> Племя выбрало общее распределение добычи как основу внутренней устойчивости.
-
-Flag:
-
-```text
-run.civ.distribution = "shared"
-```
-
-### Choice B — Лучшие получают больше
-
-Description:
-
-> Доля зависит от вклада, навыка и силы.
-
-Response:
-
-> Социальное правило закреплено.
-
-Chronicle:
-
-> Племя связало вознаграждение с личным вкладом и положением внутри группы.
-
-Flag:
-
-```text
-run.civ.distribution = "merit_weighted"
-```
-
-No player-facing claim that one is objectively more cooperative/efficient unless UI separately displays configured effects.
-
----
-
-# 11. EV-CIV-03 — Settlement specialization
-
-**Trigger area:** Agriculture / Settlement.  
-**Type:** optional/profile.  
-**Blocking:** no by default.
-
-Recommended framing:
-
-**Что укрепит поселение?**
-
-Options:
-
-## Ирригация
-
-> Сделать урожай менее зависимым от случайности сезона.
-
-## Каменная кладка
-
-> Строить медленнее, но надолго.
-
-## Обмен
-
-> Связать поселение с соседними группами через регулярную торговлю.
-
-Response:
-
-> Направление развития зафиксировано.
-
-Flags:
-
-```text
-run.civ.settlement_focus = "irrigation" | "masonry" | "exchange"
-```
-
----
-
-# 12. EV-NAR-01 — Следы до нас
-
-**Trigger:** permanent Settlement.  
-**Type:** anomaly.  
-**Blocking:** short narrative choice.
-
-## Title
-
-**Следы до нас**
-
-## Lead
-
-> Во время работ найден объект правильной геометрической формы.
->
-> Его возраст не соответствует возрасту поселения.
+> Симптомы не совпадают с усталостью.
 
 Archive:
 
-> Источник: неизвестен.
+> Отклонение зафиксировано. Причина: неизвестна.
 
-### Choice A — Исследовать
-
-Description:
-
-> Попытаться определить материал и происхождение объекта.
-
-Response:
-
-> Структура не соответствует известной технологии.
-
-Chronicle:
-
-> В земле нашли предмет, который не должен был существовать в этом времени. Его изучили, но происхождение осталось неизвестным.
+Choices: нет — narrative gate.
 
 Flags:
 
 ```text
-run.anomaly.trace_choice = "study"
-meta.anomaly.first_trace_found = true
+run.chapter1.blight_noticed = true
 ```
 
-Optional persistent detail:
+## `EV-CR-T1` — Мор
 
-```text
-meta.anomaly.first_trace_studied = true
-```
+**Trigger:** ~2 мин после `EV-NAR-04`.
+**Type:** mandatory final choice, ending.
 
-### Choice B — Разобрать
+Lead:
 
-Description:
-
-> Использовать необычный материал сейчас.
-
-Response:
-
-> Объект утрачен. Материал сохранён.
-
-Chronicle:
-
-> Необычный предмет разобрали ради полезного материала. Его происхождение осталось неизвестным.
-
-Flags:
-
-```text
-run.anomaly.trace_choice = "dismantle"
-meta.anomaly.first_trace_found = true
-meta.anomaly.first_trace_lost = true
-```
-
-### Choice C — Сохранить
-
-Description:
-
-> Не трогать находку до появления лучших методов исследования.
-
-Response:
-
-> Объект помещён в хранилище.
-
-Chronicle:
-
-> Странный предмет пережил своих первооткрывателей и был сохранён для будущих поколений.
-
-Flags:
-
-```text
-run.anomaly.trace_choice = "preserve"
-meta.anomaly.first_trace_found = true
-meta.anomaly.first_trace_preserved = true
-```
-
-### Hard narrative rule
-
-Не использовать слова `предыдущая Timeline`, `предыдущая цивилизация Архива`, `reset residue` в player-facing copy Timeline #1.
-
----
-
-# 13. EV-CIV-04 — Кто принимает решения?
-
-**Trigger:** City.  
-**Type:** government-lite profile.  
-**Blocking:** short.
-
-## Title
-
-**Кто принимает решения?**
-
-## Lead
-
-> Чем больше становится город, тем меньше решений можно принимать всем одновременно.
-
-### Совет
-
-> Представители групп договариваются до общего решения.
-
-Response: `Модель управления зафиксирована.`
-
-Flag:
-
-```text
-run.civ.governance = "council"
-```
-
-### Лидер
-
-> Полномочия сосредоточены у одного центра принятия решений.
-
-Response: `Модель управления зафиксирована.`
-
-Flag:
-
-```text
-run.civ.governance = "leader"
-```
-
-### Торговые дома
-
-> Крупные обменные сети получают политическое влияние вместе с экономическим.
-
-Response: `Модель управления зафиксирована.`
-
-Flag:
-
-```text
-run.civ.governance = "merchants"
-```
-
-Chronicle should summarize the selected model neutrally.
-
----
-
-# 14. EV-CIV-05 — City / Industry profile
-
-**Type:** optional/profile.  
-**Blocking:** no by default.
-
-Allowed identity set:
-
-- Production
-- Science
-- Energy
-
-Recommended title:
-
-**Чем станет город?**
-
-Do not make this an extra mandatory paid gate before Mechanization without a separate balance decision.
-
-Flag:
-
-```text
-run.civ.city_focus = "production" | "science" | "energy"
-```
-
----
-
-# 15. EV-CIV-06 — Энергетический кризис
-
-**Trigger:** Industry / Machine Age.  
-**Type:** major narrative choice.  
-**Blocking:** yes, short.
-
-## Title
-
-**Энергетический кризис**
-
-## Lead
-
-> Рост требует больше энергии, чем прежняя система способна дать.
+> Плотная жизнь одного лагеря не оставляет для отклонения свободного
+> пространства.
 >
-> Следующий выбор изменит не только производство, но и облик мира.
+> Решение необходимо сейчас, не после подтверждения причины.
 
-### Choice A — Ископаемая промышленность
+### Choice A — Изолировать больных
 
-Description:
+Response: `Часть группы отделена. Часть — потеряна раньше срока.`
 
-> Быстро расширить добычу топлива и генерацию.
+Flag: `run.chapter1.response = "isolate"`, `meta.endings.chapter1_subtype = "blight_isolated"`
 
-Response:
+### Choice B — Держаться вместе
 
-> Энергетическая стратегия принята.
+Response: `Группа осталась цельной. Отклонение осталось тоже.`
 
-Chronicle:
+Flag: `run.chapter1.response = "stay_together"`, `meta.endings.chapter1_subtype = "blight_unified"`
 
-> Цивилизация выбрала быстрый промышленный рост и масштабное использование ископаемого топлива.
+### Choice C — Довериться целителю
 
-Flag:
+Response: `Единственный доступный ответ был испробован раньше, чем понят.`
 
-```text
-run.energy.strategy = "fossil"
-```
+Flag: `run.chapter1.response = "healer"`, `meta.endings.chapter1_subtype = "blight_early_medicine"`
 
-Tags may include pollution only if gameplay config maps them explicitly.
-
-### Choice B — Чистая программа
-
-Description:
-
-> Расширять энергетику медленнее, снижая долгосрочную нагрузку на среду.
-
-Response:
-
-> Энергетическая стратегия принята.
-
-Chronicle:
-
-> Цивилизация перестроила рост вокруг более чистых источников энергии.
-
-Flag:
+После любого выбора:
 
 ```text
-run.energy.strategy = "clean"
+complete_ending: subtype = <см. flag выше>, ending_id = "ENDING_BLIGHT"
+set_meta_flag: meta.archive.heard_before_seen = true
 ```
 
-### Choice C — Ранняя атомная программа
-
-Description:
-
-> Направить крупную часть исследований в новую область энергии.
-
-Response:
-
-> Энергетическая стратегия принята.
-
-Chronicle:
-
-> Цивилизация начала исследовать атомную энергию раньше, чем это требовалось текущей инфраструктуре.
-
-Flag:
-
-```text
-run.energy.strategy = "early_atomic"
-```
+Chronicle: `Первая цивилизация не пережила собственную плотность. Архив зафиксировал: это уже происходило.`
 
 ---
 
-# 16. EV-CIV-07 — Preatomic specialization
+# 5. `T2` — новое
 
-**Trigger area:** Modern.  
-**Type:** optional/profile.  
-**Blocking:** no by default.
+## Вход в главу (не событие с выбором, intro-сцена)
 
-Possible focuses:
+Проигрывается автоматически при старте `T2`, до первого игрового
+действия.
 
-- Electrification
-- Research Institutions
-- Logistics
-
-Recommended title:
-
-**Что свяжет современный мир?**
-
-This event must not duplicate Energy Crisis semantics.
-
-Flag:
-
-```text
-run.civ.modern_focus = "electrification" | "research" | "logistics"
-```
-
----
-
-# 17. EV-NAR-02 — ERROR 17
-
-**Trigger:** Modern civilization before Atomic Age.  
-**Type:** anomaly.  
-**Blocking:** no; interrupts briefly.
-
-No choice.
-
-Sequence:
-
-> Прогноз завершения цикла: доступен.
-
-Pause.
-
-> ERROR 17
-
-> Доступ к записи запрещён.
-
-Then remove/hide first line from ordinary UI and create story objective:
-
-**Найдите источник повреждённых данных.**
-
-Detail view:
-
-> Фрагмент существует в Архиве дольше текущей биосферы.
+> Плотность более не единственная переменная модели.
 >
-> Временная метка повреждена.
+> Начальное распределение: рассредоточенное.
 
-Flags:
+Flags: `run.chapter = "T2"`, `meta.act1.species_skin = 1`
 
-```text
-meta.anomaly.error17_seen = true
-meta.archive.prediction_leak_seen = true
-run.anomaly.error17_active = true
-```
+## `EV-NAR-05` — Первый толчок
 
-Timeline #1 cannot complete the objective.
+**Trigger:** ~20–24 мин внутри `T2`, после Settlement specialization.
+**Type:** anomaly, non-blocking.
 
----
+Lead:
 
-# 18. EV-NAR-03 — Снова
-
-**Trigger:** Atomic Age milestone.  
-**Type:** anomaly/milestone.  
-**Blocking:** only cinematic beat.
-
-Sequence:
-
-> Снова.
-
-~1 sec pause.
-
-Replace with:
-
-> Событие зарегистрировано.
-
-Do not append `ошибка`, `исправление`, `предыдущий цикл` or explanation.
-
-Flags:
-
-```text
-meta.archive.heard_again = true
-run.anomaly.again_seen = true
-```
-
-Chronicle:
-
-> Архив зарегистрировал атомный переход дважды. Первая строка состояла из одного слова: «Снова.»
-
----
-
-# 19. EV-CR-01 — Конфликт блоков
-
-**Trigger:** crisis C1.  
-**Type:** required crisis choice.
-
-## Title
-
-**Конфликт блоков**
-
-## Lead
-
-> Две коалиции требуют несовместимых условий безопасности.
+> Земля движется там, где раньше не двигалась.
 >
-> Военные системы переведены в повышенную готовность.
+> Ни одна из групп не находится достаточно близко к другой, чтобы
+> сравнить наблюдения.
 
-### Деэскалация
+Archive:
 
-Description:
+> Сигналы не согласованы между локациями.
 
-> Сохранить прямые каналы связи и предложить взаимное снижение готовности.
+Flags: `run.chapter2.tremor_noticed = true`
 
-Response:
+## `EV-CR-T2` — Катаклизм
 
-> Каналы связи сохранены.
+**Trigger:** ~3–5 мин после `EV-NAR-05`.
+**Type:** mandatory final choice, ending.
 
-Flag:
+Lead:
 
-```text
-run.crisis.bloc_choice = "deescalate"
-```
+> То, что защитило группу от одного вида отклонения, не защищает её от
+> земли под ногами.
 
-### Санкции
+### Choice A — Стянуть группы к центру
 
-Description:
+Response: `Путь между очагами оказался длиннее, чем оставшееся время.`
 
-> Усилить экономическое давление без прямого военного шага.
+Flag: `run.chapter2.response = "converge"`, `meta.endings.chapter2_subtype = "cataclysm_converge"`
 
-Response:
+### Choice B — Укрыть каждую группу отдельно
 
-> Экономическое давление усилилось.
+Response: `Каждая группа выбрала собственный ответ. Не каждый ответ оказался верным.`
 
-Flag:
+Flag: `run.chapter2.response = "shelter_separately"`, `meta.endings.chapter2_subtype = "cataclysm_scattered"`
 
-```text
-run.crisis.bloc_choice = "sanctions"
-```
+### Choice C — Довериться прежнему опыту
 
-### Демонстрация силы
+Response: `Прежний опыт отвечал на прежнюю угрозу.`
 
-Description:
-
-> Повысить военную готовность, пытаясь заставить противника отступить.
-
-Response:
-
-> Военная готовность повышена.
-
-Flag:
+Flag: `run.chapter2.response = "old_experience"`, `meta.endings.chapter2_subtype = "cataclysm_unprepared"`
 
 ```text
-run.crisis.bloc_choice = "force"
+complete_ending: subtype = <см. flag>, ending_id = "ENDING_CATACLYSM"
 ```
 
-Exact Stability effects belong to crisis config.
+Chronicle: `Рассредоточение остановило Мор и не остановило землю. Вторая цивилизация закончилась порознь.`
 
 ---
 
-# 20. EV-CR-02 — Ложное предупреждение
+# 6. `T3` — новое
 
-**Trigger:** crisis C2.  
-**Type:** required crisis choice.
+## Вход в главу
 
-## Title
+> Рассеивание не защитило группу. Проверяется концентрация с
+> укреплением.
 
-**Предупреждение**
+Flags: `run.chapter = "T3"`
 
-## Lead
+`EV-CIV-04` («Кто принимает решения?») переиспользуется без изменений
+текста; выбор в нём (`run.civ.governance`) становится precondition для
+части ответов `EV-CR-T3` ниже.
 
-> Система раннего предупреждения фиксирует атаку.
+## `EV-NAR-06` — Заметьте раскол
+
+**Trigger:** ~24–28 мин внутри `T3`, после governance choice.
+**Type:** anomaly, non-blocking.
+
+Lead:
+
+> Стены держат снаружи то, что было снаружи.
 >
-> Подтверждение из независимых источников отсутствует.
+> Они не рассчитаны на то, что уже внутри.
 
-### Довериться автоматике
+Archive:
 
-Description:
+> Внутреннее расхождение превышает модельный порог впервые с начала
+> главы.
 
-> Начать предусмотренную процедуру до получения дополнительного подтверждения.
+Flags: `run.chapter3.fracture_noticed = true`
 
-Response:
+## `EV-CR-T3` — Раскол
 
-> Ответные процедуры начаты до завершения проверки.
+**Trigger:** ~4–6 мин после `EV-NAR-06`.
+**Type:** mandatory final choice, ending.
 
-Flag:
+Lead:
+
+> Укрытие сделало тесноту постоянной, а не временной.
+
+### Choice A — Подавить несогласных
+
+Response: `Порядок восстановлен там, где раньше был спор.`
+
+Flag: `run.chapter3.response = "suppress"`, `meta.endings.chapter3_subtype = "fracture_suppressed"`
+
+### Choice B — Разделить крепость
+
+Response: `Стена, построенная против внешнего, оказалась пригодна и для внутреннего раздела.`
+
+Flag: `run.chapter3.response = "split"`, `meta.endings.chapter3_subtype = "fracture_split"`
+
+### Choice C — Вынести решение на всех
+
+Response: `Решение заняло больше времени, чем у крепости оставалось.`
+
+Flag: `run.chapter3.response = "vote"`, `meta.endings.chapter3_subtype = "fracture_deliberated"`
 
 ```text
-run.crisis.warning_choice = "trust_automation"
+complete_ending: subtype = <см. flag>, ending_id = "ENDING_FRACTURE"
+set_meta_flag: meta.archive.knows_more_seen = true
 ```
 
-### Ручная проверка
-
-Description:
-
-> Задержать ответ и потребовать независимое подтверждение.
-
-Response:
-
-> Сигнал не подтверждён.
-
-Flag:
-
-```text
-run.crisis.warning_choice = "manual_verify"
-```
-
-This event must not imply manual verification guarantees survival in Timeline #1.
+Chronicle: `Крепость пережила катастрофу снаружи и не пережила себя изнутри.`
 
 ---
 
-# 21. EV-CR-03 — Последний протокол
+# 7. `T4` — новое
 
-**Trigger:** crisis C4 after dramatic clamps.  
-**Type:** mandatory final choice.
+## Вход в главу
 
-## Title
+> Управление не удержало систему. Проверяется способность системы
+> понимать себя.
 
-**ПОСЛЕДНИЙ ПРОТОКОЛ**
+Flags: `run.chapter = "T4"`, `meta.act1.species_skin = 2`
 
-## Lead
+`EV-CIV-06` («Энергетический кризис») переиспользуется без изменений
+текста.
 
-> Несколько систем требуют окончательного решения.
+## `EV-CIV-08` — Темп автоматизации
+
+**Trigger:** после Machine Age milestone.
+**Type:** branch, non-blocking, входит в условие `EV-CR-T4`.
+
+Lead:
+
+> Автоматика уже способна решать быстрее, чем система успевает её
+> проверить.
+
+### Choice A — Осторожный темп
+
+Response: `Темп автоматизации зафиксирован.`
+
+Flag: `run.chapter4.automation_pace = "cautious"`
+
+### Choice B — Агрессивный темп
+
+Response: `Темп автоматизации зафиксирован.`
+
+Flag: `run.chapter4.automation_pace = "aggressive"`
+
+### Choice C — Делегировать полный контроль
+
+Response: `Темп автоматизации зафиксирован.`
+
+Flag: `run.chapter4.automation_pace = "delegated"`
+
+## `EV-NAR-07` — Заметьте перегрузку
+
+**Trigger:** ~30–34 мин внутри `T4`.
+**Type:** anomaly, non-blocking.
+
+Lead:
+
+> Одна подсистема требует больше ресурсов, чем ей выделено.
 >
-> Полной информации нет.
+> Запрос удовлетворён автоматически, до подтверждения человеком.
+
+Flags: `run.chapter4.overload_noticed = true`
+
+## `EV-CR-T4` — Авария
+
+**Trigger:** ~3–5 мин после `EV-NAR-07`.
+**Type:** mandatory final choice, ending. Набор choices зависит от
+`run.chapter4.automation_pace` (см. `07_GOALS_AND_MILESTONES.md` §7.6);
+ниже — базовый набор при `cautious`/`aggressive`; при `delegated` выбор
+недоступен и происходит автоматически (см. Choice C с автоматическим
+исходом).
+
+Lead:
+
+> Каскад уже начался. Время есть только на один уровень вмешательства.
+
+### Choice A — Остановить вручную
+
+Response: `Ручная остановка успела не везде.`
+
+Flag: `run.chapter4.response = "manual_stop"`, `meta.endings.chapter4_subtype = "overload_manual"`
+
+### Choice B — Перенаправить нагрузку
+
+Response: `Перенаправленная нагрузка нашла новую точку отказа.`
+
+Flag: `run.chapter4.response = "reroute"`, `meta.endings.chapter4_subtype = "overload_rerouted"`
+
+### Choice C — Довериться автоматике до конца (автоматически при `delegated`)
+
+Response: `Система выполнила то, для чего была построена.`
+
+Flag: `run.chapter4.response = "trust_automation"`, `meta.endings.chapter4_subtype = "overload_automated"`
+
+```text
+complete_ending: subtype = <см. flag>, ending_id = "ENDING_OVERLOAD"
+```
+
+Chronicle: `Цивилизация научилась думать быстрее, чем успевала за собственной мыслью.`
+
+Reveal (появляется и тут же исчезает, не в choice-response, а отдельной
+строкой после ending card):
+
+> Вероятность успешного прохождения Фильтра: —
+
+Flag: `meta.archive.filter_probability_glimpsed = true`
+
+---
+
+# 8. `T5` — новое: вход в главу
+
+## `EV-NAR-08` — Синтез
+
+**Trigger:** старт `T5`, до первого игрового действия.
+**Type:** narrative intro, non-blocking.
+
+Lead:
+
+> Четыре модели исчерпаны. Пятая объединяет условия предыдущих.
 >
-> Времени на новый цикл проверки не осталось.
+> Видовая линия: исходная.
 
-### Choice A — Ответить ударом
+Archive не объясняет, что значит «объединяет» — это раскрывается только
+через T5-DECK ниже, не текстом здесь.
 
-Description:
-
-> Подтвердить ответные действия.
-
-Confirmation button:
-
-**Подтвердить**
-
-Flag:
-
-```text
-run.crisis.last_protocol = "retaliate"
-meta.endings.pending_subtype = "ash_fire"
-```
-
-### Choice B — Попытаться разоружить систему
-
-Description:
-
-> Остановить собственные цепочки запуска, даже если противник не сделает того же.
-
-Flag:
-
-```text
-run.crisis.last_protocol = "disarm"
-meta.endings.pending_subtype = "ash_too_late"
-```
-
-### Choice C — Передать решение системе
-
-Description:
-
-> Разрешить автоматике завершить протокол без нового человеческого решения.
-
-Flag:
-
-```text
-run.crisis.last_protocol = "delegate_system"
-meta.endings.pending_subtype = "ash_system"
-```
-
-After confirmation:
-
-- disable ordinary gameplay input;
-- begin ending cinematic;
-- do not show ad/reward modal;
-- converge to `ENDING_ASH`.
+Flags: `run.chapter = "T5"`, `meta.act1.species_skin = 0` (возврат к
+исходной линии)
 
 ---
 
-# 22. Milestone narrative copy
+# T5-DECK. `T5`-only procedural event deck («Синтез уроков»)
 
-| Milestone | UI title | Primary line |
-|---|---|---|
-| MS01 | ЖИЗНЬ | Теперь система поддерживает собственные процессы. |
-| MS02 | МНОГОКЛЕТОЧНОСТЬ | Клетки становятся частями одного целого. |
-| MS03 | РАЗУМ ПРОБУДИЛСЯ | Жизнь попыталась понять, что означает увиденное. |
-| MS04 | ПЛЕМЯ | Группа стала чем-то большим, чем сумма её членов. |
-| MS05 | МЫ ОСТАЛИСЬ | Это место должно пережить тех, кто его построил. |
-| MS06 | ЭПОХА МАШИН | Энергия превращается в инфраструктуру. |
-| MS07 | МЫ РАСКОЛОЛИ МАТЕРИЮ | Цивилизация получила доступ к энергии внутри самой материи. |
-| MS08 | ПЕПЕЛ | Timeline #1 завершена. |
-| MS09 | АРХИВ ПОМНИТ | Некоторые данные могут быть перенесены дальше. |
+**Deck id:** `t5_synthesis`.
+**PhaseWindow:** `eraIds: ['MODERN', 'ATOMIC']` (не раньше `EV-NAR-08`).
+**Назначение:** прямой ответ на запрос — до этой revision случайные
+(procedural, deck-сэмплируемые) события существовали только в
+молекулярном окне `T1` (`early_biology` deck: `EV-RNA-RESONANCE`,
+`EV-DNA-TRACE`); `T5` имел только authored-события. Эта deck закрывает
+разрыв и одновременно выполняет требование «приправить случайные
+события сценарием»: каждое событие явно ссылается на исход одной из
+`T1–T4` этого конкретного прогона через `meta.endings.chapterN_subtype`.
 
----
+## Правила deck
 
-# 23. Event queue priority
+- authored crisis events (`EV-NAR-02/03`, `EV-CR-01…03`) сохраняют
+  приоритет в queue — эта deck никогда не прерывает и не блокирует их;
+- каждое minor-событие ссылается на ровно одну прошлую главу; каждое
+  major-событие — на ту же главу, что и предшествующий ему minor (пара),
+  чтобы echo читался как связная деталь, а не случайный шум;
+- если `meta.endings.chapterN_subtype` для нужной главы не записан
+  (например, save мигрировал без полной истории Act 1), событие
+  считается неприменимым и не попадает в eligible pool — никаких
+  default-текстов, придумывающих чужую историю игроку;
+- weight/cooldown — как у `early_biology` deck (см.
+  `docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` §7 fairness
+  rules): minor раз в 2–4 мин, major раз в 7–12 мин активной игры внутри
+  `T5`.
 
-Canonical queue priority:
+## `EV-T5-ECHO-BLIGHT-MINOR` — Протокол карантина
+
+**Deck:** `t5_synthesis`. **Precondition:** `meta.endings.chapter1_subtype` set.
+**Type:** flavor, minor.
+
+Lead:
+
+> Новый регламент здравоохранения ссылается на случай, у которого нет
+> названия в текущих архивах.
+
+Archive: `Протокол применён.`
+
+Choices: `{ id: 'acknowledge', label: 'Принять к сведению', effects: [{ grant_resource: knowledge, small }] }`
+
+Chronicle: `Где-то в основании современной медицины лежит урок, который никто не помнит вслух.`
+
+## `EV-T5-ECHO-BLIGHT-MAJOR` — Вспышка старого штамма
+
+**Deck:** `t5_synthesis`. **Precondition:** предшествует
+`EV-T5-ECHO-BLIGHT-MINOR` в том же прогоне.
+**Type:** flavor, major, risk/reward.
+
+Lead:
+
+> Локальная вспышка совпадает с моделью, для которой уже есть готовый
+> протокол.
+
+### Choice A — Применить протокол немедленно
+
+Response: `Вспышка локализована до распространения.` Small Stability-adjacent bonus.
+
+### Choice B — Провести проверку сначала
+
+Response: `Проверка заняла больше времени, чем распространение.` Меньший или нулевой bonus.
+
+Chronicle (варьируется по `meta.endings.chapter1_subtype`):
+
+- если `blight_isolated`: `Разделение оказалось не только первым ответом цивилизации — оно стало последним общим правилом на этот случай.`
+- если `blight_unified`/`blight_early_medicine`: `На этот раз готового правила не было — только медленно собранный опыт.`
+
+## `EV-T5-ECHO-CATACLYSM-MINOR` — Сейсмический протокол
+
+**Deck:** `t5_synthesis`. **Precondition:** `meta.endings.chapter2_subtype` set.
+**Type:** flavor, minor.
+
+Lead:
+
+> Инфраструктурный кодекс требует запаса прочности, обоснование которого
+> отсутствует в текущей документации.
+
+Archive: `Требование сохранено без источника.`
+
+## `EV-T5-ECHO-CATACLYSM-MAJOR` — Толчок в новой сети
+
+**Deck:** `t5_synthesis`. **Precondition:** предшествует
+`EV-T5-ECHO-CATACLYSM-MINOR` в том же прогоне.
+**Type:** flavor, major, risk/reward.
+
+Lead:
+
+> Сейсмический датчик фиксирует событие в пределах спрогнозированного
+> сценария.
+
+### Choice A — Довериться инфраструктурному запасу
+
+Response: `Сеть выдержала нагрузку, для которой не была официально рассчитана.`
+
+### Choice B — Экстренно перераспределить ресурсы
+
+Response: `Перераспределение сработало почти везде.`
+
+Chronicle (варьируется по `meta.endings.chapter2_subtype`):
+
+- если `cataclysm_converge`: `На этот раз путь между точками сети был рассчитан заранее.`
+- если `cataclysm_scattered`/`cataclysm_unprepared`: `Никто прямо не связал этот запас прочности с землёй, ушедшей из-под ног пятью попытками раньше.`
+
+## `EV-T5-ECHO-FRACTURE-MINOR` — Эхо раскола
+
+**Deck:** `t5_synthesis`. **Precondition:** `meta.endings.chapter3_subtype` set.
+**Type:** flavor, minor.
+
+Lead:
+
+> Модель общественного согласия ссылается на исторический случай без
+> указания источника.
+
+Archive: `Ссылка сохранена. Случай — неизвестен.`
+
+## `EV-T5-ECHO-FRACTURE-MAJOR` — Голос несогласных
+
+**Deck:** `t5_synthesis`. **Precondition:** предшествует
+`EV-T5-ECHO-FRACTURE-MINOR` в том же прогоне.
+**Type:** flavor, major, choice.
+
+Lead:
+
+> Часть населения открыто не согласна с текущим направлением развития.
+> Модель управления предлагает три пути ответа.
+
+### Choice A — Услышать и скорректировать курс
+
+Response: `Курс скорректирован. Несогласие осталось меньшинством.`
+
+### Choice B — Настоять на едином курсе
+
+Response: `Курс не изменился. Несогласие осталось меньшинством другого рода.`
+
+Chronicle (варьируется по `meta.endings.chapter3_subtype`):
+
+- если `fracture_deliberated`: `На этот раз у несогласия было место для голоса, прежде чем оно стало расколом.`
+- если `fracture_suppressed`/`fracture_split`: `Модель управления решила вопрос до того, как он стал историей — по крайней мере, официально.`
+
+## `EV-T5-ECHO-OVERLOAD-MINOR` — Автоматика помнит
+
+**Deck:** `t5_synthesis`. **Precondition:** `meta.endings.chapter4_subtype` set.
+**Type:** flavor, minor.
+
+Lead:
+
+> Диагностика автоматики отклоняет команду, ссылаясь на правило, не
+> указанное ни в одном текущем регламенте.
+
+Archive: `Отказ подтверждён. Источник правила: не определён.`
+
+## `EV-T5-ECHO-OVERLOAD-MAJOR` — Каскад под контролем
+
+**Deck:** `t5_synthesis`. **Precondition:** предшествует
+`EV-T5-ECHO-OVERLOAD-MINOR` в том же прогоне.
+**Type:** flavor, major, risk/reward.
+
+Lead:
+
+> Локальная перегрузка сети повторяет паттерн, для которого автоматика
+> уже имеет готовый ответ.
+
+### Choice A — Позволить автоматике сработать
+
+Response: `Каскад остановлен раньше, чем стал заметен людям.`
+
+### Choice B — Перехватить управление вручную
+
+Response: `Ручной перехват сработал — медленнее, чем сработала бы автоматика.`
+
+Chronicle (варьируется по `meta.endings.chapter4_subtype`):
+
+- если `overload_automated`: `На этот раз довериться автоматике оказалось не последней ошибкой, а первым верным решением.`
+- если `overload_manual`/`overload_rerouted`: `Автоматика справилась с тем, с чем не справились раньше её создатели.`
+
+## Event queue priority внутри `T5` (расширено)
 
 ```text
 ENDING / EV-CR-03
-> required crisis
-> EV-BIO blocking branch
+> required crisis (EV-CR-01/02)
+> EV-NAR-02/03 (ERROR 17 / Снова)
 > milestone
-> required narrative choice
-> anomaly
-> optional/profile
-> flavor
+> EV-CIV-07 (preatomic specialization)
+> T5-DECK major
+> T5-DECK minor
 ```
-
-`ERROR 17` may visually interrupt but must not steal control from an active crisis/blocking choice.
 
 ---
 
-# 24. Implementation checklist
+# 9. Implementation checklist (act-structure revision)
 
-- [x] every canonical GDD event has narrative copy
-- [x] no obsolete Energy/Information early branch
-- [x] Absorption/Symbiosis/Shell is primary biological branch
-- [x] Photosynthesis/Chemosynthesis are optional
-- [x] AP adaptation layer is non-exclusive
-- [x] Cognition events are lightweight
-- [x] civilization choices are neutral in tone
-- [x] Energy Crisis remains major
-- [x] ERROR 17 has no Timeline #1 solution
-- [x] `Снова.` remains unexplained
-- [x] three Last Protocol choices map to three Ash subtypes
-- [x] numeric effects remain owned by gameplay config
+- [x] `T1` reused events сохранили canonical текст
+- [x] каждая `T1–T4` collapse имеет три choice, три subtype, один
+      неизбежный ending_id
+- [x] `T5` получила новую procedural deck (`t5_synthesis`), отсутствовавшую
+      ранее
+- [x] каждое событие T5-DECK явно завязано на `meta.endings.chapterN_subtype`
+      конкретного прогона, а не на generic текст
+- [x] authored crisis events `T5` сохраняют приоритет над T5-DECK
+- [x] `ERROR 17` / `Снова.` остаются необъяснёнными
+- [x] species swap flags (`meta.act1.species_skin`) выставляются на входе
+      `T2` (=1), `T4` (=2), `T5` (=0, возврат к исходной линии)
+- [x] numeric effects остаются во владении gameplay config

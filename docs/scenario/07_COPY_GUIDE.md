@@ -1,8 +1,12 @@
 # Хроники Эволюции — Narrative Copy Guide
 
-**Документ:** DS-05  
-**Статус:** ready for review  
-**Назначение:** единые правила языка интерфейса, Архива, milestones, событий, Chronicle и endings.
+**Документ:** DS-05, act-structure revision 3.0
+**Статус:** ready for review
+**Назначение:** единые правила языка интерфейса, Архива, milestones, событий, Chronicle и endings — для всех пяти глав Act 1 (`T1–T5`).
+
+**Что изменилось:** голос Архива по эрам (§4) теперь привязан к главам
+`T1–T5`, а не к минутам одного 120-минутного прогона; добавлена
+терминология для глав/collapse-endings/species skin (§2).
 
 ---
 
@@ -68,7 +72,7 @@ Canonical terms:
 - Современность
 - Атомный век
 
-## Final act
+## Final act (`T5`)
 
 - Стабильность — internal unless needed in detail view
 - Напряжение мира / World Tension — player-facing crisis meter
@@ -76,7 +80,19 @@ Canonical terms:
 - Пепел
 - Архив
 - Фрагменты Архива
-- Timeline / Timeline #1 — acceptable system/lore term if localized consistently
+- Timeline / Timeline #1 — legacy term; в player-facing UI предпочтительно
+  «глава»/`T1–T5`, `Timeline` остаётся допустимым system/lore-термином там,
+  где уже используется, не расширять на новый UI
+
+## Act 1 structure (`T1–T5`)
+
+- Глава — player-facing термин для `T1–T5` (не «Timeline», не «эпоха» в UI)
+- Мор / Катаклизм / Раскол / Авария — canonical titles для endings `T1–T4`
+- Синтез — вход в `T5`, не отдельный ending
+- (внутренний термин, не для UI) species skin swap — косметическая смена
+  вида на входе `T2`/`T4`; не выводить слово «skin»/«swap» в player-facing
+  текст, использовать нейтральное описание («вид», «форма»), как для
+  primary trait в `T1`
 
 ---
 
@@ -104,9 +120,19 @@ Canonical terms:
 
 ---
 
-# 4. Archive voice by era
+# 4. Archive voice by chapter
 
-## 4.1 0–40 min — Instrument
+Фазы голоса теперь растянуты на пять глав вместо 120 минут одного
+прогона (см. `docs/scenario/01_TIMELINE_01_SCRIPT.md` §2):
+
+```text
+Инструмент  — весь T1
+Наблюдатель — T2, T3
+Свидетель   — T4
+Участник    — T5
+```
+
+## 4.1 `T1` — Instrument
 
 Стиль:
 
@@ -133,7 +159,7 @@ Avoid:
 
 ---
 
-## 4.2 40–95 min — Observer
+## 4.2 `T2`, `T3` — Observer
 
 Архив начинает формулировать исторические наблюдения, но ещё не проявляет эмоцию.
 
@@ -145,13 +171,20 @@ Avoid:
 
 > Региональные системы соединяются в одну сеть.
 
-Allowed: чуть более образный язык.
+Allowed: чуть более образный язык. Начиная с `T3`, Архив явно проговаривает
+правку стартового условия как прямой ответ на прошлый collapse:
+
+> «Рассеивание не защитило группу. Проверяется концентрация с
+> укреплением.»
+
+Это уже не нейтральное наблюдение, а видимое предвидение — источник этой
+точности не объясняется до `T5`.
 
 Still avoid explicit first person.
 
 ---
 
-## 4.3 95–108 min — Witness
+## 4.3 `T4` — Witness
 
 Появляются сбои, недоговорённость и знание вне текущей Timeline.
 
@@ -167,7 +200,7 @@ Important: странность создаётся нарушением преж
 
 ---
 
-## 4.4 118–120 min — Participant
+## 4.4 `T5` — Participant
 
 После Ash допускается первое коллективное местоимение:
 
@@ -686,6 +719,8 @@ docs/scenario/06_ENDINGS_COPY.md
 docs/scenario/07_COPY_GUIDE.md
 ```
 
-`00_NARRATIVE_BIBLE.md` remains the high-level long-range story bible.
+`00_NARRATIVE_BIBLE.md` remains the high-level long-range story bible,
+now with an explicit product-Act ↔ narrative-Act mapping in its §0.
 
-The DS-05 files define the implementation-ready first Timeline.
+The DS-05 files define the implementation-ready Act 1 (`T1–T5`), not a
+single Timeline.

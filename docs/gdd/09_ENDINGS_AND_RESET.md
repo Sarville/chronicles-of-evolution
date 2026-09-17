@@ -1,23 +1,40 @@
-# Хроники Эволюции — Великий фильтр, ending «Пепел» и первый reset
+# Хроники Эволюции — Act 1: пять концовок и переход между главами
 
-**Документ:** DS-02 / reconciliation revision 2.0  
-**Статус:** canonical ending/reset contract.
+**Документ:** DS-02 / act-structure revision 3.0
+**Статус:** canonical reset/ending contract для всех пяти глав `T1–T5`;
+`T5`/`Ash`-специфика (§2–15) реализована, `T1–T4`-специфика — новый scope
+этой ревизии.
+**Authority:** `docs/DECISIONS_ACT_STRUCTURE.md`, `docs/gdd/13_ACT_ONE_
+CHAPTERS.md` §6.
+
+> Этот документ описывает **общий reset-паттерн**, разделяемый всеми пятью
+> главами Act 1: shared cinematic beats, ending card, Archive Summary,
+> idempotent reset transaction, forbidden CTA wording (никогда `Game Over`/
+> `Попробовать снова`). Конкретный визуал, ending ID/title/subtype и
+> Archive Fragments диапазон отличаются по главе — см. таблицу в §7 и
+> `13_ACT_ONE_CHAPTERS.md` §6. Секции 2–15 ниже описывают `T5`/`Ash` во
+> всех деталях, т.к. это уже реализованный, самый глубокий из пяти
+> case — читай их как образец полноты, которую `T1–T4` эндинги
+> переиспользуют в упрощённом виде (§16–18).
 
 ---
 
-# 1. Canonical final act
+# 1. Canonical final act (`T5` specifics)
 
-The final act remains one of the strongest accepted late-design systems and is preserved.
+`T5` остаётся сильнейшей из уже принятых late-design систем и сохраняется
+почти без изменений — теперь как содержимое одной конкретной, последней
+главы Act 1, а не всего продукта.
 
-Corrected pacing:
+Corrected pacing (внутри `T5`, не всего Act 1):
 
-- Modern bridge: ~132–140 min;
-- Atomic preparation: ~140–168 min;
-- Atomic Age / Great Filter: ~168–180 min;
-- Ash: ~177–183 min;
+- Modern bridge: ранняя часть `T5`;
+- Atomic preparation → Atomic Age / Great Filter → Ash: остаток `T5`,
+  target ~45–60 мин суммарно (`13_ACT_ONE_CHAPTERS.md` §3);
 - Archive/reset: immediately after Ash.
 
-The first Ash remains unavoidable.
+The first Ash remains unavoidable — и остаётся единственным `Ash` за весь
+Act 1: `T1–T4` заканчиваются каждая своим уникальным ending, ни один не
+переиспользует `Ash`.
 
 ---
 
@@ -130,7 +147,7 @@ Good play does not change the first ending ID.
 
 # 7. Ending ID and subtypes
 
-Canonical ending:
+Canonical `T5` ending:
 
 ```text
 ENDING_ASH
@@ -143,6 +160,20 @@ Last Protocol variants:
 - delegate_system → `ash_system`.
 
 All variants converge into Ash while preserving different narrative/meta traces.
+
+## `T1–T4` endings (parallel table)
+
+Same convergence rule — a chapter's collapse is unavoidable once its final
+event fires; only subtype/reward/Chronicle vary.
+
+| Глава | Ending ID | Title | Choice → subtype |
+|---|---|---|---|
+| `T1` | `ENDING_BLIGHT` | МОР | `isolate → blight_isolated` / `stay_together → blight_unified` / `healer → blight_early_medicine` |
+| `T2` | `ENDING_CATACLYSM` | КАТАКЛИЗМ | `converge → cataclysm_converge` / `shelter_separately → cataclysm_scattered` / `old_experience → cataclysm_unprepared` |
+| `T3` | `ENDING_FRACTURE` | РАСКОЛ | `suppress → fracture_suppressed` / `split → fracture_split` / `vote → fracture_deliberated` |
+| `T4` | `ENDING_OVERLOAD` | АВАРИЯ | `manual_stop → overload_manual` / `reroute → overload_rerouted` / `trust_automation → overload_automated` (exact choice set narrowed by `run.chapter4.automation_pace`, see `08_EVENTS_AND_CHOICES.md` §23) |
+
+Full event/goal contract for each — `08_EVENTS_AND_CHOICES.md` §23.
 
 ---
 
@@ -212,11 +243,26 @@ Do not show obsolete primary metabolism branch `Photosynthesis/Chemosynthesis/Ab
 
 Use Archive Fragments as the single spendable first prestige currency.
 
-Target remains:
+Target for `T5`/`Ash` remains:
 
 ```text
-14–18 AF typical first reset
+14–18 AF typical
 ```
+
+`T1–T4` non-Ash endings use a smaller provisional envelope (shorter
+chapters, smaller stakes) — see `13_ACT_ONE_CHAPTERS.md` §6:
+
+```text
+T1 Мор:      4–6 AF
+T2 Катаклизм: 5–7 AF
+T3 Раскол:    6–8 AF
+T4 Авария:    7–9 AF
+```
+
+Эти диапазоны — provisional envelope, не финальная формула; суммарно пять
+глав должны давать сопоставимую или чуть большую общую награду, чем старый
+единый 180-минутный `Ash`, поскольку игрок теперь пять раз проходит
+reset-ритуал вместо одного.
 
 Reward application must be idempotent.
 
@@ -276,7 +322,10 @@ Reset transaction must:
 
 ---
 
-# 13. Timeline #2 teaser
+# 13. Timeline #2 / Act 2 teaser (`T5` only)
+
+This section applies **only** after `T5`/`Ash` — the end of Act 1. `T1–T4`
+endings transition into the next chapter of Act 1 instead; see §16.
 
 After reset:
 
@@ -324,3 +373,57 @@ writes one ending Chronicle record and a bounded 14–18 AF award, then creates
 the next active run without duplicating a transaction on retry. The AF formula
 and crisis coefficients are provisional pending balance; idempotency and the
 reward envelope are not.
+
+---
+
+# 16. `T1–T4` chapter transitions (not the Act 1 → Act 2 teaser)
+
+Each of `ENDING_BLIGHT` / `ENDING_CATACLYSM` / `ENDING_FRACTURE` /
+`ENDING_OVERLOAD` uses a **compact** transition, lighter than `T5`'s full
+cinematic — no white flash (reserved for `Ash`), no full Archive Summary
+screen:
+
+1. short world pause (1–2 sec) + local diorama dimming (not a white flash);
+2. ending card: `ЦИВИЛИЗАЦИЯ №{N} ЗАВЕРШЕНА` / chapter title (`МОР` etc.);
+3. one to two lines of Archive neutral summary (e.g. `Ответ на отклонение:
+   изоляция.`);
+4. that chapter's reveal line, if it has one — `T1`, `T3`, `T4` do, `T2`
+   does not (§5B in `docs/scenario/05_NARRATIVE_FLAGS.md`);
+5. CTA **Продолжить синтез**, leading straight into the next chapter's
+   opening scene — no intermediate menu.
+
+It does not show:
+
+- `Мы можем изменить результат.` (reserved for the end of `T5`);
+- the `СОЗДАТЬ НОВУЮ ЖИЗНЬ` CTA (reserved for the Act 1 → Act 2 transition);
+- a full multi-section Archive Summary (World/Species/Civilization/Filter);
+- a Timeline #2 / Act 2 teaser of any kind.
+
+Full copy for all four transitions — `docs/scenario/06_ENDINGS_COPY.md`
+§T1–§T4 and §0 (shared template).
+
+The reset transaction itself is idempotent in the same sense as `T5`'s (§12):
+one immutable per-chapter summary, one bounded AF award (§10 range for that
+chapter), one Chronicle entry, safe to retry without duplication. What differs
+is only that "the next run candidate" this transaction creates is the next
+chapter of the same Act 1 attempt, not a fresh Act 1 `T1`.
+
+---
+
+# 17. What this revision changed
+
+Changed:
+
+- scope: this document now covers reset/ending for all five Act 1 chapters,
+  not only the former single-run `Ash`;
+- four new ending IDs/titles/subtypes (§7);
+- a smaller, chapter-scoped Archive Fragments envelope for `T1–T4` (§10);
+- `T1–T4` endings transition into the next chapter, not into a Timeline #2 /
+  Act 2 teaser (§16).
+
+Kept, unchanged for `T5`:
+
+- everything in §1–15 above describing `Ash` specifically;
+- Stability/World Tension, crisis clamps, unavoidable first Ash, Last
+  Protocol, Archive Summary shape, AF envelope for `T5`, Chronicle,
+  idempotent reset, Act 2 teaser after `T5`.

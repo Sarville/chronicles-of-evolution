@@ -1,571 +1,293 @@
-# Хроники Эволюции — первые 180 минут
+# Хроники Эволюции — Act 1 (`T1–T5`): экономика и темп по главам
 
-**Версия:** reconciliation v2.0  
-**Статус:** canonical gameplay progression  
-**Область:** Timeline #1, от первой устойчивой молекулы до Ash/reset.  
-**Authority:** `docs/DECISIONS_RECONCILIATION.md`.
+**Версия:** act-structure revision 3.0
+**Статус:** canonical gameplay progression для `T1`/`T5` (реализовано);
+`T2–T4` — новый scope, темп provisional.
+**Область:** Act 1 целиком, от первой устойчивой молекулы (`T1`) до
+обязательного `Ash` (`T5`), ~3–4 часа суммарно вместо старых 180 минут в
+одном прогоне.
+**Authority:** `docs/DECISIONS_ACT_STRUCTURE.md`, `docs/gdd/12_LONG_TERM_
+PROGRESSION_AND_RESET_ROADMAP.md`.
 
-> Этот документ снова задаёт **смысловую progression** игры. Economy обязана балансировать эту progression, а не заменять её более удобными абстракциями.
+> Этот документ задаёт **смысловую progression и темп** внутри каждой
+> главы. Economy обязана балансировать эту progression, а не заменять её
+> более удобными абстракциями. Конкретные goals/ID — в
+> `docs/gdd/07_GOALS_AND_MILESTONES.md`.
 
 ---
 
-# 1. Product promise первых 180 минут
+# 1. Product promise Act 1
 
-Игрок должен прожить понятную причинно-следственную историю:
+Игрок проживает не одну длинную арку, а пять коротких попыток одной и той
+же цивилизационной дуги, каждая обрывается собственной причиной и
+объясняется прямой правкой Архива в начале следующей:
 
 ```text
-RNA
-→ replication
-→ DNA
-→ membrane
-→ cell
-→ biomass / metabolism
-→ organelles / adaptations
-→ multicellular organism
-→ senses / mobility / digestion
-→ nervous system
-→ cognition
-→ sapience
-→ tribe
-→ settlement
-→ city
-→ industry
-→ modern civilization
-→ atomic age
-→ crisis
-→ Ash
-→ Archive / reset
+T1 Origin:      RNA → cell → sapience → tribe            → Мор
+T2 Одиночки:    dispersed start → settlement              → Катаклизм
+T3 Крепость:    fortified start → city                    → Раскол
+T4 Большой мозг: cognition-bias start → industry/modern    → Авария
+T5 Синтез:      synthesis start → atomic → Great Filter    → Ash (обязателен)
 ```
 
-Главный принцип biological phase:
+Главный принцип biological phase (`T1`) не меняется:
 
-> Не использовать абстрактный ресурс там, где игроку можно показать естественный предметный аналог.
-
----
-
-# 2. Corrected timeline
-
-| Окно | Стадия | Главный payoff |
-|---:|---|---|
-| 0–2 | Искра | RNA |
-| 2–7 | Репликация | Self Replication, DNA |
-| 7–12 | Первая клетка | Membrane, Cell, Biomass |
-| 10–18 | Адаптация | Metabolism + первая branch |
-| 18–28 | Многоклеточность | тело + Adaptation Points |
-| 28–38 | Нервная система | Cognition layer |
-| ~38–40 | Sapience transition | Civilization mode |
-| 38–56 | Племя | Population / Food / Materials / Knowledge |
-| 56–84 | Поселение | постоянные здания |
-| 84–110 | Город | writing / research / trade-lite |
-| 110–126 | Индустрия | mechanization / Power |
-| 126–138 | Modern | grid / communications / global civilization |
-| 138–168 | Предатомная программа | Scientific Method / Atomic Theory / reactor program |
-| 168–180 | Великий фильтр | World Tension / crisis / Last Protocol / Ash / Archive |
-
-Компетентный детерминированный профиль (seed 7) завершает Ash на 179.8 мин;
-окна выше — целевые telemetry ranges, а не таймеры.
+> Не использовать абстрактный ресурс там, где игроку можно показать
+> естественный предметный аналог.
 
 ---
 
-# 3. Resources by phase
+# 2. Темп по главам
 
-## Molecular, 0–7
+| Глава | Target active time | Главный payoff конца главы |
+|---|---:|---|
+| `T1` | ~20 мин | ПЛЕМЯ → Мор |
+| `T2` | ~25–30 мин | ПЕРВЫЙ ТОЛЧОК → Катаклизм |
+| `T3` | ~30–35 мин | КРЕПОСТЬ → Раскол |
+| `T4` | ~35–45 мин | ЭПОХА МАШИН → Авария |
+| `T5` | ~45–60 мин | МЫ РАСКОЛОЛИ МАТЕРИЮ → Ash |
 
-- **RNA** — основной видимый ресурс.
-- DNA ещё locked.
-
-## Cell, 7–18
-
-- **RNA**;
-- **DNA**;
-- **Biomass** после Cell.
-
-## Metabolic / multicellular, 10–38
-
-- **DNA**;
-- **Biomass**;
-- **Energy** после Metabolism;
-- **Adaptation Points** как milestone reward, не passive currency.
-
-`Information` не является видимой spendable currency Timeline #1.
-
-## Civilization
-
-- Food;
-- Materials;
-- Knowledge;
-- Population.
-
-## Industry+
-
-- Food supporting;
-- Materials;
-- Knowledge;
-- Power;
-- Population.
-
-## Crisis
-
-- Materials / Knowledge / Power;
-- Stability internal;
-- World Tension visible.
-
-На mobile одновременно показывать только контекстно важные показатели.
+Компетентный детерминированный профиль (`T1`+`T5`, seed 7, старая
+нумерация) уже завершает Ash в границах целевого диапазона; окна выше —
+целевые telemetry ranges для новых глав `T2–T4`, а не таймеры.
 
 ---
 
-# 4. 0:00–0:02 — RNA / Искра
+# 3. `T1` — Origin: RNA → Tribe → Мор
 
-## Objective
+Раздел ниже воспроизводит принятую (реализованную) экономику `T1` без
+изменений по существу — только границы окна теперь ~0–20 мин вместо
+~0–56.
 
-**Создайте первую устойчивую молекулу.**
+## 3.1 Resources by phase
 
-Первое действие игрока запускает primordial reaction и создаёт RNA.
+**Molecular:** RNA основной видимый ресурс, DNA locked.
+**Cell:** RNA, DNA, Biomass после Cell.
+**Metabolic/multicellular:** DNA, Biomass, Energy после Metabolism, AP как
+milestone reward.
+**Civilization (Tribe):** Food, Materials, Knowledge, Population.
 
-UX:
+`Information` не является видимой spendable currency.
 
-- успешное действие <20 секунд;
-- действие ощущается как запуск реакции/process, а не бесконечный clicker;
-- после нескольких действий открывается passive RNA formation;
-- к концу блока игрок понимает, что жизнь начинает поддерживать процесс сама.
-
-Milestone:
-
-> «Молекула сохраняет форму.»
-
----
-
-# 5. 0:02–0:07 — Replication / DNA
-
-Core progression:
+## 3.2 Ключевые биения (без изменений)
 
 ```text
-Stable RNA
-→ Self Replication
-→ DNA Synthesis
+Stable RNA → Self Replication → DNA Synthesis → Membrane → Cell
+→ Metabolism + первая branch (Absorption/Symbiosis/Shell)
+→ Multicellularity + Adaptation Points
+→ Nervous system → Cognition 0..100 → Sapience
+→ Tribe (Population ≈5, Food/Materials/Knowledge)
 ```
 
-Player-facing goals:
+Точные UX-описания каждого биения — см. историю этого документа (revision
+2.0) и реализованный `config/`; они не переносятся сюда повторно, так как
+не изменились.
 
-1. стабилизировать RNA production;
-2. открыть Self Replication;
-3. создать первые DNA;
-4. усилить replication.
+## 3.3 Новое: 16–20 мин — Мор
 
-`Error Correction` может появиться как ранний OPTIONAL node, чтобы показать нелинейность дерева без блокировки core path.
+После `ПЛЕМЯ` плотная жизнь без ответа на эпидемиологию становится
+уязвимостью, не выбором игрока. Archive не предупреждает заранее —
+`EV-NAR-04` вводит вспышку как факт, одно mandatory choice (`EV-CR-T1`)
+определяет subtype, `Мор` неизбежен.
 
-Narrative payoff:
-
-> «Информация научилась копировать себя.»
-
-Manual input после Self Replication перестаёт быть главным источником прогресса.
+Reward cadence остаётся плотной до самого конца — это by design: чем
+короче глава, тем чаще payoff (см. §9).
 
 ---
 
-# 6. 0:07–0:12 — Membrane / Cell
+# 4. `T2` — Одиночки: dispersed start → Settlement → Катаклизм
 
-Core progression:
+## 4.1 Стартовое условие
+
+Глава начинается не с нуля. Archive line:
+
+> «Плотность более не единственная переменная модели.»
+
+Population стартует рассредоточенной — несколько малых групп вместо
+одного лагеря. Экономически это медленнее локальный рост (несколько
+меньших Food/Materials пулов вместо одного), но снижает вероятность
+повторения `Мор`-подобной механики (её здесь и нет — Archive уже
+исправил именно эту причину).
+
+Species skin #1 применяется на этом входе — косметическая смена
+(art/label/1–2 flavor-способности), не переоткрывает биологическую
+progression `T1`.
+
+## 4.2 Resources by phase
+
+Food, Materials, Knowledge, Population — как в старой Settlement-фазе,
+но с явным «разброс/объединение» modifier на старте.
+
+## 4.3 Ключевые биения
 
 ```text
-DNA
-→ Membrane
-→ Cell
+Соедините первые группы (G027)
+→ Освойте земледелие (G028, переиспользует старый G016-контент)
+→ Первый толчок (G029, EV-NAR-05)
+→ Переживите Катаклизм (G030, EV-CR-T2)
 ```
 
-После Cell:
+## 4.4 Новое: конец главы — Катаклизм
 
-- unlock Biomass;
-- cell становится главным visual object;
-- появляются Ribosome / Protein Synthesis / Organelles hooks;
-- старый molecular gameplay сворачивается в background production/history.
-
-Milestone:
-
-# ЖИЗНЬ
-
-> Теперь система отделяет себя от среды и поддерживает собственные процессы.
+Разрозненные группы физически не могут собрать единый ответ на
+геологическую катастрофу. Один mandatory choice меняет subtype/epitaph,
+не сам факт коллапса.
 
 ---
 
-# 7. 0:10–0:18 — Metabolism + first branch
+# 5. `T3` — Крепость: fortified start → City → Раскол
 
-После Cell открывается Metabolism и Energy как **реальная способность живой системы получать/использовать энергию**.
+## 5.1 Стартовое условие
 
-## First meaningful branch
+Archive line:
 
-### Поглощение
+> «Рассеивание не защитило группу. Проверяется концентрация с
+> укреплением.»
 
-Identity:
+Базовые оборонительные структуры уже построены на входе. Species skin
+не меняется (та же линия, что в `T2`).
 
-- активный рост;
-- сильная Biomass economy;
-- predator/aggressive visual bias.
+## 5.2 Resources by phase
 
-### Симбиоз
+Как старая City-фаза (Food/Materials/Knowledge/Population, organized
+labor, trade-lite), но стартующая не с нуля, а с готового укрытия.
 
-Identity:
-
-- cooperation/internal efficiency;
-- устойчивый passive growth;
-- future research/social affinity.
-
-### Панцирь
-
-Identity:
-
-- resilience;
-- storage/survival;
-- сниженные losses/risk later.
-
-Timeline #1: выбрать один primary trait.
-
-Поздние идеи `Photosynthesis` и `Chemosynthesis` сохраняются как **optional metabolic adaptations**, а не заменяют первую branch.
-
----
-
-# 8. 0:18–0:28 — Multicellularity
-
-Goal:
-
-**Создайте сложный многоклеточный организм.**
-
-Core requirements conceptually:
-
-- достаточная Biomass;
-- DNA/genetic complexity;
-- several organelle/cell-system milestones.
-
-## Adaptation Points
-
-AP выдаются:
-
-- за major biological milestones;
-- за optional objectives;
-- за exploration/behavior challenges.
-
-AP тратятся на optional adaptations:
-
-- Mobility;
-- Sensory Cells;
-- Digestion;
-- Structural Tissue;
-- later body-specific upgrades.
-
-AP не производятся `/sec` и не нужны для обязательных breakthroughs.
-
-Visual payoff: из cell colony формируется единый организм.
-
----
-
-# 9. 0:28–0:38 — Nervous system / Cognition
-
-Core progression:
+## 5.3 Ключевые биения
 
 ```text
-sensory development
-→ neural tissue
-→ nervous system
-→ behavior
-→ Cognition
+Заселите крепость (G031)
+→ Откройте письменность (G032, переиспользует старый G018-контент)
+→ Выберите модель управления (G032B, EV-CIV-04, policy-lite)
+→ Заметьте раскол (G033, EV-NAR-06)
+→ Переживите Раскол (G034, EV-CR-T3)
 ```
 
-## Cognition meter
+## 5.4 Новое: конец главы — Раскол
+
+Первый коллапс Act 1, причина которого исходит изнутри, а не из среды:
+безопасность снова концентрирует население, и вместе с ней теснота и
+внутреннее напряжение. Governance-выбор из `G032B` явно входит в условие
+`EV-CR-T3`, а не остаётся изолированным profile-флагом.
+
+---
+
+# 6. `T4` — Большой мозг: cognition-bias start → Industry/Modern → Авария
+
+## 6.1 Стартовое условие
+
+Archive line:
+
+> «Управление не удержало систему. Проверяется способность системы
+> понимать себя.»
+
+Повышенный стартовый Cognition, раннее Writing/культура. Species skin #2
+применяется здесь — второй и последний swap Act 1; `T5` возвращается к
+исходной линии.
+
+## 6.2 Resources by phase
+
+Как старые Industry/Modern-фазы (Food supporting, Materials, Knowledge,
+Power, Population), но с более ранним доступом к Power за счёт
+стартового Cognition-bias.
+
+## 6.3 Ключевые биения
 
 ```text
-0..100
+Механизируйте производство (G035, переиспользует старый G020-контент)
+→ Войдите в эпоху машин (G036, переиспользует старый G021-контент)
+→ Automation-risk choice (G037, EV-CIV-08)
+→ Заметьте перегрузку (G038, EV-NAR-07)
+→ Переживите Аварию (G039, EV-CR-T4)
 ```
 
-Источники Cognition:
+## 6.4 Новое: конец главы — Авария
 
-- sensory upgrades;
-- neural complexity;
-- social behavior;
-- object manipulation / tool-use precursor;
-- selected mini-events.
+Цивилизация обгоняет собственную способность управлять своей
+технологией — каскадный отказ инфраструктуры/автоматики, не внешний
+враг и не атомный Ash. Automation-risk выбор из `G037` напрямую входит в
+условие `EV-CR-T4`.
 
-Flavor events:
-
-- **Опасность** — flee / confront;
-- **Другой** — cooperate / conflict.
-
-Они влияют на path profile и немного на Cognition, но не превращаются в обязательную visual-novel chain.
-
-## Sapience
-
-При `Cognition >= 100` и выполненных core nervous-system prerequisites:
-
-# РАЗУМ ПРОБУДИЛСЯ
-
-Sapience — milestone/convergence, **не обычная покупка за три currencies**.
+Reveal на переходе к `T5`: «Вероятность успешного прохождения Фильтра:
+—» (строка появляется и тут же удаляется — последний предвестник перед
+Синтезом).
 
 ---
 
-# 10. Sapience transition
+# 7. `T5` — Синтез: Modern → Atomic → Great Filter → Ash
 
-При переходе:
+Раздел воспроизводит принятую (реализованную) экономику старых секций
+14–18 этого документа без изменений по существу — только стартовая сцена
+и procedural deck новые.
 
-- biological production прекращает быть active main economy;
-- evolutionary history остаётся в Evolution/Chronicle;
-- UI меняет масштаб от организма к маленькой группе существ;
-- стартовый Population ≈ **5**;
-- открываются Food / Materials / Knowledge / Population.
+## 7.1 Новое стартовое условие
 
-Не использовать формулу конверсии остатка RNA/DNA/Biomass/Energy в 18–24 Population.
+Archive вмешивается напрямую, синтезируя уроки `T1–T4`, и возвращает
+исходную видовую линию. `EV-NAR-08 «Синтез»` — intro-сцена, не отдельная
+economy-фаза.
 
-Допустим небольшой deterministic стартовый пакет F/M/K, но он задаётся новым balance pass, а не stock-farming exploit.
+## 7.2 Resources by phase (без изменений)
 
----
+Modern: Food supporting, Materials, Knowledge, Power, Population.
+Atomic/crisis: Materials, Knowledge, Power, Stability internal, World
+Tension visible.
 
-# 11. 38–50 — Tribe
-
-Jobs first layer:
-
-- Forager/Hunter;
-- Gatherer;
-- Thinker.
-
-Caregiver может появиться позднее как optional/advanced role, а не обязательная четвёртая профессия с первой секунды civilization.
-
-Buildings:
-
-- Shelter;
-- Campfire/Hearth;
-- Food Store;
-- Tool/Work area.
-
-Primary goal:
-
-- positive Food;
-- Population growth;
-- basic storage;
-- first stable camp.
-
-Civilization choice `Как делить добычу` сохраняется как narrative/profile decision.
-
----
-
-# 12. 50–65 — Settlement
-
-Core concepts:
-
-- Farming;
-- Housing;
-- Workshop;
-- Storage;
-- first permanent roads/fields;
-- Writing precursor.
-
-Goal:
-
-**Постройте постоянное поселение.**
-
-Specializations Irrigation / Masonry / Exchange могут существовать как optional/recommended branch content, но не каждая Timeline обязана пройти ещё одну blocking branch только ради единообразия дерева.
-
-`Следы до нас` остаётся canonical anomaly event.
-
----
-
-# 13. 65–80 — City
-
-Unlocks:
-
-- organized labor;
-- Writing;
-- trade-lite;
-- School/formal research;
-- Market;
-- government-lite choice.
-
-Main resources остаются aggregate:
-
-- Food;
-- Materials;
-- Knowledge;
-- Population.
-
-Wood/Stone/Metal могут быть internal categories, visuals или production breakdown, но не отдельные обязательные top-level currencies v1.
-
-Government-lite:
-
-- Council;
-- Leader;
-- Merchants.
-
-Это profile choice; точные multipliers не должны скрыто ломать baseline economy.
-
----
-
-# 14. 80–95 — Industry
-
-Milestone:
-
-# ЭПОХА МАШИН
-
-Main concepts:
-
-- Steam;
-- Mechanization;
-- factories;
-- rail/logistics;
-- automation;
-- electricity;
-- **Power becomes active resource here**.
-
-Key goal:
-
-**Электрифицируйте промышленную цивилизацию.**
-
-Energy Crisis choice сохраняется:
-
-- Fossil;
-- Clean/Renewable;
-- Early Atomic research.
-
-Choice affects visuals, path profile and later crisis tags; numeric effects must be included explicitly in balance simulation.
-
----
-
-# 15. 95–104 — Modern civilization
-
-Короткая bridge phase должна быть видима, даже если не превращается в отдельную огромную tech tree.
-
-Core meaning:
-
-- electrical grid;
-- modern research institutions;
-- communications;
-- global connection / regions;
-- advanced logistics/automation;
-- civilization becomes planetary/global in presentation.
-
-`Radio` / `Computing precursor` могут быть combined milestones rather than mandatory grind nodes.
-
-Здесь появляется `ERROR 17`.
-
----
-
-# 16. 104–108 — Atomic transition
-
-Core progression:
+## 7.3 Ключевые биения (без изменений)
 
 ```text
-Scientific Method
-→ Atomic Theory
-→ tangible reactor/lab program
-→ Atomic Age
+Scientific Method → Atomic Theory → tangible reactor/lab program
+→ Atomic Age (МЫ РАСКОЛОЛИ МАТЕРИЮ) → World Tension → crisis events
+→ Last Protocol → Ash → Archive Summary
 ```
 
-Milestone:
+## 7.4 Новое: `T5`-only procedural deck
 
-# МЫ РАСКОЛОЛИ МАТЕРИЮ
+Поверх Modern/Atomic окна работает новая procedural deck
+(`deck: 't5_synthesis'`), флейвор-события которой явно ссылаются на
+исходы `T1–T4` этого конкретного прогона. Полный список — `docs/
+scenario/04_STORY_EVENTS.md` §T5-DECK.
 
-Archive anomaly:
+## 7.5 Ash / Archive (без изменений)
 
-> «Снова.»
+Все Last Protocol variants converge to `ENDING_ASH`. После cinematic —
+Timeline Summary всей Act 1 (не только `T5`), Archive Fragments,
+Chronicle всех пяти глав, Meta Tree, переход в Act 2 (`P1`) teaser.
 
-then correction:
-
-> «Событие зарегистрировано.»
-
-On Atomic Age:
-
-- Stability = 100;
-- World Tension UI appears;
-- crisis clock begins;
-- first-run offline crisis progression freezes.
+Reset остаётся окончанием истории цивилизации, не failure screen — как и
+`Мор`/`Катаклизм`/`Раскол`/`Авария` до него.
 
 ---
 
-# 17. 108–118 — Great Filter
-
-Internal state:
-
-```text
-Stability 100 → 0
-```
-
-Player-facing state:
-
-```text
-World Tension = 100 - Stability
-```
-
-Keep:
-
-- conflict between blocs;
-- false-warning event;
-- shortages/pollution/atomic-risk tags;
-- crisis response nodes;
-- Last Protocol;
-- minimum dramatic clamps;
-- first Ash unavoidable.
-
-Good play changes:
-
-- timing inside allowed window;
-- reward;
-- Chronicle;
-- subtype/epitaph;
-- persistent flags.
-
-It does not cancel Timeline #1 Ash.
-
----
-
-# 18. Ash / Archive
-
-All Last Protocol variants converge to:
-
-```text
-ENDING_ASH
-```
-
-with subtype/flags.
-
-After cinematic:
-
-- Timeline Summary;
-- species/evolution profile;
-- civilization profile;
-- crisis decisions;
-- Archive Fragments;
-- Chronicle;
-- clear list of preserved/reset state;
-- Meta Tree;
-- Timeline #2 teaser.
-
-Reset is an ending of a civilization, not a failure screen.
-
----
-
-# 19. Goal philosophy
+# 8. Goal philosophy (без изменений)
 
 Keep Goal Engine model:
 
 - Current Goal: 30 sec–6 min;
 - Chapter Goal: 10–25 min;
-- Destiny Goal: run-scale.
+- Destiny Goal: границы одной главы `T1–T5`.
 
-Optional goals must provide meaningful rewards, especially Adaptation Points in biology.
-
-Target time is telemetry, not hard completion.
-
----
-
-# 20. Reward cadence
-
-- 0–10: payoff every 30–90 sec;
-- 10–30: meaningful unlock every 2–4 min;
-- 30–60: visual/system payoff every 5–10 min;
-- 60–180: major feature/milestone roughly every 10–15 min.
-
-No invisible dead zone >5 min in the first 30 min.
+Optional goals must provide meaningful rewards, особенно Adaptation
+Points в `T1`. Target time — telemetry, не hard completion.
 
 ---
 
-# 21. Systems preserved from later design
+# 9. Reward cadence
 
-This reconciliation **does not remove**:
+- `T1` (0–20): payoff каждые 30 сек — 4 мин, тот же темп, что в старой
+  0–56-минутной версии `T1`, просто глава заканчивается раньше;
+- `T2` (0–30): значимый unlock каждые 2–5 мин;
+- `T3` (0–35): visual/system payoff каждые 4–8 мин;
+- `T4` (0–45): major feature/milestone каждые 6–12 мин;
+- `T5` (0–60): major feature/milestone каждые 8–15 мин, плюс procedural
+  deck заполняет промежутки между authored событиями.
+
+No invisible dead zone >5 мин ни в одной главе — глава короче 180-минутного
+старого run, поэтому допустимый dead zone тоже пропорционально короче.
+
+---
+
+# 10. Systems preserved from later design (без изменений)
+
+Этот документ **не убирает**:
 
 - generic Goal Engine;
 - optional objectives;
@@ -574,12 +296,13 @@ This reconciliation **does not remove**:
 - save/recovery/autosave;
 - dev simulation/time scale;
 - telemetry;
-- Stability/World Tension;
-- Error 17;
-- Ash;
+- Stability/World Tension (только в `T5`);
+- Error 17, Again (только в `T5`);
+- Ash (только в `T5`) плюс новые `Мор`/`Катаклизм`/`Раскол`/`Авария`
+  endings (`T1–T4`);
 - Chronicle;
 - Archive/meta;
 - idempotent reset;
-- Timeline #2 concept.
+- Act 2 (`P1`) teaser.
 
-Those systems now serve the restored gameplay progression instead of defining it.
+Те системы теперь обслуживают пять глав вместо одной.

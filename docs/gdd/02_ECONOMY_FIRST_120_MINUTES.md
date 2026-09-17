@@ -4,6 +4,15 @@
 **Статус:** canonical / biological 0–18 resource-flow, storage-cap and Cell-cost pass applied / later phases provisional
 **Authority:** `DECISIONS_RECONCILIATION.md` + `01_FIRST_120_MINUTES.md`.
 
+> **(2026-09-17) Act-structure note:** этот документ описывает
+> переиспользуемый экономический контент-пакет (`T1-0…T1-6`), а не
+> единственный забег. Как именно этот пакет нарезается на пять коротких
+> глав `T1–T5` — см. `docs/gdd/13_ACT_ONE_CHAPTERS.md`. Все таймкоды ниже
+> остаются валидными как есть только для главы `T1` (единственная, что
+> реально проходит эту экономику с нуля); `T2–T5` достигают тех же точек
+> экономики намного быстрее за счёт стартовых грантов главы — см.
+> `docs/gdd/01_FIRST_120_MINUTES.md` §2–7 для per-chapter темпа.
+
 > Economy описывает **как сбалансировать утверждённый gameplay**. Она больше не может вводить новые visible resources, generators или progression nodes ради удобства симуляции.
 
 ---

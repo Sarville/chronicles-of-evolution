@@ -187,3 +187,199 @@ expected to reuse the large majority of already-built mechanical content
 Old documents are kept in place (not deleted/moved) as historical record,
 per this repo's existing convention (`DECISIONS_RECONCILIATION.md` does the
 same for what it supersedes).
+
+---
+
+## ACT-008 — Act 2: one scenario regardless of planet, Archive as observer
+
+### Decision
+
+`P1–P3` differ only in which lopsided civilization the player is dropped
+into (ACT-003); the **narrative track is identical** across all three and is
+authored once, not per-`P`. Whichever `P` the player starts, the Archive's
+behavior and lines follow the same script:
+
+- Archive does not edit the world between attempts the way it did between
+  `T1–T5` (ACT-002's "fix creates next vulnerability" pattern). It states
+  this explicitly near the start of the first `P` attempt: this run is a
+  controlled test, not an intervention.
+- Throughout the run, Archive comments on player actions as an observer —
+  reactive, curious, occasionally surprised — never directive. It does not
+  offer the "next fix" framing that ended each Act 1 chapter.
+- Whichever `P` collapses (mandatory or optional), the ending sequence is a
+  **single unified summary + reveal scene**, not a per-`P` bespoke ending.
+  The specific collapse cause (stagnation / internal conflict / neglected
+  subsistence) is referenced by one variable line inside an otherwise fixed
+  scene — the same pattern already used for the `T5` echo deck's
+  subtype-branching text (`docs/gdd/13_ACT_ONE_CHAPTERS.md` §7).
+
+### Reason
+
+Act 2 exists to answer a question the player has been implicitly asking
+since `T2`: is the Archive's own meddling the reason every Act 1 attempt
+dies differently? A civilization the Archive does not touch, left to run on
+its own structural imbalance, either confirms or falsifies that. The answer
+has to be the same regardless of which imbalance the player picked, so the
+reveal can't fork three ways — it would dilute the one twist Act 2 exists to
+deliver.
+
+### The reveal
+
+The unified reveal at the end of any `P` run is the single consolidated
+"truth" beat that used to be spread thinly across old narrative Acts VI–IX
+(`docs/scenario/00_NARRATIVE_BIBLE.md`, pre-2026-09-17 revision): the
+Archive is not a singular custodian but one running instance among a larger
+set of Archives, each observing a different attempt/lineage, searching for
+one that survives its own Great Filter. The player's civilization — across
+every `T1–T5` chapter and this `P` run — is one such attempt. This reveal is
+what opens Act 3 — see ACT-009. Full copy —
+`docs/scenario/02_ACT2_ACT3_SCRIPT.md` §1–2.
+
+### What this replaces
+
+Supersedes the placeholder "Акт V — Память" bullets and the separate
+reveal-per-act structure of old Acts VI–IX in
+`docs/scenario/00_NARRATIVE_BIBLE.md` §5 (pre-2026-09-17 revision). Those
+acts are folded into Act 3 content (ACT-009) instead of remaining sequential
+narrative acts of their own — see the updated §5/§6 in that file.
+
+---
+
+## ACT-009 — Act 3: system reveals, first-reset finale, post-finale horizontal loop
+
+### Decision
+
+Act 3 has three narrative beats, in order:
+
+1. **Entry reveal lines.** Each previously-locked system Act 3 opens
+   (races/traits, multi-currency prestige, universes/challenge modifiers,
+   ARPA-equivalent tech — catalogued in old
+   `12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` §6) gets one short Archive
+   line the first time the player reaches it, framed as something the
+   Archive had access to and withheld during the Act 1/Act 2 controlled
+   attempts — not something newly invented. This keeps Act 3 the same
+   continuous Archive character rather than resetting the fiction.
+2. **First-reset finale.** Act 3 has its own reset/prestige loop (the
+   original Evolve's universe reset lives here). The first time the player
+   completes that reset inside Act 3, a one-time authored sequence fires: a
+   full recap of the run so far (which `T1–T5` collapses this playthrough
+   actually suffered, which `P` was chosen, which Act 3 systems were
+   reached), plus explicit hints at what repeat resets/universes/challenge
+   modifiers will look like going forward. This is the game's authored "you
+   finished the story" moment — a closed narrative arc, not a hard stop.
+3. **Archive downgrades to assistant.** After the first-reset finale,
+   Archive's dialogue register permanently changes: no more mystery,
+   reveal, or commentary-on-the-player's-choices lines — from here on it
+   only gives UI-assistant-tier lines (tooltips, confirmations, occasional
+   dry remarks), the same register the early `T1` tutorial nudges already
+   use. Continuing to narrate an already-resolved mystery during an
+   intentionally endless loop reads as padding.
+
+After the first-reset finale, the game's stated goal changes from "reach the
+next act" (there isn't one) to **horizontal completion** — the global
+Archive/achievement system defined in ACT-011 becomes the primary
+long-horizon goal the UI surfaces (a progress/completion screen, not a new
+"Act 4" teaser). "Horizontal" here means breadth of a **finite** achievement
+set (every race, every universe type, every challenge modifier, every
+ending variant), not an unbounded number to grind — the underlying
+prestige currencies stay literally uncapped, but the authored completion
+goal that replaces "the next act" always has a visible finish line (see
+ACT-011).
+
+### Reason
+
+Requested directly: a real ending for the open-ended endgame without
+actually closing the endgame. Reused pattern from incremental games that
+give a "credits roll, game continues" beat rather than a literal stop.
+
+---
+
+## ACT-010 — Grand finale: Archive at 100% completion
+
+### Decision
+
+One additional authored scene, gated on Archive Completion reaching 100%
+(ACT-011's metric — every achievement across every chapter/`P`
+type/Act 3 system). It is not a new mechanical ending (no new reset, no new
+currency) — a one-time epilogue that plays the moment the completion meter
+crosses 100%, then never repeats.
+
+### Content direction
+
+At 100%, the player has not just finished every civilization's story — they
+have finished the Archive's own Chronicle. The Archive addresses the player
+directly (not through a civilization) for the first and only time in the
+whole game, and closes the mirror the game has been building toward: the
+player has spent the whole game resetting civilizations that couldn't see
+the pattern trapping them — and the Archive itself is a civilization's
+attempt at the same trick, one level up, being watched and reset by
+something else on the same terms. The scene does not resolve whether that
+outer loop ever breaks; it hands the ambiguity to the player. This absorbs
+and closes out old `00_NARRATIVE_BIBLE.md` Act X "Разрыв цикла", which
+otherwise had no concrete gate or payoff.
+
+Full copy — `docs/scenario/02_ACT2_ACT3_SCRIPT.md` §5.
+
+### Reason
+
+"Finale of finales" requested explicitly. Gating it on 100% completion
+rather than a story beat keeps it aligned with ACT-011's percentage framing
+and gives the achievement system a payoff beyond numeric rewards.
+
+---
+
+## ACT-011 — Global Archive completion / achievement system
+
+### Decision
+
+Introduces **Archive Completion** as a single 0–100% meta-stat, computed
+from achievements, and an **Archive Log** screen that presents it. Full
+mechanical spec — new `docs/gdd/14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md`.
+Summary:
+
+- Reuses existing primitives instead of adding a new currency: every
+  achievement is a boolean flag already derivable from existing state
+  (`meta.endings.*`, Chronicle entries, Archive Tree node purchases, `P`
+  completions, Act 3 milestones) — no new tracked resource. Unlocking an
+  achievement does **not** grant AF; AF stays reward-for-reset only
+  (`docs/gdd/10_META_PROGRESSION.md` §2, unchanged).
+- Completion % = achievements unlocked ÷ total achievements that exist —
+  a fixed, known denominator even though Act 3's underlying currencies are
+  uncapped (see doc §3 for the per-act weighting).
+- Presented via a physical-archive metaphor (shelves/fragments filling in),
+  consistent with the existing Archive/Chronicle/Archive Fragments
+  vocabulary, rather than a generic percentage bar or trophy case.
+
+### Reason
+
+Requested directly: "доработать механику глобального архива, как считается
+этот прогресс, какие вообще ачивки, как они представлены". Reusing AF/
+Chronicle/Archive Tree avoids adding a second progression currency the
+player has to learn, consistent with ACT-002's single-currency rule.
+
+---
+
+## ACT-012 — Documents requiring rework (2026-09-17 extension)
+
+- `docs/gdd/14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md` — new file, canonical
+  spec for ACT-011.
+- `docs/scenario/00_NARRATIVE_BIBLE.md` §5/§6 — old Acts V–X placeholder
+  bullets replaced with the ACT-008/009/010 content; §0 product/narrative
+  Act mapping table extended.
+- `docs/scenario/02_ACT2_ACT3_SCRIPT.md` — new file: Act 2 observer script,
+  the unified `P`-collapse reveal scene, Act 3 entry reveal lines, the
+  first-reset finale recap, and the 100%-completion grand finale.
+- `docs/scenario/05_NARRATIVE_FLAGS.md` — new `meta.act2.*`/`meta.act3.*`/
+  `meta.archive_completion_pct`/achievement-flag namespaces.
+- `docs/scenario/06_ENDINGS_COPY.md` — cross-reference note pointing to the
+  new non-`ENDING_`-id resolution scenes (`P` reveal, Act 3 finales) that
+  live in `02_ACT2_ACT3_SCRIPT.md` instead of the collapse-ending table.
+
+### Still open (unchanged from ACT-006)
+
+- Naming for `P1–P3`.
+- Exact achievement list/count per chapter — provisional in
+  `14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md` §4, finalized after Act 2/3 are
+  implemented.
+- Exact per-act completion weighting (§3 of the same doc) — needs
+  telemetry/playtest like every other numeric target in this project.

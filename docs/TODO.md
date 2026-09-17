@@ -300,9 +300,42 @@ that as Act 3. The items below (`T1-0`…`T1-7`, their gates, and the
 TIMELINE_01_REBUILD_PLAN.md` authority they cite) reflect the pre-redesign
 plan and are kept as history + reusable implementation baseline (see
 `ACT-005` in the new decision doc for how `T1-0…T1-6` map onto the new
-chapters) — they are not the current execution order. Next session: turn
-`docs/DECISIONS_ACT_STRUCTURE.md` §ACT-006 open questions into a concrete
-`T1` chapter implementation plan before writing gameplay code.
+chapters) — they are not the current execution order.
+
+**(2026-09-17, updated) Next session:** GDD/scenario docs for the full
+three-act structure (Act 1 `T1–T5`, Act 2 `P1–P3`, Act 3 + both finales +
+global Archive/achievements) are now complete — see the two entries below.
+Nothing left to write before code. Pick one of two next steps:
+
+1. Turn `docs/DECISIONS_ACT_STRUCTURE.md` §ACT-006/§ACT-012 "still open"
+   items (per-chapter minute budget, `P1–P3` naming, `T2`/`T4` swap
+   mechanics) into a concrete `T1`-chapter implementation plan, then start
+   coding `Мор`/`Катаклизм`/`Раскол`/`Авария` + `t5_synthesis`
+   (`docs/production/TIMELINE_01_REBUILD_PLAN.md` Package B/C/D) — this is
+   the shortest path to a playable Act 1.
+2. Start the still-unwritten detailed Act 3 GDD (system-by-system design,
+   finite achievement list for `docs/gdd/14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md`
+   §4.5) — needed before Act 3 can be implemented, but Act 1 code can
+   proceed without it.
+
+Separately, unrelated to this doc track: this working tree also has
+uncommitted gameplay-code changes (`src/chronicles/config/*`,
+`src/chronicles/domain/*`, `tests/*`, `evolve/chronicles.js`) predating this
+session's docs work — see the manual-playtest status note below. Review and
+commit/discard that separately; it was intentionally left untouched by the
+2026-09-17 docs commits.
+
+**(2026-09-17) GDD/scenario rework for the five-chapter structure is done.**
+New: `docs/gdd/13_ACT_ONE_CHAPTERS.md` (canonical `T1–T5` chapter map: era
+cutoffs, starting conditions, new collapse endings `ENDING_BLIGHT/
+CATACLYSM/FRACTURE/OVERLOAD`, the `t5_synthesis` procedural echo deck).
+Updated: `docs/gdd/07/08/09/12` (goals/events/endings/roadmap), light
+reframing notes on `01/02/04`; `docs/scenario/00/01/04/05/06/07` rewritten
+for the five chapters, including full copy for all four new collapse
+endings and the `T5` echo-of-`T1–T4` event deck (the "season `T5`'s random
+events with the story" request); `docs/production/TIMELINE_01_REBUILD_PLAN.md`
+also reworked into a five-chapter package table. Still open, not done this
+pass: the exact per-chapter numeric balance (`ACT-006`).
 
 **Status (pre-redesign, kept for history):** MANUAL PLAYTEST 0–180. Full code
 route and headless baseline are ready; release closeout awaits fresh-state
@@ -345,6 +378,86 @@ Guardrails:
 - [ ] manual playtest rule (2026-09-17): every key branch point must be presented as
   its own explicit event/modal with a dedicated goal — never only inside a general
   discoveries/unlock list.
+
+---
+
+# Act-structure documentation rework (2026-09-17)
+
+**Status:** DONE — docs rewritten to match `docs/DECISIONS_ACT_STRUCTURE.md`.
+
+- [x] `docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` §3–6 rewritten
+  around `T1–T5` as five short chapters of Act 1, `P1–P3` as Act 2.
+- [x] `docs/production/TIMELINE_01_REBUILD_PLAN.md` reworked to a five-chapter
+  build plan; work packages now map to `T1–T5` collapse content instead of
+  one 0–180 min run.
+- [x] `docs/gdd/07_GOALS_AND_MILESTONES.md` restructured per chapter; new
+  goal IDs `G025–G039` proposed for `Мор`/`Катаклизм`/`Раскол`/`Авария`
+  starting conditions and collapses. Numeric targets provisional.
+- [x] `docs/gdd/01_FIRST_120_MINUTES.md` restructured into per-chapter
+  economy/pacing sections.
+- [x] `docs/scenario/01_TIMELINE_01_SCRIPT.md` rewritten as a five-chapter
+  script; `T1` content unchanged, `T2–T4` are new collapse narratives,
+  `T5` reframed as "Синтез" reusing existing Modern→Atomic→Ash content.
+- [x] `docs/scenario/04_STORY_EVENTS.md` — new event contracts for
+  `T1–T4` collapses (`EV-NAR-04..08`, `EV-CR-T1..T4`, `EV-CIV-08`) plus
+  the requested `T5`-only procedural event deck (`t5_synthesis`, §T5-DECK)
+  that echoes each prior chapter's specific collapse.
+- [x] `docs/scenario/05_NARRATIVE_FLAGS.md` — new `run.chapterN.*`/
+  `meta.act1.*`/`meta.endings.chapterN_subtype` namespaces; reset
+  behavior generalized to four intra-Act-1 chapter resets + one Act reset.
+- [x] `docs/scenario/06_ENDINGS_COPY.md` — four new endings
+  (`ENDING_BLIGHT`/`ENDING_CATACLYSM`/`ENDING_FRACTURE`/`ENDING_OVERLOAD`)
+  with full subtype copy, alongside `ENDING_ASH` (unchanged, now `T5`-only).
+- [x] `docs/scenario/00_NARRATIVE_BIBLE.md` — reconciled product Acts 1–3
+  with narrative Acts I–X (§0); redistributed reveals across `T1`/`T3`/`T4`/`T5`.
+- [x] `docs/scenario/07_COPY_GUIDE.md` — Archive voice-by-era re-keyed to
+  chapters; new terminology for chapters/collapse endings/species skin.
+
+**Not done, deliberately out of scope for this pass** (docs-only rework,
+no code changes):
+
+- [ ] implement `Мор`/`Катаклизм`/`Раскол`/`Авария` in `config/goals.js`,
+  `config/events.js`, `config/eras.js` (new `G025–G039`, new events, new
+  `endings` entries) — see `docs/production/TIMELINE_01_REBUILD_PLAN.md`
+  Package B/C.
+- [ ] implement `t5_synthesis` deck in `config/events.js` — Package D;
+  requires `meta.endings.chapterN_subtype` to exist first (depends on the
+  item above).
+- [ ] species skin swap presentation (art/UI), not just the flag.
+- [ ] balance pass for `T2–T4` numeric targets (currently provisional).
+
+---
+
+# Act 2/Act 3 narrative + global Archive extension (2026-09-17)
+
+**Status:** DONE — docs written per `docs/DECISIONS_ACT_STRUCTURE.md`
+`ACT-008`…`ACT-012`. Docs-only, no code changes.
+
+- [x] `ACT-008`…`ACT-012` appended to `docs/DECISIONS_ACT_STRUCTURE.md`.
+- [x] new `docs/gdd/14_GLOBAL_ARCHIVE_AND_ACHIEVEMENTS.md` — Archive
+  Completion %, per-act weighting, achievement categories, Archive Log
+  screen contract, grand-finale gate.
+- [x] new `docs/scenario/02_ACT2_ACT3_SCRIPT.md` — unified `P1–P3` script
+  (Archive as observer, not editor), unified collapse reveal scene, Act 3
+  system-entry reveal lines, first-Act-3-reset finale (full path recap +
+  future hints), grand finale at 100% Archive (`АРХИВ ПОМНИТ ВСЁ`).
+- [x] `docs/scenario/00_NARRATIVE_BIBLE.md` §0/§5/§32/§33 — old placeholder
+  Acts VI–X collapsed into one Act VI ("Правда и бесконечность") mapped to
+  the two new gates instead of five vague reveal-drip acts.
+- [x] `docs/scenario/06_ENDINGS_COPY.md` — cross-reference note after the
+  Act 2 (`P1`) teaser pointing at the new script file.
+- [x] `docs/scenario/05_NARRATIVE_FLAGS.md` §5C/§5D + reset-behavior
+  entries for `P` reset and Act 3 universe/challenge reset.
+
+**Not done, deliberately out of scope for this pass:**
+
+- [ ] Act 2/Act 3 gameplay config (goals/events/eras) — nothing here was
+  implemented in code; this is narrative/mechanic spec only.
+- [ ] finite Act 3 system/achievement list (`14_...ACHIEVEMENTS.md` §4.5) —
+  depends on Act 3 GDD, not yet written (`ACT-006` still open).
+- [ ] per-act Archive Completion weighting (`14_...ACHIEVEMENTS.md` §3) and
+  Act 2 observer-line trigger conditions (`02_...SCRIPT.md` §1.1) —
+  provisional, need playtest/telemetry like every other numeric target.
 
 ---
 
