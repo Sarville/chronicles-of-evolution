@@ -157,6 +157,9 @@ export function selectNodeStatus(state, ruleset, nodeId) {
   if (!prerequisitesMet(state, node) || !branchAvailable(state, ruleset, node)) {
     return 'locked';
   }
+  if ((node.adaptationPointCost || 0) > (state.run.adaptation?.points || 0)) {
+    return 'available_unaffordable';
+  }
   const cost = selectNodeCost(state, ruleset, nodeId);
   return canAfford(state, cost).ok ? 'available_affordable' : 'available_unaffordable';
 }

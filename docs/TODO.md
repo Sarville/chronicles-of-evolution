@@ -57,22 +57,28 @@ Scope implemented:
 
 The accepted 0–18 slice is now a baseline inside the full `T1` rebuild below.
 Its manual 10–18 playtest remains useful, but its final numbers are approved
-only after the unified 0–120 simulation and playtest pass.
+only after the unified 0–180 simulation and playtest pass.
 
-### T1-3 foundation — civilization resource chains (2026-09-17)
+### T1 full route implementation (2026-09-17)
 
 - [x] Food: tribe/settlement/city/industry jobs → Population maintenance → Food storage cap → recoverable growth pause.
 - [x] Materials and Knowledge: phase-aware jobs/buildings → atomic node/building costs → dedicated storage caps; no invented passive drain.
 - [x] Power: industrial plants → stored reserve → powered-building consumption/automatic curtailment → recovery event.
 - [x] save migration to `timeline1-v8-civilization-chains`; domain/config/save regression coverage.
-- [ ] connect the chains to the Sapience-to-Tribe route, full civilization goal graph and 38–108 balance profiles.
+- [x] connect Sapience-to-Tribe, Settlement, City, Industry, Modern and Atomic to one save-safe goal graph.
+- [x] implement phase-aware job remapping, tangible building gates, Modern bridge and Reactor/Lab requirement.
+- [x] implement active-play crisis phases, Last Protocol subtypes, Ash and Archive-reset handoff.
+- [x] run 0–180 simulation profiles and establish the first costs/rates/threshold baseline; manual playtest remains.
+- [x] extend headless runner through Sapience, jobs/buildings, all eras, crisis and Archive reset; it now reports structured balance stalls.
+- [ ] resolve first full-run finding: A03 is unreachable in the competent seed-7 profile because Materials/Knowledge/Power storage caps land below the atomic program costs.
 
 ### T1-1 — Organism foundation (2026-09-17)
 
 - [x] run-local Adaptation Points: no passive rate, non-negative atomic spend and save normalization.
 - [x] G007 grants the first AP; G008 requires one selected optional body adaptation.
 - [x] B02A–D optional adaptations and C07 Multicellularity / G009 transition are in the ruleset.
-- [ ] add 18–28 headless profile, body-adaptation presentation and the next nervous-system package.
+- [x] add Nervous System, Cognition, behavior choice and Sapience transition package.
+- [ ] add 18–40 and 38–120 headless profiles, then tune the route as one balance pass.
 
 ---
 
@@ -240,40 +246,34 @@ all tracks + balance/regression
 
 ---
 
-# Timeline #1 — полная пересборка 0–120 минут
+# Timeline #1 — полная пересборка 0–180 минут
 
-**Status:** READY. Product roadmap and implementation order approved on
+**Status:** MANUAL PLAYTEST 0–180. Full code route and headless baseline are
+ready; release closeout awaits fresh-state manual verification.
 2026-09-16. Authority: `docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md`
 and `docs/production/TIMELINE_01_REBUILD_PLAN.md`.
 
-- [-] `T1-0` — Foundation + Event Engine: config-driven early deck, seeded
+- [x] `T1-0` — Foundation + Event Engine: config-driven early deck, seeded
   RNG/deck state, atomic `RESOLVE_EVENT`, save v2 migration, RNA/DNA/Cell
   event set, Chronicle/unlock extension points, deterministic and event-aware
   simulations are implemented. RNA/DNA/Cell caps now require repeatable
   storage purchases; only storage buildings expand capacity. Remaining:
   formal `0–18` config/goal audit and manual playtest.
-- [ ] `T1-1` — Organism 18–28: AP, Multicellularity, adaptations and target
-  timing validation.
-- [ ] `T1-2` — Cognition 28–40: Nervous System, Cognition `0..100`, Sapience
-  convergence, biological profiles and simulations.
-- [ ] `T1-3` — First civilization 38–65: Population~5 start, Tribe,
-  Settlement, phase-aware jobs/buildings, Food/Morale/Knowledge, recovery
-  from deficits and event expansion. Before balance: reconstruct the original
-  Food/Materials/Knowledge/Power production and consumption chains; current
-  caps and storage gates are config-ready, but those live flows are not yet
-  implemented.
-- [ ] `T1-4` — City and Industry 65–95: contextual resources/crafting,
-  compact market and Power, city/industry simulation profiles.
-- [ ] `T1-5` — Modern and Atomic 95–108: Modern bridge, World Tension,
-  Error 17, `Again`, late event deck.
-- [ ] `T1-6` — Great Filter/reset 108–120: Last Protocol, inevitable first
+- [x] `T1-1` — Organism 18–28: AP, Multicellularity and adaptations are implemented.
+- [x] `T1-2` — Cognition 28–40: Nervous System, Cognition `0..100` and Sapience are implemented.
+- [x] `T1-3` — First civilization 38–84: Population start, Tribe, Settlement,
+  jobs, Food loop and recovery behaviour are implemented.
+- [x] `T1-4` — City and Industry 84–128: city infrastructure, Power and contextual resources are implemented.
+- [x] `T1-5` — Modern and Atomic programme 128–168: Modern bridge, World Tension,
+  Error 17, `Again` and late event deck are implemented.
+- [x] `T1-6` — Great Filter/reset 168–180: Last Protocol, inevitable first
   Ash, AF, Archive, idempotent reset and T2 teaser.
-- [ ] `T1-7` — Full-run closeout: p25/p50/p75 rebalance, fresh-state mobile
-  and desktop playtests, save/recovery, telemetry, UI/smoke/build gate.
+- [-] `T1-7` — Full-run closeout: manual fresh-state mobile and desktop
+  playtests for 0–180, then p25/p50/p75 rebalance, save/recovery, telemetry and release gate.
 
 Guardrails:
 
-- [ ] no `T2` runtime before `T1-7` passes full-run regression and manual
+- [ ] no `T2` runtime before `T1-7` passes manual 0–180 playtest, full-run regression and
   playtest;
 - [ ] keep accepted `0–10` numbers unless an explicit balance decision records
   a change;

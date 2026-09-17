@@ -1,4 +1,4 @@
-# Хроники Эволюции — события, выборы и narrative flags первых 120 минут
+# Хроники Эволюции — события, выборы и narrative flags первых 180 минут
 
 **Документ:** DS-02 / reconciliation revision 2.0  
 **Статус:** canonical event semantics.
@@ -461,3 +461,21 @@ Reconciliation explicitly keeps:
 - persistent narrative flags.
 
 They now attach to the restored gameplay progression.
+
+---
+
+# 22. Implemented event and crisis boundary
+
+The authored config now implements the civilization events in the sequence
+above: early group/distribution, Tribe, Settlement profile, `Следы до нас`,
+governance, energy path, `ERROR 17`, `Снова.`, then the three crisis choices.
+`EV-FLAVOR-01` / `EV-FLAVOR-02` also provide small persisted Cognition
+contributions during the neural phase; they enrich the route but cannot be the
+sole Sapience gate.
+
+Atomic crisis phases are active-play-only and pause while a required modal is
+pending. The current regression profile queues C1 / bloc conflict at 90 s,
+C2 / false warning at 210 s, C3 at 330 s and C4 / Last Protocol at 435 s.
+Those checkpoints protect narrative order; their exact coefficients remain a
+balance-pass input. `EV-CR-03` is the only first-run path to `ENDING_ASH` and
+all three choices retain their distinct subtype.

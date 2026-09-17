@@ -14,5 +14,6 @@ export const eras = [
   { id: 'CITY', chapterId: 'CH06', activeResources: ['food', 'materials', 'knowledge'] },
   { id: 'INDUSTRY', chapterId: 'CH07', activeResources: ['food', 'materials', 'knowledge', 'power'] },
   { id: 'MODERN', chapterId: 'CH07', activeResources: ['food', 'materials', 'knowledge', 'power'] },
+  { id: 'PRE_ATOMIC', chapterId: 'CH08', activeResources: ['materials', 'knowledge', 'power'] },
   { id: 'ATOMIC', chapterId: 'CH08', activeResources: ['materials', 'knowledge', 'power'] },
 ];

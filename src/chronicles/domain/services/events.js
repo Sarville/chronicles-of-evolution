@@ -1,6 +1,7 @@
 import { createRulesetIndexes } from '../../config/index.js';
 import { createDomainEvent } from '../domainEvents.js';
 import { addResource } from './resources.js';
+import { adjustCrisisStability, completeAshEnding } from './crisis.js';
 
 const EVENT_RNG_MULTIPLIER = 1664525;
 const EVENT_RNG_INCREMENT = 1013904223;
@@ -133,6 +134,13 @@ export function resolveEvent(state, ruleset, eventId, choiceId, ports, options =
   for (const effect of choice.effects || []) {
     if (effect.type === 'grant_resource') effectEvents.push(...addResource(state, effect.resourceId, effect.amount, ruleset, ports));
     if (effect.type === 'set_flag') state.run.flags[effect.flag] = effect.value;
+    if (effect.type === 'set_meta_flag') (state.meta.persistentFlags ||= {})[effect.flag] = effect.value;
+    if (effect.type === 'grant_cognition') {
+      state.run.cognition ||= { eventBonus: 0 };
+      state.run.cognition.eventBonus = Math.max(0, state.run.cognition.eventBonus + effect.amount);
+    }
+    if (effect.type === 'adjust_crisis_stability') adjustCrisisStability(state, effect.amount);
+    if (effect.type === 'complete_ending') completeAshEnding(state, effect.subtype);
     if (effect.type === 'unlock_meta') state.meta.unlocks[effect.unlockId] = true;
   }
   runtime.states[eventId] = { ...runtime.states[eventId], status: 'resolved', choiceId, resolvedAtMs: state.run.clock.simulationMs };

@@ -11,6 +11,12 @@ export function prerequisitesMet(state, entity) {
   if (!flagsMet) {
     return false;
   }
+  const buildingsMet = (entity.requiresBuildings || []).every((requirement) => {
+    return (state.run.buildings?.[requirement.buildingId]?.count || 0) >= (requirement.count || 1);
+  });
+  if (!buildingsMet) {
+    return false;
+  }
   if (entity.cognitionMin != null && cognitionValue(state, entity.cognitionContributions) < entity.cognitionMin) {
     return false;
   }
@@ -23,7 +29,7 @@ export function prerequisitesMet(state, entity) {
 export function cognitionValue(state, contributions = []) {
   const total = contributions.reduce((sum, contribution) => {
     return state.run.nodes.completed[contribution.nodeId] ? sum + contribution.value : sum;
-  }, 0);
+  }, state.run.cognition?.eventBonus || 0);
   return Math.min(100, total);
 }
 

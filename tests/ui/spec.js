@@ -71,7 +71,11 @@ assert.equal(appSource.includes('data-action="manual" data-id="${process.id}"'),
 assert.equal(appSource.includes('PROC_BIOMASS_UPTAKE'), true);
 assert.equal(appSource.includes('PROC_RESPIRATION'), true);
 assert.equal(appSource.includes("C06: 'Cell Coordination'"), true);
-assert.equal(appSource.includes('Storage buildings'), true);
+assert.equal(appSource.includes('Infrastructure'), true);
+assert.equal(appSource.includes('data-action="job"'), true);
+assert.equal(appSource.includes('archive-reset'), true);
 assert.equal(appSource.includes('BLD_MEMBRANE_STORE'), true);
+assert.equal(appSource.includes('Adaptation Points:'), true);
+assert.equal(appSource.includes('INSUFFICIENT_ADAPTATION_POINTS'), true);
 
 console.log('ui runtime ok');

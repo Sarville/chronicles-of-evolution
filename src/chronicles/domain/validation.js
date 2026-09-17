@@ -165,6 +165,14 @@ export function validateRuleset(ruleset) {
         errors.push(`${node.id} requires unknown node ${required}`);
       }
     }
+    for (const requirement of node.requiresBuildings || []) {
+      if (!indexes.buildings[requirement.buildingId]) {
+        errors.push(`${node.id} requires unknown building ${requirement.buildingId}`);
+      }
+      if (!Number.isInteger(requirement.count) || requirement.count <= 0) {
+        errors.push(`${node.id} has invalid building requirement count`);
+      }
+    }
     for (const effect of node.effects || []) {
       validateEffect(effect, ruleset, node.id, errors);
     }
@@ -311,7 +319,7 @@ export function validateRuleset(ruleset) {
     }
   }
 
-  const eventEffectTypes = new Set(['grant_resource', 'set_flag', 'unlock_meta']);
+  const eventEffectTypes = new Set(['grant_resource', 'set_flag', 'set_meta_flag', 'unlock_meta', 'grant_cognition', 'adjust_crisis_stability', 'complete_ending']);
   for (const event of ruleset.events) {
     if (!event.type || !event.deck || !event.trigger?.type || !Array.isArray(event.choices) || event.choices.length === 0) {
       errors.push(`${event.id} must define type, deck, trigger and choices`);
@@ -333,6 +341,15 @@ export function validateRuleset(ruleset) {
         if (!eventEffectTypes.has(effect.type)) errors.push(`${event.id} uses unknown event effect ${effect.type}`);
         if (effect.type === 'grant_resource' && (!indexes.resources[effect.resourceId] || !Number.isFinite(effect.amount) || effect.amount < 0)) {
           errors.push(`${event.id} has invalid resource grant`);
+        }
+        if (effect.type === 'adjust_crisis_stability' && !Number.isFinite(effect.amount)) {
+          errors.push(`${event.id} has invalid crisis stability adjustment`);
+        }
+        if (effect.type === 'grant_cognition' && (!Number.isFinite(effect.amount) || effect.amount < 0)) {
+          errors.push(`${event.id} has invalid Cognition grant`);
+        }
+        if (effect.type === 'complete_ending' && !effect.subtype) {
+          errors.push(`${event.id} completes ending without subtype`);
         }
       }
     }

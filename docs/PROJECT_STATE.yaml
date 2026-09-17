@@ -2,9 +2,9 @@ schema_version: 1
 project:
   name: "Хроники Эволюции"
   repository: "Sarville/chronicles-of-evolution"
-  scope: "Release 1: T1 Origin (life -> Ash -> Archive) through T5 Exodus / first Bioseed, followed by optional Worlds and Beyond depth. Current delivery: full T1 rebuild, 0-120 minutes."
+  scope: "Release 1: T1 Origin (life -> Ash -> Archive) through T5 Exodus / first Bioseed, followed by optional Worlds and Beyond depth. Current delivery: full T1 rebuild, 0-180 minutes."
   work_mode: "timeline_01_full_rebuild_planning"
-  last_updated: "2026-09-16"
+  last_updated: "2026-09-17"
   documentation_language: "Описания по умолчанию пишутся на русском. Английский допустим только для стабильных идентификаторов, имён файлов, кодовых состояний, enum-подобных меток и закреплённых названий фич."
 
 authority:
@@ -116,7 +116,7 @@ design:
     DS-11: { name: "Cross-document consistency pass and design freeze", status: blocked_by_code_rework_and_balance }
 
 implementation:
-  current_iteration: "T1-0"
+  current_iteration: "T1-MANUAL-PLAYTEST-0-180"
   status:
     - "iteration_3_technical_foundation_passed"
     - "biological_0_10_accepted_and_frozen"
@@ -154,22 +154,22 @@ implementation:
       completion_commit: "79e7b93ea5bde181ff77ad8c6d281449cc5be1d8"
     T1-0:
       name: "Foundation, Event Engine and 0-18 audit"
-      status: in_progress
-      delivered: "Event Engine core, original RNA→DNA resource-flow correction, finite storage caps with mandatory storage gates, ATP rename, rebalanced C03/C05/C06 costs and save migrations. Discoveries no longer expand capacity. Remaining: complete 0-18 config audit and manual playtest."
+      status: implemented_pending_manual_playtest
+      delivered: "Event Engine core, original RNA→DNA resource-flow correction, finite storage caps with mandatory storage gates, ATP rename, rebalanced C03/C05/C06 costs and save migrations. Discoveries no longer expand capacity. Included in the 0-180 manual fresh-state playtest."
       plan: "docs/production/TIMELINE_01_REBUILD_PLAN.md"
-    T1-1: { name: "Organism: AP and Multicellularity", status: in_progress, delivered: "Run-local Adaptation Points, atomic optional B02A-D purchases, G008 and C07/G009 Multicellularity transition implemented. 18-28 balance profile and presentation remain." }
-    T1-2: { name: "Cognition: Nervous System through Sapience", status: planned }
-    T1-3: { name: "First civilization: Tribe through Settlement", status: in_progress, delivered: "Restored job assignment, Food maintenance/deficit recovery, aggregate Materials/Knowledge sources and spend semantics, industrial Power generation/curtailment and storage-cap contract; phase content and balance route remain." }
-    T1-4: { name: "City and Industry", status: planned }
-    T1-5: { name: "Modern and Atomic", status: planned }
-    T1-6: { name: "Great Filter, Ash, Archive and reset", status: planned }
-    T1-7: { name: "Full-run closeout and release gate", status: planned }
+    T1-1: { name: "Organism: AP and Multicellularity", status: implemented_pending_manual_playtest, delivered: "Run-local Adaptation Points, atomic optional B02A-D purchases, G008 and C07/G009 Multicellularity transition implemented." }
+    T1-2: { name: "Cognition: Nervous System through Sapience", status: implemented_pending_manual_playtest, delivered: "Derived Cognition, two small Cognition events, behavior branch event and transactional Sapience start are in the active ruleset." }
+    T1-3: { name: "First civilization: Tribe through Settlement", status: implemented_pending_manual_playtest, delivered: "Sapience→EARLY_CIV, jobs/Food loops, Tribe, Agriculture, permanent Settlement and lineage-safe job remapping are implemented." }
+    T1-4: { name: "City and Industry", status: implemented_pending_manual_playtest, delivered: "Writing, City, Mechanization, Steam, Electrification, infrastructure gates and Power are implemented." }
+    T1-5: { name: "Modern and Atomic", status: implemented_pending_manual_playtest, delivered: "Grid, research, global connection, pre-Atomic science and visible Reactor/Lab path are implemented." }
+    T1-6: { name: "Great Filter, Ash, Archive and reset", status: implemented_pending_manual_playtest, delivered: "Active-play crisis phases, Last Protocol subtypes, inevitable Ash and idempotent Archive reset wiring are implemented." }
+    T1-7: { name: "Full-run closeout and release gate", status: manual_playtest_0_180 }
 
 timeline_01_rebuild:
-  status: "in_progress"
-  target_ruleset: "timeline1-v8-civilization-chains"
-  scope: "RNA to mandatory first Ash/Archive/reset, target 105-120 active minutes"
-  first_package: "T1-0 Foundation + Event Engine + 0-18 audit"
+  status: "manual_playtest_0_180"
+  target_ruleset: "timeline1-v10-adaptation-repair"
+  scope: "RNA to mandatory first Ash/Archive/reset, target 177-183 active minutes for a competent run"
+  first_package: "T1 full route implemented; begin manual fresh-state playtest 0-180. 180 minutes is the current pacing target, subject to playtest evidence."
   canonical_plan: "docs/production/TIMELINE_01_REBUILD_PLAN.md"
   preserved_baseline: "timeline1-v2-reconciled biological 0-18, subject to explicit full-run validation"
   blocker_for_t2_runtime: "T1-7 full-run regression and manual fresh-state playtest"
@@ -194,12 +194,16 @@ iteration_4:
   note: "Closed by direct user confirmation on 2026-09-16, ahead of a manual 10-18 playtest pass. Automated tests/simulation/build back the implementation, and goal-ID alignment with GDD/DS-05 canon is now verified; treat exact 10-18 numbers as provisional (see balance.biological_10_18) until an actual playtest happens."
 
 balance:
-  ruleset_target: "timeline1-v8-civilization-chains"
+  ruleset_target: "timeline1-v10-adaptation-repair"
   old_0_10_ei_balance: "historical_superseded"
   biological_numbers: "0_10_original_resource_flow_corrected"
-  post_cell_numbers: "iteration_4_implemented_pending_full_0_120_validation"
-  civilization_numbers: "provisional_until_full_rebalance"
-  crisis_contract: "accepted_pending_regression"
+  post_cell_numbers: "implemented_pending_manual_0_180_validation"
+  civilization_numbers: "balanced_against_full_headless_competent_profile"
+  full_t1_simulation:
+    status: "headless_baseline_pending_manual_0_180"
+    profile: "optimized, competent and slow / seed 7"
+    result: "All profiles complete Ash plus Archive reset: optimized 177.3m, competent 179.8m, slow 179.4m. Competent anchors: Sapience 38.4m, Settlement 82.4m, City 108.6m, Industry 123.7m, Modern 135.2m, Atomic 167.8m."
+  crisis_contract: "implemented_pending_manual_0_180"
   biological_0_10:
     status: "accepted_with_original_resource_flow_and_storage_caps"
     freeze_scope:
@@ -232,5 +236,5 @@ open_decisions:
 
 next_action:
   owner: "Codex"
-  session: "T1-0"
-  description: "Complete the T1-0 0-18 config/goal audit and manual playtest; Event Engine core and early event deck are implemented and regression-tested."
+  session: "T1-7"
+  description: "Use the complete full-T1 simulator to rebalance storage capacity/costs, population thresholds and civilization pacing without reopening the frozen 0-10 baseline."

@@ -28,7 +28,7 @@ Playable without:
 - offline progress;
 - paid acceleration.
 
-## INV-02 — Full run ≈120 min
+## INV-02 — Full run ≈180 min
 
 Corrected anchors:
 
@@ -38,16 +38,18 @@ Corrected anchors:
 | Cell | ~9–11 min |
 | Multicellularity | ~24–28 min |
 | Sapience | ~38–40 min |
-| Tribe | ~48–50 min |
-| Settlement | ~62–65 min |
-| City | ~78–80 min |
-| Industry | ~93–95 min |
-| Modern | ~102–104 min |
-| Atomic | ~107–108 min |
-| Ash | ~116–118 min |
-| Reset | ~120 min |
+| Tribe | ~52–58 min |
+| Settlement | ~78–86 min |
+| City | ~104–112 min |
+| Industry | ~120–128 min |
+| Modern | ~132–140 min |
+| Atomic | ~165–172 min |
+| Ash | ~177–183 min |
+| Reset | immediately after Ash |
 
-Normal full-run working window remains roughly 110–130 min during tuning.
+Normal full-run working window is 170–185 min during tuning. Until manual
+fresh-state testing completes, 180 min is the pacing target; the competent
+headless profile reaches Ash at 179.8 min.
 
 ## INV-03 — Biological readability
 
@@ -156,7 +158,7 @@ Timeline #1 meaningful payoff target:
 0–10 min: 30–90 sec
 10–30 min: 2–4 min
 30–60 min: 3–6 min
-60–120 min: 5–12 min
+60–180 min: 5–12 min
 ```
 
 No visible horizon gap >5 min in first 30 min.
@@ -380,7 +382,7 @@ The reconciled gameplay requires a new ruleset version.
 Recommended semantic name:
 
 ```text
-timeline1-v2-reconciled
+timeline1-v9-full-t1-route
 ```
 
 The old E/I implementation is historical pre-release ruleset content.
@@ -401,9 +403,11 @@ Mandatory order:
 4. 10–18 implementation/balance;
 5. full 0–40 biological simulation;
 6. civilization start/population retune;
-7. 38–108 simulation;
+7. 38–168 simulation;
 8. crisis regression;
 9. Timeline #2/meta tuning;
 10. design freeze v2.
 
-Iteration 4 must not start before step 3 is approved.
+The full route is now implemented and regression-covered through the domain,
+save and UI gates. The next active work is the full 0–180 simulation and
+balance pass; it must not silently change the frozen 0–10 baseline.

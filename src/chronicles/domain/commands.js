@@ -10,6 +10,7 @@ import { useManualProcess } from './services/manualProcesses.js';
 import { applyEffects } from './services/modifiers.js';
 import { assertPopulationRequirement } from './services/population.js';
 import { addResource } from './services/resources.js';
+import { prepareResetTransaction, applyPreparedResetTransaction } from '../save/resetTransaction.js';
 
 function ok(state, events) {
   state.session.dirty = true;
@@ -33,7 +34,7 @@ function rejected(reason, details = {}) {
 }
 
 export function dispatchCommand(state, ruleset, command, ports = {}) {
-  if (!state.run || state.run.lifecycle !== 'active') {
+  if (!state.run || (state.run.lifecycle !== 'active' && command.type !== 'ARCHIVE_RESET')) {
     if (command.type === 'TICK') {
       return { ok: true, events: [], frozen: true };
     }
@@ -57,6 +58,8 @@ export function dispatchCommand(state, ruleset, command, ports = {}) {
       return buyBuilding(state, ruleset, command.buildingId, ports);
     case 'ASSIGN_JOB':
       return assignJob(state, ruleset, command.jobId, command.amount, ports);
+    case 'ARCHIVE_RESET':
+      return archiveReset(state, ruleset, command, ports);
     case 'TICK': {
       state.run.clock.simulationMs += command.deltaMs;
       state.run.clock.activeMs += command.deltaMs;
@@ -85,6 +88,35 @@ function assignJob(state, ruleset, jobId, amount, ports) {
   }
   assignments[jobId] = amount;
   return ok(state, [createDomainEvent('job_assigned', { jobId, previous: current, amount }, state, ports)]);
+}
+
+function archiveReset(state, ruleset, command, ports) {
+  if (state.run.lifecycle !== 'ended' || state.run.ending?.id !== 'ENDING_ASH') {
+    return rejected('ENDING_NOT_READY_FOR_ARCHIVE');
+  }
+  const nodeCount = Object.keys(state.run.nodes.completed || {}).length;
+  const peakPopulation = state.run.population?.peak || 0;
+  const stabilityBonus = Math.max(0, Math.min(3, Math.floor((state.run.crisis?.minStability || 0) / 30)));
+  const archiveFragments = Math.max(14, Math.min(18, 14 + Math.floor(nodeCount / 15) + (peakPopulation >= 60 ? 1 : 0) + stabilityBonus));
+  const transaction = prepareResetTransaction(state, {
+    transactionId: command.transactionId,
+    endingId: 'ENDING_ASH',
+    reward: { archiveFragments },
+    chronicleRecord: {
+      id: `${state.run.id}:ending`,
+      kind: 'ending',
+      endingId: 'ENDING_ASH',
+      subtype: state.run.ending.subtype,
+      durationMs: state.run.clock.activeMs,
+      peakPopulation,
+      minimumStability: state.run.crisis?.minStability ?? 100,
+      summary: 'Timeline #1 завершён: Пепел сохранён в Архиве.',
+    },
+  });
+  const applied = applyPreparedResetTransaction(state, transaction, { ruleset, nextRunId: command.nextRunId });
+  if (!applied.ok) return applied;
+  Object.assign(state, applied.state);
+  return ok(state, [createDomainEvent('archive_reset_completed', { transactionId: transaction.id, archiveFragments, alreadyApplied: applied.alreadyApplied }, state, ports)]);
 }
 
 function manualProcess(state, ruleset, command, ports) {

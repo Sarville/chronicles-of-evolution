@@ -73,10 +73,10 @@ const STORAGE_CAPACITY_EFFECTS = {
   BLD_GENETIC_STORE: [{ resourceId: 'dna', value: 150 }],
   BLD_BIOMASS_STORE: [{ resourceId: 'biomass', value: 160 }],
   BLD_ATP_STORE: [{ resourceId: 'atp', value: 120 }],
-  BLD_FOOD_STORE: [{ resourceId: 'food', value: 500 }],
-  BLD_MATERIALS_STORE: [{ resourceId: 'materials', value: 400 }],
-  BLD_KNOWLEDGE_ARCHIVE: [{ resourceId: 'knowledge', value: 300 }],
-  BLD_POWER_STORE: [{ resourceId: 'power', value: 500 }],
+  BLD_FOOD_STORE: [{ resourceId: 'food', value: 1500 }],
+  BLD_MATERIALS_STORE: [{ resourceId: 'materials', value: 2000 }],
+  BLD_KNOWLEDGE_ARCHIVE: [{ resourceId: 'knowledge', value: 1500 }],
+  BLD_POWER_STORE: [{ resourceId: 'power', value: 2000 }],
 };
 
 function migrateToStorageGates(run) {
@@ -98,6 +98,23 @@ function migrateToStorageGates(run) {
   }
   for (const [resourceId, resource] of Object.entries(run.resources || {})) {
     if (caps[resourceId] != null) resource.amount = Math.min(resource.amount, caps[resourceId]);
+  }
+}
+
+function migrateLegacyAdaptationPoints(run) {
+  const adaptation = run.adaptation ||= { points: 0, earnedTotal: 0, spentTotal: 0, selectedOptionalNodes: [] };
+  adaptation.selectedOptionalNodes ||= [];
+  adaptation.earnedTotal ||= 0;
+  adaptation.spentTotal ||= 0;
+  // Early v9 saves could already contain C06 before the G007 reward was
+  // introduced. Preserve their progression by restoring the one-time grant.
+  if (run.nodes?.completed?.C06 && adaptation.earnedTotal === 0) {
+    const spent = adaptation.selectedOptionalNodes.reduce((total, nodeId) => {
+      return total + ({ B02A: 1, B02B: 1, B02C: 1, B02D: 2 }[nodeId] || 0);
+    }, 0);
+    adaptation.earnedTotal = 2;
+    adaptation.spentTotal = Math.max(adaptation.spentTotal, spent);
+    adaptation.points = Math.max(adaptation.points || 0, Math.max(0, 2 - spent));
   }
 }
 
@@ -127,6 +144,10 @@ export function normalizeEnvelope(envelope) {
         spentTotal: 0,
         selectedOptionalNodes: [],
         ...(envelope.run?.adaptation || {}),
+      },
+      cognition: {
+        eventBonus: 0,
+        ...(envelope.run?.cognition || {}),
       },
       stats: {
         totalEarned: {},
@@ -202,6 +223,18 @@ export function migrateEnvelope(envelope) {
     migrated.rulesetVersion = 'timeline1-v8-civilization-chains';
     migrated.run.rulesetVersion = 'timeline1-v8-civilization-chains';
     migrated.run.migrationNotice = 'T1-5: civilization jobs, Food maintenance and industrial Power deficits restored.';
+  }
+  if (migrated.rulesetVersion === 'timeline1-v8-civilization-chains') {
+    migrated.run.crisis ??= null;
+    migrated.rulesetVersion = 'timeline1-v9-full-t1-route';
+    migrated.run.rulesetVersion = 'timeline1-v9-full-t1-route';
+    migrated.run.migrationNotice = 'T1-6: full Tribe → Atomic route, crisis phases and Ash ending added.';
+  }
+  if (migrated.rulesetVersion === 'timeline1-v9-full-t1-route') {
+    migrateLegacyAdaptationPoints(migrated.run);
+    migrated.rulesetVersion = 'timeline1-v10-adaptation-repair';
+    migrated.run.rulesetVersion = 'timeline1-v10-adaptation-repair';
+    migrated.run.migrationNotice = 'T1-7: Adaptation Points restored for completed Cell Coordination.';
   }
   return migrated;
 }

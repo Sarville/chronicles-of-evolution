@@ -1,4 +1,4 @@
-# Хроники Эволюции — цели и вехи первых 120 минут
+# Хроники Эволюции — цели и вехи первых 180 минут
 
 **Документ:** DS-02 / reconciliation revision 2.0  
 **Статус:** canonical goal semantics / exact balance conditions provisional.
@@ -51,12 +51,11 @@ Create Life
 | CH01 Искра | 0–12 | Создайте клетку |
 | CH02 Организм | 10–28 | Станьте многоклеточным |
 | CH03 Разум | 28–40 | Преодолейте когнитивный порог |
-| CH04 Племя | 38–50 | Создайте устойчивое племя |
-| CH05 Поселение | 50–65 | Постройте постоянное поселение |
-| CH06 Город | 65–80 | Создайте город |
-| CH07 Машины | 80–95 | Начните индустриализацию |
-| CH08 Современность | 95–108 | Станьте глобальной современной цивилизацией и войдите в атомный век |
-| CH09 Фильтр | 108–120 | Пройдите Великий фильтр |
+| CH04 Племя | 38–56 | Создайте устойчивое племя |
+| CH05 Поселение | 56–84 | Постройте постоянное поселение |
+| CH06 Город | 84–110 | Создайте город |
+| CH07 Машины | 110–138 | Начните индустриализацию и свяжите мир |
+| CH08 Атом | 138–180 | Завершите атомную программу и пройдите Великий фильтр |
 
 ---
 
@@ -396,7 +395,7 @@ Reward:
 
 # 7. G024 — Пройдите Великий фильтр
 
-**Target:** Ash ~116–118, reset ~120.
+**Target:** Ash ~177–183, reset immediately after Ash.
 
 Not a purchase goal.
 
@@ -491,6 +490,19 @@ Milestones are emotional payoffs, not currencies or arbitrary locks.
 
 # 12. Implementation status
 
-Goal Engine implementation from Iteration 3 remains accepted.
+Goal Engine implementation from Iteration 3 remains accepted. The `timeline1-v9-full-t1-route` ruleset now contains the complete first-run chain `G001–G024`:
 
-Only content/config for G001–G013 and related UI copy/targets requires biological reconciliation rework before Iteration 4.
+```text
+G001–G013 biology / Sapience
+→ G014–G015 group / Tribe
+→ G016–G017 agriculture / permanent Settlement
+→ G018–G019 writing / City
+→ G020–G021 mechanization / Industry
+→ G022 Modern
+→ G023 Atomic
+→ G024 crisis / Ash / Archive reset
+```
+
+Goals whose fantasy is composite are explicitly composite in config: Settlement checks field/house/workshop/population, City checks school/market/population, Industry checks factory/steam infrastructure, Modern checks grid/laboratory/rail, and Atomic requires Reactor/Lab.
+
+The route is implemented and regression-covered; all cost, rate and threshold values remain **provisional until the dedicated full-run simulation and balance pass**.

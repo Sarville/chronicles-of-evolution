@@ -295,3 +295,23 @@ Until full reconciliation simulation:
 - Power output requirements.
 
 Codex must not treat old DS-01 numbers as immutable canon during the Rework Iteration.
+
+---
+
+# 13. Implemented T1 catalogue boundary
+
+The runtime catalogue now carries the canonical tangible chain:
+
+```text
+Hearth / Shelter / Tool Bench
+→ Field / House / Workshop
+→ School / Market
+→ Factory / Steam Plant / Rail Hub
+→ Grid / Laboratory
+→ Reactor/Lab
+```
+
+`Field`, `House` and `Workshop` are required by the permanent-settlement
+breakthrough; `School` and `Market` by City; `Factory` and `Steam Plant` by
+Industry; `Grid`, `Laboratory` and `Rail Hub` by Modern; `Reactor/Lab` by
+Atomic. This is a gameplay requirement, not merely a visual asset list.

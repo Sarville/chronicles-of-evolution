@@ -11,11 +11,11 @@ The final act remains one of the strongest accepted late-design systems and is p
 
 Corrected pacing:
 
-- Modern bridge: ~95–104 min;
-- Atomic preparation: ~104–108 min;
-- Atomic Age: ~107–108 min;
-- Ash: ~116–118 min;
-- Archive/reset: ~118–120 min.
+- Modern bridge: ~132–140 min;
+- Atomic preparation: ~140–168 min;
+- Atomic Age / Great Filter: ~168–180 min;
+- Ash: ~177–183 min;
+- Archive/reset: immediately after Ash.
 
 The first Ash remains unavoidable.
 
@@ -309,3 +309,18 @@ Kept:
 - Chronicle;
 - idempotent reset;
 - Timeline #2 teaser.
+
+---
+
+# 15. Implemented first-run transaction
+
+`A04 Atomic Age` initializes `run.crisis` with Stability 100 and an
+active-play clock. `EV-CR-01`, `EV-CR-02` and `EV-CR-03` are queued in phase
+order; a Last Protocol choice writes `ENDING_ASH` plus one of
+`ash_fire`, `ash_too_late` or `ash_system`, and closes ordinary input.
+
+The Archive CTA then uses the existing canonical reset transaction ID. It
+writes one ending Chronicle record and a bounded 14–18 AF award, then creates
+the next active run without duplicating a transaction on retry. The AF formula
+and crisis coefficients are provisional pending balance; idempotency and the
+reward envelope are not.

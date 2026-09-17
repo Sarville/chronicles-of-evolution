@@ -414,7 +414,7 @@ Exact Goal IDs are defined in `07_GOALS_AND_MILESTONES.md` and may retain stable
 
 # 17. Deferred balance values
 
-Until the new 0–120 simulation pass completes, the following are configurable/provisional:
+After the accepted 0–180 headless balance pass, the following remain configurable/provisional for manual playtest:
 
 - civilization starting grants;
 - Population thresholds;
@@ -426,3 +426,26 @@ Until the new 0–120 simulation pass completes, the following are configurable/
 - modern/atomic costs.
 
 Do not use old numbers merely because they were already simulated under the superseded 46-minute Sapience model.
+
+---
+
+# 18. Implemented T1 route contract
+
+The first-run implementation uses one contiguous, save-safe route:
+
+```text
+T08 Agriculture → SETTLEMENT_EARLY
+T09 Permanent Settlement → SETTLEMENT
+T10 Writing → T11 Organized Labor → T12 City → CITY
+T13 Mechanization → T14 Steam/Rail → T15 Electrification → INDUSTRY
+T16 Grid → T17 Research Institutions → T18 Global Connection → MODERN
+A01 Scientific Method → A02 Atomic Theory → Reactor/Lab → A03 Program → A04 Atomic → ATOMIC
+```
+
+On each era transition, job assignments remap by semantic lineage (food,
+materials, knowledge) when a direct successor exists; otherwise they become
+unassigned. This prevents a hidden workforce lock after Settlement, City or
+Industry.
+
+The route is complete as a domain/config/UI baseline. Its numbers are a
+simulation input, not an approved balance table.

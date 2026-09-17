@@ -17,24 +17,24 @@ import {
   selectProductionRates,
   selectSideGoals,
   selectVisibleResources,
+  selectPopulation,
+  selectCognition,
 } from '../domain/selectors.js';
 import { createSaveRepository } from '../save/repository.js';
 import { createPlayableRuntime, routeCtaFocus } from './runtime.js';
 
 const DEV = __CHRONICLES_DEV__;
 const ROOT_ID = 'chronicles-root';
-const EVOLUTION_NODES = [
-  'M01', 'M02', 'M03', 'M04', 'M05', 'M06',
-  'C01', 'C02A', 'C02B', 'C02C', 'C04A', 'C04B', 'C04C', 'C03', 'C05', 'C06',
-  'B02A', 'B02B', 'B02C', 'B02D', 'C07',
-  'B03', 'B04', 'B05', 'N03', 'N05', 'N07',
-  'N02A', 'N02B', 'N02C',
-];
+const EVOLUTION_NODES = ruleset.nodes.map((node) => node.id);
 const RESOURCE_NAMES = {
   rna: 'RNA',
   dna: 'DNA',
   biomass: 'Biomass',
   atp: 'ATP',
+  food: 'Food',
+  materials: 'Materials',
+  knowledge: 'Knowledge',
+  power: 'Power',
 };
 const NODE_NAMES = {
   M01: 'Stable RNA',
@@ -61,6 +61,12 @@ const NODE_NAMES = {
   B03: 'Tissue Specialization', B04: 'Nervous Tissue', B05: 'Nervous System',
   N03: 'Neural Complexity', N05: 'Proto-language', N07: 'Sapience',
   N02A: 'Solitary Strategy', N02B: 'Social Behavior', N02C: 'Object Manipulation',
+  T01A: 'Hunting Tradition', T01B: 'Gathering Network', T01C: 'Knowledge Ritual',
+  T02: 'Fire', T03: 'Shared Survival', T05: 'Tribe', T07: 'Seed Selection', T08: 'Agriculture',
+  T09: 'Permanent Settlement', T10: 'Writing', T11: 'Organized Labor', T12: 'City',
+  T13: 'Mechanization', T14: 'Steam and Rail', T15: 'Electrification', T16: 'Electrical Grid',
+  T17: 'Research Institutions', T18: 'Global Connection', A01: 'Scientific Method',
+  A02: 'Atomic Theory', A03: 'Reactor/Lab Program', A04: 'Atomic Age',
 };
 const PRODUCER_NAMES = {
   PROC_PRIMORDIAL_REACTION: 'Primordial Reaction',
@@ -79,6 +85,8 @@ const BUILDING_NAMES = {
   BLD_KNOWLEDGE_ARCHIVE: 'Knowledge Archive',
   BLD_POWER_STORE: 'Power Reserve',
   BLD_FIELD: 'Field',
+  BLD_HOUSE: 'House', BLD_WORKSHOP: 'Workshop', BLD_SCHOOL: 'School', BLD_MARKET: 'Market',
+  BLD_FACTORY: 'Factory', BLD_RAIL_HUB: 'Rail Hub', BLD_GRID: 'Electrical Grid', BLD_REACTOR_LAB: 'Reactor/Lab',
 };
 
 const storage = createBrowserStorage();
@@ -128,7 +136,26 @@ function formatWholeCost(cost) {
     .join(' + ');
 }
 
+function formatNodeCost(node, cost) {
+  const adaptationCost = node.adaptationPointCost ? `${node.adaptationPointCost} AP` : '';
+  const resourceCost = formatWholeCost(cost);
+  return [adaptationCost, resourceCost].filter(Boolean).join(' + ');
+}
+
+function nodePurchaseFailureMessage(result) {
+  if (result.reason === 'INSUFFICIENT_ADAPTATION_POINTS') {
+    return `Нужно AP: ${result.details?.required || 0}; доступно: ${result.details?.available || 0}.`;
+  }
+  if (result.reason === 'BLOCKED_BY_EVENT') {
+    return 'Сначала завершите открытое событие.';
+  }
+  return `Не удалось открыть узел: ${result.reason || 'UNKNOWN'}.`;
+}
+
 function phaseLabel() {
+  if (engine().state.run.eraId !== 'MOLECULAR' && engine().state.run.eraId !== 'CELLULAR' && engine().state.run.eraId !== 'MULTICELLULAR') {
+    return engine().state.run.eraId.replaceAll('_', ' ');
+  }
   if (engine().state.run.nodes.completed.C06) return 'Cell Coordination';
   if (engine().state.run.nodes.completed.C05) return 'Organelles';
   if (engine().state.run.nodes.completed.C03) return 'Protein Synthesis';
@@ -305,7 +332,22 @@ function renderBuildings() {
     })
     .join('');
   if (!rows) return '';
-  return `<section class="panel"><h2>Storage buildings</h2><div class="entity-list">${rows}</div></section>`;
+  return `<section class="panel"><h2>Infrastructure</h2><div class="entity-list">${rows}</div></section>`;
+}
+
+function renderJobs() {
+  const population = selectPopulation(engine().state);
+  if (!population) return '';
+  const rows = ruleset.jobs
+    .filter((job) => job.eraIds.includes(engine().state.run.eraId))
+    .map((job) => {
+      const count = engine().state.run.population.assignments[job.id] || 0;
+      const output = formatCost(job.output);
+      return `<div class="job-row"><span><strong>${job.labelKey?.replace('job.', '') || job.id}</strong><small>+${output}/s per person</small></span>
+        <span class="job-controls"><button data-action="job" data-id="${job.id}" data-amount="${Math.max(0, count - 1)}" ${count ? '' : 'disabled'}>−</button><strong>${count}</strong><button data-action="job" data-id="${job.id}" data-amount="${count + 1}" ${population.unassigned > 0 ? '' : 'disabled'}>+</button></span></div>`;
+    }).join('');
+  if (!rows) return '';
+  return `<section class="panel"><h2>Jobs</h2><p class="job-summary">Population ${formatNumber(population.current)} / ${formatNumber(population.cap)} · unassigned ${population.unassigned}</p>${rows}</section>`;
 }
 
 function renderEvolution() {
@@ -325,15 +367,17 @@ function renderEvolution() {
     const eta = etaText(status, cost);
     const etaLabel = eta || (status === 'completed' ? 'Готово' : status === 'locked' ? 'Недоступно' : 'Сейчас');
     return `<button class="node ${status} ${focusedEntityId === nodeId ? 'focused' : ''}" data-entity-id="${nodeId}" data-action="node" data-id="${nodeId}" ${status === 'available_affordable' ? '' : 'disabled'}>
-      <span><strong>${nodeId} — ${NODE_NAMES[nodeId]}</strong>${optional}</span>
+      <span><strong>${nodeId} — ${NODE_NAMES[nodeId] || node.labelKey || nodeId}</strong>${optional}</span>
       <span>${status.replaceAll('_', ' ')}<small>ETA ${etaLabel}</small></span>
-      <small>${formatWholeCost(cost)}</small>
+      <small>${formatNodeCost(node, cost)}</small>
     </button>`;
   }).join('');
-  return `<section class="panel evolution-panel"><h2>Evolution</h2><div class="node-grid">${rows}</div></section>`;
+  const adaptationPoints = engine().state.run.adaptation?.points || 0;
+  return `<section class="panel evolution-panel"><h2>Evolution</h2><p class="job-summary">Adaptation Points: ${adaptationPoints}</p><div class="node-grid">${rows}</div></section>`;
 }
 
 function renderDiorama() {
+  const cognition = engine().state.run.nodes.completed.B05 ? `<span>Cognition ${selectCognition(engine().state, ruleset).value}/100</span>` : '';
   return `<section class="diorama" aria-label="World state">
     <div class="orbital orbital-a"></div>
     <div class="orbital orbital-b"></div>
@@ -341,9 +385,15 @@ function renderDiorama() {
     <div>
       <p>World</p>
       <h1>${phaseLabel()}</h1>
-      <span>Timeline #1 · ${Math.floor(engine().state.run.clock.simulationMs / 1000)}s</span>
+      <span>Timeline #1 · ${Math.floor(engine().state.run.clock.simulationMs / 1000)}s</span>${cognition}
     </div>
   </section>`;
+}
+
+function renderEnding() {
+  const ending = engine().state.run.ending;
+  if (!ending) return '';
+  return `<section class="panel ending"><small>ЦИВИЛИЗАЦИЯ №1 ЗАВЕРШЕНА</small><h2>ПЕПЕЛ</h2><p>Подтип: ${ending.subtype}. История готова к сохранению в Архив.</p><button class="primary" data-action="archive-reset">Сохранить в Архив</button></section>`;
 }
 
 const renderDevPanel = DEV
@@ -387,7 +437,7 @@ function render() {
   }
   root.innerHTML = `<main class="app">
     <header>
-      <div><strong>Хроники Эволюции</strong><small>Early playable 0-18 min slice</small></div>
+      <div><strong>Хроники Эволюции</strong><small>Timeline #1 · RNA → Ash</small></div>
       <nav>
         <button data-action="view" data-view="world" class="${activeView === 'world' ? 'active' : ''}">World</button>
         <button data-action="view" data-view="evolution" class="${activeView === 'evolution' ? 'active' : ''}">Evolution</button>
@@ -398,10 +448,10 @@ function render() {
     <div class="layout">
       <div>
         ${renderDiorama()}
-        ${activeView === 'world' ? `${renderProducers()}${renderBuildings()}` : renderEvolution()}
+        ${activeView === 'world' ? `${renderProducers()}${renderJobs()}${renderBuildings()}` : renderEvolution()}
       </div>
       <aside>
-        ${renderObjective()}
+        ${renderEnding() || renderObjective()}
         <section class="panel status"><h2>Save</h2><p>${lastSaveMessage}</p>${engine().state.run.migrationNotice ? `<p class="hint">${engine().state.run.migrationNotice}</p>` : ''}<button data-action="save">Save now</button><button data-action="new-run">New run</button></section>
         ${renderDevPanel()}
       </aside>
@@ -436,13 +486,25 @@ function handleAction(target) {
   if (action === 'manual') engine().dispatch({ type: 'USE_MANUAL_PROCESS', processId: button.dataset.id });
   if (action === 'producer') engine().dispatch({ type: 'BUY_PRODUCER', producerId: button.dataset.id });
   if (action === 'building') engine().dispatch({ type: 'BUY_BUILDING', buildingId: button.dataset.id });
+  if (action === 'job') engine().dispatch({ type: 'ASSIGN_JOB', jobId: button.dataset.id, amount: Number(button.dataset.amount) });
   if (action === 'node') {
     const result = engine().dispatch({ type: 'BUY_NODE', nodeId: button.dataset.id });
+    if (!result.ok) {
+      lastSaveMessage = nodePurchaseFailureMessage(result);
+    }
     if (result.ok && result.events.some((event) => event.type === 'cell_reached' || event.payload?.nodeId === 'M06')) {
       autosave().flush('cell_reached');
     }
   }
   if (action === 'resolve-event') engine().dispatch({ type: 'RESOLVE_EVENT', eventId: button.dataset.eventId, choiceId: button.dataset.choiceId });
+  if (action === 'archive-reset') {
+    const result = engine().dispatch({ type: 'ARCHIVE_RESET' });
+    if (result.ok) {
+      autosave().flush('archive_reset');
+      lastSaveMessage = 'Ash saved in Archive';
+      activeView = 'world';
+    }
+  }
   if (action === 'save') {
     const saved = autosave().flush('manual');
     lastSaveMessage = saved.ok ? 'Saved' : `Save failed: ${saved.reason}`;
@@ -512,6 +574,9 @@ function installStyles() {
     .event-panel p { margin: 0 0 12px; color: #e2e8e5; line-height: 1.45; }
     .event-choices { display: flex; flex-wrap: wrap; gap: 8px; }
     .event-choice { min-width: 150px; flex: 1; }
+    .job-row { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid #2d383c; }
+    .job-controls { display: flex; align-items: center; gap: 8px; } .job-controls button { min-height: 34px; min-width: 38px; text-align: center; padding: 4px 8px; }
+    .job-summary { margin: 0 0 8px; color: #aab7b5 !important; } .ending { border-color: #f0c36a; background: #332d1f; }
     .recovery { display: grid; min-height: 100vh; place-items: center; }
     .recovery-panel { width: min(680px, calc(100vw - 32px)); }
     .recovery-panel h1 { margin: 0 0 10px; font-size: 28px; letter-spacing: 0; }

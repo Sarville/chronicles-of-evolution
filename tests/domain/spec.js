@@ -32,7 +32,7 @@ const clock = createFakeClock(1000);
 const rng = createSeededRng(42);
 const engine = createChroniclesEngine({ ruleset, ports: { clock, rng } });
 
-assert.equal(engine.state.run.rulesetVersion, 'timeline1-v8-civilization-chains');
+assert.equal(engine.state.run.rulesetVersion, 'timeline1-v10-adaptation-repair');
 assert.equal(engine.state.run.eraId, 'MOLECULAR');
 assert.deepEqual(selectResourceAmounts(engine.state), { rna: 0 });
 assert.deepEqual(selectVisibleResources(engine.state, ruleset).map((resource) => resource.id), ['rna']);
@@ -268,6 +268,12 @@ assert.equal(result.ok, true);
 assert.equal(branchEngine.state.run.adaptation.points, 1);
 assert.deepEqual(branchEngine.state.run.adaptation.selectedOptionalNodes, ['B02A']);
 assert.equal(branchEngine.state.run.goals.states.G008.status, 'archived');
+
+const adaptationGateEngine = createChroniclesEngine({ ruleset });
+adaptationGateEngine.state.run.eraId = 'MULTICELLULAR';
+adaptationGateEngine.state.run.nodes.completed.C06 = { completedAtMs: 0 };
+adaptationGateEngine.state.run.resources = { biomass: { amount: 100 }, atp: { amount: 100 }, dna: { amount: 100 } };
+assert.equal(selectNodeStatus(adaptationGateEngine.state, ruleset, 'B02A'), 'available_unaffordable');
 
 // Cognition is derived from neural progress. Sapience has no spendable price:
 // it becomes available only at 100 and performs the civilization-start transaction.
@@ -508,6 +514,7 @@ powerEngine.state.run.buildings = {
   BLD_STEAM_PLANT: { count: 1 },
   BLD_FOUNDRY: { count: 1 },
 };
+powerEngine.state.run.nodes.completed.T14 = { completedAtMs: 0 };
 tick = powerEngine.tick(1000);
 assert.equal(tick.events.some((event) => event.type === 'power_deficit_started'), true);
 assert.equal(powerEngine.state.run.economy.deficits.power, true);
@@ -552,6 +559,54 @@ deckB.state.run.goals.states.G001 = { status: 'archived' };
 deckB.tick(60000);
 assert.equal(deckB.state.run.events.pendingId, deckA.state.run.events.pendingId);
 assert.equal(deckB.state.run.events.rngState, deckA.state.run.events.rngState);
+
+// Full T1 route: phase transitions remap jobs, Atomic starts the bounded
+// authored crisis sequence, and every Last Protocol variant still reaches Ash.
+const fullRouteEngine = createChroniclesEngine({ ruleset });
+fullRouteEngine.state.run.eraId = 'CITY';
+fullRouteEngine.state.run.resources = {
+  food: { amount: 10000, capOverride: 100000 }, materials: { amount: 10000, capOverride: 100000 },
+  knowledge: { amount: 10000, capOverride: 100000 }, power: { amount: 10000, capOverride: 100000 },
+};
+fullRouteEngine.state.run.population = {
+  current: 100, peak: 100, baseCap: 120, assignments: { JOB_CITY_WORKER: 3 }, foodStatus: 'healthy',
+};
+for (const nodeId of ['T12', 'T13', 'T14']) fullRouteEngine.state.run.nodes.completed[nodeId] = { completedAtMs: 0 };
+fullRouteEngine.state.run.buildings = { BLD_FACTORY: { count: 1 }, BLD_STEAM_PLANT: { count: 1 } };
+result = fullRouteEngine.dispatch({ type: 'BUY_NODE', nodeId: 'T15' });
+assert.equal(result.ok, true);
+assert.equal(fullRouteEngine.state.run.eraId, 'INDUSTRY');
+assert.deepEqual(fullRouteEngine.state.run.population.assignments, { JOB_INDUSTRY_WORKER: 3 });
+assert.equal(fullRouteEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CIV-06', choiceId: 'clean' }).ok, true);
+
+fullRouteEngine.state.run.eraId = 'PRE_ATOMIC';
+for (const resource of Object.values(fullRouteEngine.state.run.resources)) resource.amount = 20000;
+for (const nodeId of ['A01', 'A02', 'A03']) fullRouteEngine.state.run.nodes.completed[nodeId] = { completedAtMs: 0 };
+fullRouteEngine.state.run.buildings.BLD_REACTOR_LAB = { count: 1 };
+result = fullRouteEngine.dispatch({ type: 'BUY_NODE', nodeId: 'A04' });
+assert.equal(result.ok, true);
+assert.equal(fullRouteEngine.state.run.eraId, 'ATOMIC');
+assert.equal(fullRouteEngine.state.run.crisis.stability, 100);
+assert.equal(fullRouteEngine.state.run.events.pendingId, 'EV-NAR-03');
+assert.equal(fullRouteEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-NAR-03', choiceId: 'continue' }).ok, true);
+fullRouteEngine.tick(120000);
+assert.equal(fullRouteEngine.state.run.events.pendingId, 'EV-CR-01');
+assert.equal(fullRouteEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-01', choiceId: 'deescalate' }).ok, true);
+fullRouteEngine.tick(180000);
+assert.equal(fullRouteEngine.state.run.events.pendingId, 'EV-CR-02');
+assert.equal(fullRouteEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-02', choiceId: 'manual_verify' }).ok, true);
+fullRouteEngine.tick(180000);
+assert.equal(fullRouteEngine.state.run.crisis.phase, 'C3');
+fullRouteEngine.tick(240000);
+assert.equal(fullRouteEngine.state.run.events.pendingId, 'EV-CR-03');
+assert.equal(fullRouteEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-03', choiceId: 'disarm' }).ok, true);
+assert.equal(fullRouteEngine.state.run.lifecycle, 'ended');
+assert.equal(fullRouteEngine.state.run.ending.subtype, 'ash_too_late');
+result = fullRouteEngine.dispatch({ type: 'ARCHIVE_RESET' });
+assert.equal(result.ok, true);
+assert.equal(fullRouteEngine.state.run.lifecycle, 'active');
+assert.equal(fullRouteEngine.state.meta.archiveFragments >= 14 && fullRouteEngine.state.meta.archiveFragments <= 18, true);
+assert.equal(fullRouteEngine.state.meta.chronicle.some((record) => record.kind === 'ending'), true);
 
 assert.doesNotThrow(() => JSON.stringify(engine.state.run));
 assert.equal(typeof rng.next(), 'number');

@@ -1,4 +1,4 @@
-# Хроники Эволюции — первые 120 минут
+# Хроники Эволюции — первые 180 минут
 
 **Версия:** reconciliation v2.0  
 **Статус:** canonical gameplay progression  
@@ -9,7 +9,7 @@
 
 ---
 
-# 1. Product promise первых 120 минут
+# 1. Product promise первых 180 минут
 
 Игрок должен прожить понятную причинно-следственную историю:
 
@@ -54,17 +54,16 @@ RNA
 | 18–28 | Многоклеточность | тело + Adaptation Points |
 | 28–38 | Нервная система | Cognition layer |
 | ~38–40 | Sapience transition | Civilization mode |
-| 38–50 | Племя | Population / Food / Materials / Knowledge |
-| 50–65 | Поселение | постоянные здания |
-| 65–80 | Город | writing / research / trade-lite |
-| 80–95 | Индустрия | mechanization / Power |
-| 95–104 | Modern | grid / communications / global civilization |
-| 104–108 | Атом | Atomic Theory / reactor program |
-| 108–118 | Великий фильтр | World Tension / crisis / Last Protocol |
-| 116–118 | Пепел | first ending |
-| 118–120 | Архив | summary / AF / reset / Timeline #2 teaser |
+| 38–56 | Племя | Population / Food / Materials / Knowledge |
+| 56–84 | Поселение | постоянные здания |
+| 84–110 | Город | writing / research / trade-lite |
+| 110–126 | Индустрия | mechanization / Power |
+| 126–138 | Modern | grid / communications / global civilization |
+| 138–168 | Предатомная программа | Scientific Method / Atomic Theory / reactor program |
+| 168–180 | Великий фильтр | World Tension / crisis / Last Protocol / Ash / Archive |
 
-Точные median timings будут подтверждены новым balance simulation после code reconciliation.
+Компетентный детерминированный профиль (seed 7) завершает Ash на 179.8 мин;
+окна выше — целевые telemetry ranges, а не таймеры.
 
 ---
 
@@ -558,7 +557,7 @@ Target time is telemetry, not hard completion.
 - 0–10: payoff every 30–90 sec;
 - 10–30: meaningful unlock every 2–4 min;
 - 30–60: visual/system payoff every 5–10 min;
-- 60–120: major feature/milestone roughly every 10–15 min.
+- 60–180: major feature/milestone roughly every 10–15 min.
 
 No invisible dead zone >5 min in the first 30 min.
 

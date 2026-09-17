@@ -33,7 +33,7 @@ assert.equal(loaded.ok, true);
 assert.equal(loaded.state.run.resources.rna.amount, 12);
 assert.equal(loaded.sourceKey, SAVE_KEYS.primary);
 assert.equal(loaded.envelope.schemaVersion, CURRENT_SCHEMA_VERSION);
-assert.equal(loaded.envelope.rulesetVersion, 'timeline1-v8-civilization-chains');
+assert.equal(loaded.envelope.rulesetVersion, 'timeline1-v10-adaptation-repair');
 assert.equal(loaded.envelope.transactions.pendingReset, null);
 assert.equal(loaded.state.meta.archiveFragments, 0);
 assert.equal(loaded.state.settings.autosave, true);
@@ -111,8 +111,8 @@ v2EventMigration.rulesetVersion = 'timeline1-v2-reconciled';
 v2EventMigration.run.rulesetVersion = 'timeline1-v2-reconciled';
 delete v2EventMigration.run.events;
 const migratedV2 = migrateEnvelope(v2EventMigration);
-assert.equal(migratedV2.rulesetVersion, 'timeline1-v8-civilization-chains');
-assert.equal(migratedV2.run.migrationNotice.includes('civilization jobs'), true);
+assert.equal(migratedV2.rulesetVersion, 'timeline1-v10-adaptation-repair');
+assert.equal(migratedV2.run.migrationNotice.includes('Adaptation Points restored'), true);
 
 const v3CapacityMigration = createSaveEnvelope(createInitialGameState(), { clock });
 v3CapacityMigration.rulesetVersion = 'timeline1-v3-full';
@@ -120,7 +120,7 @@ v3CapacityMigration.run.rulesetVersion = 'timeline1-v3-full';
 v3CapacityMigration.run.nodes.completed.M02 = { completedAtMs: 0 };
 v3CapacityMigration.run.modifiers.active = {};
 const migratedV3 = migrateEnvelope(v3CapacityMigration);
-assert.equal(migratedV3.rulesetVersion, 'timeline1-v8-civilization-chains');
+assert.equal(migratedV3.rulesetVersion, 'timeline1-v10-adaptation-repair');
 assert.equal(migratedV3.run.modifiers.active['M02:capacity:rna'], undefined);
 
 const v4AtpMigration = createSaveEnvelope(createInitialGameState(), { clock });
@@ -133,7 +133,7 @@ v4AtpMigration.run.modifiers.active['C01:capacity:energy'] = {
   type: 'resource_capacity', resourceId: 'energy', value: 120,
 };
 const migratedV4 = migrateEnvelope(v4AtpMigration);
-assert.equal(migratedV4.rulesetVersion, 'timeline1-v8-civilization-chains');
+assert.equal(migratedV4.rulesetVersion, 'timeline1-v10-adaptation-repair');
 assert.deepEqual(migratedV4.run.resources.atp, { amount: 37 });
 assert.equal(migratedV4.run.resources.energy, undefined);
 assert.equal(migratedV4.run.stats.totalEarned.atp, 91);
@@ -147,7 +147,7 @@ v5CellBalanceMigration.run.rulesetVersion = 'timeline1-v5-atp';
 v5CellBalanceMigration.run.nodes.completed.C05 = { completedAtMs: 0 };
 v5CellBalanceMigration.run.modifiers.active = {};
 const migratedV5 = migrateEnvelope(v5CellBalanceMigration);
-assert.equal(migratedV5.rulesetVersion, 'timeline1-v8-civilization-chains');
+assert.equal(migratedV5.rulesetVersion, 'timeline1-v10-adaptation-repair');
 assert.equal(migratedV5.run.modifiers.active['C05:capacity:biomass'], undefined);
 
 const v6StorageGateMigration = createSaveEnvelope(createInitialGameState(), { clock });
@@ -160,10 +160,20 @@ v6StorageGateMigration.run.modifiers.active['M02:capacity:rna'] = {
   type: 'resource_capacity', resourceId: 'rna', value: 300,
 };
 const migratedV6 = migrateEnvelope(v6StorageGateMigration);
-assert.equal(migratedV6.rulesetVersion, 'timeline1-v8-civilization-chains');
+assert.equal(migratedV6.rulesetVersion, 'timeline1-v10-adaptation-repair');
 assert.equal(migratedV6.run.modifiers.active['M02:capacity:rna'], undefined);
 assert.equal(migratedV6.run.modifiers.active['BLD_MEMBRANE_STORE:2:capacity:rna'].value, 250);
 assert.equal(migratedV6.run.resources.rna.amount, 600);
+
+const v9AdaptationMigration = createSaveEnvelope(createInitialGameState(), { clock });
+v9AdaptationMigration.rulesetVersion = 'timeline1-v9-full-t1-route';
+v9AdaptationMigration.run.rulesetVersion = 'timeline1-v9-full-t1-route';
+v9AdaptationMigration.run.nodes.completed.C06 = { completedAtMs: 0 };
+v9AdaptationMigration.run.adaptation = { points: 0, earnedTotal: 0, spentTotal: 0, selectedOptionalNodes: [] };
+const migratedV9 = migrateEnvelope(v9AdaptationMigration);
+assert.equal(migratedV9.rulesetVersion, 'timeline1-v10-adaptation-repair');
+assert.equal(migratedV9.run.adaptation.points, 2);
+assert.equal(migratedV9.run.adaptation.earnedTotal, 2);
 
 const missingRun = validateGameState({ meta: {}, settings: {}, session: {} }, ruleset);
 assert.equal(missingRun.ok, false);

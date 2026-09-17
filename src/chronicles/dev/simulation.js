@@ -16,6 +16,12 @@ import { producerMilestoneMultiplier, productionMultiplierForResource } from '..
 import { calculateCap } from '../domain/services/resources.js';
 
 const MAIN_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M06', 'C01', 'C02A', 'C03', 'C05', 'C06'];
+const FULL_T1_NODE_ORDER = [
+  'M01', 'M02', 'M03', 'M05', 'M06', 'C01', 'C02A', 'C03', 'C05', 'C06',
+  'B02A', 'C07', 'B03', 'B04', 'B05', 'N02A', 'N03', 'N05', 'N07',
+  'T01A', 'T02', 'T03', 'T05', 'T07', 'T08', 'T09', 'T10', 'T11', 'T12',
+  'T13', 'T14', 'T15', 'T16', 'T17', 'T18', 'A01', 'A02', 'A03', 'A04',
+];
 const OPTIONAL_NODE_ORDER = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'C01', 'C02A', 'C03', 'C05', 'C06'];
 const SYMBIOSIS_NODE_ORDER = ['M01', 'M02', 'M03', 'M05', 'M06', 'C01', 'C02B', 'C03', 'C05', 'C06'];
 const BRANCH_NODE_ORDER = {
@@ -359,7 +365,10 @@ function tryBuyRequiredStorage(engine, nodeOrder, spends, log) {
   if (!node) return false;
 
   for (const [resourceId, requiredAmount] of Object.entries(node.cost || {})) {
-    if (requiredAmount <= calculateCap(engine.state, resourceId, engine.ruleset)) continue;
+    // A conversion can leave a source resource just below an exact cap at the
+    // end of every tick. Buying one more store at equality keeps the simulator
+    // from treating an unreachable exact-cost purchase as affordable.
+    if (requiredAmount < calculateCap(engine.state, resourceId, engine.ruleset)) continue;
     const building = engine.ruleset.buildings.find((candidate) =>
       (candidate.effects || []).some((effect) => effect.type === 'resource_capacity' && effect.resourceId === resourceId)
     );
@@ -389,6 +398,127 @@ function tryBuyProducer(engine, nodeOrder, profile, spends, log, finalNodeId) {
   addCost(spends.producers, cost);
   log.push({ atMs: engine.state.run.clock.simulationMs, action: 'producer', producerId });
   return true;
+}
+
+function currentIncompleteNode(engine, nodeOrder) {
+  return nodeOrder.find((nodeId) => !engine.state.run.nodes.completed[nodeId]) || null;
+}
+
+function buyBuildingForSimulation(engine, buildingId, spends, log) {
+  if (selectBuildingStatus(engine.state, engine.ruleset, buildingId) !== 'available_affordable') return false;
+  const cost = selectBuildingPrice(engine.state, engine.ruleset, buildingId);
+  const result = engine.dispatch({ type: 'BUY_BUILDING', buildingId });
+  if (!result.ok) return false;
+  addCost(spends.buildings, cost);
+  log.push({ atMs: engine.state.run.clock.simulationMs, action: 'building', buildingId });
+  return true;
+}
+
+function setCivilizationJobs(engine, log) {
+  const population = engine.state.run.population;
+  if (!population) return false;
+  const jobs = engine.ruleset.jobs.filter((job) => job.eraIds.includes(engine.state.run.eraId));
+  if (!jobs.length) return false;
+  const workerCount = Math.floor(population.current);
+  const foodJob = jobs.find((job) => job.lineage === 'food');
+  const materialJob = jobs.find((job) => job.lineage === 'materials');
+  const knowledgeJob = jobs.find((job) => job.lineage === 'knowledge');
+  if (!foodJob || !materialJob || !knowledgeJob) return false;
+
+  const foodRate = foodJob.output.food || 0.01;
+  const foodWorkers = Math.min(workerCount, Math.max(1, Math.ceil((population.current * 0.12) / foodRate) + 1, Math.floor(workerCount * 0.28)));
+  const remaining = Math.max(0, workerCount - foodWorkers);
+  const materialWorkers = Math.floor(remaining * 0.62);
+  const target = {
+    [foodJob.id]: foodWorkers,
+    [materialJob.id]: materialWorkers,
+    [knowledgeJob.id]: remaining - materialWorkers,
+  };
+  const assignments = population.assignments || {};
+  if (jobs.every((job) => (assignments[job.id] || 0) === target[job.id])) return false;
+
+  for (const job of jobs) {
+    if ((assignments[job.id] || 0) > 0) engine.dispatch({ type: 'ASSIGN_JOB', jobId: job.id, amount: 0 });
+  }
+  for (const [jobId, amount] of Object.entries(target)) {
+    engine.dispatch({ type: 'ASSIGN_JOB', jobId, amount });
+  }
+  log.push({ atMs: engine.state.run.clock.simulationMs, action: 'jobs', assignments: target });
+  return true;
+}
+
+function tryBuyFullTimelineInfrastructure(engine, nodeOrder, spends, log) {
+  const completed = engine.state.run.nodes.completed;
+  const currentNodeId = currentIncompleteNode(engine, nodeOrder);
+  const currentNode = engine.ruleset.nodes.find((node) => node.id === currentNodeId);
+  const planned = [];
+
+  // Goal-only onboarding requirements precede the first Tribe breakthrough.
+  if (['EARLY_CIV', 'TRIBE'].includes(engine.state.run.eraId)) planned.push('BLD_HEARTH', 'BLD_SHELTER', 'BLD_TOOL_BENCH');
+  if (completed.T08) planned.push('BLD_FIELD', 'BLD_WORKSHOP');
+  if (completed.T09) planned.push('BLD_SCHOOL');
+  if (completed.T10) planned.push('BLD_MARKET');
+  if (completed.T13) planned.push('BLD_FACTORY');
+  if (completed.T14) planned.push('BLD_STEAM_PLANT', 'BLD_RAIL_HUB');
+  if (completed.T15) planned.push('BLD_GRID');
+  if (completed.T16) planned.push('BLD_LABORATORY');
+  if (completed.A02) planned.push('BLD_REACTOR_LAB');
+  for (const requirement of currentNode?.requiresBuildings || []) planned.unshift(requirement.buildingId);
+
+  const houseTarget = completed.T12 ? 6 : completed.T09 ? 4 : completed.T08 ? 2 : 0;
+  const houseCount = engine.state.run.buildings.BLD_HOUSE?.count || 0;
+  if (houseCount < houseTarget) planned.unshift('BLD_HOUSE');
+
+  for (const buildingId of [...new Set(planned)]) {
+    const building = engine.ruleset.buildings.find((candidate) => candidate.id === buildingId);
+    if (!building) continue;
+    if (building.maxCount != null && (engine.state.run.buildings[buildingId]?.count || 0) >= building.maxCount) continue;
+    const nodeRequirement = (currentNode?.requiresBuildings || []).find((requirement) => requirement.buildingId === buildingId);
+    if (nodeRequirement && (engine.state.run.buildings[buildingId]?.count || 0) >= nodeRequirement.count) continue;
+    // Required infrastructure is a tangible gate, not an unbounded auto-buy
+    // sink. Storage and houses are handled by their dedicated policies.
+    if (buildingId === 'BLD_HOUSE' && (engine.state.run.buildings[buildingId]?.count || 0) >= houseTarget) continue;
+    if (buildingId !== 'BLD_HOUSE' && (engine.state.run.buildings[buildingId]?.count || 0) >= 1) continue;
+    if (buyBuildingForSimulation(engine, buildingId, spends, log)) return true;
+  }
+
+  const steamPlants = engine.state.run.buildings.BLD_STEAM_PLANT?.count || 0;
+  // Electricity is a stockpile gate for all four late discoveries. A player
+  // who understands the loop expands generation immediately after the Grid,
+  // instead of waiting through several low-output power caps in Pre-Atomic.
+  if (completed.T15 && steamPlants < 3) {
+    return buyBuildingForSimulation(engine, 'BLD_STEAM_PLANT', spends, log);
+  }
+  return false;
+}
+
+function fullTimelineStall(engine, nodeOrder) {
+  const nodeId = currentIncompleteNode(engine, nodeOrder);
+  if (!nodeId) return null;
+  const node = engine.ruleset.nodes.find((candidate) => candidate.id === nodeId);
+  const resources = Object.entries(node?.cost || {}).map(([resourceId, required]) => {
+    const amount = engine.state.run.resources[resourceId]?.amount || 0;
+    const cap = calculateCap(engine.state, resourceId, engine.ruleset);
+    return {
+      resourceId,
+      required,
+      amount,
+      cap,
+      missing: Math.max(0, required - amount),
+      capBlocked: required >= cap,
+    };
+  });
+  return {
+    nodeId,
+    status: selectNodeStatus(engine.state, engine.ruleset, nodeId),
+    elapsedMs: engine.state.run.clock.simulationMs,
+    eraId: engine.state.run.eraId,
+    resources,
+    population: engine.state.run.population
+      ? { current: engine.state.run.population.current, cap: engine.state.run.population.baseCap }
+      : null,
+    pendingEventId: engine.state.run.events?.pendingId || null,
+  };
 }
 
 function resolvePendingEventForProfile(engine, branchId, log, timings, snapshots, profile, spends, finalNodeId) {
@@ -459,13 +589,16 @@ export function runHeadlessSimulation(options = {}) {
   const profileName = options.profile || 'competent';
   const profile = options.profileConfig || simulationProfiles[profileName] || simulationProfiles.competent;
   const branchId = options.branch || 'C02A';
-  const nodeOrder = options.includeOptionalM04 ? OPTIONAL_NODE_ORDER : (BRANCH_NODE_ORDER[branchId] || MAIN_NODE_ORDER);
+  const fullTimeline = options.fullTimeline === true;
+  const nodeOrder = fullTimeline
+    ? FULL_T1_NODE_ORDER
+    : (options.includeOptionalM04 ? OPTIONAL_NODE_ORDER : (BRANCH_NODE_ORDER[branchId] || MAIN_NODE_ORDER));
   const finalNodeId = nodeOrder[nodeOrder.length - 1];
   const branchNodeId = nodeOrder.find((nodeId) => nodeId.startsWith('C02'));
   const clock = options.clock || createFakeClock(0);
   const rng = options.rng || createSeededRng(options.seed || 1);
   const engine = createChroniclesEngine({ ruleset: sourceRuleset, ports: { clock, rng } });
-  const maxMs = options.maxMs || 22 * 60 * 1000;
+  const maxMs = options.maxMs || (fullTimeline ? 240 * 60 * 1000 : 22 * 60 * 1000);
   const stepMs = options.stepMs || 1000;
   const log = [];
   const timingsByNode = {};
@@ -477,7 +610,10 @@ export function runHeadlessSimulation(options = {}) {
   const nextManualAtMs = Object.fromEntries(manualProcessIdsForProfile(profile).map((processId) => [processId, 0]));
   let manualEconomicsAtThreeMinutes = null;
 
-  while (engine.state.run.clock.simulationMs <= maxMs && !engine.state.run.nodes.completed[finalNodeId]) {
+  while (
+    engine.state.run.clock.simulationMs <= maxMs &&
+    !(fullTimeline ? engine.state.run.lifecycle === 'ended' : engine.state.run.nodes.completed[finalNodeId])
+  ) {
     const now = engine.state.run.clock.simulationMs;
 
     resolvePendingEventForProfile(engine, branchId, log, timingsByNode, snapshots, profile, spends, finalNodeId);
@@ -511,9 +647,11 @@ export function runHeadlessSimulation(options = {}) {
       let acted = true;
       let actions = 0;
       while (acted && actions < profile.maxActionsPerDecision) {
+        if (fullTimeline) setCivilizationJobs(engine, log);
         acted =
           tryBuyNextNode(engine, nodeOrder, timingsByNode, snapshots, profile, spends, finalNodeId) ||
           tryBuyRequiredStorage(engine, nodeOrder, spends, log) ||
+          (fullTimeline && tryBuyFullTimelineInfrastructure(engine, nodeOrder, spends, log)) ||
           tryBuyProducer(engine, nodeOrder, profile, spends, log, finalNodeId);
         actions += acted ? 1 : 0;
       }
@@ -530,10 +668,19 @@ export function runHeadlessSimulation(options = {}) {
     engine.tick(stepMs);
   }
 
+  const ending = engine.state.run.ending ? { ...engine.state.run.ending } : null;
+  let archiveReset = null;
+  if (fullTimeline && ending?.id === 'ENDING_ASH') {
+    archiveReset = engine.dispatch({ type: 'ARCHIVE_RESET' });
+    if (archiveReset.ok) log.push({ atMs: engine.state.run.clock.simulationMs, action: 'archive_reset', endingId: ending.id });
+  }
+  const stall = fullTimeline && !archiveReset?.ok ? fullTimelineStall(engine, nodeOrder) : null;
+
   return {
-    ok: Boolean(engine.state.run.nodes.completed[finalNodeId]),
+    ok: fullTimeline ? Boolean(archiveReset?.ok) : Boolean(engine.state.run.nodes.completed[finalNodeId]),
     profile: profileName,
     branch: branchId,
+    fullTimeline,
     includeOptionalM04: options.includeOptionalM04 === true,
     state: engine.state,
     log,
@@ -550,11 +697,27 @@ export function runHeadlessSimulation(options = {}) {
       proteinSynthesisAtMs: timingsByNode.C03 ?? null,
       organellesAtMs: timingsByNode.C05 ?? null,
       cellCoordinationAtMs: timingsByNode.C06 ?? null,
+      multicellularityAtMs: timingsByNode.C07 ?? null,
+      sapienceAtMs: timingsByNode.N07 ?? null,
+      tribeAtMs: timingsByNode.T05 ?? null,
+      settlementAtMs: timingsByNode.T09 ?? null,
+      cityAtMs: timingsByNode.T12 ?? null,
+      industryAtMs: timingsByNode.T15 ?? null,
+      modernAtMs: timingsByNode.T18 ?? null,
+      atomicAtMs: timingsByNode.A04 ?? null,
+      ashAtMs: ending?.completedAtMs ?? null,
     },
     producerCounts: producerCounts(engine.state, profile, finalNodeId),
     finalRates: selectProductionRates(engine.state, sourceRuleset),
     manual: { ...manual, economicsAtThreeMinutes: manualEconomicsAtThreeMinutes },
     spends,
     snapshots,
+    ending,
+    archiveReset: archiveReset ? { ok: archiveReset.ok, reason: archiveReset.reason || null } : null,
+    stall,
   };
+}
+
+export function runFullTimelineSimulation(options = {}) {
+  return runHeadlessSimulation({ ...options, fullTimeline: true });
 }

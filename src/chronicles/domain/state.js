@@ -42,6 +42,7 @@ export function createInitialGameState(options = {}) {
       population: null,
       economy: { deficits: {} },
       adaptation: { points: 0, earnedTotal: 0, spentTotal: 0, selectedOptionalNodes: [] },
+      cognition: { eventBonus: 0 },
       buildings: {},
       goals: {
         currentId: null,

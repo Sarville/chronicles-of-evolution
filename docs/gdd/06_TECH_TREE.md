@@ -301,3 +301,19 @@ Retune later:
 - branch multipliers;
 - Power requirements;
 - modern/atomic pacing.
+
+---
+
+# 15. Implemented stable T1 IDs
+
+The current pre-release implementation fixes the following additive IDs:
+
+| Meaning | IDs |
+|---|---|
+| Agriculture / settlement | `T08` / `T09` |
+| Writing / organized labour / City | `T10` / `T11` / `T12` |
+| Mechanization / steam / electrification | `T13` / `T14` / `T15` |
+| Modern bridge | `T16` Grid, `T17` Research, `T18` Global Connection |
+| Pre-Atomic / Atomic | `A01` Scientific Method, `A02` Atomic Theory, `A03` Reactor/Lab Program, `A04` Atomic Age |
+
+`A04` requires the visible `BLD_REACTOR_LAB`; it is not an invisible resource-only conversion. The IDs are save-safe additions under `timeline1-v9-full-t1-route`; exact prices are explicitly not frozen.

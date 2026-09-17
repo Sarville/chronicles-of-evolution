@@ -1,4 +1,4 @@
-# Хроники Эволюции — экономика первых 120 минут
+# Хроники Эволюции — экономика первых 180 минут
 
 **Версия:** reconciliation balance spec v2.3
 **Статус:** canonical / biological 0–18 resource-flow, storage-cap and Cell-cost pass applied / later phases provisional
@@ -17,8 +17,8 @@ Timeline #1 должен:
 3. убрать clicker dominance после первых 2–3 минут;
 4. давать понятный payoff каждые 2–6 минут;
 5. доводить до Sapience примерно к 38–40 минуте;
-6. сохранить City около 80, Industry около 94–95, Atomic около 108;
-7. приводить к Ash около 116–118 и reset около 120;
+6. сохранить City около 108, Industry около 124, Modern около 135 и Atomic около 168;
+7. приводить к Ash и Archive reset около 180;
 8. не требовать ads/offline/meta для первого прохождения.
 
 ---
@@ -35,14 +35,14 @@ Timeline #1 должен:
 | Multicellularity | ~24:00–28:00 |
 | Nervous System | ~31:00–35:00 |
 | Sapience | ~38:00–40:00 |
-| Tribe established | ~48:00–50:00 |
-| Permanent Settlement | ~62:00–65:00 |
-| City | ~78:00–80:00 |
-| Industry | ~93:00–95:00 |
-| Modern bridge complete | ~103:00–104:00 |
-| Atomic Age | ~107:00–108:00 |
-| Ash | ~116:00–118:00 |
-| Reset | ~120:00 |
+| Tribe established | ~52:00–58:00 |
+| Permanent Settlement | ~78:00–86:00 |
+| City | ~104:00–112:00 |
+| Industry | ~120:00–128:00 |
+| Modern bridge complete | ~132:00–140:00 |
+| Atomic Age | ~165:00–172:00 |
+| Ash | ~177:00–183:00 |
+| Reset | immediately after Ash |
 
 These are telemetry targets, not hard timers except explicit crisis clamps.
 
@@ -56,9 +56,9 @@ These are telemetry targets, not hard timers except explicit crisis clamps.
 | 7–12 cell formation | RNA / DNA |
 | 10–18 cell/metabolism | RNA or DNA contextually / Biomass / ATP |
 | 18–38 organism | DNA / Biomass / ATP + AP indicator |
-| 38–80 civilization | Food / Materials / Knowledge / Population |
-| 80–108 industry/modern | Food supporting / Materials / Knowledge / Power / Population |
-| 108–120 crisis | Materials / Knowledge / Power + World Tension UI |
+| 38–110 civilization | Food / Materials / Knowledge / Population |
+| 110–168 industry/modern/pre-atomic | Food supporting / Materials / Knowledge / Power / Population |
+| 168–180 crisis | Materials / Knowledge / Power + World Tension UI |
 
 `Information` is not a spendable visible resource.
 

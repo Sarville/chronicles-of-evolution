@@ -11,7 +11,7 @@ export const jobs = [
   { id: 'JOB_CITY_FARMER', entityType: 'job', labelKey: 'job.city_farmer', eraIds: ['CITY'], output: { food: 1.2 }, lineage: 'food' },
   { id: 'JOB_CITY_WORKER', entityType: 'job', labelKey: 'job.city_worker', eraIds: ['CITY'], output: { materials: 0.85 }, lineage: 'materials' },
   { id: 'JOB_CITY_RESEARCHER', entityType: 'job', labelKey: 'job.city_researcher', eraIds: ['CITY'], output: { knowledge: 0.52 }, lineage: 'knowledge' },
-  { id: 'JOB_INDUSTRY_FARMER', entityType: 'job', labelKey: 'job.industry_farmer', eraIds: ['INDUSTRY', 'MODERN', 'ATOMIC'], output: { food: 1.45 }, lineage: 'food' },
-  { id: 'JOB_INDUSTRY_WORKER', entityType: 'job', labelKey: 'job.industry_worker', eraIds: ['INDUSTRY', 'MODERN', 'ATOMIC'], output: { materials: 1.05 }, lineage: 'materials' },
-  { id: 'JOB_INDUSTRY_SCIENTIST', entityType: 'job', labelKey: 'job.industry_scientist', eraIds: ['INDUSTRY', 'MODERN', 'ATOMIC'], output: { knowledge: 0.72 }, lineage: 'knowledge' },
+  { id: 'JOB_INDUSTRY_FARMER', entityType: 'job', labelKey: 'job.industry_farmer', eraIds: ['INDUSTRY', 'MODERN', 'PRE_ATOMIC', 'ATOMIC'], output: { food: 1.45 }, lineage: 'food' },
+  { id: 'JOB_INDUSTRY_WORKER', entityType: 'job', labelKey: 'job.industry_worker', eraIds: ['INDUSTRY', 'MODERN', 'PRE_ATOMIC', 'ATOMIC'], output: { materials: 1.05 }, lineage: 'materials' },
+  { id: 'JOB_INDUSTRY_SCIENTIST', entityType: 'job', labelKey: 'job.industry_scientist', eraIds: ['INDUSTRY', 'MODERN', 'PRE_ATOMIC', 'ATOMIC'], output: { knowledge: 0.72 }, lineage: 'knowledge' },
 ];

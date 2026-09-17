@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { ruleset } from '../../src/chronicles/config/index.js';
 import { createChroniclesEngine } from '../../src/chronicles/domain/engine.js';
-import { estimateProducerPurchasePayback, runHeadlessSimulation, simulationProfiles } from '../../src/chronicles/dev/simulation.js';
+import { estimateProducerPurchasePayback, runFullTimelineSimulation, runHeadlessSimulation, simulationProfiles } from '../../src/chronicles/dev/simulation.js';
 
 function between(value, min, max, label) {
   assert.equal(value >= min && value <= max, true, `${label}: expected ${value} between ${min} and ${max}`);
@@ -131,5 +131,27 @@ const tenthPrimordial = estimateProducerPurchasePayback(paybackEngine.state, rul
 between(tenthPrimordial.cost.rna, 73, 75, '10th Primordial Reaction cost');
 between(tenthPrimordial.outputDelta.rna, 0.54, 0.56, '10th Primordial Reaction RNA/s gain');
 between(tenthPrimordial.paybackSecondsByResource.rna, 130, 138, '10th Primordial Reaction payback seconds');
+
+// The full-run runner owns jobs, buildings, all era transitions, authored
+// events, crisis and Archive reset. Until balance is accepted it may report a
+// deterministic stall instead of hiding it behind a successful early slice.
+const fullTimeline = runFullTimelineSimulation({ seed: 7, profile: 'competent' });
+assert.equal(fullTimeline.fullTimeline, true);
+if (fullTimeline.ok) {
+  assert.equal(fullTimeline.ending.id, 'ENDING_ASH');
+  assert.equal(fullTimeline.archiveReset.ok, true);
+  between(fullTimeline.timings.sapienceAtMs, 36 * 60000, 41 * 60000, 'full T1 Sapience');
+  between(fullTimeline.timings.settlementAtMs, 78 * 60000, 86 * 60000, 'full T1 Settlement');
+  between(fullTimeline.timings.cityAtMs, 104 * 60000, 112 * 60000, 'full T1 City');
+  between(fullTimeline.timings.industryAtMs, 120 * 60000, 128 * 60000, 'full T1 Industry');
+  between(fullTimeline.timings.modernAtMs, 132 * 60000, 140 * 60000, 'full T1 Modern');
+  between(fullTimeline.timings.atomicAtMs, 165 * 60000, 172 * 60000, 'full T1 Atomic');
+  between(fullTimeline.timings.ashAtMs, 177 * 60000, 183 * 60000, 'full T1 Ash');
+} else {
+  assert.equal(fullTimeline.state.run.nodes.completed.N07 !== undefined, true);
+  assert.equal(fullTimeline.state.run.nodes.completed.T18 !== undefined, true);
+  assert.equal(typeof fullTimeline.stall?.nodeId, 'string');
+  assert.equal(Array.isArray(fullTimeline.stall?.resources), true);
+}
 
 console.log('headless simulation ok');

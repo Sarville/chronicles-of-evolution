@@ -1,6 +1,6 @@
 # Хроники Эволюции — план полной пересборки Timeline #1
 
-**Статус:** approved for implementation planning.
+**Статус:** manual fresh-state playtest `0–180`; реализация и headless baseline готовы.
 **Дата:** 2026-09-16.
 **Программа:** `timeline1-v3-full`.
 
@@ -9,9 +9,11 @@
 ## 1. Цель
 
 Собрать один цельный первый Timeline от первой RNA до обязательного первого
-`Ash` и Archive/reset за 105–120 минут активной игры. Это не продолжение
+`Ash` и Archive/reset примерно за 180 минут активной игры. Это текущий
+ориентир времени до подтверждения ручным тестированием, а не жёсткий таймер.
+Это не продолжение
 локальных итераций `0–18` по инерции, а их включение в единый балансируемый
-контур `0–120`.
+контур `0–180`.
 
 Первый Ash остаётся неизбежным. Он знакомит игрока с Archive и открывает
 `T2 Memory`; он не является концом продукта. Дальнейшая карта `T2`–`U2`
@@ -29,7 +31,7 @@
   `01–11`;
 - deterministic simulation, save/recovery, telemetry и mobile/desktop
   presentation для полного run;
-- единый rebalance по профилям игры от 0 до 120 минут.
+- единый rebalance по профилям игры от 0 до 180 минут.
 
 ### Не входит
 
@@ -67,11 +69,11 @@ record, content unlock registry и save-safe identifiers. Нельзя созд�
 | `T1-0` Foundation + Event Engine | 0–18 мин, retroactive | ruleset audit; полный event schema; seeded deck, cooldown, persisted deck state, `RESOLVE_EVENT`, queue priority, telemetry; RNA/DNA/Cell minor/major events; `meta.unlocks` и Chronicle contract | deterministic deck/save tests; no hard-lock loss; existing 0–18 sims remain explainable |
 | `T1-1` Organism | 18–28 мин | `G008–G009`: AP, Multicellularity, adaptation presentation and costs | AP and branch profiles simulate within target window |
 | `T1-2` Cognition | 28–40 мин | Nervous System, Cognition `0..100`, Sapience convergence, `G010–G013` | three biological profiles reach Sapience without hidden manual grind |
-| `T1-3` First civilization | 38–65 мин | Tribe/Settlement, Population around 5, buildings, phase-aware jobs, Food/Morale/Knowledge loop, events | job reassignment, save/load and population-deficit recovery pass |
-| `T1-4` City and Industry | 65–95 мин | City/Industry, contextual materials/crafting, market sheet, compact Power capacity/deficit, policies deferred | city/industry sim profiles; resources remain contextual in UI |
-| `T1-5` Modern and Atomic | 95–108 мин | Modern bridge, Atomic transition, World Tension, Error 17, `Again`, late event deck | scripted and procedural events coexist; Atomic route timing passes |
-| `T1-6` Great Filter and reset | 108–120 мин | Last Protocol variants, inevitable first Ash, AF award, Archive, idempotent reset transaction and `T2` teaser | repeated reset cannot duplicate rewards or corrupt state; ending and save recovery tests |
-| `T1-7` Full-run closeout | 0–120 мин | rebalance, accessibility/UX pass, analytics taxonomy, performance, production build and manual playtests | release-candidate test matrix and approved timing profile |
+| `T1-3` First civilization | 38–84 мин | Tribe/Settlement, Population around 5, buildings, phase-aware jobs, Food/Morale/Knowledge loop, events | job reassignment, save/load and population-deficit recovery pass |
+| `T1-4` City and Industry | 84–128 мин | City/Industry, contextual materials/crafting, market sheet, compact Power capacity/deficit, policies deferred | city/industry sim profiles; resources remain contextual in UI |
+| `T1-5` Modern and Atomic | 128–168 мин | Modern bridge, Atomic transition, World Tension, Error 17, `Again`, late event deck | scripted and procedural events coexist; Atomic route timing passes |
+| `T1-6` Great Filter and reset | 168–180 мин | Last Protocol variants, inevitable first Ash, AF award, Archive, idempotent reset transaction and `T2` teaser | repeated reset cannot duplicate rewards or corrupt state; ending and save recovery tests |
+| `T1-7` Full-run closeout | 0–180 мин | rebalance, accessibility/UX pass, analytics taxonomy, performance, production build and manual playtests | release-candidate test matrix and approved timing profile |
 
 ## 5. `T1-0`: обязательный первый шаг
 
@@ -113,12 +115,12 @@ Event Engine идёт раньше `T1-1`, потому что random events —
 | Cellular systems / G007 | 15–20 мин |
 | Multicellularity | 24–28 мин |
 | Sapience | 38–40 мин |
-| Settlement | около 65 мин |
-| City | 78–80 мин |
-| Industry | 93–95 мин |
-| Modern | 95–104 мин |
-| Atomic | 107–108 мин |
-| Ash + Archive | 105–120 мин |
+| Settlement | 78–86 мин |
+| City | 104–112 мин |
+| Industry | 120–128 мин |
+| Modern | 132–140 мин |
+| Atomic | 165–172 мин |
+| Ash + Archive | 177–183 мин |
 
 Диапазоны сверяются по p25/p50/p75, а не по одному идеальному dev profile.
 Случайное событие может менять локальную историю run, но не должно быть
