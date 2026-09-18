@@ -77,14 +77,25 @@ ending/Chronicle record, content unlock registry и save-safe identifiers.
 
 ## 4. Пакеты работы
 
-| Пакет | Целевое активное время главы | Что поставляется | Переиспользует (старая нумерация) | Gate перед следующим пакетом |
+**Скорректировано 2026-09-18** (`docs/DECISIONS_ACT_STRUCTURE.md` ACT-002):
+`T2–T5` не получают стартовый грант/модификатор. Каждая — полный replay с
+RNA; "переиспользует" ниже означает полный (а не усечённый) диапазон
+пакетов от `T1-0`, с Recall-сжатием уже виденной части и своим, более
+крупным recap goal-набором для неё (`docs/gdd/07_GOALS_AND_MILESTONES.md`
+§5–8) — не буквальным грантом/модификатором экономики.
+
+| Пакет | Целевое суммарное время (от RNA) | Что поставляется | Полный replay-диапазон | Gate перед следующим пакетом |
 |---|---:|---|---|---|
-| `T1` — Origin (retrofit) | ~20 мин | audit существующего `G001–G015`/`MS01–MS04`; новый `Мор` collapse: epidemic authored event chain, `ENDING_BLIGHT`, Chronicle/Archive reveal «Архив уже запускался раньше» | `T1-0…T1-3` (почти без изменений) | `Мор` не блокирует critical path раньше Tribe; save/reset regression на новом ending |
-| `T2` — Одиночки | ~25–30 мин | dispersed-start modifier (economy/job weighting), species skin #1, coordination-vs-isolation authored choice, flavor deck, `Катаклизм` collapse (`ENDING_CATACLYSM`) | `T1-3…T1-4` (truncated) | skin swap не ломает save schema; collapse достижим без stuck-state |
-| `T3` — Крепость | ~30–35 мин | стартовый defense kit, policy-lite choice (unity vs control), flavor deck, `Раскол` collapse (`ENDING_FRACTURE`) | `T1-4` (truncated) | policy choice не открывает скрытый permanent gate; collapse timing внутри окна |
-| `T4` — Большой мозг | ~35–45 мин | Cognition-bias старт, раннее Writing/culture, species skin #2, automation-risk choices, flavor deck, `Авария` collapse (`ENDING_OVERLOAD`) | `T1-4…T1-5` (truncated) | skin swap #2 не требует нового save field сверх skin #1; collapse причинно связан с automation-risk выборами |
-| `T5` — Синтез (reframe) | ~45–60 мин | reframe стартового условия/copy (возврат исходной линии, синтез уроков); **новая `T5`-only procedural deck** (§5); existing crisis flow/`Ash` без изменений | `T1-5…T1-6` (почти без изменений) | новая deck не блокирует authored crisis events; Ash award idempotent как раньше |
+| `T1` — Origin (retrofit) | ~20 мин | audit существующего `G001–G015`/`MS01–MS04`; новый `Мор` collapse: epidemic authored event chain, `ENDING_BLIGHT`, Chronicle/Archive reveal «Архив уже запускался раньше» — **готово** | `T1-0…T1-3` (частично, до Tribe) | `Мор` не блокирует critical path раньше Tribe; save/reset regression на новом ending |
+| `T2` — Одиночки | ~25 мин | свой recap goal-набор на RNA→Tribe (новые ID, крупнее `G001–G015`); species skin #1 на событии `C02A/B/C`; coordination-vs-isolation authored choice; flavor deck; `Катаклизм` collapse (`ENDING_CATACLYSM`) | `T1-0…T1-3` (полностью, до Settlement) | recap не ломает save schema/goal engine; skin swap не ломает save schema; collapse достижим без stuck-state |
+| `T3` — Крепость | ~30 мин | свой recap goal-набор на RNA→Settlement (крупнее recap `T2`); крепость как обычный новый контент; policy-lite choice (unity vs control); flavor deck; `Раскол` collapse (`ENDING_FRACTURE`) | `T1-0…T1-4` (до City) | policy choice не открывает скрытый permanent gate; collapse timing внутри окна |
+| `T4` — Большой мозг | ~35 мин | свой recap goal-набор на RNA→City (крупнее recap `T3`); Writing/culture и Cognition как обычный новый контент; species skin #2 на событии `C02A/B/C`; automation-risk choices; flavor deck; `Авария` collapse (`ENDING_OVERLOAD`) | `T1-0…T1-5` (до Industry/Modern) | recap не требует нового save field сверх `T2`/`T3`; skin swap #2 не требует нового save field сверх skin #1; collapse причинно связан с automation-risk выборами |
+| `T5` — Синтез (reframe) | ~40 мин | свой recap goal-набор на RNA→Industry/Modern (крупнее recap `T4`); reframe перехода (возврат исходной линии, синтез уроков, `EV-NAR-08`); **новая `T5`-only procedural deck** (§5); existing crisis flow/`Ash` без изменений | `T1-0…T1-6` (полностью) | новая deck не блокирует authored crisis events; Ash award idempotent как раньше |
 | Act 1 closeout | 0 — весь прогон `T1–T5` | rebalance, accessibility/UX pass, analytics taxonomy, Act1→Act2 transition screen, persistent-reward carryover, manual playtests | `T1-7` (расширен на 5 глав) | release-candidate test matrix и approved timing profile для всех пяти глав |
+
+Дополнительный блокер, общий для пакетов `T2–T5`: Archive Recall
+perk-система (`docs/gdd/10_META_PROGRESSION.md` §4) не реализована — без
+неё нет реального числа, насколько recap быстрее полного `T1`-прогона.
 
 ## 5. `T5`-only procedural deck: обязательный первый шаг этого документа
 
@@ -142,10 +153,11 @@ work-item, не подпакет.
 
 ```text
 T1 retrofit: Мор collapse
-→ T2: dispersed start + skin #1 + Катаклизм
-→ T3: defense start + policy-lite + Раскол
-→ T4: Cognition-bias start + skin #2 + Авария
-→ T5 reframe: synthesis deck + Ash copy update
+→ Archive Recall perk system (needed for any T2+ recap duration)
+→ T2: recap goal chain (RNA→Tribe) + skin #1 + Катаклизм
+→ T3: recap goal chain (RNA→Settlement) + policy-lite + Раскол
+→ T4: recap goal chain (RNA→City) + skin #2 + Авария
+→ T5 reframe: recap goal chain (RNA→Industry/Modern) + synthesis deck + Ash copy update
 → Act 1 closeout: full T1–T5 regression + manual playtest
 → design and implementation of P1 (Act 2)
 ```

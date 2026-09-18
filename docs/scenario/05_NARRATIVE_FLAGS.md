@@ -684,9 +684,12 @@ run.anomaly.*
 run.chapterN.*     (the chapter that just ended)
 ```
 
-except any state explicitly reconstructed by the next chapter's starting
-condition (dispersed start, defense kit, Cognition bias — see
-`docs/gdd/07_GOALS_AND_MILESTONES.md` §5–7).
+**Corrected 2026-09-18** (`docs/DECISIONS_ACT_STRUCTURE.md` ACT-002): no
+exceptions — the next chapter has no starting-condition grant to
+reconstruct state for (the old "dispersed start / defense kit / Cognition
+bias" wording is superseded). The next chapter starts exactly like `T1`, at
+RNA, replaying the same content again (Recall-compressed, own recap goal
+set — `docs/gdd/07_GOALS_AND_MILESTONES.md` §5–8).
 
 ### Must persist
 

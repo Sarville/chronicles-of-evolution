@@ -54,37 +54,83 @@ depths instead of replaying it in full each time.
 
 ---
 
-## ACT-002 — Act 1: five-chapter causal chain
+## ACT-002 — Act 1: five-chapter causal chain, full replay each time
 
 ### Decision
 
-`T1–T5` keep their names but change scope. Each chapter is a short run ending
-at a specific era cutoff (era numbers per `src/chronicles/config/eras.js`),
-reusing the already-implemented `T1-0…T1-6` packages sliced at that depth.
-Each chapter's starting condition is presented as the Archive's direct fix for
-the previous chapter's cause of death, and that fix creates the next chapter's
-new vulnerability:
+**Corrected 2026-09-18** (supersedes this section's original 2026-09-17
+text below the line — see `docs/TODO.md` "T1 retrofit: Мор collapse" §"Model
+correction" for the discussion that produced this). The original version
+gave `T2–T5` a targeted starting condition and skipped the biological stage;
+that is not what the game does.
 
-| Chapter | Era cutoff | Starting condition (fix for previous death) | New vulnerability it creates | Collapse cause | Reused package | Species/skin swap |
-|---|---|---|---|---|---|---|
-| T1 — Origin | 5 — `TRIBE` | none (baseline attempt) | dense tribal living, no epidemiology answer | Epidemic | `T1-0…T1-3` | no |
-| T2 — Одиночки | 6–7 — `SETTLEMENT` | dispersed/non-clustering lifestyle | scattered groups can't coordinate collective defense | Cataclysm (unstable planet/quake) | `T1-3…T1-4` (truncated) | **yes — swap #1**, skin only, full traits deferred to Act 3 |
-| T3 — Крепость | 8 — `CITY` | early defensive structures/tech granted from the start | safety re-concentrates population; close-quarters tension returns | Social fracture / mutation-driven internal conflict | `T1-4` (truncated) | no — same lineage, new starting tech |
-| T4 — Большой мозг | 9–10 — `INDUSTRY/MODERN` | higher baseline Cognition, earlier Writing/culture | smarter civilization outruns its ability to manage its own technology | Techno-catastrophe (industrial/automation disaster) | `T1-4…T1-5` (truncated) | **yes — swap #2**, skin only |
-| T5 — Синтез | 12 — `ATOMIC` + Great Filter | Archive intervenes directly, blends lessons from T1–T4; returns to the original lineage (swap budget spent) | — | **Great Filter / mandatory first Ash** — already-implemented `T1-6` content, now framed as the payoff of four prior "fixable" failures vs. one unfixable existential one | `T1-5…T1-6` (near-unchanged) | no |
+`T1–T5` keep their names but change scope. Each chapter is a **full replay
+from RNA**, ending at a specific era cutoff (era numbers per
+`src/chronicles/config/eras.js`) with its own collapse. There is no
+per-chapter starting-condition grant or skip-ahead state factory — `T2–T5`
+begin exactly like `T1`, at Molecular/RNA, and play forward through every
+stage `T1` already covers before reaching new territory.
 
-Only two species/skin swaps happen across all five chapters (T2, T4) — the
-other three chapters differentiate by starting tech/condition, not by
-changing the playable species. Swapped skins pull cosmetic/flavor only
-(labels, 1–2 flavor abilities); full trait/perk depth for those species is
-reserved for Act 3.
+What actually changes chapter to chapter:
+
+- the era cutoff where that chapter's collapse triggers (growing each time);
+- the total time budget for the attempt (growing each time — see Timing);
+- how much of the replay is already-seen content, **compressed** by
+  AF-bought Archive Recall perks (`docs/gdd/10_META_PROGRESSION.md` §4 —
+  cost ×0.75 / production ×1.25 on "familiar" progression) rather than
+  skipped outright — this is what frees room in the growing budget for
+  genuinely new content before the next, later collapse;
+- the collapse cause/ending itself.
+
+| Chapter | Era cutoff | Full replay range (`T1-0…T1-6` packages) | Recall-compressed (already seen) | New content this attempt | Collapse cause |
+|---|---|---|---|---|---|
+| T1 — Origin | 5 — `TRIBE` | `T1-0…T1-3` (partial, to Tribe) | none (first attempt) | all of it | Epidemic (Мор) |
+| T2 — Одиночки | 6–7 — `SETTLEMENT` | `T1-0…T1-3` (full, to Settlement) | `T1-0…T1-2` + the Tribe portion of `T1-3` | the Settlement portion of `T1-3` | Cataclysm (unstable planet/quake) |
+| T3 — Крепость | 8 — `CITY` | `T1-0…T1-4` (to City) | `T1-0…T1-3` | the City portion of `T1-4` | Social fracture / internal conflict |
+| T4 — Большой мозг | 9–10 — `INDUSTRY/MODERN` | `T1-0…T1-5` (to Industry/Modern) | `T1-0…T1-4` | the Industry/Modern portion of `T1-5` | Techno-catastrophe (automation disaster) |
+| T5 — Синтез | 12 — `ATOMIC` + Great Filter | `T1-0…T1-6` (full) | `T1-0…T1-5` | Great Filter/Ash content (`T1-6`) | Great Filter / mandatory first Ash |
+
+**Resolved 2026-09-18:** the "Recall-compressed" column above describes
+reused *mechanical* content (economy, tech tree, buildings — the same data,
+per ACT-005). It does **not** mean a later chapter literally replays an
+earlier chapter's own goal cards. Watching the same `T1` goal checklist five
+times would be boring, so each chapter gets **its own goal set** for
+whatever range it's re-covering, at a **coarser granularity than whoever
+covered it before** — fewer, bigger steps, with a couple of new short
+Archive/flavor beats inserted so the fast section still feels alive rather
+than a silent montage. This starts at `T2`'s own recap of `T1`'s
+`G001–G015` range, not only at later chapter boundaries. An earlier
+chapter's own collapse goal (e.g. `Мор`'s `G025`/`G026`) is simply not part
+of a later chapter's own goal set, so it never re-fires — no new "already
+survived" flag needed. Exact new goal IDs/granularity per chapter — design
+scope, not finalized, see `docs/gdd/07_GOALS_AND_MILESTONES.md` §5–8.
+
+Only two species/skin swaps happen across all five chapters (`T2`, `T4`).
+They are **not** a new starting screen — they're presented at the existing
+`C02A`/`C02B`/`C02C` primary-trait branch-choice event
+(`docs/gdd/03_EVOLUTION_TREE.md` §M/C), which every chapter replays since
+every chapter restarts from RNA. On `T2` and `T4` the Archive frames its own
+suggestion at that moment ("давай попробуем вот это") instead of leaving the
+pick open the way `T1` does; `T3` and `T5` replay the same branch as the
+chapter before them. Swapped skins pull cosmetic/flavor only (labels, 1–2
+flavor abilities); full trait/perk depth for those species is reserved for
+Act 3.
+
+The player should always be able to see that a large portion of Act 1's
+content/discoveries is still locked, to motivate the next attempt — this is
+why the replay is compressed rather than skipped: skipping would hide how
+much of the tree the player hasn't touched yet.
 
 ### Timing
 
-Target ~3–4h total for all five chapters combined; `T1` ~20 minutes as the
-introductory chapter. Exact per-chapter minute budgets are **not** decided
-yet — they are computed after Act 1 is implemented and played, not designed
-upfront (see ACT-006).
+Target ~3–4h total for all five chapters combined. Per-chapter total budget
+**grows each attempt**: `T1` ~20 min (retuned and confirmed, see
+`docs/TODO.md` "T1 retrofit: Мор collapse"), `T2` ~25 min, `T3` ~30 min, `T4`
+~35 min, `T5` ~40 min. These replace the earlier "not decided yet" placeholder
+now that the replay-with-compression model is confirmed; exact numbers may
+still move after `T2–T5` are implemented and played (see ACT-006), and depend
+on the Archive Recall perk system actually existing with real numbers — it is
+not implemented in code yet.
 
 ### Currency
 
@@ -147,23 +193,37 @@ adapter's job matters most.
 Existing packages `T1-0` through `T1-6` (`docs/PROJECT_STATE.yaml:157-166`,
 status `implemented_pending_manual_playtest`) are not discarded. They map
 onto the new chapters as shown in the ACT-002 table and are the starting
-point for the rework: slice at the new era cutoffs, add the per-chapter
-starting condition and collapse event, reskin twice (T2, T4). This is
-expected to reuse the large majority of already-built mechanical content
-(event engine, jobs/production, goal engine, save/reset transaction).
+point for the rework: each chapter replays them from the top, adds a growing
+time budget, Archive Recall compression on the already-seen range, its own
+collapse event at the new era cutoff, and (for `T2`, `T4`) a reskin at the
+existing `C02A/B/C` branch event. This is expected to reuse the large
+majority of already-built mechanical content (event engine, jobs/production,
+goal engine, save/reset transaction).
 
 ---
 
 ## ACT-006 — Open questions (not decided yet)
 
-- Exact per-chapter minute budget within the ~3–4h Act 1 total — computed
-  after implementation and playtest, not designed upfront.
+- Exact per-chapter minute budget within the ~3–4h Act 1 total — ACT-002 now
+  gives target numbers (20/25/30/35/40 min), but they're computed
+  before full implementation/playtest and may move once `T2–T5` exist.
+- Archive Recall's exact numeric application to the corrected `T1` pacing
+  (`docs/gdd/10_META_PROGRESSION.md` §4 gives a cost ×0.75 / production ×1.25
+  starting point, unimplemented) — needed before `T2`'s compressed-replay
+  window has a real duration.
+- ~~The exact mechanism that stops a later chapter's replay from
+  re-triggering an earlier chapter's own collapse event~~ — resolved, see
+  ACT-002's "Resolved 2026-09-18" note (own coarser per-chapter goal set,
+  earlier collapse goals simply excluded). Exact new goal IDs and how coarse
+  each recap gets are still open, tracked in
+  `docs/gdd/07_GOALS_AND_MILESTONES.md` §5–8.
 - Whether "Bioseed" as a named concept/ending survives in some form, or the
   Act 2→Act 3 transition replaces it entirely — old `DEC-023`'s "first
   Bioseed in 8–12h" no longer applies as written and needs an explicit
   replacement statement.
-- Exact mechanical shape of the T2/T4 species skin swap (how much is reused
-  from the future Act-3 race system vs. bespoke flavor content).
+- Exact mechanical shape of the T2/T4 species skin swap at the `C02A/B/C`
+  event (how much is reused from the future Act-3 race system vs. bespoke
+  flavor content).
 - Naming for the `P1–P3` act/tier (currently a placeholder).
 - Full rewrite of `docs/scenario/*` narrative scripts to match the five new
   chapter endings — not started.

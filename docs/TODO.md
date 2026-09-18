@@ -1,6 +1,6 @@
 # Хроники Эволюции — TODO
 
-**Last update:** 2026-09-16
+**Last update:** 2026-09-18
 
 `PROJECT_STATE.yaml` is the canonical status source. This file is the human-readable work queue.
 
@@ -548,12 +548,16 @@ model:
   test:sim`, `npm run smoke`, `npm run build` all pass. This is now the
   baseline later chapters/passes build on, per the user's request.
 - [ ] not done (later packages per `TIMELINE_01_REBUILD_PLAN.md` §7, and now
-  blocked on the model correction above): `T2` dispersed-start + skin swap
-  #1 + `Катаклизм`, `T3` defense-start + policy-lite + `Раскол`, `T4`
-  Cognition-bias start + skin swap #2 + `Авария`, `T5` reframe +
-  `t5_synthesis` deck, Act 1 closeout regression, Archive Recall perk
-  system. Also still open: manual playtest of the whole `T1` route
-  (biology through the Мор timer) at the new pacing.
+  blocked on the model correction above, plus the 2026-09-18 recap-goal
+  follow-up — see `docs/gdd/07_GOALS_AND_MILESTONES.md` §5–8 and memory
+  `act1_recap_goal_granularity`): Archive Recall perk system (blocks all of
+  the below — no real recap duration without it), `T2` own coarser recap
+  goal chain (RNA→Tribe) + skin swap #1 at `C02A/B/C` + `Катаклизм`, `T3`
+  own even-coarser recap (RNA→Settlement) + policy-lite + `Раскол`, `T4`
+  own recap (RNA→City) + skin swap #2 at `C02A/B/C` + `Авария`, `T5` own
+  recap (RNA→Industry/Modern) + reframe + `t5_synthesis` deck, Act 1
+  closeout regression. Also still open: manual playtest of the whole `T1`
+  route (biology through the Мор timer) at the new pacing.
 
 ---
 
@@ -592,6 +596,9 @@ model:
 
 # Immediate order
 
+**Superseded** by the Act 1 chapter structure — see "T1 retrofit: Мор
+collapse" above for current status and next step. Kept as history:
+
 ```text
 T1-0 Event Engine + 0–18 audit
 → T1-1 Organism
@@ -603,3 +610,7 @@ T1-0 Event Engine + 0–18 audit
 → T1-7 full-run closeout
 → T2 Memory design and implementation
 ```
+
+Current immediate order (2026-09-18): Archive Recall perk system (design +
+implement real numbers) → `T2` recap goal chain + skin swap #1 + Катаклизм
+→ `T3`/`T4`/`T5` in turn → Act 1 closeout regression.

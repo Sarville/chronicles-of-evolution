@@ -627,27 +627,28 @@ Converge to `ENDING_OVERLOAD`, `meta.endings.chapter4_subtype =
 
 ---
 
-# 24. Chapter starting-condition events
+# 24. Chapter framing: recap threshold events (не starting-condition grants)
 
-Каждая глава `T2–T5` открывается одной non-blocking intro-сценой, которая
-объявляет стартовый грант как прямое следствие смерти предыдущей главы —
-проигрывается автоматически при старте главы, до первого игрового действия,
-без choice кроме неявного `continue`. Полные тексты — `docs/scenario/
-01_TIMELINE_01_SCRIPT.md` §5.1/§6.1/§7.1, `04_STORY_EVENTS.md` §5–7.
+**Скорректировано 2026-09-18** (`docs/DECISIONS_ACT_STRUCTURE.md` ACT-002):
+`T2–T5` не открываются intro-сценой, объявляющей стартовый грант — гранта
+нет, каждая глава начинается на RNA точно как `T1`. `run.chapter` тегируется
+на саму попытку (сама механика reset/continue в Archive UI между главами,
+не игровое событие) и известен движку с первого тика — это то, что решает,
+идёт ли `G015` дальше в `G025` (Мор, только `T1`) или в recap-цепочку
+следующей главы (`docs/gdd/07_GOALS_AND_MILESTONES.md` §5.1, §11).
 
-| Глава | Устанавливает |
-|---|---|
-| `T2` | `run.chapter = "T2"`, `meta.act1.species_skin = 1` |
-| `T3` | `run.chapter = "T3"` |
-| `T4` | `run.chapter = "T4"`, `meta.act1.species_skin = 2` |
-| `T5` (`EV-NAR-08` «Синтез») | `run.chapter = "T5"`, `meta.act1.species_skin = 0` (возврат к исходной линии) |
+Что действительно происходит внутри каждой попытки:
 
-`EV-NAR-08` — единственная из этих сцен, реализованная как полноценный
-event ID, т.к. она несёт значимый reveal (Архив впервые прямо говорит о
-предыдущих четырёх главах). Остальные три реализуются как intro-cutscene
-без отдельной записи в event deck — implementation detail. `run.chapter`/
-`meta.act1.species_skin` — namespace `docs/scenario/05_NARRATIVE_FLAGS.md`
-§5A.
+| Глава | Где | Что |
+|---|---|---|
+| `T2`, `T4` | на существующем событии выбора primary trait (`C02A`/`C02B`/`C02C`, всё ещё внутри recap-а) | `meta.act1.species_skin` ставится в `1`/`2` — Архив сам предлагает другую ветку вместо оставленного открытым выбора |
+| `T2`, `T3`, `T4` | на пороге между recap-ом и новым контентом (Tribe/Settlement/City) | короткая non-blocking Archive-реплика, отсылающая к причине предыдущего коллапса (тексты — `07_GOALS_AND_MILESTONES.md` §5.1/6.1/7.1) — implementation detail, не отдельный event ID, как и раньше |
+| `T5` (`EV-NAR-08` «Синтез») | на пороге между recap-ом (RNA→Industry/Modern) и Atomic-контентом | полноценный event ID — значимый reveal (Архив впервые прямо говорит о предыдущих четырёх главах), `meta.act1.species_skin` возвращается в `0` (исходная линия, swap budget исчерпан) |
+
+`EV-NAR-08` остаётся единственной из этих сцен с отдельной event-записью —
+остальные реализуются как короткие Archive-реплики без отдельного event ID,
+implementation detail. `run.chapter`/`meta.act1.species_skin` — namespace
+`docs/scenario/05_NARRATIVE_FLAGS.md` §5A.
 
 ---
 
