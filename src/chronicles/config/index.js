@@ -11,7 +11,7 @@ import { milestones } from './milestones.js';
 import { endings } from './endings.js';
 import { allowedEffectTypes, effectSupport } from './effects.js';
 
-export const RULESET_VERSION = 'timeline1-v13-t1-blight-collapse';
+export const RULESET_VERSION = 'timeline1-v14-blight-timer';
 
 export const ruleset = {
   version: RULESET_VERSION,

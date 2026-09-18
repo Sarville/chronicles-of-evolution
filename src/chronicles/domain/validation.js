@@ -319,7 +319,7 @@ export function validateRuleset(ruleset) {
     }
   }
 
-  const eventEffectTypes = new Set(['grant_resource', 'set_flag', 'set_meta_flag', 'unlock_meta', 'grant_cognition', 'adjust_crisis_stability', 'complete_ending']);
+  const eventEffectTypes = new Set(['grant_resource', 'set_flag', 'set_meta_flag', 'unlock_meta', 'grant_cognition', 'adjust_crisis_stability', 'complete_ending', 'start_chapter_timer']);
   const endingIds = new Set((ruleset.endings || []).map((ending) => ending.id));
   for (const event of ruleset.events) {
     if (!event.type || !event.deck || !event.trigger?.type || !Array.isArray(event.choices) || event.choices.length === 0) {
@@ -354,6 +354,9 @@ export function validateRuleset(ruleset) {
         }
         if (effect.type === 'complete_ending' && !endingIds.has(effect.endingId)) {
           errors.push(`${event.id} completes unknown ending ${effect.endingId}`);
+        }
+        if (effect.type === 'start_chapter_timer' && !effect.timerId) {
+          errors.push(`${event.id} starts a chapter timer without timerId`);
         }
       }
     }

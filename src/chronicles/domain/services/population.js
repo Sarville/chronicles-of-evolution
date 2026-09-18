@@ -2,7 +2,10 @@ import { createDomainEvent } from '../domainEvents.js';
 import { addResource } from './resources.js';
 
 const FOOD_PER_PERSON_PER_SECOND = 0.12;
-const GROWTH_PER_SECOND = 0.02;
+// 2026-09-18 T1-pacing rebalance: ×3.5, same factor as config/producers.js
+// and config/jobs.js's Tribe-era outputs, so growth to Population 8 (T05's
+// gate) compresses along with the rest of T1's economy.
+const GROWTH_PER_SECOND = 0.07;
 
 export function calculatePopulationCap(state) {
   const baseCap = state.run.population?.baseCap || 0;

@@ -252,5 +252,10 @@ export function migrateEnvelope(envelope) {
     migrated.run.rulesetVersion = 'timeline1-v13-t1-blight-collapse';
     migrated.run.migrationNotice = 'Act 1 redesign: T1 now ends at Tribe with the Мор collapse (ENDING_BLIGHT) instead of continuing into Settlement/City/.../Ash.';
   }
+  if (migrated.rulesetVersion === 'timeline1-v13-t1-blight-collapse') {
+    migrated.rulesetVersion = 'timeline1-v14-blight-timer';
+    migrated.run.rulesetVersion = 'timeline1-v14-blight-timer';
+    migrated.run.migrationNotice = 'Мор is now a real hidden ~2min collapse (Population decay, mandatory-choice event fires only on expiry), not an instant ending.';
+  }
   return migrated;
 }

@@ -34,7 +34,7 @@ const clock = createFakeClock(1000);
 const rng = createSeededRng(42);
 const engine = createChroniclesEngine({ ruleset, ports: { clock, rng } });
 
-assert.equal(engine.state.run.rulesetVersion, 'timeline1-v13-t1-blight-collapse');
+assert.equal(engine.state.run.rulesetVersion, 'timeline1-v14-blight-timer');
 assert.equal(engine.state.run.eraId, 'MOLECULAR');
 assert.deepEqual(selectResourceAmounts(engine.state), { rna: 0 });
 assert.deepEqual(selectVisibleResources(engine.state, ruleset).map((resource) => resource.id), ['rna']);
@@ -54,14 +54,14 @@ conversionEngine.state.run.modifiers.active.test = { type: 'unlock_auto_producti
 conversionEngine.state.run.resources.rna.amount = 10;
 conversionEngine.state.run.producers.PROC_DNA_SYNTHESIS = { count: 1 };
 let conversionTick = conversionEngine.tick(1000);
-assert.equal(Math.abs(conversionTick.rates.rna + 0.52) < 0.000001, true);
-assert.equal(Math.abs(conversionTick.rates.dna - 0.26) < 0.000001, true);
-assert.equal(Math.abs(conversionEngine.state.run.resources.rna.amount - 9.48) < 0.000001, true);
-assert.equal(Math.abs(conversionEngine.state.run.resources.dna.amount - 0.26) < 0.000001, true);
+assert.equal(Math.abs(conversionTick.rates.rna + 1.82) < 0.000001, true);
+assert.equal(Math.abs(conversionTick.rates.dna - 0.91) < 0.000001, true);
+assert.equal(Math.abs(conversionEngine.state.run.resources.rna.amount - 8.18) < 0.000001, true);
+assert.equal(Math.abs(conversionEngine.state.run.resources.dna.amount - 0.91) < 0.000001, true);
 conversionEngine.state.run.resources.rna.amount = 0;
 conversionTick = conversionEngine.tick(1000);
 assert.equal(conversionTick.rates.dna, 0);
-assert.equal(conversionEngine.state.run.resources.dna.amount, 0.26);
+assert.equal(conversionEngine.state.run.resources.dna.amount, 0.91);
 
 // A resource that is both produced and consumed within the same tick (RNA
 // feeds DNA Synthesis, Biomass feeds Respiration) must still land exactly on
@@ -104,8 +104,8 @@ assert.equal(result.ok, true);
 assert.equal(engine.state.run.producers.PROC_PRIMORDIAL_REACTION.count, 1);
 let tick = engine.tick(1000);
 assert.equal(tick.ok, true);
-assert.equal(tick.rates.rna, 0.22);
-assert.equal(Math.abs(engine.state.run.resources.rna.amount - 196.22) < 0.000001, true);
+assert.equal(tick.rates.rna, 0.77);
+assert.equal(Math.abs(engine.state.run.resources.rna.amount - 196.77) < 0.000001, true);
 
 result = engine.dispatch({ type: 'BUY_NODE', nodeId: 'M02' });
 assert.equal(result.ok, false);
@@ -117,7 +117,7 @@ assert.equal(result.events.some((event) => event.type === 'node_completed'), tru
 assert.equal(result.events.some((event) => event.type === 'goal_completed'), true);
 assert.equal(engine.state.run.modifiers.active['M01:auto_production'].type, 'unlock_auto_production');
 tick = engine.tick(1000);
-assert.equal(tick.rates.rna, 0.22);
+assert.equal(tick.rates.rna, 0.77);
 assert.equal(selectManualProcessView(engine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').cooldownMs, 3500);
 
 result = engine.dispatch({ type: 'BUY_NODE', nodeId: 'M02' });
@@ -127,7 +127,7 @@ assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M03'), 0);
 assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M04'), 1);
 assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M05'), 1);
 assert.equal(selectEvolutionRevealLevel(engine.state, ruleset, 'M06'), 2);
-assert.equal(Math.abs(selectProductionRates(engine.state, ruleset).rna - 0.385) < 0.000001, true);
+assert.equal(Math.abs(selectProductionRates(engine.state, ruleset).rna - 1.3475) < 0.000001, true);
 assert.equal(selectManualProcessView(engine.state, ruleset, 'MANUAL_PRIMORDIAL_PULSE').cooldownMs, 90000);
 assert.equal(selectNodeStatus(engine.state, ruleset, 'M05'), 'locked');
 assert.equal(selectNodeStatus(engine.state, ruleset, 'M04'), 'locked');
@@ -413,8 +413,8 @@ const etaEngine = createChroniclesEngine({ ruleset });
 etaEngine.state.run.producers.PROC_PRIMORDIAL_REACTION = { count: 1 };
 let eta = selectPurchaseEta(etaEngine.state, ruleset, 'available_unaffordable', { rna: 2.2 });
 assert.equal(eta.status, 'waiting');
-assert.equal(Math.abs(eta.seconds - 10) < 0.000001, true);
-assert.equal(formatEta(eta), '≈10с');
+assert.equal(Math.abs(eta.seconds - 2.857142857142857) < 0.000001, true);
+assert.equal(formatEta(eta), '≈3с');
 etaEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 3 });
 assert.equal(selectPurchaseEta(etaEngine.state, ruleset, 'available_affordable', { rna: 2.2 }).status, 'now');
 assert.equal(formatEta(selectPurchaseEta(etaEngine.state, ruleset, 'available_affordable', { rna: 2.2 })), 'Сейчас');
@@ -466,14 +466,14 @@ for (let index = 0; index < 10; index += 1) {
   assert.equal(result.ok, true);
 }
 assert.equal(primordialMilestones.length, 1);
-assert.equal(selectProductionRates(explicitMilestoneEngine.state, ruleset).rna, 2.53);
+assert.equal(selectProductionRates(explicitMilestoneEngine.state, ruleset).rna, 8.854999999999999);
 const explicitMilestoneOutput = selectProducerOutputView(
   explicitMilestoneEngine.state,
   ruleset,
   'PROC_PRIMORDIAL_REACTION'
 );
-assert.deepEqual(explicitMilestoneOutput.basePerUnit, { rna: 0.22 });
-assert.deepEqual(explicitMilestoneOutput.currentTotal, { rna: 2.53 });
+assert.deepEqual(explicitMilestoneOutput.basePerUnit, { rna: 0.77 });
+assert.deepEqual(explicitMilestoneOutput.currentTotal, { rna: 8.854999999999999 });
 assert.equal(explicitMilestoneOutput.reachedMilestone.label, 'Reaction network');
 assert.equal(explicitMilestoneOutput.milestoneMultiplier, 1.15);
 
@@ -529,9 +529,9 @@ assert.deepEqual(selectPopulation(civilizationEngine.state), {
   unassigned: 0,
 });
 tick = civilizationEngine.tick(1000);
-assert.equal(Math.abs(tick.rates.food - 1.6) < 0.000001, true);
-assert.equal(Math.abs(tick.rates.materials - 0.96) < 0.000001, true);
-assert.equal(Math.abs(tick.rates.knowledge - 0.2) < 0.000001, true);
+assert.equal(Math.abs(tick.rates.food - 5.6) < 0.000001, true);
+assert.equal(Math.abs(tick.rates.materials - 3.36) < 0.000001, true);
+assert.equal(Math.abs(tick.rates.knowledge - 0.7) < 0.000001, true);
 assert.equal(civilizationEngine.state.run.population.current > 5, true);
 assert.equal(civilizationEngine.dispatch({ type: 'ASSIGN_JOB', jobId: 'JOB_TRIBE_FORAGER', amount: 0 }).ok, true);
 civilizationEngine.state.run.resources.food.amount = 0;

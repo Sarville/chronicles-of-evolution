@@ -173,10 +173,14 @@ implementation:
     T1-7: { name: "Full-run closeout and release gate", status: manual_playtest_0_180 }
 
 act1_chapters:
-  authority: "docs/production/TIMELINE_01_REBUILD_PLAN.md §4/§7"
+  authority: "docs/production/TIMELINE_01_REBUILD_PLAN.md §4/§7 -- but see model_correction below, ACT-002's starting-condition model is superseded pending a DECISIONS_ACT_STRUCTURE.md rewrite"
+  model_correction:
+    date: "2026-09-18"
+    status: "discussed_with_user_not_yet_written_into_decisions"
+    summary: "ACT-002 said each T2-T5 chapter gets a targeted starting condition (dispersed_start/defense kit/etc.) and does not replay the biological stage. User corrected this: every attempt replays from RNA again; per-attempt budget grows (T1~20min/T2~25/T3~30/T4~35/T5~40); the already-seen portion is compressed by AF-bought 'Archive Recall' perks (docs/gdd/10_META_PROGRESSION.md sec.4 -- cost x0.75/production x1.25 on familiar progression, NOT implemented in code); visual/species differentiation happens at an existing branch-choice moment (e.g. T2's reskin = Archive fixing the C02A/B/C pick), not a new starting screen. DECISIONS_ACT_STRUCTURE.md ACT-002 needs rewriting before T2 starts. T1 pacing retune (see packages.T1_origin_retrofit) is now done; Archive Recall remains the other prerequisite."
   packages:
-    T1_origin_retrofit: { status: done, delivered: "G025/G026, EV-NAR-04/EV-CR-T1, ENDING_BLIGHT implemented 2026-09-18. T1 now ends at Tribe (T05/G015) with the mandatory Мор collapse instead of auto-advancing into the old G016+ Settlement continuation; that content is untouched in config, reused later by T2-T5. Generalized the previously-Ash-only ending/reset machinery (domain/services/crisis.js completeEnding, domain/commands.js ENDING_RESET_PROFILES) so it now supports multiple endings. Ruleset timeline1-v13-t1-blight-collapse." }
-    T2_dispersed: { status: not_started }
+    T1_origin_retrofit: { status: done, delivered: "G025/G026, EV-NAR-04/EV-CR-T1, ENDING_BLIGHT implemented 2026-09-18. T1 now ends at Tribe (T05/G015) with the mandatory Мор collapse instead of auto-advancing into the old G016+ Settlement continuation; that content is untouched in config, reused later by T2-T5. Generalized the previously-Ash-only ending/reset machinery (domain/services/crisis.js completeEnding, domain/commands.js ENDING_RESET_PROFILES) so it now supports multiple endings. Мор is a real hidden ~2min timer (CHAPTER_TIMERS.chapter1_blight): Population decays gently then collapses to exactly 0 in the final 15s, EV-CR-T1 fires only on timer expiry (not on population hitting 0 early), player keeps agency but nothing stops the outcome. Pacing retuned 2026-09-18 to actually hit the ~20min chapter target: uniform x3.5 rate rebalance (config/producers.js, config/jobs.js Tribe-era output, domain/services/population.js GROWTH_PER_SECOND) instead of a node-by-node redesign -- costs/thresholds/relative proportions between phases untouched, everything just reached faster. Measured (optimized/competent/slow): Tribe 17.10/17.83/18.08m, full T1 incl. Мор timer 19.87m for competent. Ruleset timeline1-v14-blight-timer. No manual playtest at the new pacing yet." }
+    T2_dispersed: { status: not_started, blocked_by: "model_correction above -- no per-chapter start-grant factory needed, but the Archive Recall perk system is still a prerequisite (T1 pacing retune is done)" }
     T3_fortress: { status: not_started }
     T4_big_brain: { status: not_started }
     T5_synthesis_reframe: { status: not_started, note: "existing Modern->Atomic->Ash content (G016-G024, T07-T18, A01-A04, crisis flow) is reused here unchanged, plus the new t5_synthesis procedural deck" }
@@ -185,7 +189,7 @@ act1_chapters:
 timeline_01_rebuild:
   status: "manual_playtest_0_180"
   superseded_by: "docs/DECISIONS_ACT_STRUCTURE.md (2026-09-17) -- this block describes the pre-redesign single-180min-run plan, kept as history/reuse baseline for Act 1's five chapters, not the current execution order. See act1_chapters above for current package status."
-  target_ruleset: "timeline1-v13-t1-blight-collapse"
+  target_ruleset: "timeline1-v14-blight-timer"
   scope: "RNA to mandatory first Ash/Archive/reset, target 179-186 active minutes for a competent run"
   first_package: "T1 full route implemented; begin manual fresh-state playtest 0-180. 180 minutes is the current pacing target, subject to playtest evidence."
   canonical_plan: "docs/production/TIMELINE_01_REBUILD_PLAN.md"
@@ -212,7 +216,7 @@ iteration_4:
   note: "Closed by direct user confirmation on 2026-09-16, ahead of a manual 10-18 playtest pass. Automated tests/simulation/build back the implementation, and goal-ID alignment with GDD/DS-05 canon is now verified; treat exact 10-18 numbers as provisional (see balance.biological_10_18) until an actual playtest happens."
 
 balance:
-  ruleset_target: "timeline1-v13-t1-blight-collapse"
+  ruleset_target: "timeline1-v14-blight-timer"
   old_0_10_ei_balance: "historical_superseded"
   biological_numbers: "0_10_original_resource_flow_corrected"
   post_cell_numbers: "implemented_pending_manual_0_180_validation"
@@ -255,5 +259,5 @@ open_decisions:
 next_action:
   owner: "Codex"
   session: "ACT-STRUCTURE-REDESIGN"
-  description: "T1 origin retrofit (Package per TIMELINE_01_REBUILD_PLAN.md §7) is implemented and tested 2026-09-18: G025/G026, EV-NAR-04/EV-CR-T1, ENDING_BLIGHT; T1 now ends at Tribe with Мор instead of auto-continuing into the old Settlement+ route (see act1_chapters.T1_origin_retrofit above). Next session per §7 execution order: T2 -- Одиночки (dispersed-start modifier, species skin #1, coordination-vs-isolation choice, Катаклизм/ENDING_CATACLYSM collapse), reusing truncated T1-3/T1-4 Settlement content. After that: T3 (Раскол), T4 (Авария), T5 reframe + t5_synthesis deck, then Act 1 closeout full regression. No manual playtest of the new Мор flow has happened yet -- do that before treating T1_origin_retrofit as fully closed, not just before Act 1 closeout."
-  previous_next_action: "owner Codex, session ACT-STRUCTURE-REDESIGN (2026-09-17/18): GDD/scenario docs for all three acts complete; pick (a) T1 chapter implementation plan or (b) detailed Act 3 GDD (superseded 2026-09-18 -- (b) done, then (a)'s first package [Мор] also done, see current next_action)"
+  description: "T1 origin retrofit is implemented and tested 2026-09-18, including a real hidden-timer Мор collapse and a pacing retune that lands the whole T1 route (RNA through the Мор timer) at ~20min for a competent run (see act1_chapters.T1_origin_retrofit above) -- but do NOT start T2 next. Discussion with the user 2026-09-18 found ACT-002's starting-condition model (T2-T5 skip the biological stage via a targeted grant) is wrong; see act1_chapters.model_correction for the corrected model (every attempt replays from RNA, AF-bought Archive Recall perks compress the already-seen part, growing per-attempt budgets 20/25/30/35/40min). Before T2 can be built: (1) rewrite DECISIONS_ACT_STRUCTURE.md ACT-002 to match the corrected model, (2) design and implement the Archive Recall perk system with real numbers (currently just a paragraph in docs/gdd/10_META_PROGRESSION.md sec.4, no code). Separately, no manual playtest of the new Мор timer flow or the retuned pacing has happened yet."
+  previous_next_action: "owner Codex, session ACT-STRUCTURE-REDESIGN (2026-09-17/18): GDD/scenario docs for all three acts complete; pick (a) T1 chapter implementation plan or (b) detailed Act 3 GDD (superseded 2026-09-18 -- (b) done, then (a)'s first package [Мор] also done, then T1 pacing retuned to ~20min -- but see current next_action, the T2-T5 model it assumed needed correcting before continuing)"

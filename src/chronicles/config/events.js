@@ -130,10 +130,16 @@ export const events = [
     phaseWindow: { eraIds: ['TRIBE'] }, priority: 58, telemetryKey: 'event_blight_noticed', title: 'Заметьте первых больных',
     body: 'Часть группы не встаёт с места отдыха дольше обычного. Симптомы не совпадают с усталостью.',
     chronicleSummary: 'Отклонение зафиксировано в плотном лагере. Причина: неизвестна.',
-    choices: [{ id: 'continue', label: 'Продолжить', effects: [{ type: 'set_flag', flag: 'run.chapter1.blight_noticed', value: true }] }],
+    choices: [{ id: 'continue', label: 'Продолжить', effects: [
+      { type: 'set_flag', flag: 'run.chapter1.blight_noticed', value: true },
+      { type: 'start_chapter_timer', timerId: 'chapter1_blight' },
+    ] }],
   },
   {
-    id: 'EV-CR-T1', type: 'ending', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G025' },
+    // Queued directly by advanceChapterTimers when 'chapter1_blight' expires
+    // (domain/services/crisis.js) -- this trigger is descriptive only, same
+    // as EV-CR-01..03's crisis_phase triggers below.
+    id: 'EV-CR-T1', type: 'ending', deck: 'authored', trigger: { type: 'chapter_timer_expired', timerId: 'chapter1_blight' },
     phaseWindow: { eraIds: ['TRIBE'] }, priority: 100, telemetryKey: 'event_blight_choice', title: 'Мор',
     body: 'Плотная жизнь одного лагеря не оставляет для отклонения свободного пространства. Решение необходимо сейчас, не после подтверждения причины.',
     chronicleSummary: 'Первая цивилизация не пережила собственную плотность. Архив зафиксировал: это уже происходило.',

@@ -53,8 +53,8 @@ for (let index = 0; index < 10; index += 1) {
 const outputView = selectProducerOutputView(milestoneEngine.state, ruleset, 'PROC_PRIMORDIAL_REACTION');
 assert.equal(outputView.reachedMilestone.label, 'Reaction network');
 assert.equal(outputView.reachedMilestone.multiplier, 1.15);
-assert.deepEqual(outputView.basePerUnit, { rna: 0.22 });
-assert.deepEqual(outputView.currentTotal, { rna: 2.53 });
+assert.deepEqual(outputView.basePerUnit, { rna: 0.77 });
+assert.deepEqual(outputView.currentTotal, { rna: 8.854999999999999 });
 assert.equal(formatResourceAmount(8.99), '8');
 assert.equal(formatEta({ status: 'now', seconds: 0 }), 'Сейчас');
 assert.equal(formatEta({ status: 'waiting', seconds: 63 }), '≈1м 3с');

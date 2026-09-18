@@ -478,17 +478,82 @@ no code changes):
   Tribe with `ENDING_BLIGHT` instead of continuing to Settlement/City/
   Industry/Modern/Atomic/`ENDING_ASH`. This is the intended Act 1 redesign
   behavior, not a regression — that later content isn't discarded, it's
-  reused by `T2–T5` (not yet implemented) via their own start grants, not by
-  continuing this same `T1` run. Updated `tests/simulation/spec.js`'s
+  reused by later chapters. Updated `tests/simulation/spec.js`'s
   full-timeline assertions accordingly (drops Settlement→Ash windows, keeps
   Multicellularity/Sapience/Tribe).
 - [x] Ruleset bumped to `timeline1-v13-t1-blight-collapse` with a migration
   entry. `npm test`, `npm run test:sim`, `npm run smoke`, `npm run build` all
   pass.
-- [ ] not done (later packages per `TIMELINE_01_REBUILD_PLAN.md` §7):
-  `T2` dispersed-start + skin swap #1 + `Катаклизм`, `T3` defense-start +
-  policy-lite + `Раскол`, `T4` Cognition-bias start + skin swap #2 +
-  `Авария`, `T5` reframe + `t5_synthesis` deck, Act 1 closeout regression.
+
+### Model correction (2026-09-18, discussed with user before going further)
+
+`ACT-002`'s "each chapter gets a targeted starting condition, doesn't repeat
+the biological stage" is **not** what the user actually wants and needs
+revisiting in `DECISIONS_ACT_STRUCTURE.md` before `T2` is built. Corrected
+model:
+
+- Every attempt (`T1`-`T5`) replays from RNA again, no per-chapter "start
+  grant"/skip-ahead state factory.
+- Each attempt's total budget grows (`T1` ~20min, `T2` ~25, `T3` ~30, `T4`
+  ~35, `T5` ~40) — the already-seen portion is compressed by AF-bought
+  perks ("Archive Recall", documented in `docs/gdd/10_META_PROGRESSION.md`
+  §4 — cost ×0.75 / production ×1.25 on "familiar" progression — **not
+  implemented in code at all yet**), freeing time for genuinely new content
+  before the next, later collapse point.
+- Visual/species differentiation per attempt happens at an existing
+  branch-choice moment (e.g. `T2`'s reskin is presented as the Archive
+  fixing the `C02A`/B/C primary-trait pick), not via a new starting screen.
+- Not started: retuning `T1` to actually hit ~20min (currently ~63min to
+  Tribe — a real gap, see the C07 fix note above for how big these passes
+  get), and designing/implementing the Archive Recall perk system with real
+  numbers. Both block `T2`.
+
+- [x] Мор timer/decay mechanic (2026-09-18, replaces the instant-ending
+  version above): `EV-NAR-04`'s resolution now starts a hidden ~2min
+  countdown (`domain/services/crisis.js` `CHAPTER_TIMERS.chapter1_blight`,
+  `advanceChapterTimers` wired into `engine.js` `tick()`) instead of just
+  setting a flag. Population decays gently (×0.995/s) for the first ~105s,
+  then collapses to exactly 0 over the final 15s (proportional
+  remaining-time falloff, not asymptotic — never lingers visible above
+  zero). `EV-CR-T1` (the mandatory choice) now fires only when the timer
+  fully expires — not early, even if population already hit 0 — so the
+  player keeps agency (can still build Shelter etc.) during the window even
+  though nothing actually stops the collapse, only its subtype/epitaph.
+  Added a new `start_chapter_timer` event effect (validated in
+  `validation.js`) for `T2`-`T4` to reuse with their own timer/decay target
+  once designed. Ruleset bumped to `timeline1-v14-blight-timer`. Full test
+  suite + sim + smoke + build pass; manually verified the decay curve and
+  the timer-gated (not population-gated) trigger via direct engine ticks.
+- [x] `T1` pacing retune (2026-09-18): Tribe was landing at ~62-65m against
+  the ~20min chapter target (`docs/gdd/13_ACT_ONE_CHAPTERS.md` §3). Applied
+  a uniform ×3.5 rate rebalance instead of a node-by-node redesign, on the
+  theory that the relative proportions between phases were already
+  carefully validated by every prior balance pass (C07 fix, B02x/N02x fix,
+  etc.) and only the absolute timescale needed changing: `config/
+  producers.js` (RNA/DNA/Biomass/ATP output/input), `config/jobs.js`
+  (Tribe-era `food`/`materials`/`knowledge` job output only — other eras
+  untouched, not yet part of any timed chapter), `domain/services/
+  population.js` `GROWTH_PER_SECOND` (0.02→0.07). Costs, growth-per-unit
+  curves, milestone thresholds and population targets are all untouched —
+  everything just gets *reached* faster. Measured (optimized/competent/
+  slow): Multicellularity 7.15/8.33/8.00m, Sapience 13.30/14.00/14.17m,
+  Tribe 17.10/17.83/18.08m; full `T1` including the ~2min Мор timer lands
+  at 19.87m for competent — right at the ~20min target on the first
+  measured factor, no further iteration needed. Every dependent test
+  assertion across `tests/config/spec.js`, `tests/domain/spec.js`,
+  `tests/ui/spec.js` and `tests/simulation/spec.js` (rate snapshots,
+  producer-purchase payback, the 0-18min biological windows, the
+  full-timeline Multicellularity/Sapience/Tribe windows) was recomputed
+  from actual runtime values, not estimated. `npm test`, `npm run
+  test:sim`, `npm run smoke`, `npm run build` all pass. This is now the
+  baseline later chapters/passes build on, per the user's request.
+- [ ] not done (later packages per `TIMELINE_01_REBUILD_PLAN.md` §7, and now
+  blocked on the model correction above): `T2` dispersed-start + skin swap
+  #1 + `Катаклизм`, `T3` defense-start + policy-lite + `Раскол`, `T4`
+  Cognition-bias start + skin swap #2 + `Авария`, `T5` reframe +
+  `t5_synthesis` deck, Act 1 closeout regression, Archive Recall perk
+  system. Also still open: manual playtest of the whole `T1` route
+  (biology through the Мор timer) at the new pacing.
 
 ---
 

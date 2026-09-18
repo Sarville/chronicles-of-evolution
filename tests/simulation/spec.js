@@ -16,18 +16,23 @@ assert.equal(competent.state.run.nodes.completed.M05 !== undefined, true);
 assert.equal(competent.state.run.nodes.completed.M06 !== undefined, true);
 assert.equal(competent.state.run.nodes.completed.M04, undefined);
 assert.equal(competent.state.run.goals.states.G005.status, 'archived');
+// 2026-09-18 T1-pacing rebalance (docs/TODO.md "T1 pacing retune"): producer
+// output/input rates ×3.5 so T1 compresses onto its ~20min chapter budget;
+// windows below are re-measured, not scaled by formula, since discrete
+// purchase-threshold timing doesn't scale perfectly linearly.
 between(competent.timings.automaticIncomeAtMs, 0, 60000, 'automatic income');
-between(competent.timings.stableRnaAtMs, 20000, 60000, 'M01');
-between(competent.timings.selfReplicationAtMs, 120000, 180000, 'M02');
-between(competent.timings.dnaSynthesisAtMs, 240000, 360000, 'M03');
-between(competent.timings.membraneAtMs, 390000, 520000, 'M05');
-between(competent.timings.cellAtMs, 540000, 660000, 'M06');
+between(competent.timings.stableRnaAtMs, 10000, 35000, 'M01');
+between(competent.timings.selfReplicationAtMs, 45000, 80000, 'M02');
+between(competent.timings.dnaSynthesisAtMs, 70000, 130000, 'M03');
+between(competent.timings.membraneAtMs, 110000, 190000, 'M05');
+between(competent.timings.cellAtMs, 150000, 230000, 'M06');
 between(competent.producerCounts.PROC_PRIMORDIAL_REACTION, 6, 8, 'Primordial Reaction count');
 between(competent.producerCounts.PROC_RNA_REPLICATION, 4, 6, 'RNA Replication count');
 between(competent.producerCounts.PROC_DNA_SYNTHESIS, 4, 6, 'DNA Synthesis count');
-// Frozen 0-10 rates, measured right at Cell (M06) completion, before any Cell-era (C0x) modifiers apply.
-between(competent.snapshots.after_M06.rates.rna, 9, 11, 'RNA/s at Cell');
-between(competent.snapshots.after_M06.rates.dna, 1.2, 1.5, 'DNA/s at Cell');
+// Rates measured right at Cell (M06) completion, before any Cell-era (C0x)
+// modifiers apply (×3.5 T1-pacing rebalance vs. the old 9-11/1.2-1.5 window).
+between(competent.snapshots.after_M06.rates.rna, 32, 38, 'RNA/s at Cell');
+between(competent.snapshots.after_M06.rates.dna, 4.2, 5.3, 'DNA/s at Cell');
 assert.equal(competent.manual.economicsAtThreeMinutes.contributionRatio < 0.05, true);
 assert.equal(competent.manual.economicsAtThreeMinutes.cooldownMs, 90000);
 assert.equal(competent.manual.economicsAtThreeMinutes.resourceId, 'rna');
@@ -56,17 +61,17 @@ assert.deepEqual(competentStoragePurchases, [
   'BLD_BIOMASS_STORE',
   'BLD_ATP_STORE',
 ]);
-between(competent.timings.metabolismAtMs, 550000, 800000, 'C01 Metabolism');
-between(competent.timings.branchAtMs, 600000, 850000, 'branch choice');
-between(competent.timings.proteinSynthesisAtMs, 700000, 950000, 'C03 Protein Synthesis');
-between(competent.timings.organellesAtMs, 750000, 1000000, 'C05 Organelles');
-between(competent.timings.cellCoordinationAtMs, 800000, 1080000, 'C06 Cell Coordination');
+between(competent.timings.metabolismAtMs, 170000, 250000, 'C01 Metabolism');
+between(competent.timings.branchAtMs, 195000, 270000, 'branch choice');
+between(competent.timings.proteinSynthesisAtMs, 225000, 310000, 'C03 Protein Synthesis');
+between(competent.timings.organellesAtMs, 250000, 340000, 'C05 Organelles');
+between(competent.timings.cellCoordinationAtMs, 270000, 370000, 'C06 Cell Coordination');
 
 const competentSymbiosis = runHeadlessSimulation({ seed: 7, profile: 'competent_symbiosis', branch: 'C02B' });
 assert.equal(competentSymbiosis.ok, true);
 assert.equal(competentSymbiosis.state.run.nodes.selectedBranchByGroup.cell_identity_1, 'C02B');
 assert.equal(competentSymbiosis.state.run.nodes.completed.C02A, undefined);
-between(competentSymbiosis.timings.cellCoordinationAtMs, 800000, 1080000, 'C06 Cell Coordination (Symbiosis)');
+between(competentSymbiosis.timings.cellCoordinationAtMs, 270000, 370000, 'C06 Cell Coordination (Symbiosis)');
 
 assert.equal(simulationProfiles.baseline_optimized.decisionIntervalMs, 1000);
 assert.equal(simulationProfiles.baseline_competent.decisionIntervalMs, 5000);
@@ -84,17 +89,17 @@ const baselineSlow = runHeadlessSimulation({ seed: 7, profile: 'baseline_slow' }
 assert.equal(baselineOptimized.ok, true);
 assert.equal(baselineCompetent.ok, true);
 assert.equal(baselineSlow.ok, true);
-assert.equal(baselineSlow.timings.cellAtMs <= 690000, true);
-assert.equal(baselineSlow.timings.cellCoordinationAtMs <= 1200000, true);
+assert.equal(baselineSlow.timings.cellAtMs <= 280000, true);
+assert.equal(baselineSlow.timings.cellCoordinationAtMs <= 430000, true);
 
 const optimized = runHeadlessSimulation({ seed: 7, profile: 'optimized' });
 assert.equal(optimized.ok, true);
-between(optimized.timings.cellAtMs, 480000, 660000, 'optimized scripted M06');
+between(optimized.timings.cellAtMs, 140000, 210000, 'optimized scripted M06');
 
 const slow = runHeadlessSimulation({ seed: 7, profile: 'slow' });
 assert.equal(slow.ok, true);
-assert.equal(slow.timings.cellAtMs <= 690000, true);
-assert.equal(slow.timings.cellCoordinationAtMs <= 1200000, true);
+assert.equal(slow.timings.cellAtMs <= 260000, true);
+assert.equal(slow.timings.cellCoordinationAtMs <= 400000, true);
 
 const withM04 = runHeadlessSimulation({ seed: 7, profile: 'competent', includeOptionalM04: true });
 assert.equal(withM04.ok, true);
@@ -106,10 +111,10 @@ const milestoneSeeker = runHeadlessSimulation({ seed: 7, profile: 'milestone_see
 assert.equal(milestoneSeeker.ok, true);
 assert.equal(milestoneSeeker.producerCounts.PROC_PRIMORDIAL_REACTION, 10);
 assert.equal(milestoneSeeker.producerCounts.PROC_RNA_REPLICATION >= 5, true);
-assert.equal(milestoneSeeker.timings.cellAtMs >= 480000, true);
-assert.equal(milestoneSeeker.timings.cellAtMs <= 660000, true);
-assert.equal(milestoneSeeker.timings.cellCoordinationAtMs >= 750000, true);
-assert.equal(milestoneSeeker.timings.cellCoordinationAtMs <= 930000, true);
+assert.equal(milestoneSeeker.timings.cellAtMs >= 150000, true);
+assert.equal(milestoneSeeker.timings.cellAtMs <= 200000, true);
+assert.equal(milestoneSeeker.timings.cellCoordinationAtMs >= 250000, true);
+assert.equal(milestoneSeeker.timings.cellCoordinationAtMs <= 310000, true);
 
 const manualAssisted = runHeadlessSimulation({ seed: 7, profile: 'manual_assisted' });
 assert.equal(manualAssisted.ok, true);
@@ -129,8 +134,8 @@ for (let index = 0; index < 9; index += 1) {
 }
 const tenthPrimordial = estimateProducerPurchasePayback(paybackEngine.state, ruleset, 'PROC_PRIMORDIAL_REACTION');
 between(tenthPrimordial.cost.rna, 73, 75, '10th Primordial Reaction cost');
-between(tenthPrimordial.outputDelta.rna, 0.54, 0.56, '10th Primordial Reaction RNA/s gain');
-between(tenthPrimordial.paybackSecondsByResource.rna, 130, 138, '10th Primordial Reaction payback seconds');
+between(tenthPrimordial.outputDelta.rna, 1.85, 2.0, '10th Primordial Reaction RNA/s gain');
+between(tenthPrimordial.paybackSecondsByResource.rna, 35, 42, '10th Primordial Reaction payback seconds');
 
 // Act 1 redesign (2026-09-18, docs/gdd/13_ACT_ONE_CHAPTERS.md): the T1
 // chapter now ends at Tribe with the mandatory Мор collapse (ENDING_BLIGHT),
@@ -144,18 +149,19 @@ assert.equal(fullTimeline.fullTimeline, true);
 if (fullTimeline.ok) {
   assert.equal(fullTimeline.ending.id, 'ENDING_BLIGHT');
   assert.equal(fullTimeline.archiveReset.ok, true);
-  // Windows from the 2026-09-18 C07 Multicellularity cost fix (docs/TODO.md
-  // T1-1): it was priced so low relative to C06's already-established economy
-  // that it completed at ~19-21m instead of the canonical 24-28m window
-  // (docs/gdd/02_ECONOMY_FIRST_120_MINUTES.md §7); correcting it adds real
-  // gathering time there, so Sapience/Tribe move out by roughly 6-7m too.
-  // Tribe itself (~62-65m) is far past the chapter's ~20min target budget
-  // (docs/gdd/13_ACT_ONE_CHAPTERS.md §3) — that gap is a known, provisional,
-  // separate balance-pass item, not something this package's gate requires
-  // fixing (the gate is Мор reachability/save-safety, not chapter pacing).
-  between(fullTimeline.timings.multicellularityAtMs, 23 * 60000, 29 * 60000, 'full T1 Multicellularity');
-  between(fullTimeline.timings.sapienceAtMs, 44 * 60000, 49 * 60000, 'full T1 Sapience');
-  between(fullTimeline.timings.tribeAtMs, 60 * 60000, 66 * 60000, 'full T1 Tribe');
+  // 2026-09-18 T1-pacing rebalance (docs/TODO.md "T1 pacing retune"): T1 was
+  // landing Tribe at ~62-65m against a ~20min chapter target
+  // (docs/gdd/13_ACT_ONE_CHAPTERS.md §3). Applied a ×3.5 rate rebalance
+  // (config/producers.js, config/jobs.js Tribe-era outputs,
+  // domain/services/population.js GROWTH_PER_SECOND) -- costs/thresholds
+  // untouched, so every previously-tuned relative proportion between phases
+  // is preserved, just reached faster. Measured across optimized/competent/
+  // slow: Multicellularity 7.15-8.33m, Sapience 13.30-14.17m, Tribe
+  // 17.10-18.08m; EV-CR-T1 (end of the Мор timer) lands at 19.87m for
+  // competent -- right at the ~20min target.
+  between(fullTimeline.timings.multicellularityAtMs, 6.5 * 60000, 9 * 60000, 'full T1 Multicellularity');
+  between(fullTimeline.timings.sapienceAtMs, 12.5 * 60000, 15 * 60000, 'full T1 Sapience');
+  between(fullTimeline.timings.tribeAtMs, 16.5 * 60000, 19 * 60000, 'full T1 Tribe');
 } else {
   assert.equal(fullTimeline.state.run.nodes.completed.N07 !== undefined, true);
   assert.equal(typeof fullTimeline.stall?.nodeId, 'string');

@@ -52,6 +52,57 @@ export function advanceCrisis(state, ruleset, deltaMs, ports) {
   return events;
 }
 
+// T1-T4 chapter collapses (Мор, Катаклизм, Раскол, Авария): a short, hidden
+// countdown starts on the chapter's anomaly event and always runs to
+// completion once started — nothing the player does in that window changes
+// the outcome, only its subtype/epitaph (docs/gdd/13_ACT_ONE_CHAPTERS.md §2).
+// The player keeps agency (can still build, buy, etc.) so the collapse reads
+// as a real event, not a scripted cutscene.
+// ponytail: only 'population' decay is implemented (T1's Мор); T2-T4 may
+// need a different decay target once their collapses are designed.
+export const CHAPTER_TIMERS = {
+  chapter1_blight: { totalMs: 120000, cliffMs: 15000, decays: 'population', endingEventId: 'EV-CR-T1' },
+};
+
+export function startChapterTimer(state, timerId) {
+  state.run.chapterTimers ||= {};
+  state.run.chapterTimers[timerId] = { active: true, elapsedMs: 0 };
+}
+
+export function advanceChapterTimers(state, ruleset, deltaMs, ports) {
+  const timers = state.run.chapterTimers;
+  if (!timers || state.run.events?.pendingId) return [];
+  const events = [];
+  for (const [timerId, timer] of Object.entries(timers)) {
+    if (!timer.active) continue;
+    const config = CHAPTER_TIMERS[timerId];
+    const remainingBefore = Math.max(0, config.totalMs - timer.elapsedMs);
+    timer.elapsedMs = Math.min(config.totalMs, timer.elapsedMs + deltaMs);
+    const remainingAfter = Math.max(0, config.totalMs - timer.elapsedMs);
+
+    if (config.decays === 'population' && state.run.population) {
+      const population = state.run.population;
+      if (remainingBefore <= config.cliffMs) {
+        // Final cliff: collapse to exactly 0 by the time the timer ends,
+        // instead of asymptotically approaching it, so it never lingers
+        // visible above zero.
+        population.current = remainingBefore > 0 ? population.current * (remainingAfter / remainingBefore) : 0;
+      } else {
+        // Gentle attrition before the cliff -- noticeable, not alarming.
+        population.current *= 0.995 ** (deltaMs / 1000);
+      }
+      population.current = Math.max(0, population.current);
+    }
+
+    if (remainingAfter <= 0) {
+      timer.active = false;
+      const queued = queueEvent(state, ruleset, config.endingEventId, ports);
+      if (queued.ok) events.push(...queued.events);
+    }
+  }
+  return events;
+}
+
 export function adjustCrisisStability(state, amount) {
   if (!state.run.crisis) return;
   state.run.crisis.stability = Math.max(0, Math.min(100, state.run.crisis.stability + amount));
