@@ -59,12 +59,13 @@ export function advanceCrisis(state, ruleset, deltaMs, ports) {
 // The player keeps agency (can still build, buy, etc.) so the collapse reads
 // as a real event, not a scripted cutscene.
 // ponytail: only 'population' decay is implemented (reused as-is for T2's
-// Катаклизм and T3's Раскол); T4 may need a different decay target once
-// designed.
+// Катаклизм, T3's Раскол and T4's Авария) -- all four T1-T4 collapses share
+// the same visible shape, per docs/gdd/13_ACT_ONE_CHAPTERS.md sec.2.
 export const CHAPTER_TIMERS = {
   chapter1_blight: { totalMs: 120000, cliffMs: 15000, decays: 'population', endingEventId: 'EV-CR-T1' },
   chapter2_cataclysm: { totalMs: 120000, cliffMs: 15000, decays: 'population', endingEventId: 'EV-CR-T2' },
   chapter3_fracture: { totalMs: 120000, cliffMs: 15000, decays: 'population', endingEventId: 'EV-CR-T3' },
+  chapter4_overload: { totalMs: 120000, cliffMs: 15000, decays: 'population', endingEventId: 'EV-CR-T4' },
 };
 
 export function startChapterTimer(state, timerId) {

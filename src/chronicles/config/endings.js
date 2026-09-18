@@ -23,5 +23,11 @@ export const endings = [
     requiresEra: 'CITY',
     targetTimeMs: 1650000,
   },
+  {
+    id: 'ENDING_OVERLOAD',
+    type: 'scripted_chapter_collapse',
+    requiresEra: 'MODERN',
+    targetTimeMs: 1800000,
+  },
 ];
 

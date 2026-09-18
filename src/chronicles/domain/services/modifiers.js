@@ -49,6 +49,16 @@ export function applyEffects(state, effects = [], source = {}) {
     if (effect.type === 'chapter_timer_duration_multiplier') {
       state.run.modifiers.active[`${sourceKey}:chapter_timer_duration:${effect.timerId}`] = effect;
     }
+    if (effect.type === 'building_output_floor') {
+      state.run.modifiers.active[`${sourceKey}:building_output_floor:${effect.eraId}`] = effect;
+    }
+    if (effect.type === 'building_output_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:building_output_multiplier:${effect.eraId}`] = effect;
+    }
+    if (effect.type === 'grant_cognition') {
+      state.run.cognition ||= { eventBonus: 0 };
+      state.run.cognition.eventBonus = Math.max(0, (state.run.cognition.eventBonus || 0) + effect.amount);
+    }
     if (effect.type === 'unlock_resource') {
       if (!state.run.resources[effect.resourceId]) {
         state.run.resources[effect.resourceId] = { amount: 0 };

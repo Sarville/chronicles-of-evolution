@@ -745,14 +745,49 @@ Concrete code TODO:
   - Explicitly **not built** (pure polish, zero mechanical effect, same
     reasons as `T2`): skin swap (`T3` doesn't get one per the doc anyway —
     only `T2`/`T4` do) and the `MS13`/`MS14` milestone banners.
-- [ ] `T4` doesn't exist as its own chapter yet, so its defense-perk
-  auto-grant + style-perk triad aren't wired — same mechanism as
-  `T1`/`T2`/`T3` once it lands.
-- [ ] Implement the two `T4` "Быстрое обучение" effects concretely:
-  Cognition (`config/goals.js` `G011_COGNITION_TRACK`'s
-  `cognition_at_least` condition — auto-credit `B04`+`N05` contributions)
-  and Writing (`config/nodes.js` `T09`/`T10` — ×0.55 cost multiplier on
-  both, not a skip of either node).
+- [x] `T4` "Большой мозг" implemented as its own chapter (2026-09-18):
+  - `T4`'s own goal chain: `G060`/`G061` (recap RNA->City in 2 coarse steps)
+    + `G035`-`G037` (new live content: Mechanization, Industry, Modern --
+    reuses the exact conditions `T1`'s old dead `G020`-`G022` used) +
+    `G038`/`G039` (rising + Авария ending), all `chapterAttempt: 'T4'`.
+  - **Did not** retarget the dead-since-redesign `EV-CIV-06` (energy path,
+    trigger `goalId: 'G021'`) to `T4`'s own goal the way `EV-CIV-04` was
+    retargeted for `T3` -- caught in testing that `G021` is still exercised
+    by the pre-existing `tests/domain/spec.js` `fullRouteEngine` test (the
+    old single-run-to-Ash route, which stands in for the future `T5`, not
+    dead). `T4` got its own fresh `EV-CIV-07` (automation-risk, the doc's
+    "`G037` automation-risk входит в условие" note) instead of reusing it.
+  - New `EV-NAR-T4`/`EV-CR-T4` events (mandatory 3-choice ending:
+    `shutdown`/`patch`/`delegate`) + `EV-NAR-T4-RECALL` seam flavor, new
+    `ENDING_OVERLOAD`, new `chapter4_overload` timer (same shape as
+    `T1`-`T3`'s).
+  - `T4`'s defense perk (cosmetic, "Единый протокол согласия") + style
+    triad:
+    - **auto** "Фоновые процессы" -- new `building_output_floor` modifier
+      (`domain/services/production.js`): a building starved of its input
+      (power) still outputs a guaranteed floor, without actually paying
+      for that floor's input.
+    - **invest** "Форсированное производство" -- new
+      `building_output_multiplier` modifier, same file.
+    - **efficiency** "Быстрое обучение" -- finally implements the
+      `10_META_PROGRESSION.md` sec.4.3 worked example: new `grant_cognition`
+      effect (`domain/services/modifiers.js`, mirrors the existing
+      event-effect of the same name) auto-credits Cognition's `B04`+`N05`
+      (45/100 via `run.cognition.eventBonus`); Writing reuses `T1`'s
+      existing `node_cost_multiplier` on both `T09` and `T10` (x0.55) --
+      no new code needed there.
+  - **Found and fixed a real bug** while testing the `invest`/`auto`
+    perks: `building_cost_multiplier` (`T2`/`T3`) and the two new
+    building modifiers were gated on the *building's* own (often
+    multi-era) `eraIds` list rather than the run's current era, so a
+    building spanning two perk-tagged eras (`BLD_FACTORY`: `CITY..ATOMIC`)
+    silently double-multiplied. Regated all three on `state.run.eraId`
+    instead (`domain/selectors.js` `selectBuildingPrice`,
+    `domain/services/production.js`).
+  - Regression tests in `tests/domain/spec.js`: the full synthetic run,
+    plus targeted checks for the output floor and output multiplier.
+  - Explicitly **not built** (pure polish, zero mechanical effect, same
+    reasons as `T2`): skin swap #2 and the `MS15` milestone banner.
 - [ ] Implement `T5`'s 3-perk stacking + post-unlock numeric-scaling
   mechanic, applied live across the parallel Act 1/2 ↔ Act 3+ switch.
 - [ ] Implement Archive-mode as an entry point (available after first Act

@@ -106,4 +106,52 @@ export const ARCHIVE_RECALL_CHAPTERS = {
       },
     },
   },
+  T4: {
+    endingId: 'ENDING_OVERLOAD',
+    // Cosmetic only -- the same Раскол can't refire, this is flavor/UI, no
+    // mechanical effect (docs/gdd/10_META_PROGRESSION.md sec.4.2 table).
+    defensePerk: {
+      id: 'T4_DEFENSE_UNIFIED_CONSENT_PROTOCOL',
+      label: 'Единый протокол согласия',
+      description: 'Косметика: следующая попытка помнит, как выглядел Раскол.',
+      effects: [],
+    },
+    stylePerks: {
+      auto: {
+        id: 'T4_AUTO_BACKGROUND_PROCESSES',
+        label: 'Фоновые процессы',
+        description: 'Постройки Industry/Modern сохраняют не менее ~25% выпуска даже при нехватке входных ресурсов.',
+        effects: [
+          { type: 'building_output_floor', eraId: 'INDUSTRY', value: 0.25 },
+          { type: 'building_output_floor', eraId: 'MODERN', value: 0.25 },
+        ],
+      },
+      invest: {
+        id: 'T4_INVEST_FORCED_PRODUCTION',
+        label: 'Форсированное производство',
+        description: 'Выпуск построек Industry/Modern ×1.25.',
+        effects: [
+          { type: 'building_output_multiplier', eraId: 'INDUSTRY', value: 1.25 },
+          { type: 'building_output_multiplier', eraId: 'MODERN', value: 1.25 },
+        ],
+      },
+      efficiency: {
+        // docs/gdd/10_META_PROGRESSION.md sec.4.3 worked example: Cognition
+        // (G011_COGNITION_TRACK's 4 weighted contributors, B04=20/B05=25/
+        // N03=30/N05=25) auto-credits B04+N05 (45 of 100) via eventBonus,
+        // leaving B05+N03 (55, the majority) live. Writing (T09->T10, two
+        // sequential cost gates) gets the same ~45% relief but as a
+        // proportional multiplier on both, not a node skip -- a flat skip
+        // doesn't compound with the rest of the stacked perk set.
+        id: 'T4_EFFICIENCY_FAST_LEARNING',
+        label: 'Быстрое обучение',
+        description: 'Cognition: 45 из 100 засчитано сразу. Письменность: цена основания и закрепления поселения (T09/T10) ×0.55.',
+        effects: [
+          { type: 'grant_cognition', amount: 45 },
+          { type: 'node_cost_multiplier', nodeId: 'T09', value: 0.55 },
+          { type: 'node_cost_multiplier', nodeId: 'T10', value: 0.55 },
+        ],
+      },
+    },
+  },
 };

@@ -67,6 +67,27 @@ function activeJobFlows(state, ruleset) {
     });
 }
 
+// T4 "Форсированное производство" perk: an era-scoped output multiplier for
+// buildings specifically, since resource_production_multiplier already
+// covers producers/jobs but buildings had no era-scoped hook of their own.
+// Gated on the run's *current* era (like building_cost_multiplier below),
+// not the building's own multi-era eraIds list, so a building spanning
+// several eras can't double up two different chapters' era-tagged perks.
+function buildingOutputMultiplier(state) {
+  return Object.values(state.run.modifiers.active).reduce((multiplier, modifier) => {
+    return modifier.type === 'building_output_multiplier' && modifier.eraId === state.run.eraId ? multiplier * modifier.value : multiplier;
+  }, 1);
+}
+
+// T4 "Фоновые процессы" perk: buildings keep a minimum output floor even
+// when starved of input (power) -- used only by applyProduction, which
+// already computed each flow's real input-availability scale.
+export function buildingOutputFloor(state) {
+  return Object.values(state.run.modifiers.active).reduce((floor, modifier) => {
+    return modifier.type === 'building_output_floor' && modifier.eraId === state.run.eraId ? Math.max(floor, modifier.value) : floor;
+  }, 0);
+}
+
 function activeBuildingFlows(state, ruleset) {
   const indexes = createRulesetIndexes(ruleset);
   return Object.entries(state.run.buildings)
@@ -76,7 +97,7 @@ function activeBuildingFlows(state, ruleset) {
       kind: 'building',
       id: building.id,
       input: Object.fromEntries(Object.entries(building.input || {}).map(([resourceId, amount]) => [resourceId, count * amount])),
-      output: Object.fromEntries(Object.entries(building.output || {}).map(([resourceId, amount]) => [resourceId, count * amount * productionMultiplierForResource(state, resourceId)])),
+      output: Object.fromEntries(Object.entries(building.output || {}).map(([resourceId, amount]) => [resourceId, count * amount * productionMultiplierForResource(state, resourceId) * buildingOutputMultiplier(state)])),
     }));
 }
 
@@ -126,8 +147,12 @@ export function applyProduction(state, ruleset, deltaMs, ports) {
     }
   }
   for (const flow of appliedFlows) {
+    // Output-only floor: a building that can't fully pay its own input still
+    // keeps a small guaranteed trickle. Input consumption above stays keyed
+    // to the real (unfloored) scale, so this floor is never paid for.
+    const outputScale = flow.kind === 'building' ? Math.max(flow.scale, buildingOutputFloor(state)) : flow.scale;
     for (const [resourceId, rate] of Object.entries(flow.output)) {
-      const appliedRate = rate * flow.scale;
+      const appliedRate = rate * outputScale;
       actualRates[resourceId] = (actualRates[resourceId] || 0) + appliedRate;
       events.push(...addResource(state, resourceId, appliedRate * seconds, ruleset, ports));
     }

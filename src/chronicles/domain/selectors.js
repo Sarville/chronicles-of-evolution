@@ -206,7 +206,12 @@ export function selectBuildingPrice(state, ruleset, buildingId) {
   const count = state.run.buildings[buildingId]?.count || 0;
   let cost = scaleCost(building.baseCost, building.growth, count);
   for (const modifier of Object.values(state.run.modifiers.active)) {
-    if (modifier.type === 'building_cost_multiplier' && (building.eraIds || []).includes(modifier.eraId)) {
+    // Gated on the run's *current* era, not the building's own (often
+    // multi-era) eraIds list -- a building available across several eras
+    // must not double-discount just because two different chapters' perks
+    // each tag one of those eras (e.g. T2 tags SETTLEMENT, T3 tags CITY;
+    // BLD_HOUSE spans both). Only one era is ever "current" at a time.
+    if (modifier.type === 'building_cost_multiplier' && modifier.eraId === state.run.eraId) {
       cost = multiplyCost(cost, modifier.value);
     }
   }

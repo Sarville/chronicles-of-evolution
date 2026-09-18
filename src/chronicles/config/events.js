@@ -256,6 +256,64 @@ export const events = [
     ],
   },
   {
+    // T4 "Большой мозг" recap seam, same role as EV-NAR-T2-RECALL/T3-RECALL.
+    id: 'EV-NAR-T4-RECALL', type: 'flavor', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G061' },
+    phaseWindow: { eraIds: ['CITY'] }, priority: 40, telemetryKey: 'event_t4_recall_seam', title: 'Уже пройденное',
+    body: 'Архив: до города дорога сжалась почти до одного шага. Дальше начинается то, чего вы ещё не видели.',
+    chronicleSummary: 'Архив отметил конец сжатого участка четвёртой попытки.',
+    choices: [{ id: 'continue', label: 'Продолжить', effects: [] }],
+  },
+  {
+    // docs/gdd/13_ACT_ONE_CHAPTERS.md sec.5's "G037 automation-risk входит
+    // в условие" -- pure flavor/Chronicle context for Авария, same
+    // no-mechanical-branch rule as EV-CIV-04's governance choice.
+    id: 'EV-CIV-07', type: 'narrative', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G037' },
+    phaseWindow: { eraIds: ['MODERN'] }, priority: 50, telemetryKey: 'event_automation_risk', title: 'Автоматизация без страховки',
+    body: 'Заводы и сети можно замкнуть друг на друга без человека в контуре. Вопрос не в том, можно ли, а в том, насколько быстро.',
+    chronicleSummary: 'Современная цивилизация выбрала свой уровень автоматизации.',
+    choices: [
+      { id: 'unchecked', label: 'Внедрить без ограничений', effects: [{ type: 'set_flag', flag: 'run.chapter4.automation_risk', value: 'unchecked' }] },
+      { id: 'cautious', label: 'Внедрить с ограничениями', effects: [{ type: 'set_flag', flag: 'run.chapter4.automation_risk', value: 'cautious' }] },
+      { id: 'delay', label: 'Отложить автоматизацию', effects: [{ type: 'set_flag', flag: 'run.chapter4.automation_risk', value: 'delayed' }] },
+    ],
+  },
+  {
+    id: 'EV-NAR-T4', type: 'anomaly', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G037' },
+    phaseWindow: { eraIds: ['MODERN'] }, priority: 58, telemetryKey: 'event_overload_noticed', title: 'Признаки перегрузки',
+    body: 'Сети отвечают друг другу быстрее, чем успевает решить любой человек в цепочке. Задержка перестала быть заметной величиной.',
+    chronicleSummary: 'Первые признаки каскадной перегрузки зафиксированы в современной сети.',
+    choices: [{ id: 'continue', label: 'Продолжить', effects: [
+      { type: 'set_flag', flag: 'run.chapter4.overload_noticed', value: true },
+      { type: 'start_chapter_timer', timerId: 'chapter4_overload' },
+    ] }],
+  },
+  {
+    // Queued directly by advanceChapterTimers when 'chapter4_overload'
+    // expires (domain/services/crisis.js) -- this trigger is descriptive
+    // only, same as EV-CR-T1/T2/T3's triggers.
+    id: 'EV-CR-T4', type: 'ending', deck: 'authored', trigger: { type: 'chapter_timer_expired', timerId: 'chapter4_overload' },
+    phaseWindow: { eraIds: ['MODERN'] }, priority: 100, telemetryKey: 'event_overload_choice', title: 'Авария',
+    body: 'Каскад уже идёт быстрее, чем любой протокол согласования. Решение необходимо сейчас, не после того, как сеть остановится сама.',
+    chronicleSummary: 'Четвёртая цивилизация не удержала собственную автоматику. Архив зафиксировал: это уже происходило.',
+    choices: [
+      { id: 'shutdown', label: 'Остановить систему', effects: [
+        { type: 'set_flag', flag: 'run.chapter4.response', value: 'shutdown' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter4_subtype', value: 'overload_shutdown' },
+        { type: 'complete_ending', endingId: 'ENDING_OVERLOAD', subtype: 'overload_shutdown' },
+      ] },
+      { id: 'patch', label: 'Залатать на ходу', effects: [
+        { type: 'set_flag', flag: 'run.chapter4.response', value: 'patch' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter4_subtype', value: 'overload_patched' },
+        { type: 'complete_ending', endingId: 'ENDING_OVERLOAD', subtype: 'overload_patched' },
+      ] },
+      { id: 'delegate', label: 'Передать управление резерву', effects: [
+        { type: 'set_flag', flag: 'run.chapter4.response', value: 'delegate' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter4_subtype', value: 'overload_delegated' },
+        { type: 'complete_ending', endingId: 'ENDING_OVERLOAD', subtype: 'overload_delegated' },
+      ] },
+    ],
+  },
+  {
     id: 'EV-CIV-03', type: 'flavor', deck: 'authored', trigger: { type: 'node_completed', nodeId: 'T08' },
     phaseWindow: { eraIds: ['SETTLEMENT_EARLY'] }, priority: 35, telemetryKey: 'event_settlement_profile', title: 'Первое поле',
     body: 'Земля начинает отвечать на повторяющийся труд.', chronicleSummary: 'Племя выбрало путь постоянного труда на земле.',
@@ -290,6 +348,12 @@ export const events = [
     ],
   },
   {
+    // NOT retargeted to T4 (considered it, like EV-CIV-04 for T3): the
+    // pre-existing "fullRouteEngine" regression test in tests/domain/
+    // spec.js still exercises the old single-run-to-Ash route through
+    // G021 (that route stands in for the future T5, not dead) --
+    // retargeting this one would have orphaned that test. T4's own
+    // automation-risk flavor moment is EV-CIV-07 below instead.
     id: 'EV-CIV-06', type: 'crisis', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G021' },
     phaseWindow: { eraIds: ['INDUSTRY'] }, priority: 70, telemetryKey: 'event_energy_path', title: 'Энергетический выбор',
     body: 'Новая инфраструктура требует больше энергии, чем прежний мир умеет давать без последствий.', chronicleSummary: 'Индустриальная цивилизация выбрала свой энергетический профиль.',

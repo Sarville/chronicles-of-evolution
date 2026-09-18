@@ -754,8 +754,8 @@ const t3Reset = t3Engine.dispatch({ type: 'ARCHIVE_RESET', perkChoiceId: 'auto' 
 assert.equal(t3Reset.ok, true);
 assert.equal(t3Engine.state.meta.archiveRecall.chapters.T3.styleChoice, 'auto');
 assert.equal(t3Engine.state.meta.archiveRecall.chapters.T3.defensePerkId, 'T3_DEFENSE_SEISMIC_FOOTINGS');
-// T4 doesn't exist as its own chapter yet -- falls back to T1 by default.
-assert.equal(t3Engine.state.run.actOneAttempt, 'T1');
+// T4 now exists as its own chapter, so T3's reset advances into it.
+assert.equal(t3Engine.state.run.actOneAttempt, 'T4');
 
 // "Самоорганизация" (auto perk): idle population auto-fills era jobs, and a
 // job stuck at its output resource's cap auto-reassigns elsewhere.
@@ -783,5 +783,92 @@ assert.equal(t3EffEngine.state.run.events.pendingId, null);
 t3EffEngine.tick(36000);
 assert.equal(t3EffEngine.state.run.chapterTimers.chapter3_fracture.active, false);
 assert.equal(t3EffEngine.state.run.events.pendingId, 'EV-CR-T3');
+
+// T4 "Большой мозг": recap covers RNA->City in 2 coarse steps (G060/G061),
+// then new Industry/Modern content (G035-G037, including the automation-
+// risk flavor event EV-CIV-07) and its own collapse (G038/G039,
+// ENDING_OVERLOAD).
+const t4Engine = createChroniclesEngine({ ruleset, actOneAttempt: 'T4' });
+assert.equal(t4Engine.state.run.actOneAttempt, 'T4');
+t4Engine.state.run.eraId = 'MODERN';
+for (const nodeId of ['T09', 'T12', 'T13', 'T15', 'T18']) {
+  t4Engine.state.run.nodes.completed[nodeId] = { completedAtMs: 0 };
+}
+t4Engine.state.run.population = { current: 62, peak: 62, baseCap: 80, assignments: {}, foodStatus: 'healthy' };
+t4Engine.state.run.buildings = {
+  BLD_FIELD: { count: 1 }, BLD_HOUSE: { count: 1 }, BLD_WORKSHOP: { count: 1 },
+  BLD_SCHOOL: { count: 1 }, BLD_MARKET: { count: 1 },
+  BLD_FACTORY: { count: 1 }, BLD_STEAM_PLANT: { count: 1 }, BLD_RAIL_HUB: { count: 1 },
+};
+result = t4Engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'food', amount: 0 });
+assert.equal(result.ok, true);
+for (const goalId of ['G060', 'G061', 'G035', 'G036', 'G037']) {
+  assert.equal(t4Engine.state.run.goals.states[goalId]?.status, 'archived');
+}
+for (const goalId of ['G050', 'G051', 'G031', 'G032', 'G033', 'G034']) {
+  assert.equal(t4Engine.state.run.goals.states[goalId], undefined);
+}
+// EV-CIV-07 (automation-risk, defined first) and EV-NAR-T4 (rising) both
+// queue off the same G037 completion; EV-CIV-07 wins the race to pendingId.
+assert.equal(t4Engine.state.run.events.pendingId, 'EV-CIV-07');
+assert.deepEqual(t4Engine.state.run.events.queue, ['EV-NAR-T4']);
+assert.equal(t4Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CIV-07', choiceId: 'cautious' }).ok, true);
+assert.equal(t4Engine.state.run.flags['run.chapter4.automation_risk'], 'cautious');
+assert.equal(t4Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-NAR-T4', choiceId: 'continue' }).ok, true);
+assert.equal(t4Engine.state.run.chapterTimers.chapter4_overload.active, true);
+t4Engine.tick(120000);
+assert.equal(t4Engine.state.run.events.pendingId, 'EV-CR-T4');
+assert.equal(t4Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-T4', choiceId: 'patch' }).ok, true);
+assert.equal(t4Engine.state.run.lifecycle, 'ended');
+assert.equal(t4Engine.state.run.ending.id, 'ENDING_OVERLOAD');
+assert.equal(t4Engine.state.run.ending.subtype, 'overload_patched');
+
+const t4MissingChoice = t4Engine.dispatch({ type: 'ARCHIVE_RESET' });
+assert.equal(t4MissingChoice.ok, false);
+assert.equal(t4MissingChoice.reason, 'INVALID_ARCHIVE_RECALL_PERK_CHOICE');
+
+const t4Reset = t4Engine.dispatch({ type: 'ARCHIVE_RESET', perkChoiceId: 'efficiency' });
+assert.equal(t4Reset.ok, true);
+assert.equal(t4Engine.state.meta.archiveRecall.chapters.T4.styleChoice, 'efficiency');
+assert.equal(t4Engine.state.meta.archiveRecall.chapters.T4.defensePerkId, 'T4_DEFENSE_UNIFIED_CONSENT_PROTOCOL');
+// T5 doesn't exist as its own chapter yet -- falls back to T1 by default.
+assert.equal(t4Engine.state.run.actOneAttempt, 'T1');
+// "Быстрое обучение": Cognition auto-credits 45/100, Writing (T09/T10) x0.55.
+assert.equal(t4Engine.state.run.cognition.eventBonus, 45);
+assert.deepEqual(selectNodeCost(t4Engine.state, ruleset, 'T09'), { food: 1160, materials: 633, knowledge: 215 });
+assert.deepEqual(selectNodeCost(t4Engine.state, ruleset, 'T10'), { food: 1490, materials: 798, knowledge: 286 });
+
+// "Фоновые процессы" (auto perk): a power-starved Industry building still
+// outputs a 25% floor, without actually consuming that unpaid power.
+const t4AutoEngine = createChroniclesEngine({ ruleset });
+t4AutoEngine.state.meta.archiveRecall = { chapters: { T4: { styleChoice: 'auto', perkId: 'T4_AUTO_BACKGROUND_PROCESSES', defensePerkId: null } } };
+t4AutoEngine.state.run.modifiers.active['T4_AUTO_BACKGROUND_PROCESSES:building_output_floor:INDUSTRY'] = {
+  type: 'building_output_floor', eraId: 'INDUSTRY', value: 0.25,
+};
+t4AutoEngine.state.run.eraId = 'INDUSTRY';
+t4AutoEngine.state.run.buildings = { BLD_FOUNDRY: { count: 1 } };
+t4AutoEngine.state.run.resources.power = { amount: 0, capOverride: 1000 };
+t4AutoEngine.state.run.resources.materials = { amount: 0, capOverride: 1000 };
+t4AutoEngine.tick(1000);
+assert.equal(t4AutoEngine.state.run.resources.materials.amount, 0.2625);
+assert.equal(t4AutoEngine.state.run.resources.power.amount, 0);
+
+// "Форсированное производство" (invest perk): Industry building output x1.25,
+// gated on the run's *current* era so a building spanning multiple
+// perk-tagged eras (e.g. BLD_FACTORY: CITY..ATOMIC) never double-multiplies.
+const t4InvestEngine = createChroniclesEngine({ ruleset });
+t4InvestEngine.state.meta.archiveRecall = { chapters: { T4: { styleChoice: 'invest', perkId: 'T4_INVEST_FORCED_PRODUCTION', defensePerkId: null } } };
+t4InvestEngine.state.run.modifiers.active['T4_INVEST_FORCED_PRODUCTION:building_output_multiplier:INDUSTRY'] = {
+  type: 'building_output_multiplier', eraId: 'INDUSTRY', value: 1.25,
+};
+t4InvestEngine.state.run.modifiers.active['T4_INVEST_FORCED_PRODUCTION:building_output_multiplier:MODERN'] = {
+  type: 'building_output_multiplier', eraId: 'MODERN', value: 1.25,
+};
+t4InvestEngine.state.run.eraId = 'INDUSTRY';
+t4InvestEngine.state.run.flags = { 'run.unlock.building.BLD_FACTORY': true };
+t4InvestEngine.state.run.buildings = { BLD_FACTORY: { count: 1 } };
+t4InvestEngine.state.run.resources.materials = { amount: 0, capOverride: 1000 };
+t4InvestEngine.tick(1000);
+assert.equal(t4InvestEngine.state.run.resources.materials.amount, 1.1875);
 
 console.log('domain flow ok');

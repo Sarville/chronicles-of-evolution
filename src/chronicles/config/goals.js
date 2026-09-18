@@ -370,4 +370,79 @@ export const goals = [
     conditions: [{ type: 'flag_set', flag: 'run.ending.id', value: 'ENDING_FRACTURE' }], rewards: [],
     cta: { type: 'event', targetId: 'EV-CR-T3', label: 'Пережить Раскол' }, highlight: { type: 'event', targetId: 'EV-CR-T3' },
   },
+
+  // T4 "Большой мозг" (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.3/5): recap now
+  // covers RNA->City (what used to be T3's own recap PLUS T3's new content)
+  // in just 2 coarse steps, same count as T3 but covering more ground --
+  // "крупнее recap T3" per the doc. G035-G039 are the new content
+  // (Mechanization/Industry/Modern) + collapse (Авария).
+  {
+    id: 'G060', title: 'Recall: от РНК до поселения', description: 'Молекулы, клетка, разум, племя и первое поселение — Архив проходит это одним шагом.',
+    targetTimeMs: 300000, nodeId: 'T09', chapterId: 'CH05', slot: 'chapter', chapterAttempt: 'T4',
+    sequence: { nextGoalId: 'G061' }, prerequisites: [],
+    conditions: [
+      { type: 'node_completed', nodeId: 'T09' },
+      { type: 'building_count', buildingId: 'BLD_FIELD', count: 1 },
+      { type: 'building_count', buildingId: 'BLD_HOUSE', count: 1 },
+      { type: 'building_count', buildingId: 'BLD_WORKSHOP', count: 1 },
+      { type: 'population_at_least', value: 14 },
+    ], rewards: [],
+    cta: { type: 'node', targetId: 'T09', label: 'Основать поселение' }, highlight: { type: 'node', targetId: 'T09' },
+  },
+  {
+    id: 'G061', title: 'Recall: письменность и город', description: 'Четвёртое по счёту поселение сразу становится городом.',
+    targetTimeMs: 600000, nodeId: 'T12', chapterId: 'CH06', slot: 'chapter', chapterAttempt: 'T4',
+    sequence: { previousGoalId: 'G060', nextGoalId: 'G035' }, prerequisites: [{ type: 'node_completed', nodeId: 'T09' }],
+    conditions: [
+      { type: 'node_completed', nodeId: 'T12' },
+      { type: 'building_count', buildingId: 'BLD_SCHOOL', count: 1 },
+      { type: 'building_count', buildingId: 'BLD_MARKET', count: 1 },
+      { type: 'population_at_least', value: 28 },
+    ], rewards: [],
+    cta: { type: 'node', targetId: 'T12', label: 'Создать город' }, highlight: { type: 'node', targetId: 'T12' },
+  },
+  {
+    id: 'G035', title: 'Механизируйте производство', description: 'Впервые за эту попытку — по-настоящему новый шаг: Mechanization.',
+    targetTimeMs: 900000, nodeId: 'T13', chapterId: 'CH07', slot: 'chapter', chapterAttempt: 'T4',
+    sequence: { previousGoalId: 'G061', nextGoalId: 'G036' }, prerequisites: [{ type: 'node_completed', nodeId: 'T12' }],
+    conditions: [{ type: 'node_completed', nodeId: 'T13' }, { type: 'building_count', buildingId: 'BLD_FACTORY', count: 1 }], rewards: [],
+    cta: { type: 'building', targetId: 'BLD_FACTORY', label: 'Построить фабрику' }, highlight: { type: 'building', targetId: 'BLD_FACTORY' },
+  },
+  {
+    id: 'G036', title: 'Войдите в эпоху машин', description: 'Электрификация связывает фабрику и электростанцию в одну систему.',
+    targetTimeMs: 1200000, nodeId: 'T15', chapterId: 'CH07', slot: 'chapter', chapterAttempt: 'T4',
+    sequence: { previousGoalId: 'G035', nextGoalId: 'G037' }, prerequisites: [{ type: 'node_completed', nodeId: 'T13' }],
+    conditions: [
+      { type: 'node_completed', nodeId: 'T15' },
+      { type: 'building_count', buildingId: 'BLD_FACTORY', count: 1 },
+      { type: 'building_count', buildingId: 'BLD_STEAM_PLANT', count: 1 },
+      { type: 'population_at_least', value: 46 },
+    ], rewards: [],
+    cta: { type: 'node', targetId: 'T15', label: 'Электрифицировать производство' }, highlight: { type: 'node', targetId: 'T15' },
+  },
+  {
+    id: 'G037', title: 'Создайте современную цивилизацию', description: 'Рельсовая сеть связывает город в единую современную систему.',
+    targetTimeMs: 1500000, nodeId: 'T18', chapterId: 'CH07', slot: 'chapter', chapterAttempt: 'T4',
+    sequence: { previousGoalId: 'G036', nextGoalId: 'G038' }, prerequisites: [{ type: 'node_completed', nodeId: 'T15' }],
+    conditions: [
+      { type: 'node_completed', nodeId: 'T18' },
+      { type: 'building_count', buildingId: 'BLD_RAIL_HUB', count: 1 },
+      { type: 'population_at_least', value: 62 },
+    ], rewards: [],
+    cta: { type: 'node', targetId: 'T18', label: 'Соединить мир' }, highlight: { type: 'node', targetId: 'T18' },
+  },
+  {
+    id: 'G038', title: 'Заметьте признаки перегрузки', description: 'Сети отвечают друг другу быстрее, чем успевает решить человек.',
+    targetTimeMs: 1650000, chapterId: 'CH07', slot: 'chapter', chapterAttempt: 'T4',
+    sequence: { previousGoalId: 'G037', nextGoalId: 'G039' }, prerequisites: [{ type: 'node_completed', nodeId: 'T18' }],
+    conditions: [{ type: 'flag_set', flag: 'run.chapter4.overload_noticed', value: true }], rewards: [],
+    cta: { type: 'event', targetId: 'EV-NAR-T4', label: 'Признаки перегрузки' }, highlight: { type: 'event', targetId: 'EV-NAR-T4' },
+  },
+  {
+    id: 'G039', title: 'Переживите Аварию', description: 'Решение не отменяет коллапс — только то, как сеть его запомнит.',
+    targetTimeMs: 1800000, chapterId: 'CH07', slot: 'chapter', chapterAttempt: 'T4',
+    sequence: { previousGoalId: 'G038' }, prerequisites: [{ type: 'flag_set', flag: 'run.chapter4.overload_noticed', value: true }],
+    conditions: [{ type: 'flag_set', flag: 'run.ending.id', value: 'ENDING_OVERLOAD' }], rewards: [],
+    cta: { type: 'event', targetId: 'EV-CR-T4', label: 'Пережить Аварию' }, highlight: { type: 'event', targetId: 'EV-CR-T4' },
+  },
 ];
