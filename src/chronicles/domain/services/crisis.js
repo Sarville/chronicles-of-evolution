@@ -24,6 +24,15 @@ export function createInitialCrisisState() {
   };
 }
 
+// T5 "Экспансия / Стабильность" endgame perk (docs/gdd/10_META_PROGRESSION.md
+// sec.4.4): a permanent, stacking slowdown of Stability decay -- the "Stability
+// reserve" half of that perk, alongside its resource_capacity_multiplier half.
+function crisisStabilityDecayMultiplier(state) {
+  return Object.values(state.run.modifiers.active).reduce((value, modifier) => {
+    return modifier.type === 'crisis_stability_decay_multiplier' ? value * modifier.value : value;
+  }, 1);
+}
+
 // The crisis timer belongs to active play only: offline progress never calls
 // engine.tick(). Required choices pause the clock, guaranteeing that the first
 // Timeline exposes every authored beat before Last Protocol.
@@ -32,7 +41,7 @@ export function advanceCrisis(state, ruleset, deltaMs, ports) {
   if (!crisis?.active || state.run.eraId !== 'ATOMIC' || state.run.events?.pendingId) return [];
 
   crisis.crisisClockMs += deltaMs;
-  crisis.stability = Math.max(0, crisis.stability - (deltaMs / 1000) * 0.2);
+  crisis.stability = Math.max(0, crisis.stability - (deltaMs / 1000) * 0.2 * crisisStabilityDecayMultiplier(state));
   crisis.minStability = Math.min(crisis.minStability ?? crisis.stability, crisis.stability);
   const events = [createDomainEvent('crisis_updated', {
     stability: crisis.stability,

@@ -1,15 +1,13 @@
 import { ruleset as defaultRuleset } from '../config/index.js';
 import { createInitialGameState } from '../domain/state.js';
 import { createResetCandidate } from '../domain/services/reset.js';
-import { applyArchiveRecallPerks } from '../domain/services/archiveRecall.js';
+import { applyArchiveRecallPerks, applyArchiveRecallEndgamePerks } from '../domain/services/archiveRecall.js';
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-// Only T1->T2->T3->T4 is wired so far -- T5 doesn't exist as its own
-// chapter yet (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.3).
-const NEXT_ACT_ONE_ATTEMPT = { T1: 'T2', T2: 'T3', T3: 'T4' };
+const NEXT_ACT_ONE_ATTEMPT = { T1: 'T2', T2: 'T3', T3: 'T4', T4: 'T5' };
 
 function formatTimelineId(timelineId) {
   return String(timelineId).padStart(3, '0');
@@ -73,8 +71,19 @@ export function applyPreparedResetTransaction(state, transaction, options = {}) 
     }
     if (transaction.reward?.archiveRecallPerk) {
       const { chapterKey, styleChoice, perkId, defensePerkId } = transaction.reward.archiveRecallPerk;
-      meta.archiveRecall = meta.archiveRecall || { chapters: {} };
+      meta.archiveRecall = meta.archiveRecall || { chapters: {}, endgame: {} };
       meta.archiveRecall.chapters = { ...meta.archiveRecall.chapters, [chapterKey]: { styleChoice, perkId, defensePerkId: defensePerkId ?? null } };
+    }
+    if (transaction.reward?.archiveRecallEndgamePerk) {
+      const grant = transaction.reward.archiveRecallEndgamePerk;
+      meta.archiveRecall = meta.archiveRecall || { chapters: {}, endgame: {} };
+      const endgame = { ...(meta.archiveRecall.endgame || {}) };
+      if (grant.unlock) {
+        endgame[grant.unlock] = 1;
+      } else if (grant.scaleAll) {
+        for (const perkKey of Object.keys(endgame)) endgame[perkKey] = (endgame[perkKey] || 0) + 1;
+      }
+      meta.archiveRecall.endgame = endgame;
     }
     if (transaction.chronicleRecord) {
       const chronicle = Array.isArray(meta.chronicle) ? meta.chronicle : [];
@@ -97,7 +106,14 @@ export function applyPreparedResetTransaction(state, transaction, options = {}) 
     const nextAttempt = NEXT_ACT_ONE_ATTEMPT[transaction.reward.archiveRecallPerk.chapterKey];
     if (nextAttempt) nextState.run.actOneAttempt = nextAttempt;
   }
+  // T5 loops back to itself: Act 2/3 don't exist yet in code, and every
+  // further T5 completion keeps mattering via the endgame perks' numeric
+  // scaling (docs/gdd/10_META_PROGRESSION.md sec.4.4/4.6).
+  if (transaction.reward?.archiveRecallEndgamePerk) {
+    nextState.run.actOneAttempt = 'T5';
+  }
   applyArchiveRecallPerks(nextState);
+  applyArchiveRecallEndgamePerks(nextState);
 
   return { ok: true, state: nextState, transaction, alreadyApplied };
 }

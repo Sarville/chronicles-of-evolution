@@ -247,8 +247,45 @@ export const goals = [
   { id: 'G020', title: 'Механизируйте производство', description: 'Завершите Mechanization и начните строить фабричную инфраструктуру.', targetTimeMs: 6900000, nodeId: 'T13', chapterId: 'CH07', slot: 'chapter', chapterAttempt: 'T1', sequence: { previousGoalId: 'G019', nextGoalId: 'G021' }, prerequisites: [{ type: 'node_completed', nodeId: 'T12' }], conditions: [{ type: 'node_completed', nodeId: 'T13' }, { type: 'building_count', buildingId: 'BLD_FACTORY', count: 1 }], rewards: [], cta: { type: 'building', targetId: 'BLD_FACTORY', label: 'Построить фабрику' }, highlight: { type: 'building', targetId: 'BLD_FACTORY' } },
   { id: 'G021', title: 'Войдите в эпоху машин', description: 'Электрифицируйте производство и запустите первую Power-инфраструктуру.', targetTimeMs: 7440000, nodeId: 'T15', chapterId: 'CH07', slot: 'chapter', chapterAttempt: 'T1', sequence: { previousGoalId: 'G020', nextGoalId: 'G022' }, prerequisites: [{ type: 'node_completed', nodeId: 'T13' }], conditions: [{ type: 'node_completed', nodeId: 'T15' }, { type: 'building_count', buildingId: 'BLD_STEAM_PLANT', count: 1 }], rewards: [], cta: { type: 'node', targetId: 'T15', label: 'Электрифицировать производство' }, highlight: { type: 'node', targetId: 'T15' } },
   { id: 'G022', title: 'Создайте современную глобальную цивилизацию', description: 'Свяжите grid, исследовательские институты и логистику в одну систему.', targetTimeMs: 8100000, nodeId: 'T18', chapterId: 'CH07', slot: 'chapter', chapterAttempt: 'T1', sequence: { previousGoalId: 'G021', nextGoalId: 'G023' }, prerequisites: [{ type: 'node_completed', nodeId: 'T15' }], conditions: [{ type: 'node_completed', nodeId: 'T18' }, { type: 'building_count', buildingId: 'BLD_GRID', count: 1 }, { type: 'building_count', buildingId: 'BLD_LABORATORY', count: 1 }, { type: 'building_count', buildingId: 'BLD_RAIL_HUB', count: 1 }], rewards: [], cta: { type: 'node', targetId: 'T18', label: 'Соединить мир' }, highlight: { type: 'node', targetId: 'T18' } },
-  { id: 'G023', title: 'Войдите в атомный век', description: 'Завершите научную цепочку и запустите Reactor/Lab Program.', targetTimeMs: 10080000, nodeId: 'A04', chapterId: 'CH08', slot: 'chapter', chapterAttempt: 'T1', sequence: { previousGoalId: 'G022', nextGoalId: 'G024' }, prerequisites: [{ type: 'node_completed', nodeId: 'T18' }], conditions: [{ type: 'node_completed', nodeId: 'A04' }, { type: 'building_count', buildingId: 'BLD_REACTOR_LAB', count: 1 }], rewards: [], cta: { type: 'node', targetId: 'A04', label: 'Войти в атомный век' }, highlight: { type: 'node', targetId: 'A04' } },
-  { id: 'G024', title: 'Пройдите Великий фильтр', description: 'Пройдите кризис, выберите Last Protocol и сохраните историю мира.', targetTimeMs: 10800000, chapterId: 'CH08', slot: 'chapter', chapterAttempt: 'T1', sequence: { previousGoalId: 'G023' }, prerequisites: [{ type: 'era_reached', eraId: 'ATOMIC' }], conditions: [{ type: 'flag_set', flag: 'run.ending.id', value: 'ENDING_ASH' }], rewards: [], cta: { type: 'event', targetId: 'EV-CR-01', label: 'Следить за напряжением мира' }, highlight: { type: 'event', targetId: 'EV-CR-01' }, hintTimeoutMs: 120000, hint: 'Напряжение мира нельзя отменить в первом Timeline. Решения меняют память об исходе, но не сам первый Ash.' },
+  // Retargeted 2026-09-18 from T1 (dead there since the Act 1 redesign -- T1
+  // ends at Tribe/Мор) to T5: docs/gdd/13_ACT_ONE_CHAPTERS.md sec.5/7 and
+  // [[archive-recall-perk-design]] both call out Atomic/Ash (old G023/G024)
+  // as the one genuinely-reusable-as-is range, unlike Settlement/City/
+  // Industry/Modern (G016-G022), which T2-T4 already cover with their own
+  // goal IDs and which T5's own recap (G070/G071 below) compresses further.
+  { id: 'G023', title: 'Войдите в атомный век', description: 'Завершите научную цепочку и запустите Reactor/Lab Program.', targetTimeMs: 1560000, nodeId: 'A04', chapterId: 'CH08', slot: 'chapter', chapterAttempt: 'T5', sequence: { previousGoalId: 'G071', nextGoalId: 'G024' }, prerequisites: [{ type: 'node_completed', nodeId: 'T18' }], conditions: [{ type: 'node_completed', nodeId: 'A04' }, { type: 'building_count', buildingId: 'BLD_REACTOR_LAB', count: 1 }], rewards: [], cta: { type: 'node', targetId: 'A04', label: 'Войти в атомный век' }, highlight: { type: 'node', targetId: 'A04' } },
+  { id: 'G024', title: 'Пройдите Великий фильтр', description: 'Пройдите кризис, выберите Last Protocol и сохраните историю мира.', targetTimeMs: 2400000, chapterId: 'CH08', slot: 'chapter', chapterAttempt: 'T5', sequence: { previousGoalId: 'G023' }, prerequisites: [{ type: 'era_reached', eraId: 'ATOMIC' }], conditions: [{ type: 'flag_set', flag: 'run.ending.id', value: 'ENDING_ASH' }], rewards: [], cta: { type: 'event', targetId: 'EV-CR-01', label: 'Следить за напряжением мира' }, highlight: { type: 'event', targetId: 'EV-CR-01' }, hintTimeoutMs: 120000, hint: 'Напряжение мира нельзя отменить в пятой попытке. Решения меняют память об исходе, но не сам первый Ash.' },
+
+  // T5 "Синтез" (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.3/5/7): recap now
+  // covers RNA->Modern (what used to be T4's whole recap PLUS T4's own new
+  // content) in the same 2 coarse steps T4 used -- coarser per step since it
+  // covers more ground, per the doc's "крупнее recap T4" rule. G070/G071
+  // continue the reserved decade-per-chapter recap-ID pattern (G040s=T2,
+  // G050s=T3, G060s=T4). G023/G024 above are T5's only genuinely new-live
+  // content (Atomic entry + Great Filter/Ash).
+  {
+    id: 'G070', title: 'Recall: от РНК до города', description: 'Молекулы, клетка, разум, племя и поселение — Архив проходит это одним шагом.',
+    targetTimeMs: 360000, nodeId: 'T12', chapterId: 'CH06', slot: 'chapter', chapterAttempt: 'T5',
+    sequence: { nextGoalId: 'G071' }, prerequisites: [],
+    conditions: [
+      { type: 'node_completed', nodeId: 'T12' },
+      { type: 'building_count', buildingId: 'BLD_SCHOOL', count: 1 },
+      { type: 'building_count', buildingId: 'BLD_MARKET', count: 1 },
+      { type: 'population_at_least', value: 28 },
+    ], rewards: [],
+    cta: { type: 'node', targetId: 'T12', label: 'Создать город' }, highlight: { type: 'node', targetId: 'T12' },
+  },
+  {
+    id: 'G071', title: 'Recall: город и современная цивилизация', description: 'Пятое поселение подряд сразу становится современной глобальной цивилизацией.',
+    targetTimeMs: 720000, nodeId: 'T18', chapterId: 'CH07', slot: 'chapter', chapterAttempt: 'T5',
+    sequence: { previousGoalId: 'G070', nextGoalId: 'G023' }, prerequisites: [{ type: 'node_completed', nodeId: 'T12' }],
+    conditions: [
+      { type: 'node_completed', nodeId: 'T18' },
+      { type: 'building_count', buildingId: 'BLD_RAIL_HUB', count: 1 },
+      { type: 'population_at_least', value: 62 },
+    ], rewards: [],
+    cta: { type: 'node', targetId: 'T18', label: 'Соединить мир' }, highlight: { type: 'node', targetId: 'T18' },
+  },
 
   // T2 "Одиночки" (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.3/5): every attempt
   // replays from RNA again, but T2's own goal chain recaps RNA->Tribe in 3

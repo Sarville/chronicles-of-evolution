@@ -155,3 +155,39 @@ export const ARCHIVE_RECALL_CHAPTERS = {
     },
   },
 };
+
+// T5's ending is structurally different from T1-T4 (docs/gdd/
+// 10_META_PROGRESSION.md sec.4.4/sec.4.6, [[archive-recall-perk-design]]):
+// no defense perk (the first Ash is mandatory, nothing to protect against),
+// and its 3 perks stack simultaneously instead of one-slot-per-chapter --
+// each is picked once (unlocking it at level 1), then every further T5
+// completion after all 3 exist scales every level by +1 instead of granting
+// anything new. See domain/services/archiveRecall.js
+// grantArchiveRecallEndgamePerk/applyArchiveRecallEndgamePerks for the level
+// -> modifier-value math; this table only names the 3 axes and their
+// per-level magnitude.
+export const ARCHIVE_RECALL_ENDGAME = {
+  endingId: 'ENDING_ASH',
+  perLevel: {
+    production: 0.05,
+    stability: 0.08,
+    cognition: 0.06,
+  },
+  perks: {
+    production: {
+      id: 'T5_ENDGAME_PRODUCTION',
+      label: 'Производство',
+      description: 'Постоянный бонус к базовому производству (+5% за уровень).',
+    },
+    stability: {
+      id: 'T5_ENDGAME_STABILITY',
+      label: 'Экспансия / Стабильность',
+      description: 'Постоянный бонус к капам основных ресурсов и запасу Stability в кризисе (+8% за уровень).',
+    },
+    cognition: {
+      id: 'T5_ENDGAME_COGNITION',
+      label: 'Познание',
+      description: 'Постоянный бонус к скорости накопления Knowledge (+6% за уровень).',
+    },
+  },
+};

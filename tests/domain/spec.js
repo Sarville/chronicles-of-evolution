@@ -609,53 +609,115 @@ deckB.tick(60000);
 assert.equal(deckB.state.run.events.pendingId, deckA.state.run.events.pendingId);
 assert.equal(deckB.state.run.events.rngState, deckA.state.run.events.rngState);
 
-// Full T1 route: phase transitions remap jobs, Atomic starts the bounded
-// authored crisis sequence, and every Last Protocol variant still reaches Ash.
-const fullRouteEngine = createChroniclesEngine({ ruleset });
-fullRouteEngine.state.run.eraId = 'CITY';
-fullRouteEngine.state.run.resources = {
+// T5 "Синтез": recap covers RNA->Modern in 2 coarse steps (G070/G071, same
+// step count as T4's recap but reaching further -- G023/G024 (Atomic/Ash)
+// are reused as-is, the only genuinely new-live content per docs/gdd/
+// 13_ACT_ONE_CHAPTERS.md sec.5/7. Phase transitions still remap jobs, Atomic
+// still starts the bounded authored crisis sequence, and every Last Protocol
+// variant still reaches Ash -- this obsoletes the old T1-default
+// "fullRouteEngine" version of this test now that T5 is its real owner.
+const t5Engine = createChroniclesEngine({ ruleset, actOneAttempt: 'T5' });
+assert.equal(t5Engine.state.run.actOneAttempt, 'T5');
+t5Engine.state.meta.persistentFlags = { 'meta.endings.chapter1_subtype': 'blight_isolated' };
+t5Engine.state.run.eraId = 'MODERN';
+t5Engine.state.run.resources = {
   food: { amount: 10000, capOverride: 100000 }, materials: { amount: 10000, capOverride: 100000 },
   knowledge: { amount: 10000, capOverride: 100000 }, power: { amount: 10000, capOverride: 100000 },
 };
-fullRouteEngine.state.run.population = {
-  current: 100, peak: 100, baseCap: 120, assignments: { JOB_CITY_WORKER: 3 }, foodStatus: 'healthy',
+for (const nodeId of ['T09', 'T12', 'T13', 'T14', 'T15', 'T18']) {
+  t5Engine.state.run.nodes.completed[nodeId] = { completedAtMs: 0 };
+}
+t5Engine.state.run.population = { current: 100, peak: 100, baseCap: 120, assignments: { JOB_INDUSTRY_WORKER: 3 }, foodStatus: 'healthy' };
+t5Engine.state.run.buildings = {
+  BLD_FIELD: { count: 1 }, BLD_HOUSE: { count: 1 }, BLD_WORKSHOP: { count: 1 },
+  BLD_SCHOOL: { count: 1 }, BLD_MARKET: { count: 1 }, BLD_RAIL_HUB: { count: 1 },
+  BLD_FACTORY: { count: 1 }, BLD_STEAM_PLANT: { count: 1 },
 };
-for (const nodeId of ['T12', 'T13', 'T14']) fullRouteEngine.state.run.nodes.completed[nodeId] = { completedAtMs: 0 };
-fullRouteEngine.state.run.buildings = { BLD_FACTORY: { count: 1 }, BLD_STEAM_PLANT: { count: 1 } };
-result = fullRouteEngine.dispatch({ type: 'BUY_NODE', nodeId: 'T15' });
+result = t5Engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'food', amount: 0 });
 assert.equal(result.ok, true);
-assert.equal(fullRouteEngine.state.run.eraId, 'INDUSTRY');
-assert.deepEqual(fullRouteEngine.state.run.population.assignments, { JOB_INDUSTRY_WORKER: 3 });
-assert.equal(fullRouteEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CIV-06', choiceId: 'clean' }).ok, true);
+for (const goalId of ['G070', 'G071']) {
+  assert.equal(t5Engine.state.run.goals.states[goalId]?.status, 'archived');
+}
+for (const goalId of ['G060', 'G061', 'G035', 'G036', 'G037', 'G038', 'G039', 'G022']) {
+  assert.equal(t5Engine.state.run.goals.states[goalId], undefined);
+}
+// EV-NAR-08 (Синтез, higher priority) and EV-NAR-02 (ERROR 17) both queue off
+// the same G071 completion; EV-NAR-08 wins the race to pendingId.
+assert.equal(t5Engine.state.run.events.pendingId, 'EV-NAR-08');
+assert.deepEqual(t5Engine.state.run.events.queue, ['EV-NAR-02']);
+assert.equal(t5Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-NAR-08', choiceId: 'continue' }).ok, true);
+assert.equal(t5Engine.state.run.flags['run.chapter5.synthesis_started'], true);
+assert.equal(t5Engine.state.run.events.pendingId, 'EV-NAR-02');
+assert.equal(t5Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-NAR-02', choiceId: 'record' }).ok, true);
 
-fullRouteEngine.state.run.eraId = 'PRE_ATOMIC';
-for (const resource of Object.values(fullRouteEngine.state.run.resources)) resource.amount = 20000;
-for (const nodeId of ['A01', 'A02', 'A03']) fullRouteEngine.state.run.nodes.completed[nodeId] = { completedAtMs: 0 };
-fullRouteEngine.state.run.buildings.BLD_REACTOR_LAB = { count: 1 };
-result = fullRouteEngine.dispatch({ type: 'BUY_NODE', nodeId: 'A04' });
+// t5_synthesis echo deck: only chapter1_subtype is set, so the weighted
+// draw's eligible pool has exactly one candidate each time -- deterministic.
+t5Engine.tick(65000);
+assert.equal(t5Engine.state.run.events.pendingId, 'EV-T5-ECHO-BLIGHT-MINOR');
+assert.equal(t5Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-T5-ECHO-BLIGHT-MINOR', choiceId: 'continue' }).ok, true);
+t5Engine.tick(65000);
+assert.equal(t5Engine.state.run.events.pendingId, 'EV-T5-ECHO-BLIGHT-MAJOR');
+assert.equal(t5Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-T5-ECHO-BLIGHT-MAJOR', choiceId: 'deploy' }).ok, true);
+
+t5Engine.state.run.eraId = 'PRE_ATOMIC';
+for (const resource of Object.values(t5Engine.state.run.resources)) resource.amount = 20000;
+for (const nodeId of ['A01', 'A02', 'A03']) t5Engine.state.run.nodes.completed[nodeId] = { completedAtMs: 0 };
+t5Engine.state.run.buildings.BLD_REACTOR_LAB = { count: 1 };
+result = t5Engine.dispatch({ type: 'BUY_NODE', nodeId: 'A04' });
 assert.equal(result.ok, true);
-assert.equal(fullRouteEngine.state.run.eraId, 'ATOMIC');
-assert.equal(fullRouteEngine.state.run.crisis.stability, 100);
-assert.equal(fullRouteEngine.state.run.events.pendingId, 'EV-NAR-03');
-assert.equal(fullRouteEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-NAR-03', choiceId: 'continue' }).ok, true);
-fullRouteEngine.tick(120000);
-assert.equal(fullRouteEngine.state.run.events.pendingId, 'EV-CR-01');
-assert.equal(fullRouteEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-01', choiceId: 'deescalate' }).ok, true);
-fullRouteEngine.tick(180000);
-assert.equal(fullRouteEngine.state.run.events.pendingId, 'EV-CR-02');
-assert.equal(fullRouteEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-02', choiceId: 'manual_verify' }).ok, true);
-fullRouteEngine.tick(180000);
-assert.equal(fullRouteEngine.state.run.crisis.phase, 'C3');
-fullRouteEngine.tick(240000);
-assert.equal(fullRouteEngine.state.run.events.pendingId, 'EV-CR-03');
-assert.equal(fullRouteEngine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-03', choiceId: 'disarm' }).ok, true);
-assert.equal(fullRouteEngine.state.run.lifecycle, 'ended');
-assert.equal(fullRouteEngine.state.run.ending.subtype, 'ash_too_late');
-result = fullRouteEngine.dispatch({ type: 'ARCHIVE_RESET' });
-assert.equal(result.ok, true);
-assert.equal(fullRouteEngine.state.run.lifecycle, 'active');
-assert.equal(fullRouteEngine.state.meta.archiveFragments >= 14 && fullRouteEngine.state.meta.archiveFragments <= 18, true);
-assert.equal(fullRouteEngine.state.meta.chronicle.some((record) => record.kind === 'ending'), true);
+assert.equal(t5Engine.state.run.eraId, 'ATOMIC');
+assert.equal(t5Engine.state.run.crisis.stability, 100);
+assert.equal(t5Engine.state.run.events.pendingId, 'EV-NAR-03');
+assert.equal(t5Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-NAR-03', choiceId: 'continue' }).ok, true);
+assert.equal(t5Engine.state.run.goals.states.G023?.status, 'archived');
+t5Engine.tick(120000);
+assert.equal(t5Engine.state.run.events.pendingId, 'EV-CR-01');
+assert.equal(t5Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-01', choiceId: 'deescalate' }).ok, true);
+t5Engine.tick(180000);
+assert.equal(t5Engine.state.run.events.pendingId, 'EV-CR-02');
+assert.equal(t5Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-02', choiceId: 'manual_verify' }).ok, true);
+t5Engine.tick(180000);
+assert.equal(t5Engine.state.run.crisis.phase, 'C3');
+t5Engine.tick(240000);
+assert.equal(t5Engine.state.run.events.pendingId, 'EV-CR-03');
+assert.equal(t5Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-03', choiceId: 'disarm' }).ok, true);
+assert.equal(t5Engine.state.run.lifecycle, 'ended');
+assert.equal(t5Engine.state.run.ending.id, 'ENDING_ASH');
+assert.equal(t5Engine.state.run.ending.subtype, 'ash_too_late');
+// RESOLVE_EVENT doesn't re-run goal evaluation itself (only dispatches that
+// go through withGoalEvaluation do); a zero-length tick is enough to let
+// G024's flag_set condition catch up, same as any real next frame would.
+t5Engine.tick(0);
+assert.equal(t5Engine.state.run.goals.states.G024?.status, 'archived');
+
+// ENDING_ASH no longer grants Archive Fragments -- it grants a choice among
+// 3 permanent endgame perks instead (docs/gdd/10_META_PROGRESSION.md sec.4.4).
+const t5MissingChoice = t5Engine.dispatch({ type: 'ARCHIVE_RESET' });
+assert.equal(t5MissingChoice.ok, false);
+assert.equal(t5MissingChoice.reason, 'INVALID_ARCHIVE_RECALL_PERK_CHOICE');
+
+const t5Reset = t5Engine.dispatch({ type: 'ARCHIVE_RESET', perkChoiceId: 'production' });
+assert.equal(t5Reset.ok, true);
+assert.equal(t5Engine.state.run.lifecycle, 'active');
+assert.equal(t5Engine.state.meta.archiveFragments, 0);
+assert.equal(t5Engine.state.meta.archiveRecall.endgame.production, 1);
+assert.equal(t5Engine.state.meta.chronicle.some((record) => record.kind === 'ending'), true);
+// T5 loops back to itself -- Act 2/3 don't exist yet.
+assert.equal(t5Engine.state.run.actOneAttempt, 'T5');
+assert.equal(Math.abs(t5Engine.state.run.modifiers.active['T5_ENDGAME_PRODUCTION:global']?.value - 1.05) < 0.000001, true);
+
+// Once all 3 endgame perks are unlocked, a further ENDING_ASH completion
+// needs no perkChoiceId and instead scales every level by +1.
+t5Engine.state.meta.archiveRecall.endgame = { production: 1, stability: 1, cognition: 1 };
+t5Engine.state.run.ending = { id: 'ENDING_ASH', subtype: 'ash_fire', completedAtMs: t5Engine.state.run.clock.simulationMs };
+t5Engine.state.run.lifecycle = 'ended';
+const t5Scale = t5Engine.dispatch({ type: 'ARCHIVE_RESET', transactionId: 'test_t5_scale_1' });
+assert.equal(t5Scale.ok, true);
+assert.deepEqual(t5Engine.state.meta.archiveRecall.endgame, { production: 2, stability: 2, cognition: 2 });
+assert.equal(Math.abs(t5Engine.state.run.modifiers.active['T5_ENDGAME_PRODUCTION:global']?.value - 1.1) < 0.000001, true);
+assert.equal(Math.abs(t5Engine.state.run.modifiers.active['T5_ENDGAME_STABILITY:capacity_multiplier:food']?.value - 1.16) < 0.000001, true);
+assert.equal(Math.abs(t5Engine.state.run.modifiers.active['T5_ENDGAME_STABILITY:crisis_stability_decay']?.value - 0.84) < 0.000001, true);
+assert.equal(Math.abs(t5Engine.state.run.modifiers.active['T5_ENDGAME_COGNITION:resource:knowledge']?.value - 1.12) < 0.000001, true);
 
 assert.doesNotThrow(() => JSON.stringify(engine.state.run));
 assert.equal(typeof rng.next(), 'number');
@@ -831,8 +893,8 @@ const t4Reset = t4Engine.dispatch({ type: 'ARCHIVE_RESET', perkChoiceId: 'effici
 assert.equal(t4Reset.ok, true);
 assert.equal(t4Engine.state.meta.archiveRecall.chapters.T4.styleChoice, 'efficiency');
 assert.equal(t4Engine.state.meta.archiveRecall.chapters.T4.defensePerkId, 'T4_DEFENSE_UNIFIED_CONSENT_PROTOCOL');
-// T5 doesn't exist as its own chapter yet -- falls back to T1 by default.
-assert.equal(t4Engine.state.run.actOneAttempt, 'T1');
+// T5 now exists as its own chapter, so T4's reset advances into it.
+assert.equal(t4Engine.state.run.actOneAttempt, 'T5');
 // "Быстрое обучение": Cognition auto-credits 45/100, Writing (T09/T10) x0.55.
 assert.equal(t4Engine.state.run.cognition.eventBonus, 45);
 assert.deepEqual(selectNodeCost(t4Engine.state, ruleset, 'T09'), { food: 1160, materials: 633, knowledge: 215 });

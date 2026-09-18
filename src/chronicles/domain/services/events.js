@@ -28,6 +28,13 @@ function conditionsMet(state, conditions = []) {
     if (condition.type === 'goal_completed') return state.run.goals.states[condition.goalId]?.status === 'archived';
     if (condition.type === 'flag_set') return state.run.flags[condition.flag] === condition.value;
     if (condition.type === 'era_reached') return state.run.eraId === condition.eraId;
+    // T5 echo deck (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.7.2): gates on a
+    // chapter having *any* recorded subtype, not one exact value -- Мор/
+    // Катаклизм/Раскол/Авария each have several possible subtypes.
+    if (condition.type === 'meta_flag_set') return state.meta?.persistentFlags?.[condition.flag] != null;
+    // A paired major card only opens after its own minor already resolved
+    // this run (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.7.2's "minor -> major").
+    if (condition.type === 'event_resolved') return state.run.events?.states?.[condition.eventId]?.status === 'resolved';
     return false;
   });
 }

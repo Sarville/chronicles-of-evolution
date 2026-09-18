@@ -364,7 +364,25 @@ export const events = [
     ],
   },
   {
-    id: 'EV-NAR-02', type: 'anomaly', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G022' },
+    // T5 "Синтез" recap seam (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.5/7), same
+    // role as EV-NAR-T2/T3/T4-RECALL but also doubles as the doc's named
+    // narrative beat opening the t5_synthesis echo deck window. Defined
+    // before EV-NAR-02 below so it wins the pendingId race when both queue
+    // off the same G071 completion (queueEventsForTrigger activates events
+    // in array order, not priority order -- same mechanic as EV-CIV-07
+    // winning over EV-NAR-T4 for T4).
+    id: 'EV-NAR-08', type: 'narrative', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G071' },
+    phaseWindow: { eraIds: ['MODERN'] }, priority: 66, telemetryKey: 'event_t5_synthesis', title: 'Синтез',
+    body: 'Архив: до этой точки дорога прошла один раз, сразу через всё. Дальше — то, что помнят и предыдущие попытки: Мор, Катаклизм, Раскол, Авария, каждая по-своему.',
+    chronicleSummary: 'Архив начал смешивать уроки прошлых цивилизаций внутри пятой попытки.',
+    choices: [{ id: 'continue', label: 'Продолжить', effects: [{ type: 'set_flag', flag: 'run.chapter5.synthesis_started', value: true }] }],
+  },
+  {
+    // Retargeted 2026-09-18 from the now-dead T1-only G022 to T5's own
+    // "reached Modern" recap checkpoint (G071) -- docs/gdd/
+    // 13_ACT_ONE_CHAPTERS.md sec.7 lists ERROR 17 among the T5 content
+    // reused "почти без изменений", same pattern as EV-CIV-04's T3 retarget.
+    id: 'EV-NAR-02', type: 'anomaly', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G071' },
     phaseWindow: { eraIds: ['MODERN'] }, priority: 65, telemetryKey: 'event_error17', title: 'ERROR 17',
     body: 'Прогноз завершения цикла: доступен.\n\nERROR 17', chronicleSummary: 'Глобальная система показала невозможный прогноз завершения цикла.',
     choices: [{ id: 'record', label: 'Зафиксировать', effects: [{ type: 'set_flag', flag: 'run.anomaly.error17_active', value: true }, { type: 'set_meta_flag', flag: 'meta.anomaly.error17_seen', value: true }] }],
@@ -402,6 +420,125 @@ export const events = [
       { id: 'retaliate', label: 'Ответить ударом', effects: [{ type: 'set_flag', flag: 'run.crisis.last_protocol', value: 'retaliate' }, { type: 'complete_ending', endingId: 'ENDING_ASH', subtype: 'ash_fire' }] },
       { id: 'disarm', label: 'Попытаться разоружить систему', effects: [{ type: 'set_flag', flag: 'run.crisis.last_protocol', value: 'disarm' }, { type: 'complete_ending', endingId: 'ENDING_ASH', subtype: 'ash_too_late' }] },
       { id: 'delegate_system', label: 'Передать решение системе', effects: [{ type: 'set_flag', flag: 'run.crisis.last_protocol', value: 'delegate_system' }, { type: 'complete_ending', endingId: 'ENDING_ASH', subtype: 'ash_system' }] },
+    ],
+  },
+
+  // T5 "t5_synthesis" echo deck (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.7.2/7.3):
+  // reuses the exact same generic deck mechanism as 'early_biology' (seeded
+  // weighted draw, per-event cooldown) -- new cards, not a new engine. Each
+  // pair is gated on the matching chapter's meta subtype flag (absent if
+  // that chapter was never completed or a save migrated without full
+  // history) and opens only after EV-NAR-08 "Синтез" has been read; a major
+  // additionally requires its own paired minor already resolved this run.
+  // Hard rule (sec.7.2): no echo choice may complete_ending or otherwise
+  // touch the mandatory first Ash -- only grant_resource/
+  // adjust_crisis_stability, same envelope as EV-CR-01/02.
+  {
+    id: 'EV-T5-ECHO-BLIGHT-MINOR', type: 'flavor', deck: 't5_synthesis', trigger: { type: 'deck', deck: 't5_synthesis' },
+    phaseWindow: { eraIds: ['MODERN', 'ATOMIC'] },
+    preconditions: [{ type: 'event_resolved', eventId: 'EV-NAR-08' }, { type: 'meta_flag_set', flag: 'meta.endings.chapter1_subtype' }],
+    weight: 1, cooldownMs: 0, priority: 15,
+    telemetryKey: 'event_t5_echo_blight_minor', title: 'Эхо: Мор',
+    body: 'Архив вспоминает первую попытку: как быстро плотность одного лагеря стала опасной. Та же логика сейчас работает в масштабе города.',
+    chronicleSummary: 'Пятая попытка вспомнила урок первого Мора.',
+    choices: [{ id: 'continue', label: 'Отметить', effects: [{ type: 'set_flag', flag: 'run.chapter5.echo.blight_minor', value: true }] }],
+  },
+  {
+    id: 'EV-T5-ECHO-BLIGHT-MAJOR', type: 'flavor', deck: 't5_synthesis', trigger: { type: 'deck', deck: 't5_synthesis' },
+    phaseWindow: { eraIds: ['MODERN', 'ATOMIC'] },
+    preconditions: [
+      { type: 'event_resolved', eventId: 'EV-NAR-08' },
+      { type: 'meta_flag_set', flag: 'meta.endings.chapter1_subtype' },
+      { type: 'event_resolved', eventId: 'EV-T5-ECHO-BLIGHT-MINOR' },
+    ],
+    weight: 1, cooldownMs: 0, priority: 16,
+    telemetryKey: 'event_t5_echo_blight_major', title: 'Протокол на основе Мора',
+    body: 'Служба здоровья предлагает развернуть карантинный протокол по образцу первой цивилизации -- быстро, но не бесплатно.',
+    chronicleSummary: 'Пятая попытка применила протокол, рождённый первым Мором.',
+    choices: [
+      { id: 'deploy', label: 'Развернуть протокол', effects: [{ type: 'grant_resource', resourceId: 'knowledge', amount: 240 }] },
+      { id: 'skip', label: 'Не тратить ресурсы', effects: [{ type: 'set_flag', flag: 'run.chapter5.echo.blight_major_skipped', value: true }] },
+    ],
+  },
+  {
+    id: 'EV-T5-ECHO-CATACLYSM-MINOR', type: 'flavor', deck: 't5_synthesis', trigger: { type: 'deck', deck: 't5_synthesis' },
+    phaseWindow: { eraIds: ['MODERN', 'ATOMIC'] },
+    preconditions: [{ type: 'event_resolved', eventId: 'EV-NAR-08' }, { type: 'meta_flag_set', flag: 'meta.endings.chapter2_subtype' }],
+    weight: 1, cooldownMs: 0, priority: 15,
+    telemetryKey: 'event_t5_echo_cataclysm_minor', title: 'Эхо: Катаклизм',
+    body: 'Архив вспоминает второе поселение: землю, которая треснула без предупреждения. Нынешние фундаменты проверяются по тем же признакам.',
+    chronicleSummary: 'Пятая попытка вспомнила урок второго Катаклизма.',
+    choices: [{ id: 'continue', label: 'Отметить', effects: [{ type: 'set_flag', flag: 'run.chapter5.echo.cataclysm_minor', value: true }] }],
+  },
+  {
+    id: 'EV-T5-ECHO-CATACLYSM-MAJOR', type: 'flavor', deck: 't5_synthesis', trigger: { type: 'deck', deck: 't5_synthesis' },
+    phaseWindow: { eraIds: ['MODERN', 'ATOMIC'] },
+    preconditions: [
+      { type: 'event_resolved', eventId: 'EV-NAR-08' },
+      { type: 'meta_flag_set', flag: 'meta.endings.chapter2_subtype' },
+      { type: 'event_resolved', eventId: 'EV-T5-ECHO-CATACLYSM-MINOR' },
+    ],
+    weight: 1, cooldownMs: 0, priority: 16,
+    telemetryKey: 'event_t5_echo_cataclysm_major', title: 'Запас на случай толчка',
+    body: 'Инженеры предлагают заранее укрепить инфраструктуру по образцу второй попытки -- либо потратить материалы сейчас, либо рискнуть без запаса.',
+    chronicleSummary: 'Пятая попытка применила инфраструктурный запас, рождённый вторым Катаклизмом.',
+    choices: [
+      { id: 'reinforce', label: 'Укрепить заранее', effects: [{ type: 'grant_resource', resourceId: 'materials', amount: 300 }, { type: 'adjust_crisis_stability', amount: 3 }] },
+      { id: 'skip', label: 'Не тратить материалы', effects: [{ type: 'set_flag', flag: 'run.chapter5.echo.cataclysm_major_skipped', value: true }] },
+    ],
+  },
+  {
+    id: 'EV-T5-ECHO-FRACTURE-MINOR', type: 'flavor', deck: 't5_synthesis', trigger: { type: 'deck', deck: 't5_synthesis' },
+    phaseWindow: { eraIds: ['MODERN', 'ATOMIC'] },
+    preconditions: [{ type: 'event_resolved', eventId: 'EV-NAR-08' }, { type: 'meta_flag_set', flag: 'meta.endings.chapter3_subtype' }],
+    weight: 1, cooldownMs: 0, priority: 15,
+    telemetryKey: 'event_t5_echo_fracture_minor', title: 'Эхо: Раскол',
+    body: 'Архив вспоминает третью крепость: кварталы, переставшие ждать общего решения. Голоса несогласных снова слышны в нынешней сети.',
+    chronicleSummary: 'Пятая попытка вспомнила урок третьего Раскола.',
+    choices: [{ id: 'continue', label: 'Отметить', effects: [{ type: 'set_flag', flag: 'run.chapter5.echo.fracture_minor', value: true }] }],
+  },
+  {
+    id: 'EV-T5-ECHO-FRACTURE-MAJOR', type: 'flavor', deck: 't5_synthesis', trigger: { type: 'deck', deck: 't5_synthesis' },
+    phaseWindow: { eraIds: ['MODERN', 'ATOMIC'] },
+    preconditions: [
+      { type: 'event_resolved', eventId: 'EV-NAR-08' },
+      { type: 'meta_flag_set', flag: 'meta.endings.chapter3_subtype' },
+      { type: 'event_resolved', eventId: 'EV-T5-ECHO-FRACTURE-MINOR' },
+    ],
+    weight: 1, cooldownMs: 0, priority: 16,
+    telemetryKey: 'event_t5_echo_fracture_major', title: 'Модель согласия из Раскола',
+    body: 'Аналитики предлагают применить модель согласия, выведенную из третьей попытки, прежде чем разногласия успеют накопиться снова.',
+    chronicleSummary: 'Пятая попытка применила модель согласия, рождённую третьим Расколом.',
+    choices: [
+      { id: 'apply', label: 'Применить модель', effects: [{ type: 'adjust_crisis_stability', amount: 4 }] },
+      { id: 'skip', label: 'Оставить как есть', effects: [{ type: 'adjust_crisis_stability', amount: -2 }] },
+    ],
+  },
+  {
+    id: 'EV-T5-ECHO-OVERLOAD-MINOR', type: 'flavor', deck: 't5_synthesis', trigger: { type: 'deck', deck: 't5_synthesis' },
+    phaseWindow: { eraIds: ['MODERN', 'ATOMIC'] },
+    preconditions: [{ type: 'event_resolved', eventId: 'EV-NAR-08' }, { type: 'meta_flag_set', flag: 'meta.endings.chapter4_subtype' }],
+    weight: 1, cooldownMs: 0, priority: 15,
+    telemetryKey: 'event_t5_echo_overload_minor', title: 'Эхо: Авария',
+    body: 'Архив вспоминает четвёртую сеть: каскад автоматики быстрее любого протокола согласования. Диагностика ищет тот же паттерн заранее.',
+    chronicleSummary: 'Пятая попытка вспомнила урок четвёртой Аварии.',
+    choices: [{ id: 'continue', label: 'Отметить', effects: [{ type: 'set_flag', flag: 'run.chapter5.echo.overload_minor', value: true }] }],
+  },
+  {
+    id: 'EV-T5-ECHO-OVERLOAD-MAJOR', type: 'flavor', deck: 't5_synthesis', trigger: { type: 'deck', deck: 't5_synthesis' },
+    phaseWindow: { eraIds: ['MODERN', 'ATOMIC'] },
+    preconditions: [
+      { type: 'event_resolved', eventId: 'EV-NAR-08' },
+      { type: 'meta_flag_set', flag: 'meta.endings.chapter4_subtype' },
+      { type: 'event_resolved', eventId: 'EV-T5-ECHO-OVERLOAD-MINOR' },
+    ],
+    weight: 1, cooldownMs: 0, priority: 16,
+    telemetryKey: 'event_t5_echo_overload_major', title: 'Диагностика каскада',
+    body: 'Диагностика, выведенная из четвёртой Аварии, может заранее притормозить автоматику -- ценой части выпуска сейчас.',
+    chronicleSummary: 'Пятая попытка применила диагностику каскада, рождённую четвёртой Аварией.',
+    choices: [
+      { id: 'throttle', label: 'Притормозить автоматику', effects: [{ type: 'adjust_crisis_stability', amount: 3 }] },
+      { id: 'push', label: 'Форсировать выпуск', effects: [{ type: 'grant_resource', resourceId: 'materials', amount: 300 }, { type: 'adjust_crisis_stability', amount: -2 }] },
     ],
   },
 ];

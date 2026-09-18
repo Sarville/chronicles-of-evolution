@@ -11,7 +11,7 @@ import { applyEffects } from './services/modifiers.js';
 import { assertPopulationRequirement } from './services/population.js';
 import { addResource } from './services/resources.js';
 import { prepareResetTransaction, applyPreparedResetTransaction } from '../save/resetTransaction.js';
-import { grantArchiveRecallPerkChoice } from './services/archiveRecall.js';
+import { grantArchiveRecallPerkChoice, grantArchiveRecallEndgamePerk } from './services/archiveRecall.js';
 
 function ok(state, events) {
   state.session.dirty = true;
@@ -92,19 +92,14 @@ function assignJob(state, ruleset, jobId, amount, ports) {
 }
 
 // Every T1-T5 chapter ends with its own reset (Ash is only mandatory on T5);
-// see docs/gdd/13_ACT_ONE_CHAPTERS.md. ENDING_ASH still stands in for the
-// eventual T5/endgame ending and keeps the Archive Fragment reward it always
-// had. ENDING_BLIGHT is T1's Мор collapse: per docs/gdd/10_META_PROGRESSION.md
-// §1/§3, no currency exists anywhere in Act 1-2 -- its reward is an Archive
-// Recall perk choice instead (§4).
+// see docs/gdd/13_ACT_ONE_CHAPTERS.md. Per docs/gdd/10_META_PROGRESSION.md
+// §1/§3, no currency exists anywhere in Act 1-2 -- ENDING_ASH is now T5's own
+// ending and its reward is a choice among 3 permanent endgame perks (§4.4),
+// not the Archive Fragment grant it used to have as a stand-in. ENDING_BLIGHT
+// is T1's Мор collapse: its reward is an Archive Recall perk choice (§4.2).
 const ENDING_RESET_PROFILES = {
   ENDING_ASH: {
-    reward(state) {
-      const nodeCount = Object.keys(state.run.nodes.completed || {}).length;
-      const peakPopulation = state.run.population?.peak || 0;
-      const stabilityBonus = Math.max(0, Math.min(3, Math.floor((state.run.crisis?.minStability || 0) / 30)));
-      return Math.max(14, Math.min(18, 14 + Math.floor(nodeCount / 15) + (peakPopulation >= 60 ? 1 : 0) + stabilityBonus));
-    },
+    endgamePerk: true,
     chronicleSummary: 'Timeline #1 завершён: Пепел сохранён в Архиве.',
   },
   ENDING_BLIGHT: {
@@ -137,6 +132,10 @@ function archiveReset(state, ruleset, command, ports) {
     const grant = grantArchiveRecallPerkChoice(profile.archiveRecallChapterKey, command.perkChoiceId);
     if (!grant.ok) return rejected(grant.reason, grant.details);
     reward = { archiveRecallPerk: grant.grant };
+  } else if (profile.endgamePerk) {
+    const grant = grantArchiveRecallEndgamePerk(state, command.perkChoiceId);
+    if (!grant.ok) return rejected(grant.reason, grant.details);
+    reward = { archiveRecallEndgamePerk: grant.grant };
   } else {
     reward = { archiveFragments: profile.reward(state) };
   }

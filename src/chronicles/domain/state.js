@@ -65,7 +65,7 @@ export function createInitialGameState(options = {}) {
     },
     meta: {
       archiveFragments: 0,
-      archiveRecall: { chapters: {} },
+      archiveRecall: { chapters: {}, endgame: {} },
       chronicle: [],
       unlocks: {},
       persistentFlags: {},

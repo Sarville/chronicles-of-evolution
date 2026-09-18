@@ -1,6 +1,6 @@
 import { createBrowserStorage } from '../adapters/storageAdapter.js';
 import { ruleset, createRulesetIndexes } from '../config/index.js';
-import { ARCHIVE_RECALL_CHAPTERS } from '../config/archiveRecall.js';
+import { ARCHIVE_RECALL_CHAPTERS, ARCHIVE_RECALL_ENDGAME } from '../config/archiveRecall.js';
 import { calculateCap } from '../domain/services/resources.js';
 import {
   selectCurrentGoal,
@@ -462,7 +462,14 @@ function renderEnding() {
       .join('');
     return `<section class="panel ending"><small>ЦИВИЛИЗАЦИЯ ЗАВЕРШЕНА</small><h2>${ENDING_TITLE_BY_ID[ending.id] || ending.id}</h2><p>Подтип: ${ending.subtype}. Выберите перк Archive Recall для следующей попытки.</p>${defenseNote}${options}</section>`;
   }
-  return `<section class="panel ending"><small>ЦИВИЛИЗАЦИЯ №1 ЗАВЕРШЕНА</small><h2>ПЕПЕЛ</h2><p>Подтип: ${ending.subtype}. История готова к сохранению в Архив.</p><button class="primary" data-action="archive-reset">Сохранить в Архив</button></section>`;
+  const endgameLevels = engine().state.meta.archiveRecall?.endgame || {};
+  const lockedPerks = Object.entries(ARCHIVE_RECALL_ENDGAME.perks).filter(([perkKey]) => !(endgameLevels[perkKey] > 0));
+  const endgameOptions = lockedPerks.length
+    ? lockedPerks
+        .map(([perkKey, perk]) => `<button class="primary" data-action="archive-reset" data-perk="${perkKey}">${perk.label}: ${perk.description}</button>`)
+        .join('')
+    : `<button class="primary" data-action="archive-reset">Усилить все перки Архива</button>`;
+  return `<section class="panel ending"><small>ЦИВИЛИЗАЦИЯ №1 ЗАВЕРШЕНА</small><h2>ПЕПЕЛ</h2><p>Подтип: ${ending.subtype}. Выберите постоянный перк Архива для этой и будущих попыток.</p>${endgameOptions}</section>`;
 }
 
 const renderDevPanel = DEV

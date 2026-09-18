@@ -55,6 +55,9 @@ export function applyEffects(state, effects = [], source = {}) {
     if (effect.type === 'building_output_multiplier') {
       state.run.modifiers.active[`${sourceKey}:building_output_multiplier:${effect.eraId}`] = effect;
     }
+    if (effect.type === 'crisis_stability_decay_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:crisis_stability_decay`] = effect;
+    }
     if (effect.type === 'grant_cognition') {
       state.run.cognition ||= { eventBonus: 0 };
       state.run.cognition.eventBonus = Math.max(0, (state.run.cognition.eventBonus || 0) + effect.amount);

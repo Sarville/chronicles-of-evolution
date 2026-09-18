@@ -788,15 +788,74 @@ Concrete code TODO:
     plus targeted checks for the output floor and output multiplier.
   - Explicitly **not built** (pure polish, zero mechanical effect, same
     reasons as `T2`): skin swap #2 and the `MS15` milestone banner.
-- [ ] Implement `T5`'s 3-perk stacking + post-unlock numeric-scaling
-  mechanic, applied live across the parallel Act 1/2 ↔ Act 3+ switch.
+- [x] `T5` "Синтез" implemented as its own chapter (2026-09-18) — last of
+  Act 1, `T1`-`T5` all now exist in code:
+  - `T5`'s own goal chain: `G070`/`G071` (recap RNA→Modern, 2 coarse steps —
+    same step count as `T4`'s recap but reaching further, per "крупнее"
+    scaling by endpoint, not step count) + `G023`/`G024` (Atomic entry/Ash,
+    retagged `chapterAttempt` from the now-dead `'T1'` to `'T5'` — the only
+    genuinely-reusable-as-is content per the doc). `EV-NAR-02` "ERROR 17"
+    retargeted from dead `G022` to `G071`, same dead-event-retarget pattern
+    as `T3`'s `EV-CIV-04`.
+  - New `EV-NAR-08` "Синтез" narrative seam at the recap/new-content
+    boundary, doubling as the intro to the `t5_synthesis` echo deck (docs
+    sec.7.2) — 4 minor/major card pairs (`EV-T5-ECHO-{BLIGHT,CATACLYSM,
+    FRACTURE,OVERLOAD}-{MINOR,MAJOR}`), reusing the existing generic
+    weighted-deck engine (`early_biology`'s mechanism, new cards only).
+    Gated on `meta.endings.chapterN_subtype` (via a new `meta_flag_set`
+    precondition type — existence check, not exact-value, since each
+    chapter has several possible subtypes) and, for majors, on their paired
+    minor already resolved this run (new `event_resolved` precondition
+    type). Both added to `domain/services/events.js` `conditionsMet`.
+  - `T5`'s ending (`ENDING_ASH`, now fully `T5`-owned) grants a choice among
+    3 permanent, simultaneously-stacking endgame perks instead of `T1-T4`'s
+    one-slot-per-chapter pattern — new `ARCHIVE_RECALL_ENDGAME`
+    (`config/archiveRecall.js`) + `meta.archiveRecall.endgame` (per-perk
+    integer levels) + `grantArchiveRecallEndgamePerk`/
+    `applyArchiveRecallEndgamePerks` (`domain/services/archiveRecall.js`).
+    Производство = `global_production_multiplier`; Познание =
+    `resource_production_multiplier` on `knowledge` (not `grant_cognition`
+    — by endgame the Cognition gate is long passed, a permanent Knowledge-
+    rate bonus is what actually keeps compounding); Экспансия/Стабильность =
+    `resource_capacity_multiplier` ×3 + one new modifier type,
+    `crisis_stability_decay_multiplier` (consulted in `crisis.js`
+    `advanceCrisis`). Once all 3 are unlocked, `ARCHIVE_RESET` needs no
+    `perkChoiceId` and instead scales every level by +1 (capped at 5,
+    `ponytail:`-marked — the real curve is the item below).
+  - `ENDING_ASH`'s old flat 14-18 AF reward removed entirely
+    (`ENDING_RESET_PROFILES.ENDING_ASH` now `{ endgamePerk: true }`); AF is
+    now fully gone from Act 1-2 across all five endings.
+    `NEXT_ACT_ONE_ATTEMPT` gained `T4: 'T5'`; `T5`'s own reset loops back to
+    `'T5'` (Act 2/3 don't exist yet, so repeat-`T5` scaling is what
+    currently stands in for further progression).
+  - Found that when two events share a trigger (here `EV-NAR-08`/
+    `EV-NAR-02` both on `goal_completed G071`, same shape as `T4`'s
+    `EV-CIV-07`/`EV-NAR-T4` on `G037`), which one wins `pendingId` is
+    decided by **array order in `config/events.js`**, not by `priority` —
+    had to reorder `EV-NAR-08` before `EV-NAR-02` in the file for the
+    intended narrative sequencing despite already having the higher
+    `priority` value.
+  - Regression test in `tests/domain/spec.js` replaces the old
+    default-`T1`-attempt "fullRouteEngine" placeholder with a real
+    `actOneAttempt: 'T5'` version: recap-goal archival, the `EV-NAR-08`/
+    `EV-NAR-02` ordering, one deterministic echo minor→major draw, the
+    unchanged crisis/Last-Protocol/Ash sequence, missing-choice rejection,
+    first-perk unlock, and the all-3-unlocked scale-up path.
 - [ ] Implement Archive-mode as an entry point (available after first Act
   1 completion) — no currency grant, only perk progress, live-applies to
-  the concurrently active Act 3+ run.
+  the concurrently active Act 3+ run. Still not started for any of
+  `T1-T5`: nothing currently re-offers a chapter's other 2 locked style
+  perks, or `T5`'s remaining locked endgame perks, outside the main
+  linear `T1→T2→T3→T4→T5` progression.
 - [ ] Balance pass on every number in this design (45% Cognition split,
   ×0.55 Writing, all the ×1.25/×0.75/-90%/-45% values in the `T1-T4`
-  table, `T5`'s scaling curve) — same "provisional until playtest" status
-  as every other number in `10_META_PROGRESSION.md`.
+  table, `T5`'s endgame perk magnitudes and scaling curve — currently a
+  flat +1/level cap-5 placeholder, not the real sec.4.4 curve) — same
+  "provisional until playtest" status as every other number in
+  `10_META_PROGRESSION.md`.
+- [ ] Act 1 closeout regression: a full fresh-state `T1→T5` playthrough
+  (manual or scripted) now that every chapter exists in code, to catch
+  pacing/perk-stacking issues a single-chapter regression test can't see.
 
 ---
 
@@ -850,6 +909,9 @@ T1-0 Event Engine + 0–18 audit
 → T2 Memory design and implementation
 ```
 
-Current immediate order (2026-09-18): Archive Recall perk system (design +
-implement real numbers) → `T2` recap goal chain + skin swap #1 + Катаклизм
-→ `T3`/`T4`/`T5` in turn → Act 1 closeout regression.
+Current immediate order (2026-09-18, updated after `T5`): Archive Recall
+perk system and `T1`-`T5` are all implemented — see "Archive Recall perk
+system + AF removal from Act 1-2" above for the full checklist. Next:
+Act 1 closeout regression (full fresh-state `T1→T5` playthrough) →
+balance pass on every provisional number → Archive-mode entry point →
+Act 2 (`P1-P3`) implementation.
