@@ -14,7 +14,10 @@ export function grantArchiveRecallPerkChoice(chapterKey, perkChoiceId) {
       details: { chapterKey, perkChoiceId, options: Object.keys(chapterDef.stylePerks) },
     };
   }
-  return { ok: true, grant: { chapterKey, styleChoice: perkChoiceId, perkId: perk.id } };
+  return {
+    ok: true,
+    grant: { chapterKey, styleChoice: perkChoiceId, perkId: perk.id, defensePerkId: chapterDef.defensePerk?.id ?? null },
+  };
 }
 
 // Perks are permanent (stored in meta, not run) but the effects they produce
@@ -23,8 +26,13 @@ export function grantArchiveRecallPerkChoice(chapterKey, perkChoiceId) {
 export function applyArchiveRecallPerks(state) {
   const chapters = state.meta?.archiveRecall?.chapters || {};
   for (const [chapterKey, unlocked] of Object.entries(chapters)) {
-    const perk = ARCHIVE_RECALL_CHAPTERS[chapterKey]?.stylePerks[unlocked.styleChoice];
-    if (!perk) continue;
-    applyEffects(state, perk.effects, { sourceType: 'archive_recall_perk', sourceId: perk.id });
+    const chapterDef = ARCHIVE_RECALL_CHAPTERS[chapterKey];
+    const perk = chapterDef?.stylePerks[unlocked.styleChoice];
+    if (perk) applyEffects(state, perk.effects, { sourceType: 'archive_recall_perk', sourceId: perk.id });
+    // Defense perks are cosmetic (empty effects) but still routed through
+    // applyEffects for consistency in case a future chapter gives one teeth.
+    if (unlocked.defensePerkId && chapterDef?.defensePerk?.id === unlocked.defensePerkId) {
+      applyEffects(state, chapterDef.defensePerk.effects, { sourceType: 'archive_recall_perk', sourceId: chapterDef.defensePerk.id });
+    }
   }
 }

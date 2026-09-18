@@ -34,6 +34,10 @@ export function createInitialGameState(options = {}) {
       rulesetVersion: sourceRuleset.version,
       lifecycle: 'active',
       clock: { simulationMs: 0, activeMs: 0 },
+      // Which T1-T5 Act 1 replay attempt this run represents (docs/gdd/
+      // 13_ACT_ONE_CHAPTERS.md) -- gates which chapter's own goal chain is
+      // visible, see services/goals.js chapterAttemptVisible.
+      actOneAttempt: options.actOneAttempt || 'T1',
       chapterId: 'CH01',
       eraId: 'MOLECULAR',
       resources,

@@ -443,15 +443,24 @@ function renderDiorama() {
   </section>`;
 }
 
+const ENDING_TITLE_BY_ID = { ENDING_BLIGHT: 'МОР', ENDING_CATACLYSM: 'КАТАКЛИЗМ' };
+const CHAPTER_KEY_BY_ENDING_ID = Object.fromEntries(
+  Object.entries(ARCHIVE_RECALL_CHAPTERS).map(([chapterKey, chapterDef]) => [chapterDef.endingId, chapterKey])
+);
+
 function renderEnding() {
   const ending = engine().state.run.ending;
   if (!ending) return '';
-  if (ending.id === 'ENDING_BLIGHT') {
-    const stylePerks = ARCHIVE_RECALL_CHAPTERS.T1.stylePerks;
-    const options = Object.entries(stylePerks)
+  const chapterKey = CHAPTER_KEY_BY_ENDING_ID[ending.id];
+  if (chapterKey) {
+    const chapterDef = ARCHIVE_RECALL_CHAPTERS[chapterKey];
+    const defenseNote = chapterDef.defensePerk
+      ? `<p class="hint">Также получена косметическая защита: ${chapterDef.defensePerk.label}.</p>`
+      : '';
+    const options = Object.entries(chapterDef.stylePerks)
       .map(([choiceId, perk]) => `<button class="primary" data-action="archive-reset" data-perk="${choiceId}">${perk.label}: ${perk.description}</button>`)
       .join('');
-    return `<section class="panel ending"><small>ЦИВИЛИЗАЦИЯ №1 ЗАВЕРШЕНА</small><h2>МОР</h2><p>Подтип: ${ending.subtype}. Выберите перк Archive Recall для следующей попытки.</p>${options}</section>`;
+    return `<section class="panel ending"><small>ЦИВИЛИЗАЦИЯ ЗАВЕРШЕНА</small><h2>${ENDING_TITLE_BY_ID[ending.id] || ending.id}</h2><p>Подтип: ${ending.subtype}. Выберите перк Archive Recall для следующей попытки.</p>${defenseNote}${options}</section>`;
   }
   return `<section class="panel ending"><small>ЦИВИЛИЗАЦИЯ №1 ЗАВЕРШЕНА</small><h2>ПЕПЕЛ</h2><p>Подтип: ${ending.subtype}. История готова к сохранению в Архив.</p><button class="primary" data-action="archive-reset">Сохранить в Архив</button></section>`;
 }

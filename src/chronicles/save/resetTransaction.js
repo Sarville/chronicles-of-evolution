@@ -7,6 +7,10 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+// Only T1->T2 is wired so far -- T3-T5 don't exist as their own chapters
+// yet (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.3).
+const NEXT_ACT_ONE_ATTEMPT = { T1: 'T2' };
+
 function formatTimelineId(timelineId) {
   return String(timelineId).padStart(3, '0');
 }
@@ -68,9 +72,9 @@ export function applyPreparedResetTransaction(state, transaction, options = {}) 
       meta.archiveFragments = (meta.archiveFragments || 0) + transaction.reward.archiveFragments;
     }
     if (transaction.reward?.archiveRecallPerk) {
-      const { chapterKey, styleChoice, perkId } = transaction.reward.archiveRecallPerk;
+      const { chapterKey, styleChoice, perkId, defensePerkId } = transaction.reward.archiveRecallPerk;
       meta.archiveRecall = meta.archiveRecall || { chapters: {} };
-      meta.archiveRecall.chapters = { ...meta.archiveRecall.chapters, [chapterKey]: { styleChoice, perkId } };
+      meta.archiveRecall.chapters = { ...meta.archiveRecall.chapters, [chapterKey]: { styleChoice, perkId, defensePerkId: defensePerkId ?? null } };
     }
     if (transaction.chronicleRecord) {
       const chronicle = Array.isArray(meta.chronicle) ? meta.chronicle : [];
@@ -89,6 +93,10 @@ export function applyPreparedResetTransaction(state, transaction, options = {}) 
   nextState.meta = meta;
   nextState.settings = settings;
   nextState.session.dirty = true;
+  if (transaction.reward?.archiveRecallPerk) {
+    const nextAttempt = NEXT_ACT_ONE_ATTEMPT[transaction.reward.archiveRecallPerk.chapterKey];
+    if (nextAttempt) nextState.run.actOneAttempt = nextAttempt;
+  }
   applyArchiveRecallPerks(nextState);
 
   return { ok: true, state: nextState, transaction, alreadyApplied };

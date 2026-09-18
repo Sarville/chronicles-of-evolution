@@ -663,4 +663,49 @@ clock.start((deltaMs) => engine.tick(deltaMs));
 clock.advance(250);
 assert.equal(clock.getNow(), 1250);
 
+// T2 "Одиночки" (docs/gdd/13_ACT_ONE_CHAPTERS.md): its own recap chain
+// (G040-G042) plus new live content (G027/G028) and collapse (G029/G030,
+// ENDING_CATACLYSM) only activate for a run tagged actOneAttempt: 'T2' --
+// T1's own goals (G001-G026) must stay silent even though this run marches
+// through the exact same nodes.
+const t2Engine = createChroniclesEngine({ ruleset, actOneAttempt: 'T2' });
+assert.equal(t2Engine.state.run.actOneAttempt, 'T2');
+t2Engine.state.run.eraId = 'SETTLEMENT';
+for (const nodeId of ['M06', 'N07', 'T05', 'T08', 'T09']) {
+  t2Engine.state.run.nodes.completed[nodeId] = { completedAtMs: 0 };
+}
+t2Engine.state.run.population = { current: 14, peak: 14, baseCap: 20, assignments: {}, foodStatus: 'healthy' };
+t2Engine.state.run.buildings = { BLD_FIELD: { count: 1 }, BLD_HOUSE: { count: 1 }, BLD_WORKSHOP: { count: 1 } };
+result = t2Engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'food', amount: 0 });
+assert.equal(result.ok, true);
+for (const goalId of ['G040', 'G041', 'G042', 'G027', 'G028']) {
+  assert.equal(t2Engine.state.run.goals.states[goalId]?.status, 'archived');
+}
+for (const goalId of ['G001', 'G015', 'G025', 'G026']) {
+  assert.equal(t2Engine.state.run.goals.states[goalId], undefined);
+}
+assert.equal(t2Engine.state.run.events.pendingId, 'EV-NAR-T2');
+assert.equal(t2Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-NAR-T2', choiceId: 'continue' }).ok, true);
+assert.equal(t2Engine.state.run.chapterTimers.chapter2_cataclysm.active, true);
+t2Engine.tick(120000);
+assert.equal(t2Engine.state.run.events.pendingId, 'EV-CR-T2');
+assert.equal(t2Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-T2', choiceId: 'relocate' }).ok, true);
+assert.equal(t2Engine.state.run.lifecycle, 'ended');
+assert.equal(t2Engine.state.run.ending.id, 'ENDING_CATACLYSM');
+assert.equal(t2Engine.state.run.ending.subtype, 'cataclysm_relocated');
+
+const missingChoice = t2Engine.dispatch({ type: 'ARCHIVE_RESET' });
+assert.equal(missingChoice.ok, false);
+assert.equal(missingChoice.reason, 'INVALID_ARCHIVE_RECALL_PERK_CHOICE');
+
+const t2Reset = t2Engine.dispatch({ type: 'ARCHIVE_RESET', perkChoiceId: 'invest' });
+assert.equal(t2Reset.ok, true);
+assert.equal(t2Engine.state.run.lifecycle, 'active');
+assert.equal(t2Engine.state.meta.archiveRecall.chapters.T2.styleChoice, 'invest');
+assert.equal(t2Engine.state.meta.archiveRecall.chapters.T2.defensePerkId, 'T2_DEFENSE_QUARANTINE_PROTOCOL');
+// T3 doesn't exist as its own chapter yet -- falls back to T1 by default.
+assert.equal(t2Engine.state.run.actOneAttempt, 'T1');
+assert.equal(t2Engine.state.run.modifiers.active['T2_INVEST_LARGE_CONTAINERS:capacity_multiplier:food'].value, 1.3);
+assert.equal(calculateCap(t2Engine.state, 'food', ruleset), 390);
+
 console.log('domain flow ok');

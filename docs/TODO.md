@@ -581,6 +581,10 @@ done vs. still open. `T2-T5` still don't exist as their own chapters, so
 their perk tables, the defense-perk grant, and `T5`'s stacking/scaling
 mechanic remain unimplemented.
 
+**2026-09-18, later still:** `T2` "Одиночки" is now fully implemented as
+its own chapter — recap chain, new live content, Катаклизм collapse,
+defense perk, and style-perk triad. See the checklist below.
+
 Design summary (see `10_META_PROGRESSION.md` §4 for the authoritative
 version, this is just the code-facing shape):
 
@@ -652,8 +656,58 @@ Concrete code TODO:
   `ENDING_BLIGHT` instead of the old single "Сохранить в Архив" button.
   T1 has **no defense perk** (first attempt, nothing to defend against
   yet, per the design) — nothing to build there.
-- [ ] `T2-T4` don't exist as their own chapters yet, so their defense-perk
-  auto-grant + style-perk triads aren't wired — same mechanism as `T1`
+- [x] `T2` "Одиночки" implemented as its own chapter (2026-09-18):
+  - New `run.actOneAttempt` field (`domain/state.js`, defaults `'T1'`,
+    advanced `T1`→`T2` in `save/resetTransaction.js` off
+    `transaction.reward.archiveRecallPerk.chapterKey` via
+    `NEXT_ACT_ONE_ATTEMPT`). Every existing Act 1 main-chain goal
+    (`G001`-`G026`) tagged `chapterAttempt: 'T1'`; a new
+    `chapterAttemptVisible` gate in `domain/services/goals.js` hides any
+    goal whose `chapterAttempt` doesn't match the run's `actOneAttempt` —
+    without this, T1's dormant goals (e.g. `G015`/`G025`/`G026`) could
+    hijack `currentId` mid-`T2`-run purely from array-iteration order, since
+    both chapters replay the exact same node/economy data.
+  - `T2`'s own goal chain: `G040`-`G042` (recap RNA→Tribe in 3 coarse steps,
+    vs `T1`'s 15) + `G027`/`G028` (new live content: Agriculture/Settlement,
+    reusing `T08`/`T09`'s conditions) + `G029`/`G030` (rising + Катаклизм
+    ending), all `chapterAttempt: 'T2'` (`config/goals.js`). One short
+    Archive flavor line (`EV-NAR-T2-RECALL`) at the recap/new-content seam.
+  - New events `EV-NAR-T2` (rising anomaly) / `EV-CR-T2` (mandatory 3-choice
+    ending: `rebuild`/`relocate`/`fortify`) mirroring `EV-NAR-04`/`EV-CR-T1`
+    exactly (`config/events.js`); new `ENDING_CATACLYSM`
+    (`config/endings.js`); new `chapter2_cataclysm` chapter timer, same
+    120s/15s-cliff/population-decay shape as `chapter1_blight`
+    (`domain/services/crisis.js`).
+  - `T2`'s defense perk (cosmetic, "Карантинный протокол") + style triad
+    (auto: per-population storage cap growth; invest: storage cap
+    multiplier; efficiency: Settlement-era building cost ×0.75) in
+    `config/archiveRecall.js`. Three new modifier types:
+    `resource_capacity_per_population` / `resource_capacity_multiplier`
+    (`domain/services/resources.js` `calculateCap`) and
+    `building_cost_multiplier` (`domain/selectors.js`
+    `selectBuildingPrice` — also refactored `domain/commands.js`
+    `buyBuilding` to call `selectBuildingPrice` instead of recomputing cost
+    inline, so the modifier can't be bypassed at actual payment time).
+    `grantArchiveRecallPerkChoice`/`applyArchiveRecallPerks`
+    (`domain/services/archiveRecall.js`) extended to also auto-grant and
+    re-apply a chapter's `defensePerk` alongside the chosen style perk.
+  - Fixed a latent `evaluateGoals` bug found while testing this: the
+    trailing sequence-advance step could call `activateGoal` on a
+    `nextGoal` that a *same-pass* completion loop had already archived,
+    clobbering its status back to `'active'`. Real risk for any
+    Recall-compressed chain where several goals' conditions become true in
+    one evaluation pass (exactly what compression is for) — now it walks
+    forward past any already-terminal goal instead of reactivating it.
+  - Regression test in `tests/domain/spec.js` drives a synthetic `T2` run
+    through the full recap→new-content→collapse→perk-choice→reset cycle
+    and checks `T1`'s goals stay untouched throughout.
+  - Explicitly **not built** (pure polish, zero mechanical effect,
+    deferred): skin swap #1 (cosmetic relabel of the existing `C02A/B/C`
+    branch choice — no UI hook exists to attach flavor labels to a branch
+    pick) and the `MS11`/`MS12` milestone banners (the `MS01-MS15` banner
+    system itself barely exists in code — only one `MS_PROTOCELL` stub).
+- [ ] `T3`/`T4` don't exist as their own chapters yet, so their defense-perk
+  auto-grant + style-perk triads aren't wired — same mechanism as `T1`/`T2`
   once those chapters land.
 - [ ] Implement the two `T4` "Быстрое обучение" effects concretely:
   Cognition (`config/goals.js` `G011_COGNITION_TRACK`'s

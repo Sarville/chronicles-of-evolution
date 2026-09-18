@@ -13,6 +13,17 @@ function isParallelGoal(goal) {
   return Boolean(goal.optional || goal.slot === 'side' || goal.slot === 'progressive');
 }
 
+// Every T1-T5 attempt replays the same node/economy data but plays a
+// different goal chain (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.5): each
+// chapter's own main-chain goals -- including its collapse goals -- are
+// tagged with the attempt they belong to, so e.g. T1's Мор goals never
+// hijack currentId mid-T2-run just because T05 gets completed again during
+// T2's own recap. Goals without a chapterAttempt (side/progressive content,
+// reused as-is) are visible in every attempt.
+function chapterAttemptVisible(state, goal) {
+  return !goal.chapterAttempt || goal.chapterAttempt === state.run.actOneAttempt;
+}
+
 export function getGoalState(state, goalId) {
   return state.run.goals.states[goalId] || { status: 'hidden' };
 }
@@ -162,6 +173,7 @@ export function evaluateGoals(state, ruleset, ports = {}) {
   const indexes = createRulesetIndexes(ruleset);
 
   for (const goal of ruleset.goals || []) {
+    if (!chapterAttemptVisible(state, goal)) continue;
     const goalState = getGoalState(state, goal.id);
     if (!TERMINAL_STATUSES.has(goalState.status) && goalPrerequisitesMet(state, goal) && goalState.status === 'hidden') {
       writeGoalState(state, goal, 'revealed', { revealedAtMs: state.run.clock.simulationMs });
@@ -169,6 +181,7 @@ export function evaluateGoals(state, ruleset, ports = {}) {
   }
 
   for (const goal of ruleset.goals || []) {
+    if (!chapterAttemptVisible(state, goal)) continue;
     const goalState = getGoalState(state, goal.id);
     if (TERMINAL_STATUSES.has(goalState.status)) {
       continue;
@@ -181,6 +194,7 @@ export function evaluateGoals(state, ruleset, ports = {}) {
   }
 
   for (const goal of ruleset.goals || []) {
+    if (!chapterAttemptVisible(state, goal)) continue;
     const goalState = getGoalState(state, goal.id);
     if (TERMINAL_STATUSES.has(goalState.status)) {
       continue;
@@ -192,10 +206,22 @@ export function evaluateGoals(state, ruleset, ports = {}) {
     }
   }
 
-  const currentGoal = indexes.goals[state.run.goals.currentId];
-  const nextGoal = indexes.goals[currentGoal?.sequence?.nextGoalId];
-  if (nextGoal && TERMINAL_STATUSES.has(getGoalState(state, currentGoal.id).status) && goalPrerequisitesMet(state, nextGoal)) {
-    events.push(...activateGoal(state, nextGoal, ports));
+  // Archive Recall can make several chained goals' conditions come true in
+  // the same evaluateGoals() pass (that's the whole point of compressing a
+  // recap range). Walk currentId forward past any goal that's already
+  // terminal by the time we get here -- calling activateGoal on it would
+  // clobber the 'archived' status loop3 just wrote back to 'active'.
+  let pointer = indexes.goals[state.run.goals.currentId];
+  while (pointer && TERMINAL_STATUSES.has(getGoalState(state, pointer.id).status)) {
+    const nextGoal = indexes.goals[pointer.sequence?.nextGoalId];
+    if (!nextGoal || !chapterAttemptVisible(state, nextGoal) || !goalPrerequisitesMet(state, nextGoal)) break;
+    if (!TERMINAL_STATUSES.has(getGoalState(state, nextGoal.id).status)) {
+      events.push(...activateGoal(state, nextGoal, ports));
+      break;
+    }
+    state.run.goals.currentId = nextGoal.id;
+    state.run.goals.chapter.activeId = nextGoal.id;
+    pointer = nextGoal;
   }
 
   return events;

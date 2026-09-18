@@ -34,6 +34,15 @@ export function applyEffects(state, effects = [], source = {}) {
     if (effect.type === 'node_cost_multiplier') {
       state.run.modifiers.active[`${sourceKey}:node_cost:${effect.nodeId}`] = effect;
     }
+    if (effect.type === 'resource_capacity_per_population') {
+      state.run.modifiers.active[`${sourceKey}:capacity_per_population:${effect.resourceId}`] = effect;
+    }
+    if (effect.type === 'resource_capacity_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:capacity_multiplier:${effect.resourceId}`] = effect;
+    }
+    if (effect.type === 'building_cost_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:building_cost:${effect.eraId}`] = effect;
+    }
     if (effect.type === 'unlock_resource') {
       if (!state.run.resources[effect.resourceId]) {
         state.run.resources[effect.resourceId] = { amount: 0 };

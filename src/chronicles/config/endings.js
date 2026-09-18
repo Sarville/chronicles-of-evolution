@@ -11,5 +11,11 @@ export const endings = [
     requiresEra: 'TRIBE',
     targetTimeMs: 3420000,
   },
+  {
+    id: 'ENDING_CATACLYSM',
+    type: 'scripted_chapter_collapse',
+    requiresEra: 'SETTLEMENT',
+    targetTimeMs: 1200000,
+  },
 ];
 

@@ -1,7 +1,7 @@
 import { createRulesetIndexes } from '../config/index.js';
-import { selectNodeCost, selectProducerPrice } from './selectors.js';
+import { selectBuildingPrice, selectNodeCost, selectProducerPrice } from './selectors.js';
 import { createDomainEvent } from './domainEvents.js';
-import { payCost, scaleCost } from './services/costs.js';
+import { payCost } from './services/costs.js';
 import { applyEraTransition } from './services/eras.js';
 import { branchAvailable, prerequisitesMet } from './services/evolution.js';
 import { eventBlocksNode, queueEventsForGoal, queueEventsForNode, resolveEvent } from './services/events.js';
@@ -110,6 +110,10 @@ const ENDING_RESET_PROFILES = {
   ENDING_BLIGHT: {
     archiveRecallChapterKey: 'T1',
     chronicleSummary: 'Цивилизация №1 завершена: Мор сохранён в Архиве.',
+  },
+  ENDING_CATACLYSM: {
+    archiveRecallChapterKey: 'T2',
+    chronicleSummary: 'Цивилизация №2 завершена: Катаклизм сохранён в Архиве.',
   },
 };
 
@@ -263,7 +267,7 @@ function buyBuilding(state, ruleset, buildingId, ports) {
   if (building.maxCount != null && currentCount >= building.maxCount) {
     return rejected('MAX_COUNT_REACHED', { buildingId });
   }
-  const cost = scaleCost(building.baseCost, building.growth, currentCount);
+  const cost = selectBuildingPrice(state, ruleset, buildingId);
   const payment = payCost(state, cost, ruleset, ports);
   if (!payment.ok) {
     return payment;

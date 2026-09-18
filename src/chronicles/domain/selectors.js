@@ -204,7 +204,13 @@ export function selectBuildingPrice(state, ruleset, buildingId) {
   const building = createRulesetIndexes(ruleset).buildings[buildingId];
   if (!building) return null;
   const count = state.run.buildings[buildingId]?.count || 0;
-  return scaleCost(building.baseCost, building.growth, count);
+  let cost = scaleCost(building.baseCost, building.growth, count);
+  for (const modifier of Object.values(state.run.modifiers.active)) {
+    if (modifier.type === 'building_cost_multiplier' && (building.eraIds || []).includes(modifier.eraId)) {
+      cost = multiplyCost(cost, modifier.value);
+    }
+  }
+  return cost;
 }
 
 export function selectBuildingStatus(state, ruleset, buildingId) {

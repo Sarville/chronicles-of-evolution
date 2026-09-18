@@ -165,6 +165,53 @@ export const events = [
     ],
   },
   {
+    // T2 "Одиночки" recap seam (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.5): a
+    // short Archive-voiced line right where the compressed recap (G040-G042)
+    // hands off to genuinely new content (G027+), so the speed-up reads as
+    // Archive commentary, not a silent skip.
+    id: 'EV-NAR-T2-RECALL', type: 'flavor', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G042' },
+    phaseWindow: { eraIds: ['TRIBE'] }, priority: 40, telemetryKey: 'event_t2_recall_seam', title: 'Уже пройденное',
+    body: 'Архив: до этого места дорога была короче, чем в первый раз. Дальше начинается то, чего вы ещё не видели.',
+    chronicleSummary: 'Архив отметил конец сжатого участка второй попытки.',
+    choices: [{ id: 'continue', label: 'Продолжить', effects: [] }],
+  },
+  {
+    id: 'EV-NAR-T2', type: 'anomaly', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G028' },
+    phaseWindow: { eraIds: ['SETTLEMENT'] }, priority: 58, telemetryKey: 'event_cataclysm_noticed', title: 'Первый толчок',
+    body: 'Земля под новым поселением проседает неравномерно. Трещины появляются там, где их не должно быть.',
+    chronicleSummary: 'Первые признаки нестабильности зафиксированы под новым поселением.',
+    choices: [{ id: 'continue', label: 'Продолжить', effects: [
+      { type: 'set_flag', flag: 'run.chapter2.cataclysm_noticed', value: true },
+      { type: 'start_chapter_timer', timerId: 'chapter2_cataclysm' },
+    ] }],
+  },
+  {
+    // Queued directly by advanceChapterTimers when 'chapter2_cataclysm'
+    // expires (domain/services/crisis.js) -- this trigger is descriptive
+    // only, same as EV-CR-T1/EV-CR-01..03's triggers.
+    id: 'EV-CR-T2', type: 'ending', deck: 'authored', trigger: { type: 'chapter_timer_expired', timerId: 'chapter2_cataclysm' },
+    phaseWindow: { eraIds: ['SETTLEMENT'] }, priority: 100, telemetryKey: 'event_cataclysm_choice', title: 'Катаклизм',
+    body: 'Разлом проходит через поле и мастерскую одновременно. Решение необходимо сейчас, не после того, как трещина остановится.',
+    chronicleSummary: 'Второе поселение не удержало собственную землю. Архив зафиксировал: это уже происходило.',
+    choices: [
+      { id: 'rebuild', label: 'Отстроить на месте', effects: [
+        { type: 'set_flag', flag: 'run.chapter2.response', value: 'rebuild' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter2_subtype', value: 'cataclysm_rebuilt' },
+        { type: 'complete_ending', endingId: 'ENDING_CATACLYSM', subtype: 'cataclysm_rebuilt' },
+      ] },
+      { id: 'relocate', label: 'Переселиться', effects: [
+        { type: 'set_flag', flag: 'run.chapter2.response', value: 'relocate' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter2_subtype', value: 'cataclysm_relocated' },
+        { type: 'complete_ending', endingId: 'ENDING_CATACLYSM', subtype: 'cataclysm_relocated' },
+      ] },
+      { id: 'fortify', label: 'Укрепить заранее', effects: [
+        { type: 'set_flag', flag: 'run.chapter2.response', value: 'fortify' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter2_subtype', value: 'cataclysm_fortified' },
+        { type: 'complete_ending', endingId: 'ENDING_CATACLYSM', subtype: 'cataclysm_fortified' },
+      ] },
+    ],
+  },
+  {
     id: 'EV-CIV-03', type: 'flavor', deck: 'authored', trigger: { type: 'node_completed', nodeId: 'T08' },
     phaseWindow: { eraIds: ['SETTLEMENT_EARLY'] }, priority: 35, telemetryKey: 'event_settlement_profile', title: 'Первое поле',
     body: 'Земля начинает отвечать на повторяющийся труд.', chronicleSummary: 'Племя выбрало путь постоянного труда на земле.',

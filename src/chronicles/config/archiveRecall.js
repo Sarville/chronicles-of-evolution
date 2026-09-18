@@ -32,4 +32,43 @@ export const ARCHIVE_RECALL_CHAPTERS = {
       },
     },
   },
+  T2: {
+    endingId: 'ENDING_CATACLYSM',
+    // Cosmetic only -- the same Мор can't refire, this is flavor/UI, no
+    // mechanical effect (docs/gdd/10_META_PROGRESSION.md sec.4.2 table).
+    defensePerk: {
+      id: 'T2_DEFENSE_QUARANTINE_PROTOCOL',
+      label: 'Карантинный протокол',
+      description: 'Косметика: следующая попытка помнит, как выглядел Мор.',
+      effects: [],
+    },
+    stylePerks: {
+      auto: {
+        id: 'T2_AUTO_SELF_SERVICING_STORAGE',
+        label: 'Самообслуживающиеся хранилища',
+        description: 'Кап Food/Materials/Knowledge растёт сам вместе с населением (+12 за каждого жителя).',
+        effects: [
+          { type: 'resource_capacity_per_population', resourceId: 'food', value: 12 },
+          { type: 'resource_capacity_per_population', resourceId: 'materials', value: 12 },
+          { type: 'resource_capacity_per_population', resourceId: 'knowledge', value: 12 },
+        ],
+      },
+      invest: {
+        id: 'T2_INVEST_LARGE_CONTAINERS',
+        label: 'Крупная тара',
+        description: 'Кап склада за постройку Food/Materials/Knowledge ×1.3.',
+        effects: [
+          { type: 'resource_capacity_multiplier', resourceId: 'food', value: 1.3 },
+          { type: 'resource_capacity_multiplier', resourceId: 'materials', value: 1.3 },
+          { type: 'resource_capacity_multiplier', resourceId: 'knowledge', value: 1.3 },
+        ],
+      },
+      efficiency: {
+        id: 'T2_EFFICIENCY_CHEAP_CONSTRUCTION',
+        label: 'Дешёвая застройка',
+        description: 'Цена построек Settlement-эпохи ×0.75.',
+        effects: [{ type: 'building_cost_multiplier', eraId: 'SETTLEMENT', value: 0.75 }],
+      },
+    },
+  },
 };
