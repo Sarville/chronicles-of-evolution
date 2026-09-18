@@ -1,6 +1,7 @@
 import { ruleset as defaultRuleset } from '../config/index.js';
 import { createInitialGameState } from '../domain/state.js';
 import { createResetCandidate } from '../domain/services/reset.js';
+import { applyArchiveRecallPerks } from '../domain/services/archiveRecall.js';
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -66,6 +67,11 @@ export function applyPreparedResetTransaction(state, transaction, options = {}) 
     if (Number.isFinite(transaction.reward?.archiveFragments)) {
       meta.archiveFragments = (meta.archiveFragments || 0) + transaction.reward.archiveFragments;
     }
+    if (transaction.reward?.archiveRecallPerk) {
+      const { chapterKey, styleChoice, perkId } = transaction.reward.archiveRecallPerk;
+      meta.archiveRecall = meta.archiveRecall || { chapters: {} };
+      meta.archiveRecall.chapters = { ...meta.archiveRecall.chapters, [chapterKey]: { styleChoice, perkId } };
+    }
     if (transaction.chronicleRecord) {
       const chronicle = Array.isArray(meta.chronicle) ? meta.chronicle : [];
       if (!chronicle.some((record) => record.transactionId === transaction.id)) {
@@ -83,6 +89,7 @@ export function applyPreparedResetTransaction(state, transaction, options = {}) 
   nextState.meta = meta;
   nextState.settings = settings;
   nextState.session.dirty = true;
+  applyArchiveRecallPerks(nextState);
 
   return { ok: true, state: nextState, transaction, alreadyApplied };
 }

@@ -11,6 +11,7 @@ import { applyEffects } from './services/modifiers.js';
 import { assertPopulationRequirement } from './services/population.js';
 import { addResource } from './services/resources.js';
 import { prepareResetTransaction, applyPreparedResetTransaction } from '../save/resetTransaction.js';
+import { grantArchiveRecallPerkChoice } from './services/archiveRecall.js';
 
 function ok(state, events) {
   state.session.dirty = true;
@@ -91,8 +92,11 @@ function assignJob(state, ruleset, jobId, amount, ports) {
 }
 
 // Every T1-T5 chapter ends with its own reset (Ash is only mandatory on T5);
-// see docs/gdd/13_ACT_ONE_CHAPTERS.md. Each entry describes that ending's
-// Archive Fragment reward and Chronicle summary for the shared reset flow.
+// see docs/gdd/13_ACT_ONE_CHAPTERS.md. ENDING_ASH still stands in for the
+// eventual T5/endgame ending and keeps the Archive Fragment reward it always
+// had. ENDING_BLIGHT is T1's Мор collapse: per docs/gdd/10_META_PROGRESSION.md
+// §1/§3, no currency exists anywhere in Act 1-2 -- its reward is an Archive
+// Recall perk choice instead (§4).
 const ENDING_RESET_PROFILES = {
   ENDING_ASH: {
     reward(state) {
@@ -103,13 +107,8 @@ const ENDING_RESET_PROFILES = {
     },
     chronicleSummary: 'Timeline #1 завершён: Пепел сохранён в Архиве.',
   },
-  // "Малый AF-пакет" per docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md
-  // §T1 row — deliberately far below Ash's 14-18 full award; exact number is
-  // provisional pending the Act 1 balance pass.
   ENDING_BLIGHT: {
-    reward() {
-      return 3;
-    },
+    archiveRecallChapterKey: 'T1',
     chronicleSummary: 'Цивилизация №1 завершена: Мор сохранён в Архиве.',
   },
 };
@@ -120,11 +119,20 @@ function archiveReset(state, ruleset, command, ports) {
   if (state.run.lifecycle !== 'ended' || !profile) {
     return rejected('ENDING_NOT_READY_FOR_ARCHIVE');
   }
-  const archiveFragments = profile.reward(state);
+
+  let reward;
+  if (profile.archiveRecallChapterKey) {
+    const grant = grantArchiveRecallPerkChoice(profile.archiveRecallChapterKey, command.perkChoiceId);
+    if (!grant.ok) return rejected(grant.reason, grant.details);
+    reward = { archiveRecallPerk: grant.grant };
+  } else {
+    reward = { archiveFragments: profile.reward(state) };
+  }
+
   const transaction = prepareResetTransaction(state, {
     transactionId: command.transactionId,
     endingId,
-    reward: { archiveFragments },
+    reward,
     chronicleRecord: {
       id: `${state.run.id}:ending`,
       kind: 'ending',
@@ -139,7 +147,7 @@ function archiveReset(state, ruleset, command, ports) {
   const applied = applyPreparedResetTransaction(state, transaction, { ruleset, nextRunId: command.nextRunId });
   if (!applied.ok) return applied;
   Object.assign(state, applied.state);
-  return ok(state, [createDomainEvent('archive_reset_completed', { transactionId: transaction.id, archiveFragments, alreadyApplied: applied.alreadyApplied }, state, ports)]);
+  return ok(state, [createDomainEvent('archive_reset_completed', { transactionId: transaction.id, reward, alreadyApplied: applied.alreadyApplied }, state, ports)]);
 }
 
 function manualProcess(state, ruleset, command, ports) {

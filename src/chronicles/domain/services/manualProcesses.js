@@ -28,17 +28,22 @@ export function manualProcessAvailable(state, process) {
   return state.run.clock.simulationMs >= (selectManualProcessState(state, process.id)?.availableAtMs || 0);
 }
 
+function manualCooldownMultiplier(state) {
+  return Object.values(state.run.modifiers.active).reduce((value, modifier) => {
+    return modifier.type === 'manual_cooldown_multiplier' ? value * modifier.value : value;
+  }, 1);
+}
+
 export function manualProcessCooldownMs(state, process) {
   const stage = (process.cooldownStages || [])
     .filter((candidate) => candidate.afterNodeId && state.run.nodes.completed[candidate.afterNodeId])
     .at(-1);
-  if (stage) {
-    return stage.cooldownMs;
-  }
-  if (process.cooldownAfterNodeId && state.run.nodes.completed[process.cooldownAfterNodeId]) {
-    return process.cooldownAfterMs ?? process.cooldownMs;
-  }
-  return process.cooldownMs;
+  const baseMs = stage
+    ? stage.cooldownMs
+    : process.cooldownAfterNodeId && state.run.nodes.completed[process.cooldownAfterNodeId]
+      ? process.cooldownAfterMs ?? process.cooldownMs
+      : process.cooldownMs;
+  return baseMs * manualCooldownMultiplier(state);
 }
 
 export function manualProcessInputCost(process) {

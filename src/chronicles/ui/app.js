@@ -1,5 +1,6 @@
 import { createBrowserStorage } from '../adapters/storageAdapter.js';
 import { ruleset, createRulesetIndexes } from '../config/index.js';
+import { ARCHIVE_RECALL_CHAPTERS } from '../config/archiveRecall.js';
 import { calculateCap } from '../domain/services/resources.js';
 import {
   selectCurrentGoal,
@@ -445,6 +446,13 @@ function renderDiorama() {
 function renderEnding() {
   const ending = engine().state.run.ending;
   if (!ending) return '';
+  if (ending.id === 'ENDING_BLIGHT') {
+    const stylePerks = ARCHIVE_RECALL_CHAPTERS.T1.stylePerks;
+    const options = Object.entries(stylePerks)
+      .map(([choiceId, perk]) => `<button class="primary" data-action="archive-reset" data-perk="${choiceId}">${perk.label}: ${perk.description}</button>`)
+      .join('');
+    return `<section class="panel ending"><small>ЦИВИЛИЗАЦИЯ №1 ЗАВЕРШЕНА</small><h2>МОР</h2><p>Подтип: ${ending.subtype}. Выберите перк Archive Recall для следующей попытки.</p>${options}</section>`;
+  }
   return `<section class="panel ending"><small>ЦИВИЛИЗАЦИЯ №1 ЗАВЕРШЕНА</small><h2>ПЕПЕЛ</h2><p>Подтип: ${ending.subtype}. История готова к сохранению в Архив.</p><button class="primary" data-action="archive-reset">Сохранить в Архив</button></section>`;
 }
 
@@ -552,7 +560,7 @@ function handleAction(target) {
   }
   if (action === 'resolve-event') engine().dispatch({ type: 'RESOLVE_EVENT', eventId: button.dataset.eventId, choiceId: button.dataset.choiceId });
   if (action === 'archive-reset') {
-    const result = engine().dispatch({ type: 'ARCHIVE_RESET' });
+    const result = engine().dispatch({ type: 'ARCHIVE_RESET', perkChoiceId: button.dataset.perk });
     if (result.ok) {
       autosave().flush('archive_reset');
       lastSaveMessage = 'Ash saved in Archive';

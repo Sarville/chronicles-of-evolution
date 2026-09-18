@@ -28,6 +28,12 @@ export function applyEffects(state, effects = [], source = {}) {
     if (effect.type === 'population_capacity') {
       state.run.modifiers.active[`${sourceKey}:population_capacity`] = effect;
     }
+    if (effect.type === 'manual_cooldown_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:manual_cooldown`] = effect;
+    }
+    if (effect.type === 'node_cost_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:node_cost:${effect.nodeId}`] = effect;
+    }
     if (effect.type === 'unlock_resource') {
       if (!state.run.resources[effect.resourceId]) {
         state.run.resources[effect.resourceId] = { amount: 0 };

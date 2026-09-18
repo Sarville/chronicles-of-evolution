@@ -573,8 +573,13 @@ ACHIEVEMENTS,15_ACT_THREE_SYSTEMS}.md`, `docs/DECISIONS_ACT_STRUCTURE.md`
 `ACT-002` "Currency", `docs/scenario/05_NARRATIVE_FLAGS.md`,
 `docs/production/TIMELINE_01_REBUILD_PLAN.md`,
 `docs/ux/00_TIMELINE_PRESENTATION_MAP.md`, `docs/gdd/{01_FIRST_120_MINUTES,
-02_ECONOMY_FIRST_120_MINUTES}.md`, `docs/GLOSSARY.md`. **No code exists for
-any of this yet** — this is the next implementation step, blocking `T2-T5`.
+02_ECONOMY_FIRST_120_MINUTES}.md`, `docs/GLOSSARY.md`.
+
+**2026-09-18, later:** `T1`'s own perk triad is implemented end to end
+(backend + a minimal ending-screen UI) — see the checklist below for what's
+done vs. still open. `T2-T5` still don't exist as their own chapters, so
+their perk tables, the defense-perk grant, and `T5`'s stacking/scaling
+mechanic remain unimplemented.
 
 Design summary (see `10_META_PROGRESSION.md` §4 for the authoritative
 version, this is just the code-facing shape):
@@ -609,22 +614,47 @@ version, this is just the code-facing shape):
   retrofit — that full-Ash route needs the same AF-removal treatment when
   it's reframed as `T5`, not before).
 
-Concrete code TODO (none started):
+Concrete code TODO:
 
-- [ ] Design the actual save-state schema for per-chapter perk-slot
-  unlocks (see bullet above) — needs its own pass in
-  `docs/technical/03_GAME_STATE.md` / `04_SAVE_ARCHITECTURE.md`, which
-  still describe the old single-AF-reward transaction shape and were not
-  rewritten in this docs pass (deliberately — the real schema should come
-  from the implementation, not be guessed here).
-- [ ] Remove/replace the AF grant in `ENDING_RESET_PROFILES`
-  (`domain/commands.js`) for `ENDING_BLIGHT` (and, later, `ENDING_ASH` once
-  reframed as `T5`) with a perk-choice-grant effect.
-- [ ] Decide whether `state.js`'s `archiveFragments` field stays (zeroed,
-  unused until Act 3) or is removed until Act 3 systems are built —
-  either is fine, just needs a decision before touching that file.
-- [ ] Implement the `T1-T4` defense-perk auto-grant (cosmetic, no numeric
-  hook needed) and the 1-of-3 style-perk choice UI/effect wiring.
+- [x] Design the actual save-state schema for per-chapter perk-slot
+  unlocks. Landed simpler than the `<chapterId>.<slot>.unlocked` sketch
+  above: `meta.archiveRecall.chapters[chapterKey] = { styleChoice, perkId }`
+  (`domain/state.js`, `save/resetTransaction.js`
+  `applyPreparedResetTransaction`) — one style-perk slot per chapter is all
+  `T1-T4` ever need (defense perks are cosmetic, no state), and `T5`'s
+  3-perk stacking will need its own shape when that chapter exists (not
+  this one). `docs/technical/03_GAME_STATE.md` / `04_SAVE_ARCHITECTURE.md`
+  still describe the old AF-only shape and still need their own pass —
+  left alone again this round.
+- [x] Remove/replace the AF grant in `ENDING_RESET_PROFILES`
+  (`domain/commands.js`) for `ENDING_BLIGHT` — now
+  `archiveRecallChapterKey: 'T1'`, resolved through the new
+  `domain/services/archiveRecall.js` (`grantArchiveRecallPerkChoice`,
+  `applyArchiveRecallPerks`). `ARCHIVE_RESET` now takes a
+  `perkChoiceId` (`'auto' | 'invest' | 'efficiency'`) and rejects with
+  `INVALID_ARCHIVE_RECALL_PERK_CHOICE` if it's missing/unknown.
+  `ENDING_ASH` still grants AF unchanged — deferred until it's reframed as
+  `T5`, per the note above.
+- [x] Decided: `state.js`'s `archiveFragments` field stays (zeroed, the
+  generic AF reward/transaction plumbing in `save/resetTransaction.js` is
+  reused as-is for `ENDING_ASH` and later Act 3), sitting alongside the
+  new `archiveRecall: { chapters: {} }` field.
+- [x] Implemented `T1`'s style-perk choice wiring end to end: perk catalog
+  in `config/archiveRecall.js` (`ARCHIVE_RECALL_CHAPTERS.T1.stylePerks`
+  — `auto`/`invest`/`efficiency`), two new modifier types
+  (`manual_cooldown_multiplier` consumed in
+  `domain/services/manualProcesses.js` `manualProcessCooldownMs`;
+  `node_cost_multiplier` consumed in `domain/selectors.js`
+  `selectNodeCost`), effects re-applied to a fresh run's
+  `run.modifiers.active` via `applyArchiveRecallPerks` right after
+  `applyPreparedResetTransaction` carries `meta` forward. Minimal ending
+  screen in `ui/app.js` `renderEnding()` shows the 3 choices for
+  `ENDING_BLIGHT` instead of the old single "Сохранить в Архив" button.
+  T1 has **no defense perk** (first attempt, nothing to defend against
+  yet, per the design) — nothing to build there.
+- [ ] `T2-T4` don't exist as their own chapters yet, so their defense-perk
+  auto-grant + style-perk triads aren't wired — same mechanism as `T1`
+  once those chapters land.
 - [ ] Implement the two `T4` "Быстрое обучение" effects concretely:
   Cognition (`config/goals.js` `G011_COGNITION_TRACK`'s
   `cognition_at_least` condition — auto-credit `B04`+`N05` contributions)

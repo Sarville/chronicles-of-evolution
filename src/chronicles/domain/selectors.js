@@ -246,7 +246,13 @@ export function selectProducerOutputView(state, ruleset, producerId) {
 export function selectNodeCost(state, ruleset, nodeId) {
   const indexes = createRulesetIndexes(ruleset);
   const node = indexes.nodes[nodeId];
-  return multiplyCost(node.cost, branchCostMultiplier(state, ruleset, node));
+  let cost = multiplyCost(node.cost, branchCostMultiplier(state, ruleset, node));
+  for (const modifier of Object.values(state.run.modifiers.active)) {
+    if (modifier.type === 'node_cost_multiplier' && modifier.nodeId === nodeId) {
+      cost = multiplyCost(cost, modifier.value);
+    }
+  }
+  return cost;
 }
 
 export function selectEvolutionRevealLevel(state, ruleset, nodeId, memo = {}) {

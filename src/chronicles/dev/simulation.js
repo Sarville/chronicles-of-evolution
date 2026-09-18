@@ -671,7 +671,11 @@ export function runHeadlessSimulation(options = {}) {
   const ending = engine.state.run.ending ? { ...engine.state.run.ending } : null;
   let archiveReset = null;
   if (fullTimeline && ending?.id) {
-    archiveReset = engine.dispatch({ type: 'ARCHIVE_RESET' });
+    // ENDING_BLIGHT (T1) requires an Archive Recall perk choice instead of the
+    // old flat AF reward -- 'efficiency' is an arbitrary deterministic pick,
+    // the simulation harness doesn't care which style perk it gets.
+    const perkChoiceId = ending.id === 'ENDING_BLIGHT' ? 'efficiency' : undefined;
+    archiveReset = engine.dispatch({ type: 'ARCHIVE_RESET', perkChoiceId });
     if (archiveReset.ok) log.push({ atMs: engine.state.run.clock.simulationMs, action: 'archive_reset', endingId: ending.id });
   }
   const stall = fullTimeline && !archiveReset?.ok ? fullTimelineStall(engine, nodeOrder) : null;
