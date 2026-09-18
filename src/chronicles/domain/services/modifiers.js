@@ -55,12 +55,23 @@ export function applyEffects(state, effects = [], source = {}) {
     if (effect.type === 'building_output_multiplier') {
       state.run.modifiers.active[`${sourceKey}:building_output_multiplier:${effect.eraId}`] = effect;
     }
+    if (effect.type === 'recall_era_production_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:recall_era_production`] = effect;
+    }
+    if (effect.type === 'population_growth_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:population_growth`] = effect;
+    }
     if (effect.type === 'crisis_stability_decay_multiplier') {
       state.run.modifiers.active[`${sourceKey}:crisis_stability_decay`] = effect;
     }
     if (effect.type === 'grant_cognition') {
       state.run.cognition ||= { eventBonus: 0 };
       state.run.cognition.eventBonus = Math.max(0, (state.run.cognition.eventBonus || 0) + effect.amount);
+    }
+    if (effect.type === 'grant_adaptation_points') {
+      state.run.adaptation ||= { points: 0, earnedTotal: 0, spentTotal: 0, selectedOptionalNodes: [] };
+      state.run.adaptation.points += effect.amount;
+      state.run.adaptation.earnedTotal += effect.amount;
     }
     if (effect.type === 'unlock_resource') {
       if (!state.run.resources[effect.resourceId]) {

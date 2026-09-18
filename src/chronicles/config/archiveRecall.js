@@ -124,6 +124,8 @@ export const ARCHIVE_RECALL_CHAPTERS = {
         effects: [
           { type: 'building_output_floor', eraId: 'INDUSTRY', value: 0.25 },
           { type: 'building_output_floor', eraId: 'MODERN', value: 0.25 },
+          { type: 'recall_era_production_multiplier', eraIds: ['MOLECULAR', 'CELLULAR', 'MULTICELLULAR', 'EARLY_CIV', 'TRIBE', 'SETTLEMENT_EARLY', 'SETTLEMENT', 'CITY', 'INDUSTRY', 'MODERN'], value: 2.5 },
+          { type: 'population_growth_multiplier', eraIds: ['EARLY_CIV', 'TRIBE', 'SETTLEMENT_EARLY', 'SETTLEMENT', 'CITY', 'INDUSTRY', 'MODERN'], value: 2.5 },
         ],
       },
       invest: {
@@ -133,6 +135,8 @@ export const ARCHIVE_RECALL_CHAPTERS = {
         effects: [
           { type: 'building_output_multiplier', eraId: 'INDUSTRY', value: 1.25 },
           { type: 'building_output_multiplier', eraId: 'MODERN', value: 1.25 },
+          { type: 'recall_era_production_multiplier', eraIds: ['MOLECULAR', 'CELLULAR', 'MULTICELLULAR', 'EARLY_CIV', 'TRIBE', 'SETTLEMENT_EARLY', 'SETTLEMENT', 'CITY', 'INDUSTRY', 'MODERN'], value: 2.5 },
+          { type: 'population_growth_multiplier', eraIds: ['EARLY_CIV', 'TRIBE', 'SETTLEMENT_EARLY', 'SETTLEMENT', 'CITY', 'INDUSTRY', 'MODERN'], value: 2.5 },
         ],
       },
       efficiency: {
@@ -150,6 +154,8 @@ export const ARCHIVE_RECALL_CHAPTERS = {
           { type: 'grant_cognition', amount: 45 },
           { type: 'node_cost_multiplier', nodeId: 'T09', value: 0.55 },
           { type: 'node_cost_multiplier', nodeId: 'T10', value: 0.55 },
+          { type: 'recall_era_production_multiplier', eraIds: ['MOLECULAR', 'CELLULAR', 'MULTICELLULAR', 'EARLY_CIV', 'TRIBE', 'SETTLEMENT_EARLY', 'SETTLEMENT', 'CITY', 'INDUSTRY', 'MODERN'], value: 2.5 },
+          { type: 'population_growth_multiplier', eraIds: ['EARLY_CIV', 'TRIBE', 'SETTLEMENT_EARLY', 'SETTLEMENT', 'CITY', 'INDUSTRY', 'MODERN'], value: 2.5 },
         ],
       },
     },

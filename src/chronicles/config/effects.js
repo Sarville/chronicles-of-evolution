@@ -10,6 +10,9 @@ export const effectSupport = {
   set_flag: { status: 'supported' },
   job_output_multiplier: { status: 'supported' },
   population_capacity: { status: 'supported' },
+  grant_adaptation_points: { status: 'supported' },
+  recall_era_production_multiplier: { status: 'supported' },
+  population_growth_multiplier: { status: 'supported' },
 };
 
 export const allowedEffectTypes = Object.keys(effectSupport).filter(

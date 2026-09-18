@@ -108,17 +108,17 @@ export const buildings = [
   {
     id: 'BLD_WORKSHOP', entityType: 'building', labelKey: 'building.workshop', eraIds: ['SETTLEMENT_EARLY', 'SETTLEMENT', 'CITY'],
     requiresNodes: ['T08'], baseCost: { materials: 230, food: 80, knowledge: 30 }, growth: 1.22, maxCount: null,
-    output: { materials: 0.42 },
+    output: { materials: 1.47 },
   },
   {
     id: 'BLD_SCHOOL', entityType: 'building', labelKey: 'building.school', eraIds: ['SETTLEMENT', 'CITY'],
     requiresFlags: ['run.unlock.building.BLD_SCHOOL'], baseCost: { materials: 380, food: 140, knowledge: 80 }, growth: 1.24, maxCount: null,
-    output: { knowledge: 0.34 },
+    output: { knowledge: 1.19 },
   },
   {
     id: 'BLD_MARKET', entityType: 'building', labelKey: 'building.market', eraIds: ['SETTLEMENT', 'CITY'],
     requiresFlags: ['run.unlock.building.BLD_MARKET'], baseCost: { materials: 440, food: 180, knowledge: 95 }, growth: 1.24, maxCount: null,
-    output: { food: 0.3, materials: 0.2 },
+    output: { food: 1.05, materials: 0.7 },
   },
   {
     id: 'BLD_HEARTH', entityType: 'building', labelKey: 'building.hearth', eraIds: ['EARLY_CIV', 'TRIBE'],
@@ -136,42 +136,42 @@ export const buildings = [
   },
   {
     id: 'BLD_MINE', entityType: 'building', labelKey: 'building.mine', eraIds: ['INDUSTRY', 'MODERN', 'PRE_ATOMIC', 'ATOMIC'],
-    baseCost: { materials: 180, knowledge: 45 }, growth: 1.22, maxCount: null, output: { materials: 0.75 },
+    baseCost: { materials: 180, knowledge: 45 }, growth: 1.22, maxCount: null, output: { materials: 2.625 },
   },
   {
     id: 'BLD_STEAM_PLANT', entityType: 'building', labelKey: 'building.steam_plant', eraIds: ['CITY', 'INDUSTRY', 'MODERN', 'PRE_ATOMIC', 'ATOMIC'],
     requiresNodes: ['T14'], baseCost: { materials: 260, knowledge: 80 }, growth: 1.25, maxCount: null,
     // Aggregate Materials includes the early industrial fuel/feedstock cost.
-    input: { materials: 0.14 }, output: { power: 1.25 },
+    input: { materials: 0.49 }, output: { power: 4.375 },
   },
   {
     id: 'BLD_FOUNDRY', entityType: 'building', labelKey: 'building.foundry', eraIds: ['INDUSTRY', 'MODERN', 'PRE_ATOMIC', 'ATOMIC'],
     baseCost: { materials: 240, knowledge: 65 }, growth: 1.24, maxCount: null,
-    input: { power: 0.55 }, output: { materials: 1.05 },
+    input: { power: 1.925 }, output: { materials: 3.675 },
   },
   {
     id: 'BLD_LABORATORY', entityType: 'building', labelKey: 'building.laboratory', eraIds: ['INDUSTRY', 'MODERN', 'PRE_ATOMIC', 'ATOMIC'],
     baseCost: { materials: 220, knowledge: 100 }, growth: 1.25, maxCount: null,
-    input: { power: 0.4 }, output: { knowledge: 0.8 },
+    input: { power: 1.4 }, output: { knowledge: 2.8 },
   },
   {
     id: 'BLD_FACTORY', entityType: 'building', labelKey: 'building.factory', eraIds: ['CITY', 'INDUSTRY', 'MODERN', 'PRE_ATOMIC', 'ATOMIC'],
     requiresFlags: ['run.unlock.building.BLD_FACTORY'], baseCost: { materials: 720, knowledge: 180 }, growth: 1.25, maxCount: null,
-    output: { materials: 0.95 },
+    output: { materials: 3.325 },
   },
   {
     id: 'BLD_RAIL_HUB', entityType: 'building', labelKey: 'building.rail_hub', eraIds: ['CITY', 'INDUSTRY', 'MODERN', 'PRE_ATOMIC', 'ATOMIC'],
     requiresFlags: ['run.unlock.building.BLD_RAIL_HUB'], baseCost: { materials: 950, knowledge: 260 }, growth: 1.25, maxCount: null,
-    output: { food: 0.45, materials: 0.35 },
+    output: { food: 1.575, materials: 1.225 },
   },
   {
     id: 'BLD_GRID', entityType: 'building', labelKey: 'building.grid', eraIds: ['INDUSTRY', 'MODERN', 'PRE_ATOMIC', 'ATOMIC'],
     requiresFlags: ['run.unlock.building.BLD_GRID'], baseCost: { materials: 1050, knowledge: 360, power: 180 }, growth: 1.25, maxCount: null,
-    input: { power: 0.3 }, output: { knowledge: 0.45 },
+    input: { power: 1.05 }, output: { knowledge: 1.575 },
   },
   {
     id: 'BLD_REACTOR_LAB', entityType: 'building', labelKey: 'building.reactor_lab', eraIds: ['PRE_ATOMIC', 'ATOMIC'],
     requiresFlags: ['run.unlock.building.BLD_REACTOR_LAB'], baseCost: { materials: 1800, knowledge: 920, power: 420 }, growth: 1, maxCount: 1,
-    input: { power: 0.85 }, output: { knowledge: 0.65 },
+    input: { power: 2.975 }, output: { knowledge: 2.275 },
   },
 ];

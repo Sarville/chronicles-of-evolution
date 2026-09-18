@@ -8,6 +8,14 @@ const FOOD_PER_PERSON_PER_SECOND = 0.12;
 // gate) compresses along with the rest of T1's economy.
 const GROWTH_PER_SECOND = 0.07;
 
+function populationGrowthMultiplier(state) {
+  return Object.values(state.run.modifiers.active || {}).reduce((multiplier, modifier) => {
+    return modifier.type === 'population_growth_multiplier' && modifier.eraIds?.includes(state.run.eraId)
+      ? multiplier * modifier.value
+      : multiplier;
+  }, 1);
+}
+
 export function calculatePopulationCap(state) {
   const baseCap = state.run.population?.baseCap || 0;
   const expansion = Object.values(state.run.modifiers.active || {}).reduce((total, modifier) => {
@@ -57,7 +65,7 @@ export function applyPopulationFoodLoop(state, ruleset, deltaMs, ports) {
   // A fully paid meal is not itself a surplus. Growth requires food left in
   // storage after maintenance, matching the original fed-and-stocked rule.
   if (!deficit && (state.run.resources.food?.amount || 0) > 0 && population.current < cap) {
-    grew = Math.min(cap - population.current, GROWTH_PER_SECOND * seconds);
+    grew = Math.min(cap - population.current, GROWTH_PER_SECOND * populationGrowthMultiplier(state) * seconds);
     population.current += grew;
     population.peak = Math.max(population.peak, population.current);
     events.push(createDomainEvent('population_grew', { amount: grew, current: population.current, cap }, state, ports));

@@ -597,7 +597,15 @@ export function runHeadlessSimulation(options = {}) {
   const branchNodeId = nodeOrder.find((nodeId) => nodeId.startsWith('C02'));
   const clock = options.clock || createFakeClock(0);
   const rng = options.rng || createSeededRng(options.seed || 1);
-  const engine = createChroniclesEngine({ ruleset: sourceRuleset, ports: { clock, rng } });
+  // Act-level simulation supplies the state produced by the preceding Archive
+  // reset, while the focused runners still start from a clean state.
+  const engine = createChroniclesEngine({
+    ruleset: sourceRuleset,
+    ports: { clock, rng },
+    state: options.state,
+    actOneAttempt: options.actOneAttempt,
+  });
+  const actOneAttempt = engine.state.run.actOneAttempt;
   const maxMs = options.maxMs || (fullTimeline ? 240 * 60 * 1000 : 22 * 60 * 1000);
   const stepMs = options.stepMs || 1000;
   const log = [];
@@ -671,10 +679,16 @@ export function runHeadlessSimulation(options = {}) {
   const ending = engine.state.run.ending ? { ...engine.state.run.ending } : null;
   let archiveReset = null;
   if (fullTimeline && ending?.id) {
-    // ENDING_BLIGHT (T1) requires an Archive Recall perk choice instead of the
-    // old flat AF reward -- 'efficiency' is an arbitrary deterministic pick,
-    // the simulation harness doesn't care which style perk it gets.
-    const perkChoiceId = ending.id === 'ENDING_BLIGHT' ? 'efficiency' : undefined;
+    // Every Act 1 ending awards a choice. These defaults model one coherent
+    // fresh route; callers can override each chapter to compare perk routes.
+    const defaultPerkChoices = {
+      ENDING_BLIGHT: 'efficiency',
+      ENDING_CATACLYSM: 'invest',
+      ENDING_FRACTURE: 'auto',
+      ENDING_OVERLOAD: 'efficiency',
+      ENDING_ASH: 'production',
+    };
+    const perkChoiceId = options.perkChoiceId ?? defaultPerkChoices[ending.id];
     archiveReset = engine.dispatch({ type: 'ARCHIVE_RESET', perkChoiceId });
     if (archiveReset.ok) log.push({ atMs: engine.state.run.clock.simulationMs, action: 'archive_reset', endingId: ending.id });
   }
@@ -683,6 +697,7 @@ export function runHeadlessSimulation(options = {}) {
   return {
     ok: fullTimeline ? Boolean(archiveReset?.ok) : Boolean(engine.state.run.nodes.completed[finalNodeId]),
     profile: profileName,
+    actOneAttempt,
     branch: branchId,
     fullTimeline,
     includeOptionalM04: options.includeOptionalM04 === true,
@@ -724,4 +739,34 @@ export function runHeadlessSimulation(options = {}) {
 
 export function runFullTimelineSimulation(options = {}) {
   return runHeadlessSimulation({ ...options, fullTimeline: true });
+}
+
+// Composes the isolated chapter runner into the real first-act regression:
+// T1 resets into T2, selected Recall perks persist, and the route continues
+// through the first T5 ending.
+export function runActOneSimulation(options = {}) {
+  const attempts = ['T1', 'T2', 'T3', 'T4', 'T5'];
+  const chapters = [];
+  let state = options.state;
+
+  for (const actOneAttempt of attempts) {
+    const result = runFullTimelineSimulation({
+      ...options,
+      state,
+      actOneAttempt,
+      perkChoiceId: options.perkChoices?.[actOneAttempt],
+    });
+    chapters.push(result);
+    if (!result.ok) break;
+    state = result.state;
+  }
+
+  return {
+    ok: chapters.length === attempts.length && chapters.every((chapter) => chapter.ok),
+    profile: options.profile || 'competent',
+    chapters,
+    state,
+    totalActiveMs: chapters.reduce((total, chapter) => total + (chapter.ending?.completedAtMs || 0), 0),
+    stall: chapters.find((chapter) => !chapter.ok)?.stall || null,
+  };
 }

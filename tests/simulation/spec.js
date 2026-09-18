@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { ruleset } from '../../src/chronicles/config/index.js';
 import { createChroniclesEngine } from '../../src/chronicles/domain/engine.js';
-import { estimateProducerPurchasePayback, runFullTimelineSimulation, runHeadlessSimulation, simulationProfiles } from '../../src/chronicles/dev/simulation.js';
+import { estimateProducerPurchasePayback, runActOneSimulation, runFullTimelineSimulation, runHeadlessSimulation, simulationProfiles } from '../../src/chronicles/dev/simulation.js';
 
 function between(value, min, max, label) {
   assert.equal(value >= min && value <= max, true, `${label}: expected ${value} between ${min} and ${max}`);
@@ -167,5 +167,30 @@ if (fullTimeline.ok) {
   assert.equal(typeof fullTimeline.stall?.nodeId, 'string');
   assert.equal(Array.isArray(fullTimeline.stall?.resources), true);
 }
+
+// A fresh Act 1 is five actual runs, not five independently seeded fixtures:
+// each Archive reset must carry its Recall choice into the following chapter.
+// This caught the original replay-only AP deadlock at EV-BIO-02 in T2.
+const fullActOne = runActOneSimulation({ seed: 7, profile: 'optimized' });
+assert.equal(fullActOne.ok, true);
+assert.deepEqual(fullActOne.chapters.map((chapter) => chapter.actOneAttempt), ['T1', 'T2', 'T3', 'T4', 'T5']);
+assert.deepEqual(fullActOne.chapters.map((chapter) => chapter.ending.id), [
+  'ENDING_BLIGHT',
+  'ENDING_CATACLYSM',
+  'ENDING_FRACTURE',
+  'ENDING_OVERLOAD',
+  'ENDING_ASH',
+]);
+assert.equal(fullActOne.chapters.every((chapter) => chapter.archiveReset.ok), true);
+const actOneBudgets = Object.fromEntries(fullActOne.chapters.map((chapter) => [
+  chapter.actOneAttempt,
+  chapter.ending.completedAtMs,
+]));
+between(actOneBudgets.T1, 18.5 * 60000, 20.5 * 60000, 'Act 1 T1 budget');
+between(actOneBudgets.T2, 23.5 * 60000, 26 * 60000, 'Act 1 T2 budget');
+between(actOneBudgets.T3, 28.5 * 60000, 31.5 * 60000, 'Act 1 T3 budget');
+between(actOneBudgets.T4, 33.5 * 60000, 36.5 * 60000, 'Act 1 T4 budget');
+between(actOneBudgets.T5, 39.5 * 60000, 42.5 * 60000, 'Act 1 T5 budget');
+between(fullActOne.totalActiveMs, 145 * 60000, 155 * 60000, 'Act 1 total budget');
 
 console.log('headless simulation ok');

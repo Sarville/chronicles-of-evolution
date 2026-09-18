@@ -912,7 +912,7 @@ t4AutoEngine.state.run.buildings = { BLD_FOUNDRY: { count: 1 } };
 t4AutoEngine.state.run.resources.power = { amount: 0, capOverride: 1000 };
 t4AutoEngine.state.run.resources.materials = { amount: 0, capOverride: 1000 };
 t4AutoEngine.tick(1000);
-assert.equal(t4AutoEngine.state.run.resources.materials.amount, 0.2625);
+assert.equal(t4AutoEngine.state.run.resources.materials.amount, 0.91875);
 assert.equal(t4AutoEngine.state.run.resources.power.amount, 0);
 
 // "Форсированное производство" (invest perk): Industry building output x1.25,
@@ -931,6 +931,6 @@ t4InvestEngine.state.run.flags = { 'run.unlock.building.BLD_FACTORY': true };
 t4InvestEngine.state.run.buildings = { BLD_FACTORY: { count: 1 } };
 t4InvestEngine.state.run.resources.materials = { amount: 0, capOverride: 1000 };
 t4InvestEngine.tick(1000);
-assert.equal(t4InvestEngine.state.run.resources.materials.amount, 1.1875);
+assert.equal(t4InvestEngine.state.run.resources.materials.amount, 4.15625);
 
 console.log('domain flow ok');

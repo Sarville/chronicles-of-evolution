@@ -149,7 +149,9 @@ export const goals = [
       { type: 'branch_selected', branchGroup: 'cell_identity_1' },
     ],
     conditions: [{ type: 'node_completed', nodeId: 'C06' }],
-    rewards: [{ type: 'grant_adaptation_points', amount: 2 }],
+    // C06 grants the run-local AP directly so this shared choice also works
+    // for T2-T5, whose recap chains do not activate G007.
+    rewards: [],
     cta: { type: 'node', targetId: 'C03', label: 'Развить Protein Synthesis' },
     highlight: { type: 'node', targetId: 'C03' },
     hintTimeoutMs: 150000,

@@ -19,6 +19,9 @@ export function productionMultiplierForResource(state, resourceId) {
     if (modifier.type === 'resource_production_multiplier' && modifier.resourceId === resourceId) {
       multiplier *= modifier.value;
     }
+    if (modifier.type === 'recall_era_production_multiplier' && modifier.eraIds?.includes(state.run.eraId)) {
+      multiplier *= modifier.value;
+    }
   }
   return multiplier;
 }

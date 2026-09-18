@@ -64,7 +64,8 @@ assert.deepEqual(ruleset.nodes.find((node) => node.id === 'M05').requiresNodes, 
 assert.equal(ruleset.goals.find((goal) => goal.id === 'G002').highlight.targetId, 'PROC_RNA_REPLICATION');
 assert.equal(ruleset.nodes.find((node) => node.id === 'B02A').adaptationPointCost, 1);
 assert.equal(ruleset.nodes.find((node) => node.id === 'C07').transition, 'MULTICELLULAR');
-assert.equal(ruleset.goals.find((goal) => goal.id === 'G007').rewards[0].type, 'grant_adaptation_points');
+assert.equal(ruleset.nodes.find((node) => node.id === 'C06').effects.some((effect) => effect.type === 'grant_adaptation_points'), true);
+assert.deepEqual(ruleset.goals.find((goal) => goal.id === 'G007').rewards, []);
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));

@@ -912,6 +912,8 @@ T1-0 Event Engine + 0–18 audit
 Current immediate order (2026-09-18, updated after `T5`): Archive Recall
 perk system and `T1`-`T5` are all implemented — see "Archive Recall perk
 system + AF removal from Act 1-2" above for the full checklist. Next:
-Act 1 closeout regression (full fresh-state `T1→T5` playthrough) →
-balance pass on every provisional number → Archive-mode entry point →
-Act 2 (`P1-P3`) implementation.
+Act 1 closeout regression and the first numeric pass are complete:
+the fresh-state `T1→T5` headless route finishes in 149:50–154:08 across
+optimized/competent/slow profiles, within the chapter-map budgets. Remaining
+acceptance step: manual desktop and mobile playtest. Next implementation
+track: Archive-mode entry point → Act 2 (`P1-P3`) implementation.

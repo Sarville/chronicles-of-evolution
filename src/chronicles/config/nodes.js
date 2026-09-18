@@ -210,7 +210,10 @@ export const nodes = [
     labelKey: 'node.C06',
     cost: { biomass: 170, atp: 100, dna: 160 },
     requiresNodes: ['C05'],
-    effects: [{ type: 'global_production_multiplier', value: 1.1 }],
+    // The body-adaptation event repeats in every T1-T5 attempt.  Its AP must
+    // therefore belong to the shared Cell Coordination discovery, not only to
+    // T1's fine-grained G007 goal (which later recap goal chains replace).
+    effects: [{ type: 'global_production_multiplier', value: 1.1 }, { type: 'grant_adaptation_points', amount: 2 }],
     goalId: 'G007',
   },
   {
