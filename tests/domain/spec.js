@@ -703,9 +703,85 @@ assert.equal(t2Reset.ok, true);
 assert.equal(t2Engine.state.run.lifecycle, 'active');
 assert.equal(t2Engine.state.meta.archiveRecall.chapters.T2.styleChoice, 'invest');
 assert.equal(t2Engine.state.meta.archiveRecall.chapters.T2.defensePerkId, 'T2_DEFENSE_QUARANTINE_PROTOCOL');
-// T3 doesn't exist as its own chapter yet -- falls back to T1 by default.
-assert.equal(t2Engine.state.run.actOneAttempt, 'T1');
+// T3 now exists as its own chapter, so T2's reset advances into it.
+assert.equal(t2Engine.state.run.actOneAttempt, 'T3');
 assert.equal(t2Engine.state.run.modifiers.active['T2_INVEST_LARGE_CONTAINERS:capacity_multiplier:food'].value, 1.3);
 assert.equal(calculateCap(t2Engine.state, 'food', ruleset), 390);
+
+// T3 "Крепость": recap now covers RNA->Settlement in 2 coarse steps
+// (G050/G051, even coarser than T2's 3 despite covering more ground), then
+// new City content (G031/G032, including the retargeted governance flavor
+// event EV-CIV-04) and its own collapse (G033/G034, ENDING_FRACTURE).
+const t3Engine = createChroniclesEngine({ ruleset, actOneAttempt: 'T3' });
+assert.equal(t3Engine.state.run.actOneAttempt, 'T3');
+t3Engine.state.run.eraId = 'CITY';
+for (const nodeId of ['T05', 'T09', 'T10', 'T11', 'T12']) {
+  t3Engine.state.run.nodes.completed[nodeId] = { completedAtMs: 0 };
+}
+t3Engine.state.run.population = { current: 28, peak: 28, baseCap: 35, assignments: {}, foodStatus: 'healthy' };
+t3Engine.state.run.buildings = {
+  BLD_FIELD: { count: 1 }, BLD_HOUSE: { count: 1 }, BLD_WORKSHOP: { count: 1 },
+  BLD_SCHOOL: { count: 1 }, BLD_MARKET: { count: 1 },
+};
+result = t3Engine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'food', amount: 0 });
+assert.equal(result.ok, true);
+for (const goalId of ['G050', 'G051', 'G031', 'G032']) {
+  assert.equal(t3Engine.state.run.goals.states[goalId]?.status, 'archived');
+}
+for (const goalId of ['G040', 'G041', 'G042', 'G027', 'G028', 'G029', 'G030']) {
+  assert.equal(t3Engine.state.run.goals.states[goalId], undefined);
+}
+// Both EV-NAR-T3 (rising, priority 58) and the retargeted EV-CIV-04
+// (governance, priority 50) queue off the same G032 completion.
+assert.equal(t3Engine.state.run.events.pendingId, 'EV-NAR-T3');
+assert.deepEqual(t3Engine.state.run.events.queue, ['EV-CIV-04']);
+assert.equal(t3Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-NAR-T3', choiceId: 'continue' }).ok, true);
+assert.equal(t3Engine.state.run.chapterTimers.chapter3_fracture.active, true);
+assert.equal(t3Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CIV-04', choiceId: 'council' }).ok, true);
+assert.equal(t3Engine.state.run.flags['run.civ.governance'], 'council');
+t3Engine.tick(120000);
+assert.equal(t3Engine.state.run.events.pendingId, 'EV-CR-T3');
+assert.equal(t3Engine.dispatch({ type: 'RESOLVE_EVENT', eventId: 'EV-CR-T3', choiceId: 'mediate' }).ok, true);
+assert.equal(t3Engine.state.run.lifecycle, 'ended');
+assert.equal(t3Engine.state.run.ending.id, 'ENDING_FRACTURE');
+assert.equal(t3Engine.state.run.ending.subtype, 'fracture_mediated');
+
+const t3MissingChoice = t3Engine.dispatch({ type: 'ARCHIVE_RESET' });
+assert.equal(t3MissingChoice.ok, false);
+assert.equal(t3MissingChoice.reason, 'INVALID_ARCHIVE_RECALL_PERK_CHOICE');
+
+const t3Reset = t3Engine.dispatch({ type: 'ARCHIVE_RESET', perkChoiceId: 'auto' });
+assert.equal(t3Reset.ok, true);
+assert.equal(t3Engine.state.meta.archiveRecall.chapters.T3.styleChoice, 'auto');
+assert.equal(t3Engine.state.meta.archiveRecall.chapters.T3.defensePerkId, 'T3_DEFENSE_SEISMIC_FOOTINGS');
+// T4 doesn't exist as its own chapter yet -- falls back to T1 by default.
+assert.equal(t3Engine.state.run.actOneAttempt, 'T1');
+
+// "Самоорганизация" (auto perk): idle population auto-fills era jobs, and a
+// job stuck at its output resource's cap auto-reassigns elsewhere.
+t3Engine.state.run.eraId = 'CITY';
+t3Engine.state.run.population = { current: 5, peak: 5, baseCap: 10, assignments: { JOB_CITY_WORKER: 5 }, foodStatus: 'healthy' };
+t3Engine.state.run.resources.materials = { amount: 300, capOverride: 300 };
+t3Engine.state.run.resources.food = { amount: 1000, capOverride: 100000 };
+t3Engine.tick(1000);
+assert.deepEqual(t3Engine.state.run.population.assignments, { JOB_CITY_WORKER: 0, JOB_CITY_FARMER: 5 });
+
+// "Единство раньше" (efficiency perk): chapter3_fracture's total duration
+// stretches ×1.3 while the final cliff stays the same absolute length.
+const t3EffEngine = createChroniclesEngine({ ruleset, actOneAttempt: 'T3' });
+t3EffEngine.dispatch({ type: 'ADD_RESOURCE', resourceId: 'rna', amount: 0 });
+t3EffEngine.state.meta.archiveRecall = { chapters: { T3: { styleChoice: 'efficiency', perkId: 'T3_EFFICIENCY_UNITY_SOONER', defensePerkId: null } } };
+t3EffEngine.state.run.modifiers.active['T3_EFFICIENCY_UNITY_SOONER:chapter_timer_duration:chapter3_fracture'] = {
+  type: 'chapter_timer_duration_multiplier', timerId: 'chapter3_fracture', value: 1.3,
+};
+t3EffEngine.state.run.eraId = 'CITY';
+t3EffEngine.state.run.population = { current: 20, peak: 20, baseCap: 30, assignments: {}, foodStatus: 'healthy' };
+t3EffEngine.state.run.chapterTimers = { chapter3_fracture: { active: true, elapsedMs: 0 } };
+t3EffEngine.tick(120000);
+assert.equal(t3EffEngine.state.run.chapterTimers.chapter3_fracture.active, true);
+assert.equal(t3EffEngine.state.run.events.pendingId, null);
+t3EffEngine.tick(36000);
+assert.equal(t3EffEngine.state.run.chapterTimers.chapter3_fracture.active, false);
+assert.equal(t3EffEngine.state.run.events.pendingId, 'EV-CR-T3');
 
 console.log('domain flow ok');

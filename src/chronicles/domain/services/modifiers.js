@@ -43,6 +43,12 @@ export function applyEffects(state, effects = [], source = {}) {
     if (effect.type === 'building_cost_multiplier') {
       state.run.modifiers.active[`${sourceKey}:building_cost:${effect.eraId}`] = effect;
     }
+    if (effect.type === 'unlock_auto_workforce') {
+      state.run.modifiers.active[`${sourceKey}:auto_workforce`] = effect;
+    }
+    if (effect.type === 'chapter_timer_duration_multiplier') {
+      state.run.modifiers.active[`${sourceKey}:chapter_timer_duration:${effect.timerId}`] = effect;
+    }
     if (effect.type === 'unlock_resource') {
       if (!state.run.resources[effect.resourceId]) {
         state.run.resources[effect.resourceId] = { amount: 0 };

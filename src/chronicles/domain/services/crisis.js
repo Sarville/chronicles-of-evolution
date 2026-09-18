@@ -59,15 +59,30 @@ export function advanceCrisis(state, ruleset, deltaMs, ports) {
 // The player keeps agency (can still build, buy, etc.) so the collapse reads
 // as a real event, not a scripted cutscene.
 // ponytail: only 'population' decay is implemented (reused as-is for T2's
-// Катаклизм); T3-T4 may need a different decay target once designed.
+// Катаклизм and T3's Раскол); T4 may need a different decay target once
+// designed.
 export const CHAPTER_TIMERS = {
   chapter1_blight: { totalMs: 120000, cliffMs: 15000, decays: 'population', endingEventId: 'EV-CR-T1' },
   chapter2_cataclysm: { totalMs: 120000, cliffMs: 15000, decays: 'population', endingEventId: 'EV-CR-T2' },
+  chapter3_fracture: { totalMs: 120000, cliffMs: 15000, decays: 'population', endingEventId: 'EV-CR-T3' },
 };
 
 export function startChapterTimer(state, timerId) {
   state.run.chapterTimers ||= {};
   state.run.chapterTimers[timerId] = { active: true, elapsedMs: 0 };
+}
+
+// T3 "Единство раньше" perk (docs/gdd/10_META_PROGRESSION.md sec.4.2)
+// describes a policy/Stability threshold that doesn't exist for T1-T4 (no
+// Stability system runs before Atomic) -- reinterpreted mechanically as
+// extending the chapter timer's gentle-decay phase (totalMs), while the
+// final visible cliff (cliffMs) stays the same absolute length so the
+// collapse itself still reads the same way, just arrives later.
+function chapterTimerTotalMs(state, timerId, config) {
+  const multiplier = Object.values(state.run.modifiers.active).reduce((value, modifier) => {
+    return modifier.type === 'chapter_timer_duration_multiplier' && modifier.timerId === timerId ? value * modifier.value : value;
+  }, 1);
+  return config.totalMs * multiplier;
 }
 
 export function advanceChapterTimers(state, ruleset, deltaMs, ports) {
@@ -77,9 +92,10 @@ export function advanceChapterTimers(state, ruleset, deltaMs, ports) {
   for (const [timerId, timer] of Object.entries(timers)) {
     if (!timer.active) continue;
     const config = CHAPTER_TIMERS[timerId];
-    const remainingBefore = Math.max(0, config.totalMs - timer.elapsedMs);
-    timer.elapsedMs = Math.min(config.totalMs, timer.elapsedMs + deltaMs);
-    const remainingAfter = Math.max(0, config.totalMs - timer.elapsedMs);
+    const totalMs = chapterTimerTotalMs(state, timerId, config);
+    const remainingBefore = Math.max(0, totalMs - timer.elapsedMs);
+    timer.elapsedMs = Math.min(totalMs, timer.elapsedMs + deltaMs);
+    const remainingAfter = Math.max(0, totalMs - timer.elapsedMs);
 
     if (config.decays === 'population' && state.run.population) {
       const population = state.run.population;

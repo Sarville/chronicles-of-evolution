@@ -212,6 +212,50 @@ export const events = [
     ],
   },
   {
+    // T3 "Крепость" recap seam, same role as EV-NAR-T2-RECALL.
+    id: 'EV-NAR-T3-RECALL', type: 'flavor', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G051' },
+    phaseWindow: { eraIds: ['SETTLEMENT'] }, priority: 40, telemetryKey: 'event_t3_recall_seam', title: 'Уже пройденное',
+    body: 'Архив: путь до этого места был короче, чем даже во второй раз. Дальше начинается то, чего вы ещё не видели.',
+    chronicleSummary: 'Архив отметил конец сжатого участка третьей попытки.',
+    choices: [{ id: 'continue', label: 'Продолжить', effects: [] }],
+  },
+  {
+    id: 'EV-NAR-T3', type: 'anomaly', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G032' },
+    phaseWindow: { eraIds: ['CITY'] }, priority: 58, telemetryKey: 'event_fracture_noticed', title: 'Голоса раскола',
+    body: 'Решения города больше не звучат как одно решение. Кварталы отвечают друг другу, а не Архиву.',
+    chronicleSummary: 'Первые признаки внутреннего раскола зафиксированы в укреплённом городе.',
+    choices: [{ id: 'continue', label: 'Продолжить', effects: [
+      { type: 'set_flag', flag: 'run.chapter3.fracture_noticed', value: true },
+      { type: 'start_chapter_timer', timerId: 'chapter3_fracture' },
+    ] }],
+  },
+  {
+    // Queued directly by advanceChapterTimers when 'chapter3_fracture'
+    // expires (domain/services/crisis.js) -- this trigger is descriptive
+    // only, same as EV-CR-T1/EV-CR-T2's triggers.
+    id: 'EV-CR-T3', type: 'ending', deck: 'authored', trigger: { type: 'chapter_timer_expired', timerId: 'chapter3_fracture' },
+    phaseWindow: { eraIds: ['CITY'] }, priority: 100, telemetryKey: 'event_fracture_choice', title: 'Раскол',
+    body: 'Кварталы города перестали ждать общего решения. Решение необходимо сейчас, не после того, как голоса согласуются сами.',
+    chronicleSummary: 'Третья крепость не удержала единство внутри собственных стен. Архив зафиксировал: это уже происходило.',
+    choices: [
+      { id: 'centralize', label: 'Централизовать власть', effects: [
+        { type: 'set_flag', flag: 'run.chapter3.response', value: 'centralize' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter3_subtype', value: 'fracture_centralized' },
+        { type: 'complete_ending', endingId: 'ENDING_FRACTURE', subtype: 'fracture_centralized' },
+      ] },
+      { id: 'secede', label: 'Разделиться на анклавы', effects: [
+        { type: 'set_flag', flag: 'run.chapter3.response', value: 'secede' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter3_subtype', value: 'fracture_seceded' },
+        { type: 'complete_ending', endingId: 'ENDING_FRACTURE', subtype: 'fracture_seceded' },
+      ] },
+      { id: 'mediate', label: 'Найти компромисс', effects: [
+        { type: 'set_flag', flag: 'run.chapter3.response', value: 'mediate' },
+        { type: 'set_meta_flag', flag: 'meta.endings.chapter3_subtype', value: 'fracture_mediated' },
+        { type: 'complete_ending', endingId: 'ENDING_FRACTURE', subtype: 'fracture_mediated' },
+      ] },
+    ],
+  },
+  {
     id: 'EV-CIV-03', type: 'flavor', deck: 'authored', trigger: { type: 'node_completed', nodeId: 'T08' },
     phaseWindow: { eraIds: ['SETTLEMENT_EARLY'] }, priority: 35, telemetryKey: 'event_settlement_profile', title: 'Первое поле',
     body: 'Земля начинает отвечать на повторяющийся труд.', chronicleSummary: 'Племя выбрало путь постоянного труда на земле.',
@@ -232,7 +276,11 @@ export const events = [
     ],
   },
   {
-    id: 'EV-CIV-04', type: 'narrative', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G019' },
+    // Retargeted 2026-09-18 from the now-dead T1-only G019 (T1 never reaches
+    // City anymore) to T3's own City goal -- T3 "Крепость" is the first
+    // chapter that actually plays this content live (docs/gdd/
+    // 13_ACT_ONE_CHAPTERS.md sec.5's "G032B governance входит в условие").
+    id: 'EV-CIV-04', type: 'narrative', deck: 'authored', trigger: { type: 'goal_completed', goalId: 'G032' },
     phaseWindow: { eraIds: ['CITY'] }, priority: 50, telemetryKey: 'event_governance', title: 'Кто принимает решения?',
     body: 'Город требует правила, которые переживут голос одного человека.', chronicleSummary: 'Город определил свой первый способ принимать решения.',
     choices: [

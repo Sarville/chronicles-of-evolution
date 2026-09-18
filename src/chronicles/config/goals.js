@@ -310,4 +310,64 @@ export const goals = [
     conditions: [{ type: 'flag_set', flag: 'run.ending.id', value: 'ENDING_CATACLYSM' }], rewards: [],
     cta: { type: 'event', targetId: 'EV-CR-T2', label: 'Пережить Катаклизм' }, highlight: { type: 'event', targetId: 'EV-CR-T2' },
   },
+
+  // T3 "Крепость" (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.3/5): recap now
+  // covers RNA->Settlement (what used to be T2's own recap PLUS T2's new
+  // content) in just 2 coarse steps -- even coarser than T2's 3, despite
+  // covering more ground, per the doc's "крупнее recap T2" instruction.
+  // G031-G034 are the new content (City) + collapse (Раскол), continuing
+  // the reserved G031-G039 range for T3-T4's own new/collapse goals.
+  {
+    id: 'G050', title: 'Recall: от РНК до племени', description: 'Молекулы, клетка, разум и первое племя — Архив проходит это одним шагом.',
+    targetTimeMs: 300000, nodeId: 'T05', chapterId: 'CH04', slot: 'chapter', chapterAttempt: 'T3',
+    sequence: { nextGoalId: 'G051' }, prerequisites: [],
+    conditions: [{ type: 'node_completed', nodeId: 'T05' }, { type: 'population_at_least', value: 8 }], rewards: [],
+    cta: { type: 'node', targetId: 'T05', label: 'Закрепить племя' }, highlight: { type: 'node', targetId: 'T05' },
+  },
+  {
+    id: 'G051', title: 'Recall: земледелие и поселение', description: 'Второе по счёту поселение узнаётся с первого взгляда.',
+    targetTimeMs: 600000, nodeId: 'T09', chapterId: 'CH05', slot: 'chapter', chapterAttempt: 'T3',
+    sequence: { previousGoalId: 'G050', nextGoalId: 'G031' }, prerequisites: [{ type: 'node_completed', nodeId: 'T05' }],
+    conditions: [
+      { type: 'node_completed', nodeId: 'T09' },
+      { type: 'building_count', buildingId: 'BLD_FIELD', count: 1 },
+      { type: 'building_count', buildingId: 'BLD_HOUSE', count: 1 },
+      { type: 'building_count', buildingId: 'BLD_WORKSHOP', count: 1 },
+      { type: 'population_at_least', value: 14 },
+    ], rewards: [],
+    cta: { type: 'node', targetId: 'T09', label: 'Основать поселение' }, highlight: { type: 'node', targetId: 'T09' },
+  },
+  {
+    id: 'G031', title: 'Откройте письменность', description: 'Впервые за эту попытку — по-настоящему новый шаг: Writing.',
+    targetTimeMs: 900000, nodeId: 'T10', chapterId: 'CH06', slot: 'chapter', chapterAttempt: 'T3',
+    sequence: { previousGoalId: 'G051', nextGoalId: 'G032' }, prerequisites: [{ type: 'node_completed', nodeId: 'T09' }],
+    conditions: [{ type: 'node_completed', nodeId: 'T10' }], rewards: [],
+    cta: { type: 'node', targetId: 'T10', label: 'Развить письменность' }, highlight: { type: 'node', targetId: 'T10' },
+  },
+  {
+    id: 'G032', title: 'Постройте крепость', description: 'Организованный труд, школа и рынок объединяют поселение в город.',
+    targetTimeMs: 1200000, nodeId: 'T12', chapterId: 'CH06', slot: 'chapter', chapterAttempt: 'T3',
+    sequence: { previousGoalId: 'G031', nextGoalId: 'G033' }, prerequisites: [{ type: 'node_completed', nodeId: 'T10' }],
+    conditions: [
+      { type: 'node_completed', nodeId: 'T12' },
+      { type: 'building_count', buildingId: 'BLD_SCHOOL', count: 1 },
+      { type: 'building_count', buildingId: 'BLD_MARKET', count: 1 },
+      { type: 'population_at_least', value: 28 },
+    ], rewards: [],
+    cta: { type: 'node', targetId: 'T12', label: 'Создать город' }, highlight: { type: 'node', targetId: 'T12' },
+  },
+  {
+    id: 'G033', title: 'Заметьте голоса раскола', description: 'Крепость держит стены, но не мнения внутри них.',
+    targetTimeMs: 1350000, chapterId: 'CH06', slot: 'chapter', chapterAttempt: 'T3',
+    sequence: { previousGoalId: 'G032', nextGoalId: 'G034' }, prerequisites: [{ type: 'node_completed', nodeId: 'T12' }],
+    conditions: [{ type: 'flag_set', flag: 'run.chapter3.fracture_noticed', value: true }], rewards: [],
+    cta: { type: 'event', targetId: 'EV-NAR-T3', label: 'Голоса раскола' }, highlight: { type: 'event', targetId: 'EV-NAR-T3' },
+  },
+  {
+    id: 'G034', title: 'Переживите Раскол', description: 'Решение не отменяет коллапс — только то, как крепость его запомнит.',
+    targetTimeMs: 1500000, chapterId: 'CH06', slot: 'chapter', chapterAttempt: 'T3',
+    sequence: { previousGoalId: 'G033' }, prerequisites: [{ type: 'flag_set', flag: 'run.chapter3.fracture_noticed', value: true }],
+    conditions: [{ type: 'flag_set', flag: 'run.ending.id', value: 'ENDING_FRACTURE' }], rewards: [],
+    cta: { type: 'event', targetId: 'EV-CR-T3', label: 'Пережить Раскол' }, highlight: { type: 'event', targetId: 'EV-CR-T3' },
+  },
 ];

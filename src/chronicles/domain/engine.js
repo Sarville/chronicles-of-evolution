@@ -5,7 +5,7 @@ import { evaluateGoals } from './services/goals.js';
 import { queueEventsForGoal } from './services/events.js';
 import { queueDueDeckEvents } from './services/events.js';
 import { applyProduction } from './services/production.js';
-import { applyPopulationFoodLoop } from './services/population.js';
+import { applyPopulationFoodLoop, applyAutoWorkforce } from './services/population.js';
 import { advanceChapterTimers, advanceCrisis } from './services/crisis.js';
 
 function evaluateGoalsWithQueuedEvents(state, ruleset, ports) {
@@ -36,11 +36,12 @@ export function createChroniclesEngine(options = {}) {
       const tickResult = dispatchCommand(state, ruleset, { type: 'TICK', deltaMs }, ports);
       const productionResult = applyProduction(state, ruleset, deltaMs, ports);
       const populationResult = applyPopulationFoodLoop(state, ruleset, deltaMs, ports);
+      const workforceEvents = applyAutoWorkforce(state, ruleset, ports);
       const crisisEvents = advanceCrisis(state, ruleset, deltaMs, ports);
       const chapterTimerEvents = advanceChapterTimers(state, ruleset, deltaMs, ports);
       const goalEvents = evaluateGoalsWithQueuedEvents(state, ruleset, ports);
       const deckEvents = queueDueDeckEvents(state, ruleset, ports);
-      const events = [...tickResult.events, ...productionResult.events, ...populationResult.events, ...crisisEvents, ...chapterTimerEvents, ...goalEvents, ...deckEvents];
+      const events = [...tickResult.events, ...productionResult.events, ...populationResult.events, ...workforceEvents, ...crisisEvents, ...chapterTimerEvents, ...goalEvents, ...deckEvents];
       state.session.lastEvents = events;
       return { ok: tickResult.ok, frozen: tickResult.frozen || false, rates: productionResult.rates, events };
     },

@@ -115,6 +115,10 @@ const ENDING_RESET_PROFILES = {
     archiveRecallChapterKey: 'T2',
     chronicleSummary: 'Цивилизация №2 завершена: Катаклизм сохранён в Архиве.',
   },
+  ENDING_FRACTURE: {
+    archiveRecallChapterKey: 'T3',
+    chronicleSummary: 'Цивилизация №3 завершена: Раскол сохранён в Архиве.',
+  },
 };
 
 function archiveReset(state, ruleset, command, ports) {

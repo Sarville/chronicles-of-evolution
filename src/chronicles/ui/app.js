@@ -443,7 +443,7 @@ function renderDiorama() {
   </section>`;
 }
 
-const ENDING_TITLE_BY_ID = { ENDING_BLIGHT: 'МОР', ENDING_CATACLYSM: 'КАТАКЛИЗМ' };
+const ENDING_TITLE_BY_ID = { ENDING_BLIGHT: 'МОР', ENDING_CATACLYSM: 'КАТАКЛИЗМ', ENDING_FRACTURE: 'РАСКОЛ' };
 const CHAPTER_KEY_BY_ENDING_ID = Object.fromEntries(
   Object.entries(ARCHIVE_RECALL_CHAPTERS).map(([chapterKey, chapterDef]) => [chapterDef.endingId, chapterKey])
 );

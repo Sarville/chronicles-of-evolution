@@ -71,4 +71,39 @@ export const ARCHIVE_RECALL_CHAPTERS = {
       },
     },
   },
+  T3: {
+    endingId: 'ENDING_FRACTURE',
+    // Cosmetic only -- the same Катаклизм can't refire, this is flavor/UI,
+    // no mechanical effect (docs/gdd/10_META_PROGRESSION.md sec.4.2 table).
+    defensePerk: {
+      id: 'T3_DEFENSE_SEISMIC_FOOTINGS',
+      label: 'Сейсмоусиленные опоры',
+      description: 'Косметика: следующая попытка помнит, как выглядел Катаклизм.',
+      effects: [],
+    },
+    stylePerks: {
+      auto: {
+        id: 'T3_AUTO_SELF_ORGANIZATION',
+        label: 'Самоорганизация',
+        description: 'Простаивающие рабочие сами занимают текущие профессии; рабочий, чей ресурс упёрся в кап хранилища, сам переходит на другую работу.',
+        effects: [{ type: 'unlock_auto_workforce' }],
+      },
+      invest: {
+        id: 'T3_INVEST_ACCELERATED_CONSTRUCTION',
+        label: 'Ускоренное строительство',
+        description: 'Цена построек City-эпохи ×0.75.',
+        effects: [{ type: 'building_cost_multiplier', eraId: 'CITY', value: 0.75 }],
+      },
+      efficiency: {
+        // Docs describe this as an early Stability/policy threshold, but no
+        // Stability system runs before Atomic -- reinterpreted as the
+        // chapter's own collapse timer running longer before its cliff, see
+        // domain/services/crisis.js chapterTimerTotalMs.
+        id: 'T3_EFFICIENCY_UNITY_SOONER',
+        label: 'Единство раньше',
+        description: 'Раскол наступает позже: общий запас времени до коллапса ×1.3.',
+        effects: [{ type: 'chapter_timer_duration_multiplier', timerId: 'chapter3_fracture', value: 1.3 }],
+      },
+    },
+  },
 };

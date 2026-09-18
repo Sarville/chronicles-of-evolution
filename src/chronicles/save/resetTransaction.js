@@ -7,9 +7,9 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-// Only T1->T2 is wired so far -- T3-T5 don't exist as their own chapters
-// yet (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.3).
-const NEXT_ACT_ONE_ATTEMPT = { T1: 'T2' };
+// Only T1->T2->T3 is wired so far -- T4-T5 don't exist as their own
+// chapters yet (docs/gdd/13_ACT_ONE_CHAPTERS.md sec.3).
+const NEXT_ACT_ONE_ATTEMPT = { T1: 'T2', T2: 'T3' };
 
 function formatTimelineId(timelineId) {
   return String(timelineId).padStart(3, '0');

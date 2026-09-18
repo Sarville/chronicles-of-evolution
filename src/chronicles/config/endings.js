@@ -17,5 +17,11 @@ export const endings = [
     requiresEra: 'SETTLEMENT',
     targetTimeMs: 1200000,
   },
+  {
+    id: 'ENDING_FRACTURE',
+    type: 'scripted_chapter_collapse',
+    requiresEra: 'CITY',
+    targetTimeMs: 1650000,
+  },
 ];
 

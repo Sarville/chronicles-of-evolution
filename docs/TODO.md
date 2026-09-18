@@ -706,9 +706,48 @@ Concrete code TODO:
     branch choice — no UI hook exists to attach flavor labels to a branch
     pick) and the `MS11`/`MS12` milestone banners (the `MS01-MS15` banner
     system itself barely exists in code — only one `MS_PROTOCELL` stub).
-- [ ] `T3`/`T4` don't exist as their own chapters yet, so their defense-perk
-  auto-grant + style-perk triads aren't wired — same mechanism as `T1`/`T2`
-  once those chapters land.
+- [x] `T3` "Крепость" implemented as its own chapter (2026-09-18):
+  - `T3`'s own goal chain: `G050`/`G051` (recap RNA→Settlement in 2 coarse
+    steps — even coarser than `T2`'s 3, despite covering more ground, per
+    the doc's "крупнее recap `T2`" instruction) + `G031`/`G032` (new live
+    content: Writing, then City — reuses the exact conditions `T1`'s old
+    dead `G018`/`G019` used) + `G033`/`G034` (rising + Раскол ending), all
+    `chapterAttempt: 'T3'` (`config/goals.js`).
+  - Retargeted the existing-but-dead `EV-CIV-04` (governance flavor choice)
+    from its old trigger `goalId: 'G019'` (unreachable — `T1` never reaches
+    City anymore) to `G032` instead of writing a duplicate — `T3` is the
+    first chapter that actually plays City content live, and this is
+    exactly the doc's "`G032B` governance входит в условие" note.
+  - New events `EV-NAR-T3` (rising) / `EV-CR-T3` (mandatory 3-choice
+    ending: `centralize`/`secede`/`mediate`) + `EV-NAR-T3-RECALL` (recap
+    seam flavor), new `ENDING_FRACTURE`, new `chapter3_fracture` timer
+    (same shape as `T1`/`T2`'s).
+  - `T3`'s defense perk (cosmetic, "Сейсмоусиленные опоры") + style triad:
+    - **auto** "Самоорганизация" — a genuinely new behavior, not just a
+      modifier: `unlock_auto_workforce` (`domain/services/modifiers.js`)
+      backs `applyAutoWorkforce` (`domain/services/population.js`, called
+      every tick from `domain/engine.js`), which auto-fills idle
+      population into the era's jobs and reassigns a job whose output
+      resource is already at cap to whichever job currently has the
+      fewest workers.
+    - **invest** "Ускоренное строительство" — reuses `T2`'s
+      `building_cost_multiplier` modifier with `eraId: 'CITY'` (no new
+      code needed).
+    - **efficiency** "Единство раньше" — the doc describes an early
+      Stability/policy threshold, but no Stability system runs before
+      Atomic; reinterpreted as extending the chapter timer's gentle-decay
+      phase before its cliff (new `chapter_timer_duration_multiplier`
+      modifier, `domain/services/crisis.js` `chapterTimerTotalMs`).
+  - Regression tests in `tests/domain/spec.js`: the full synthetic
+    run (recap→new content→both queued events→collapse→perk
+    choice→reset), the auto-workforce idle-fill/cap-reassign behavior, and
+    the duration-multiplier's effect on the timer.
+  - Explicitly **not built** (pure polish, zero mechanical effect, same
+    reasons as `T2`): skin swap (`T3` doesn't get one per the doc anyway —
+    only `T2`/`T4` do) and the `MS13`/`MS14` milestone banners.
+- [ ] `T4` doesn't exist as its own chapter yet, so its defense-perk
+  auto-grant + style-perk triad aren't wired — same mechanism as
+  `T1`/`T2`/`T3` once it lands.
 - [ ] Implement the two `T4` "Быстрое обучение" effects concretely:
   Cognition (`config/goals.js` `G011_COGNITION_TRACK`'s
   `cognition_at_least` condition — auto-credit `B04`+`N05` contributions)
