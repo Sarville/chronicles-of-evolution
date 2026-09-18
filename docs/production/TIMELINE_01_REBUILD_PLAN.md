@@ -142,8 +142,9 @@ work-item, не подпакет.
 - ровно один обязательный `Ash` за весь Act 1 — на `T5`; `T1–T4` не
   переиспользуют `ENDING_ASH`;
 - игрок видит только релевантные 3–4 главные counters на каждой главе;
-- persistent reward (AF, Chronicle, species skins) переносится между
-  главами без потери и без дублирования при пересборке/сбое;
+- persistent reward (Archive Recall перки, Chronicle, species skins)
+  переносится между главами без потери и без дублирования при
+  пересборке/сбое;
 - save/load/recovery устойчивы на каждой границе между главами;
 - full simulation, config/domain/save/UI/smoke/build gates проходят для
   всех пяти глав;

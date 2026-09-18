@@ -76,10 +76,12 @@ What actually changes chapter to chapter:
 - the era cutoff where that chapter's collapse triggers (growing each time);
 - the total time budget for the attempt (growing each time — see Timing);
 - how much of the replay is already-seen content, **compressed** by
-  AF-bought Archive Recall perks (`docs/gdd/10_META_PROGRESSION.md` §4 —
-  cost ×0.75 / production ×1.25 on "familiar" progression) rather than
-  skipped outright — this is what frees room in the growing budget for
-  genuinely new content before the next, later collapse;
+  Archive Recall perks (`docs/gdd/10_META_PROGRESSION.md` §4 — **corrected
+  2026-09-18**: no longer a single AF-bought automatic modifier; a
+  per-chapter choice of 1 of 3 permanent, stacking style perks, plus a
+  cosmetic defense perk against the previous chapter's own collapse)
+  rather than skipped outright — this is what frees room in the growing
+  budget for genuinely new content before the next, later collapse;
 - the collapse cause/ending itself.
 
 | Chapter | Era cutoff | Full replay range (`T1-0…T1-6` packages) | Recall-compressed (already seen) | New content this attempt | Collapse cause |
@@ -134,11 +136,16 @@ not implemented in code yet.
 
 ### Currency
 
-A single unified currency (working name: Archive Fragments, per existing
-`docs/gdd/09_ENDINGS_AND_RESET.md`) is awarded after every reset in Act 1 and
-Act 2, spent on light upgrades/perks. It does not fragment into the original
-game's multi-currency set (Plasmid/Phage/Dark/Harmony/Artifact/Supercoiled/
-AICore-equivalents) until the Act 3 transition.
+**Corrected 2026-09-18** (supersedes this subsection's original text
+below the line, which awarded a unified Archive Fragments currency after
+every Act 1/2 reset): there is **no spendable currency of any kind** in
+Act 1 or Act 2. Every reset grants Archive Recall perks only
+(`docs/gdd/10_META_PROGRESSION.md` §3-4) — no purchase, no shop. Archive
+Fragments and the rest of the original game's multi-currency set
+(Plasmid/Phage/Dark/Harmony/Artifact/Supercoiled/AICore-equivalents) start
+accumulating only once the player completes Act 3 and enters the
+repeatable endgame loop — not at the Act 2→Act 3 transition, and not
+before.
 
 ---
 
@@ -401,8 +408,10 @@ Summary:
   achievement is a boolean flag already derivable from existing state
   (`meta.endings.*`, Chronicle entries, Archive Tree node purchases, `P`
   completions, Act 3 milestones) — no new tracked resource. Unlocking an
-  achievement does **not** grant AF; AF stays reward-for-reset only
-  (`docs/gdd/10_META_PROGRESSION.md` §2, unchanged).
+  achievement does **not** grant AF; AF stays reward-for-**Act-3**-reset
+  only (`docs/gdd/10_META_PROGRESSION.md` §2 — Act 1-2 resets grant Archive
+  Recall perks instead, not AF at all, per the 2026-09-18 currency
+  correction in `ACT-002`).
 - Completion % = achievements unlocked ÷ total achievements that exist —
   a fixed, known denominator even though Act 3's underlying currencies are
   uncapped (see doc §3 for the per-act weighting).

@@ -202,15 +202,18 @@ swap Act 1; после `T5` бюджет свопов исчерпан, `T5` в�
 
 | Глава | Persistent reward | Новые systems/unlocks главы | Новая event deck |
 |---|---|---|---|
-| `T1 Origin` | `Archive Memory I`, малый AF-пакет, Chronicle первой попытки | first branch, AP, Cognition, базовые side objectives | authored RNA/DNA/Cell + Tribe deck (уже реализовано) |
-| `T2 Одиночки` | species skin #1, `Archive Recall I` (частично — не полный T2 Memory) | свой recap RNA→Tribe, coordination-vs-isolation choices | cataclysm-readiness flavor events |
-| `T3 Крепость` | policy-lite unlock, запись в Chronicle | крепость строится как новый контент главы, early policy choice (unity vs control) | internal-tension flavor events |
-| `T4 Большой мозг` | species skin #2, запись в Chronicle | Writing/culture и Cognition достигаются как новый контент главы, automation risk choices | techno-catastrophe-adjacent flavor events |
-| `T5 Синтез` | `Archive Memory` full award, AF (14–18 диапазон из старого GDD), полный Timeline Summary | Great Filter/crisis flow (реализовано), **T5-only procedural random event deck**, синтез-flashback события, ссылающиеся на T1–T4 | authored crisis events (реализовано) + новая procedural deck §7 |
+| `T1 Origin` | выбор 1 из 3 T1-перков (Archive Recall), Chronicle первой попытки | first branch, AP, Cognition, базовые side objectives | authored RNA/DNA/Cell + Tribe deck (уже реализовано) |
+| `T2 Одиночки` | species skin #1, защитный перк + выбор 1 из 3 T2-перков | свой recap RNA→Tribe, coordination-vs-isolation choices | cataclysm-readiness flavor events |
+| `T3 Крепость` | защитный перк + выбор 1 из 3 T3-перков, запись в Chronicle | крепость строится как новый контент главы, early policy choice (unity vs control) | internal-tension flavor events |
+| `T4 Большой мозг` | species skin #2, защитный перк + выбор 1 из 3 T4-перков, запись в Chronicle | Writing/culture и Cognition достигаются как новый контент главы, automation risk choices | techno-catastrophe-adjacent flavor events |
+| `T5 Синтез` | выбор 1 из 3 постоянных endgame-перков, полный Timeline Summary | Great Filter/crisis flow (реализовано), **T5-only procedural random event deck**, синтез-flashback события, ссылающиеся на T1–T4 | authored crisis events (реализовано) + новая procedural deck §7 |
 
-После `T5` игрок переходит в Act 2 (`P1–P3`), где persistent reward Act 1
-(накопленные AF, Chronicle пяти попыток, до двух species skins) становится
-стартовым капиталом.
+**Скорректировано 2026-09-18:** нет AF/валюты в Act 1-2 — persistent reward
+каждой главы — только Archive Recall перки (`docs/gdd/10_META_PROGRESSION.md`
+§4), не AF-пакет. После `T5` игрок переходит в Act 2 (`P1–P3`), где
+persistent reward Act 1 (накопленные Archive Recall перки, Chronicle пяти
+попыток, до двух species skins) продолжает действовать, но не становится
+денежным стартовым капиталом — валюты начинаются только с Act 3.
 
 ---
 

@@ -11,8 +11,10 @@ CHAPTERS.md` §6.
 > главами Act 1: shared cinematic beats, ending card, Archive Summary,
 > idempotent reset transaction, forbidden CTA wording (никогда `Game Over`/
 > `Попробовать снова`). Конкретный визуал, ending ID/title/subtype и
-> Archive Fragments диапазон отличаются по главе — см. таблицу в §7 и
-> `13_ACT_ONE_CHAPTERS.md` §6. Секции 2–15 ниже описывают `T5`/`Ash` во
+> набор Archive Recall перков, который выдаёт эта конкретная концовка,
+> отличаются по главе — см. таблицу в §10 и `docs/gdd/10_META_PROGRESSION.md`
+> §4.2/§4.4 (**2026-09-18: нет никакой валюты/AF в Act 1-2, награда —
+> только перки**). Секции 2–15 ниже описывают `T5`/`Ash` во
 > всех деталях, т.к. это уже реализованный, самый глубокий из пяти
 > case — читай их как образец полноты, которую `T1–T4` эндинги
 > переиспользуют в упрощённом виде (§16–18).
@@ -239,42 +241,29 @@ Do not show obsolete primary metabolism branch `Photosynthesis/Chemosynthesis/Ab
 
 ---
 
-# 10. Archive reward
+# 10. Archive Recall reward
 
-Use Archive Fragments as the single spendable first prestige currency.
-
-Target for `T5`/`Ash` remains:
-
-```text
-14–18 AF typical
-```
-
-`T1–T4` non-Ash endings use a smaller provisional envelope (shorter
-chapters, smaller stakes) — see `13_ACT_ONE_CHAPTERS.md` §6:
+**Corrected 2026-09-18:** no Archive Fragments, no currency of any kind,
+anywhere in Act 1 or Act 2 — see `docs/gdd/10_META_PROGRESSION.md` §1-3.
+Every ending in this document (`T1-T5`) grants Archive Recall perks
+instead:
 
 ```text
-T1 Мор:      4–6 AF
-T2 Катаклизм: 5–7 AF
-T3 Раскол:    6–8 AF
-T4 Авария:    7–9 AF
+T1 Мор:       choice of 1 of 3 T1 style perks (10_META_PROGRESSION.md §4.2)
+T2 Катаклизм: defense perk (cosmetic) + choice of 1 of 3 T2 style perks
+T3 Раскол:    defense perk (cosmetic) + choice of 1 of 3 T3 style perks
+T4 Авария:    defense perk (cosmetic) + choice of 1 of 3 T4 style perks
+T5 Ash:       choice of 1 of 3 permanent endgame perks (§4.4), no defense perk
 ```
 
-Эти диапазоны — provisional envelope, не финальная формула; суммарно пять
-глав должны давать сопоставимую или чуть большую общую награду, чем старый
-единый 180-минутный `Ash`, поскольку игрок теперь пять раз проходит
-reset-ритуал вместо одного.
+The other two of each chapter's 3 style perks (and, for `T5`, the other 2
+of its 3 endgame perks) are recovered later via Archive-mode replay
+(`10_META_PROGRESSION.md` §4.6), not from this same first-playthrough
+ending.
 
-Reward application must be idempotent.
+Reward application must be idempotent (unchanged).
 
-The old exact formula can be retained only after thresholds are revalidated against:
-
-- changed evolution node count;
-- changed Population scale;
-- corrected crisis bonus.
-
-Until then the formula is config/provisional, while the reward envelope is canonical.
-
-Ads/meta cannot multiply mandatory first-reset AF.
+Ads/meta cannot multiply or bypass a mandatory perk-choice grant.
 
 ---
 
@@ -284,7 +273,7 @@ Preserve:
 
 ### Saved
 
-- Archive Fragments;
+- Archive Recall perk unlocks (`10_META_PROGRESSION.md` §4);
 - Archive nodes;
 - Chronicle;
 - achievements;
@@ -318,7 +307,7 @@ Reset transaction must:
 - create next run candidate;
 - commit through recoverable save flow;
 - use stable transaction ID;
-- be safe to retry without duplicate AF or Chronicle entries.
+- be safe to retry without duplicate perk grants or Chronicle entries.
 
 ---
 
@@ -333,7 +322,9 @@ After reset:
 
 > Мы можем изменить результат.
 
-Timeline #2 starts with restored biological progression, accelerated by Archive systems.
+Timeline #2 starts with restored biological progression, accelerated by
+whichever Archive Recall perks were unlocked during Act 1
+(`10_META_PROGRESSION.md` §4) — not by any currency.
 
 It is not a return to the obsolete Energy/Information molecular economy.
 
@@ -345,7 +336,8 @@ Changed:
 
 - final-act entry now follows restored Modern/Atomic bridge;
 - species summary uses restored biological branches/AP/Cognition;
-- AF formula thresholds are marked for revalidation.
+- AF removed entirely from `T5`/`Ash` reward — replaced by a perk choice
+  (§10, `10_META_PROGRESSION.md` §4.4) as of 2026-09-18.
 
 Kept:
 
@@ -354,7 +346,6 @@ Kept:
 - unavoidable first Ash;
 - Last Protocol;
 - Archive Summary;
-- AF envelope;
 - Chronicle;
 - idempotent reset;
 - Timeline #2 teaser.
@@ -369,10 +360,11 @@ order; a Last Protocol choice writes `ENDING_ASH` plus one of
 `ash_fire`, `ash_too_late` or `ash_system`, and closes ordinary input.
 
 The Archive CTA then uses the existing canonical reset transaction ID. It
-writes one ending Chronicle record and a bounded 14–18 AF award, then creates
-the next active run without duplicating a transaction on retry. The AF formula
-and crisis coefficients are provisional pending balance; idempotency and the
-reward envelope are not.
+writes one ending Chronicle record and grants a choice among `T5`'s 3
+permanent endgame perks (`10_META_PROGRESSION.md` §4.4 — no AF, as of the
+2026-09-18 currency-removal), then creates the next active run without
+duplicating a transaction on retry. Crisis coefficients are provisional
+pending balance; idempotency and the perk-grant contract are not.
 
 ---
 
@@ -403,8 +395,9 @@ Full copy for all four transitions — `docs/scenario/06_ENDINGS_COPY.md`
 §T1–§T4 and §0 (shared template).
 
 The reset transaction itself is idempotent in the same sense as `T5`'s (§12):
-one immutable per-chapter summary, one bounded AF award (§10 range for that
-chapter), one Chronicle entry, safe to retry without duplication. What differs
+one immutable per-chapter summary, one perk-choice grant (§10 for that
+chapter — defense perk + 1 of 3 style perks, no AF), one Chronicle entry,
+safe to retry without duplication. What differs
 is only that "the next run candidate" this transaction creates is the next
 chapter of the same Act 1 attempt, not a fresh Act 1 `T1`.
 
@@ -417,7 +410,8 @@ Changed:
 - scope: this document now covers reset/ending for all five Act 1 chapters,
   not only the former single-run `Ash`;
 - four new ending IDs/titles/subtypes (§7);
-- a smaller, chapter-scoped Archive Fragments envelope for `T1–T4` (§10);
+- AF removed entirely, replaced by the Archive Recall perk-choice grant for
+  every chapter including `T5` (§10, 2026-09-18);
 - `T1–T4` endings transition into the next chapter, not into a Timeline #2 /
   Act 2 teaser (§16).
 
@@ -425,5 +419,5 @@ Kept, unchanged for `T5`:
 
 - everything in §1–15 above describing `Ash` specifically;
 - Stability/World Tension, crisis clamps, unavoidable first Ash, Last
-  Protocol, Archive Summary shape, AF envelope for `T5`, Chronicle,
-  idempotent reset, Act 2 teaser after `T5`.
+  Protocol, Archive Summary shape, Chronicle, idempotent reset, Act 2
+  teaser after `T5`.

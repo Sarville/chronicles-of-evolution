@@ -352,7 +352,7 @@ Hard rule: `SCR_WORLD` остаётся базовой поверхностью 
 **Trigger:** Save to Archive.  
 **Surface:** `SCR_ARCHIVE`.  
 **Visual:** Ash world может оставаться приглушённым фоном или перейти в Archive presentation; DS-06 решает layout.  
-**Content:** species, adaptations, civilization path, key decisions, peak Population, crisis, ending subtype, Archive Fragments.  
+**Content:** species, adaptations, civilization path, key decisions, peak Population, crisis, ending subtype, выбранный Archive Recall перк (не Archive Fragments — нет AF до Act 3).  
 **Rule:** это завершённая история мира, не статистика поражения.
 
 ## PB30 — Archive remembers / ~120 мин

@@ -513,15 +513,12 @@ First run:
 
 # 14. Archive reward
 
-Keep DS-04 first-reset envelope:
-
-```text
-14–18 AF typical
-```
-
-AF reward remains idempotent and cannot be multiplied by ads/meta.
-
-The exact formula may continue to use discovered evolution nodes, peak Population and crisis bonus, but thresholds must be revalidated after node/population reconciliation.
+**Superseded 2026-09-18:** this section's old "14-18 AF typical" DS-04
+envelope no longer applies — there is no AF in Act 1/2 at all. The current
+canonical reward contract is the Archive Recall perk-choice grant in
+`docs/gdd/09_ENDINGS_AND_RESET.md` §10 and `docs/gdd/10_META_PROGRESSION.md`
+§3-4. Kept unchanged: reward application is idempotent and cannot be
+multiplied or bypassed by ads/meta.
 
 ---
 

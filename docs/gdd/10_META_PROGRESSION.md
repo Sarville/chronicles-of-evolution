@@ -1,7 +1,8 @@
 # Хроники Эволюции — Meta progression
 
-**Документ:** DS-04 / reconciliation revision 2.0  
-**Статус:** canonical meta semantics / numeric early bonuses provisional.
+**Документ:** DS-04 / reconciliation revision 3.0
+**Статус:** canonical meta semantics for Act 1-2 (Archive Recall perks);
+Act 3 currency semantics (§2) canonical, exact numbers provisional.
 
 ---
 
@@ -9,14 +10,25 @@
 
 Archive remains a major accepted improvement.
 
+**Corrected 2026-09-18** (supersedes this doc's prior revision, which
+treated Archive Fragments (AF) as "the only spendable prestige currency of
+the first meta loop" and had every `T1-T5` ending grant AF): Act 1 and
+Act 2 carry **no spendable currency at all**. The only thing that survives
+a reset inside Act 1/Act 2 is Archive Recall perk unlocks (§4). AF and the
+rest of the original game's multi-currency set (Plasmid/Phage/Dark/
+Harmony/Artifact/Supercoiled/AICore-equivalents) start accumulating only
+once Act 3 opens — see `docs/DECISIONS_ACT_STRUCTURE.md` ACT-002
+"Currency" subsection for the decision record.
+
 Meta progression must:
 
-- make Timeline #2 feel meaningfully faster and more flexible;
+- make each successive Act 1 attempt (`T1-T5`) and, later, each Act 2
+  replay meaningfully faster than the one before, driven entirely by
+  Archive Recall perk unlocks, not by a currency purchase;
 - preserve familiar gameplay rather than skip it automatically;
-- allow retained traits/hybridization later;
 - never invalidate first-run balance;
 - never require ads;
-- never multiply Archive Fragment rewards.
+- never grant AF or any other currency before Act 3 is reached.
 
 The corrected biological canon is RNA/DNA/Cell/AP/Cognition. Meta must adapt to that vocabulary.
 
@@ -24,7 +36,14 @@ The corrected biological canon is RNA/DNA/Cell/AP/Cognition. Meta must adapt to 
 
 # 2. Permanent system
 
-**Archive Memory** includes:
+Two permanent layers now exist, scoped to different acts — do not conflate them:
+
+**Act 1-2 layer — Archive Recall perks (§4).** No currency, no shop. Perks
+are granted directly by chapter/attempt endings and by Archive-mode
+replays (§4.6). This is the only progression that survives a reset before
+Act 3.
+
+**Act 3 layer — Archive Memory.** Unlocked once Act 3 opens. Includes:
 
 - Archive Fragments (AF);
 - Archive Tree;
@@ -37,207 +56,213 @@ The corrected biological canon is RNA/DNA/Cell/AP/Cognition. Meta must adapt to 
 - hybridization permissions;
 - future Archive Intervention upgrades.
 
-AF remains the only spendable prestige currency of the first meta loop.
+AF becomes the spendable prestige currency of this loop specifically — not
+before, and it does not retroactively apply to Act 1/Act 2.
 
 ---
 
-# 3. First reset reward
+# 3. Chapter reset rewards (Act 1-2)
 
-Canonical envelope remains:
+No AF anywhere in Act 1-2. Each chapter ending grants perks only:
 
-```text
-14–18 AF typical
-```
+**`T1-T4` endings** each grant:
 
-Hard rules remain:
+- one cosmetic defense perk against that chapter's own collapse cause,
+  applied automatically going into the next chapter — flavor only, since
+  the same collapse structurally cannot refire anyway (its collapse goal
+  is simply absent from any later chapter's own goal set, see
+  `docs/gdd/13_ACT_ONE_CHAPTERS.md` §5 / `[[act1-recap-goal-granularity]]`);
+- a choice of 1 of that chapter's 3 not-yet-unlocked Archive Recall style
+  perks (§4.2) — permanent once picked, that slot is never re-offered on a
+  first playthrough.
 
-- idempotent grant;
-- ads do not multiply AF;
-- meta does not increase AF multiplier;
-- AF survives reset.
+**`T5`'s ending** grants a choice among its 3 permanent endgame perks
+instead (§4.4) — no defense perk, since the first `Ash` is mandatory by
+design, nothing to protect against.
 
-The old exact formula must be revalidated because evolution node count and Population scale changed in reconciliation.
+Hard rules:
+
+- idempotent grant (unchanged from the old reset-transaction contract —
+  `docs/gdd/09_ENDINGS_AND_RESET.md` §12);
+- perk unlocks never require ads;
+- perks survive every future reset, including the eventual transition into
+  Act 3.
+
+The old "14-18 AF typical" first-reward envelope and the old `T1-T4`
+per-chapter AF ranges (`docs/gdd/09_ENDINGS_AND_RESET.md` §10,
+`docs/gdd/13_ACT_ONE_CHAPTERS.md` §6) are retired along with AF itself for
+these acts. Act 3's own entry reward is a separate, not-yet-designed
+question — out of scope here.
 
 ---
 
 # 4. Archive Recall
 
-Archive Recall remains automatic after first reset.
+Archive Recall is no longer a single automatic global modifier (the old
+"cost ×0.75 / production ×1.25 on familiar progression" formula). It is a
+set of permanent, stacking perks earned per chapter: first offered as a
+choice of 1 of 3 on that chapter's own ending, with the other two
+recoverable later via Archive-mode replay (§4.6).
 
-Semantic contract:
+Semantic contract (unchanged in spirit from the original design intent):
 
-- acts only on familiar pre-Sapience core progression;
+- acts only on familiar progression the player has already lived through;
 - never completes core milestones automatically;
 - does not auto-select branches;
 - does not unlock unknown optional adaptations;
-- ends at Sapience.
+- each perk targets a *specific* mechanical range or named milestone (e.g.
+  the RNA→Tribe range, or Cognition specifically), so it keeps paying off
+  in every later chapter/replay that passes back through that same range
+  — this is the actual mechanism behind "each successive attempt is
+  faster than the last."
 
-Old wording based on `Energy production` / `Information` is superseded.
+## 4.1 The three axes
 
-Recommended reconciled effects for tuning:
+Every `T1-T4` chapter offers the same three axes on its own new mechanical
+range — three different mechanisms for the same order of acceleration, so
+the choice is genuinely about playstyle, not about picking the strongest
+option:
 
-```text
-familiar core biological costs/process requirements reduced
-familiar early biological production/process speed increased
-```
+- **Авто/пассив** — something now happens without player input;
+- **Вложение/постройка** — investing (building more of something) pays
+  off more;
+- **Эффективность** — the same actions cost or require less.
 
-Initial numeric reference may remain around the old envelope:
+## 4.2 `T1-T4` perk table
 
-```text
-cost factor ~0.75
-production/process factor ~1.25
-```
+| Глава | Защита (авто, косметика) | Авто/пассив | Вложение/постройка | Эффективность |
+|---|---|---|---|---|
+| `T1` | — (первая попытка, нечего защищать) | Резонанс молекул: пассивное производство RNA/DNA ×1.5 | Нулевая задержка: кулдаун ручного клика −90% | Дешёвый онтогенез: цена первых biological breakthrough ×0.75 |
+| `T2` (после Мор) | Карантинный протокол | Самообслуживающиеся хранилища: кап склада растёт сам с населением/эрой | Крупная тара: кап склада за постройку выше | Дешёвая застройка: цена построек Settlement-эпохи ×0.75 |
+| `T3` (после Катаклизм) | Сейсмоусиленные опоры | Самоорганизация: простаивающие рабочие авто-назначаются; рабочий, чей ресурс упёрся в кап хранилища, авто-перераспределяется на другую работу | Ускоренное строительство: цена/время построек крепости ×0.75 | Единство раньше: policy-lite порог/бонус к Stability открывается раньше |
+| `T4` (после Раскол) | Единый протокол согласия | Фоновые процессы: производственные здания Industry/Modern сохраняют ~25% выпуска без назначенных рабочих | Форсированное производство: industry-output ×1.25 | Быстрое обучение — см. §4.3 |
 
-but exact application to RNA/DNA/Biomass/Energy must be confirmed after corrected Timeline #1 balance exists.
+Each cell in the three style columns is a separate, independent unlock.
+The first one comes from that chapter's own ending; the other two come
+from Archive-mode replays of that same chapter (§4.6). Once unlocked, all
+of a chapter's unlocked perks stack simultaneously, and apply everywhere
+their target range recurs across Act 1 *and* Act 2 — a `T1` perk targeting
+RNA→Tribe also speeds up `T2-T5`'s own recap of that same range.
 
----
+## 4.3 `T4` Эффективность — "Быстрое обучение" (worked example)
 
-# 5. Tier 1 Archive nodes
+Targets two specific named milestones, each relieved by ~45% of its total
+requirement — same ratio, deliberately different mechanism, because the
+two milestones are structurally different:
 
-Keep the **concepts**, rewrite obsolete resource-specific effects.
+**Cognition** (`src/chronicles/config/goals.js` `G011_COGNITION_TRACK`,
+condition `cognition_at_least: 100`, a weighted sum of 4 contributors:
+`B04` Nervous Tissue 20, `B05` Nervous System 25, `N03` Neural Complexity
+30, `N05` Proto-language 25) — the perk auto-grants `B04` + `N05` (45 of
+100) for free; the player still completes `B05` + `N03` (55 of 100) live.
+Keeping `B05`/`N03` live (the majority) satisfies §8's "core
+nervous-system route alone must provide most of the required progress"
+rule — this was a deliberate pick, not just "the two smallest."
 
-## AR01 — Эхо молекулы
+**Письменность** (`src/chronicles/config/nodes.js` `T09`→`T10`, two
+sequential cost gates, not a weighted sum: `T09` costs food 2100 /
+materials 1150 / knowledge 390 + population 14 + 3 buildings; `T10` costs
+food 2700 / materials 1450 / knowledge 520) — the perk applies a flat
+×0.55 cost multiplier to **both** `T09` and `T10`, rather than skipping
+one gate outright. A full skip of `T09` was considered and rejected: it's
+a fixed, one-off saving that doesn't grow with the rest of the stacked
+perk set, and its relative value shrinks every time the surrounding
+economy gets faster from other unlocked perks. The ×0.55-on-both-gates
+version behaves like every other efficiency perk on this page — a
+percentage that keeps compounding with the rest of the stack instead of a
+flat, non-scaling one-off.
 
-Old: starting Energy production ×1.25.
+Exact 45%/×0.55 numbers are a starting point, not final — ordinary
+balance pass after implementation, like every other number on this page.
 
-Reconciled meaning:
+## 4.4 `T5` — permanent endgame perks
 
-- improves familiar early RNA/replication process;
-- belongs to early biological production group.
+`T5`'s ending offers a choice among 3 permanent perks instead of the
+`T1-T4` pattern — no defense perk (the first `Ash` is mandatory by design):
 
-Exact effect TBD after 0–10 rebalance.
+- **Производство** — permanent bonus to base output;
+- **Экспансия/Стабильность** — permanent bonus to caps/Stability reserve;
+- **Познание** — permanent bonus to Cognition/tech-progression rate.
 
-## AR02 — Стабильная память
+The first pick applies **immediately, live**, to whatever Act 3/endgame
+run happens to be active at that moment (Act 1/2 Archive-mode and Act 3+
+run in parallel and switch freely — §4.6) — it does not wait for the next
+Act 3 entry. Archive-mode replays of `T5` recover the other two; once all
+3 are unlocked they all **stack simultaneously** (they are not mutually
+exclusive, unlike the `T1-T4` pattern's per-slot picks). Once all 3 exist,
+every further `T5` completion no longer grants anything new — instead it
+increases their numeric magnitude, subject to the anti-snowball ceilings
+in §7. The exact scaling curve (soft cap / diminishing returns per
+completion) is not designed yet — open work, tracked in `docs/TODO.md`.
 
-Old: starting Information +10.
+## 4.5 Why the collapse timers are safe from this
 
-Reconciled meaning:
+Every `T1-T4` collapse fires on a hidden, fixed timer, not on a resource
+threshold (`[[chapter-collapse-timer-mechanic]]`). Stacking Archive Recall
+perks cannot let the player skip a chapter's own collapse — it only frees
+more time within that chapter's fixed budget for genuinely new content
+before the timer expires, which is the intended effect.
 
-- one-time familiar genetic/replication starting advantage;
-- may grant starting RNA/DNA progress or reduce first DNA requirement;
-- must not skip Self Replication entirely.
+## 4.6 Archive-mode (parallel replay)
 
-Exact effect TBD.
+Available once Act 1 is completed for the first time (and, once Act 2 has
+its own perk table designed, once Act 2 is completed too). It is a full,
+real-time replay of `T1-T5` (or later, a `P`), using whatever perks are
+already unlocked going in — not a shortcut picker that skips content.
+Each successive Archive-mode run is faster than the last purely because
+more perks are already stacked, right up until every `T1-T4` slot for
+that act is full; after that, further `T5` completions only feed the §4.4
+numeric scaling, so the mode stays useful indefinitely.
 
-## AR03 — Быстрый онтогенез
+Archive-mode grants zero currency of any kind, consistent with §1 — there
+is no currency before Act 3, so there is nothing else for it to grant.
+Its only reward is perk progress. It is freely switchable with the main
+Act 3+ run at any time, and a perk unlocked or upgraded inside Archive-mode
+applies to the Act 3+ run immediately and live, not on the next entry.
 
-Keep concept:
-
-- reduces requirements of familiar early core breakthroughs;
-- no effect on unknown/new branch content;
-- obeys cost floor.
-
-## AR04 — Спящий метаболизм
-
-Keep offline efficiency improvement concept.
-
-Offline hard cap remains 75%.
-
----
-
-# 6. Tier 2
-
-## AR05 — Сохранённая адаптация
-
-Keep unchanged conceptually.
-
-Player may retain one discovered **OPTIONAL biological node**.
-
-Activation remains dormant until original prerequisites are reached.
-
-Strong fit with restored Adaptation Points: retained optional body adaptation becomes free on activation and does not consume AP in the new run.
-
-## AR06 — Перекрёстная эволюция
-
-Old semantics `second cellular branch without ×2.5 penalty` are superseded because Timeline #1 no longer allows buying siblings for ×2.5.
-
-New semantics:
-
-> Allows unlocking one **secondary primary biological trait** from the original Absorption / Symbiosis / Shell tier after reaching the original branch prerequisites.
-
-AR06 alone does not provide full double numerical stacking.
-
-The secondary trait may initially be dormant/profile-only until a later hybridization upgrade enables numerical coexistence.
-
-## AR07 — Наследие культуры
-
-Keep civilization starting advantage concept, but exact `+20 K / +10% pop` values must be retuned because civilization now starts around Population 5.
-
-## AR08 — Память катастрофы
-
-Keep unchanged:
-
-- reveals hidden Great Filter/Stability causes in later timelines;
-- informational power, not a direct Stability bonus.
-
----
-
-# 7. Tier 3
-
-## AR09 — Двойная специализация
-
-Keep hybridization concept.
-
-Reconciled semantics:
-
-- allows one secondary biological trait to become numerically active;
-- primary = 100% effect;
-- secondary target effect around 65%, subject to regression balance.
-
-## AR10 — Ускоренная история
-
-Keep narrative lock reduction without skipping mandatory choices.
-
-## AR11 — Глубокий архив
-
-Keep lore/content unlock.
-
-## AR12 — За пределом Пепла
-
-Keep post-Ash route unlock concept; does not alter first Timeline ending.
+Act 2's own equivalent (replaying `P1-P3` for their own perk set) is
+explicitly out of scope until Act 2 has its own perk table designed —
+`P1-P3` don't have one yet
+(`docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` §6/§10).
 
 ---
 
-# 8. Timeline #2 pacing
+# 5. Superseded: the generic `AR01-12` tree
 
-Old accepted target `Sapience 20–28 min` was based on Timeline #1 Sapience ~46 min and is superseded as a fixed number.
+The prior generic, AF-purchased Archive Tree (`AR01-AR12` across 3 tiers)
+is superseded by the concrete per-chapter table in §4 — there is no AF to
+spend on it in Act 1-2 anymore. Two groups of concepts from the old tree
+are **not** covered by the new per-chapter perks and are deliberately left
+undecided rather than deleted:
 
-New principle:
-
-```text
-Timeline #2 familiar pre-Sapience path ≈ 50–65% of corrected Timeline #1 time
-```
-
-With corrected first-run Sapience ~38–40 min, initial tuning target is:
-
-```text
-no-spend: ~22–25 min
-typical Tier1: ~18–22 min
-readability floor: ~16–18 min
-```
-
-Final values require simulation after corrected Timeline #1 exists.
-
-Timeline #2 must still show:
-
-- RNA;
-- replication;
-- DNA;
-- Cell;
-- first branch;
-- organism;
-- Cognition;
-- Sapience.
-
-It accelerates familiar progression rather than replacing it.
+- **Retained trait / hybridization** (old `AR05`/`AR06`/`AR09` — keep one
+  discovered optional biological node across a reset; later unlock a
+  numerically-active secondary primary trait). This may belong to Act 3's
+  races/traits system (`docs/gdd/15_ACT_THREE_SYSTEMS.md`) instead of
+  Archive Recall — needs its own decision, not assumed here.
+- **Crisis foresight / narrative-lock reduction / lore unlock / post-Ash
+  route** (old `AR08`/`AR10`/`AR11`/`AR12`). Likely folds into ordinary
+  Chronicle/achievement content rather than a dedicated perk slot, but
+  this is also not decided.
 
 ---
 
-# 9. Meta caps
+# 6. Chapter pacing
 
-Keep anti-snowball philosophy.
+Superseded by the concrete per-chapter target-budget table in
+`docs/gdd/13_ACT_ONE_CHAPTERS.md` §3 (`T1` ~20 min … `T5` ~40 min) and the
+entry-point/compression breakdown in its §4. This page intentionally no
+longer states its own pacing numbers, to avoid two sources of truth
+drifting apart.
 
-Recommended ceilings remain starting guardrails:
+---
+
+# 7. Meta caps
+
+Keep anti-snowball philosophy. These ceilings bound how far a fully
+stacked Archive Recall perk set (§4) — not just a single automatic
+modifier — may push production/cost/Stability. Recommended ceilings
+remain starting guardrails:
 
 ```text
 pre-Sapience meta production/process multiplier <= 1.60
@@ -253,11 +278,13 @@ Familiar core effective requirement/cost floor remains around:
 >= 70% canonical
 ```
 
-Exact interpretation for non-price condition milestones (for example Cognition) must use explicit per-system rules rather than a fake universal cost multiplier.
+Exact interpretation for non-price condition milestones (for example
+Cognition) must use explicit per-system rules rather than a fake universal
+cost multiplier — §4.3's Cognition/Writing split is the concrete example.
 
 ---
 
-# 10. Cognition and meta
+# 8. Cognition and meta
 
 Archive must not simply grant `+100 Cognition`.
 
@@ -269,17 +296,21 @@ Allowed meta effects:
 
 Guardrail:
 
-> Sapience still requires the player to pass through the Cognition phase and make at least one meaningful behavioral/evolutionary choice.
+> Sapience still requires the player to pass through the Cognition phase
+> and make at least one meaningful behavioral/evolutionary choice.
+
+§4.3's Cognition perk (auto-grant 45 of 100, leave the core 55 live) is
+the concrete instance of this rule in the current design.
 
 ---
 
-# 11. Adaptation Points and meta
+# 9. Adaptation Points and meta
 
 AP remain run-local.
 
 Archive may:
 
-- retain an OPTIONAL adaptation (AR05);
+- retain an OPTIONAL adaptation (see §5's deferred retained-trait note);
 - later increase flexibility of AP loadout;
 - unlock hybrid combinations.
 
@@ -287,9 +318,10 @@ Archive must not create passive AP generation or permanent AP farming.
 
 ---
 
-# 12. Archive Intervention
+# 10. Archive Intervention
 
-Keep accepted envelope:
+Independent of the AF removal in §1 — this envelope was never AF-funded
+to begin with. Keep accepted envelope:
 
 - optional temporary acceleration;
 - one eligible resource/process target;
@@ -311,25 +343,25 @@ For restored early biology, eligible targets may include RNA/DNA/Biomass/Energy 
 
 ---
 
-# 13. What remains accepted from DS-04
+# 11. What remains accepted
 
 Keep:
 
-- automatic Archive Recall;
 - anti-snowball caps;
-- retained optional node;
-- hybridization progression;
-- crisis foresight;
+- retained optional node (deferred, §5);
+- hybridization progression (deferred, §5);
+- crisis foresight (deferred, §5);
 - ads outside baseline;
 - offline caps;
 - Archive Intervention envelope;
-- no AF multiplier;
-- Timeline #2 must feel different, not just globally ×2.
+- each Act 1 chapter must feel different from the last, not just globally
+  faster.
 
-Reconciled:
+Reconciled 2026-09-18:
 
-- removed Information-specific effects;
-- removed Energy-at-start assumption;
-- replaced AR06 ×2.5-penalty semantics;
-- recalibrated Timeline #2 target around ~38–40 min first-run Sapience;
-- integrated AP/Cognition.
+- removed AF/currency entirely from Act 1-2 (§1-3);
+- replaced the single automatic Archive Recall modifier with the
+  per-chapter, player-chosen, stacking perk system (§4);
+- superseded the generic `AR01-12` tree (§5);
+- retired this doc's own pacing numbers in favor of
+  `13_ACT_ONE_CHAPTERS.md` §3 (§6).

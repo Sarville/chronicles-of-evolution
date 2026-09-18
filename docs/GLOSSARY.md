@@ -58,7 +58,16 @@ Permanent/meta-система проекта.
 
 ### Archive Fragments / AF
 
-Единственная spendable meta currency первого prestige-loop.
+Spendable meta currency, но только начиная с Act 3 — Act 1-2 (`T1-T5`,
+`P1-P3`) не используют никакой валюты, только Archive Recall перки
+(`docs/gdd/10_META_PROGRESSION.md` §1-4, скорректировано 2026-09-18).
+
+### Archive Recall перк
+
+Перманентный, стакающийся бонус, разблокируемый по выбору 1 из 3 на
+концовке главы `T1-T5` (или позже — через Archive-mode replay). Единственная
+форма прогрессии в Act 1-2 до появления AF в Act 3
+(`docs/gdd/10_META_PROGRESSION.md` §4).
 
 ### Хроника
 

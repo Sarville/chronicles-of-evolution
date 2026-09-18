@@ -705,12 +705,12 @@ run.chapter           (overwritten to the new chapter id, not cleared)
 ## Act reset (`T5→Act 2`)
 
 Same as chapter reset, plus: full `meta.endings.act1_complete = true`,
-persistent AF/Chronicle carryover into `P1` starting capital (per
-`docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` §5), and
+persistent Archive Recall perk carryover into `P1` (per
+`docs/gdd/12_LONG_TERM_PROGRESSION_AND_RESET_ROADMAP.md` §5) — **not** a
+starting currency capital, since Act 1/2 has none
+(`docs/gdd/10_META_PROGRESSION.md` §1, corrected 2026-09-18) — and
 `meta.act1.species_skin` resets to `0` for the transition into Act 2
 (no skin budget carries into `P1–P3`).
-
-plus Archive progression/currencies defined by DS-04.
 
 ## `P` reset (`P1/P2/P3` completion → Act 3 or repeat `P` menu)
 
@@ -738,7 +738,8 @@ The following writes are idempotency-sensitive:
 - creation of Timeline Summary;
 - ending history append;
 - Chronicle finalization;
-- Archive Fragments reward;
+- Archive Recall perk-choice grant (Act 1-2) / Archive Fragments reward
+  (Act 3+ only, per `docs/gdd/10_META_PROGRESSION.md` §1-4);
 - `first_reset_complete`;
 - Timeline #2 candidate creation.
 

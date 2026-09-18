@@ -6,10 +6,12 @@
 превращает решение `ACT-011` в конкретный контракт для UI/сохранений.
 
 **Отношение к другим документам:** не вводит новую валюту. Использует уже
-существующие примитивы — Archive Fragments (AF, `docs/gdd/10_META_PROGRESSION.md`
-§2), Chronicle, Archive Tree (`AR01…AR12`), `meta.endings.*`
-(`docs/scenario/05_NARRATIVE_FLAGS.md`). Ачивка — это булев флаг поверх уже
-существующего состояния, не отдельный трекер.
+существующие примитивы — Archive Recall перки в Act 1-2 и Archive Fragments
+(AF) начиная с Act 3 (`docs/gdd/10_META_PROGRESSION.md` §2-4, скорректировано
+2026-09-18: нет AF до Act 3), Chronicle, `meta.endings.*`
+(`docs/scenario/05_NARRATIVE_FLAGS.md`). Старый генерический Archive Tree
+(`AR01…AR12`) superseded — `10_META_PROGRESSION.md` §5. Ачивка — это булев
+флаг поверх уже существующего состояния, не отдельный трекер.
 
 ---
 
@@ -41,8 +43,9 @@ Harmony/Artifact/Supercoiled/AICore-эквиваленты) сам по себе
 
 **Жёсткое правило:** Completion никогда не откатывается назад ни одним
 reset'ом (ни `T1–T5`, ни `P`, ни Act 3 universe reset) — ачивка, однажды
-открытая, остаётся открытой навсегда, как и AF. Это тот же idempotent-принцип,
-что уже действует для AF (`10_META_PROGRESSION.md` §3).
+открытая, остаётся открытой навсегда — как и любая Archive Recall перк-разблокировка
+в Act 1-2, и как AF начиная с Act 3. Это тот же idempotent-принцип, что уже
+действует для перков/AF (`10_META_PROGRESSION.md` §3-4).
 
 ---
 

@@ -550,14 +550,95 @@ model:
 - [ ] not done (later packages per `TIMELINE_01_REBUILD_PLAN.md` §7, and now
   blocked on the model correction above, plus the 2026-09-18 recap-goal
   follow-up — see `docs/gdd/07_GOALS_AND_MILESTONES.md` §5–8 and memory
-  `act1_recap_goal_granularity`): Archive Recall perk system (blocks all of
-  the below — no real recap duration without it), `T2` own coarser recap
-  goal chain (RNA→Tribe) + skin swap #1 at `C02A/B/C` + `Катаклизм`, `T3`
-  own even-coarser recap (RNA→Settlement) + policy-lite + `Раскол`, `T4`
-  own recap (RNA→City) + skin swap #2 at `C02A/B/C` + `Авария`, `T5` own
-  recap (RNA→Industry/Modern) + reframe + `t5_synthesis` deck, Act 1
-  closeout regression. Also still open: manual playtest of the whole `T1`
-  route (biology through the Мор timer) at the new pacing.
+  `act1_recap_goal_granularity`): Archive Recall perk system (design done,
+  see next section — still no code, blocks all of the below), `T2` own
+  coarser recap goal chain (RNA→Tribe) + skin swap #1 at `C02A/B/C` +
+  `Катаклизм`, `T3` own even-coarser recap (RNA→Settlement) + policy-lite +
+  `Раскол`, `T4` own recap (RNA→City) + skin swap #2 at `C02A/B/C` +
+  `Авария`, `T5` own recap (RNA→Industry/Modern) + reframe + `t5_synthesis`
+  deck, Act 1 closeout regression. Also still open: manual playtest of the
+  whole `T1` route (biology through the Мор timer) at the new pacing.
+
+---
+
+# Archive Recall perk system + AF removal from Act 1-2 (2026-09-18)
+
+**Status:** design accepted with the user, discussed and refined over
+several turns (perk mechanics, Cognition/Writing worked example, why a
+flat node-skip was rejected for Writing) — see
+`docs/gdd/10_META_PROGRESSION.md` §1-5 for the full written spec, plus the
+sync pass across `docs/gdd/{09_ENDINGS_AND_RESET,12_LONG_TERM_
+PROGRESSION_AND_RESET_ROADMAP,13_ACT_ONE_CHAPTERS,14_GLOBAL_ARCHIVE_AND_
+ACHIEVEMENTS,15_ACT_THREE_SYSTEMS}.md`, `docs/DECISIONS_ACT_STRUCTURE.md`
+`ACT-002` "Currency", `docs/scenario/05_NARRATIVE_FLAGS.md`,
+`docs/production/TIMELINE_01_REBUILD_PLAN.md`,
+`docs/ux/00_TIMELINE_PRESENTATION_MAP.md`, `docs/gdd/{01_FIRST_120_MINUTES,
+02_ECONOMY_FIRST_120_MINUTES}.md`, `docs/GLOSSARY.md`. **No code exists for
+any of this yet** — this is the next implementation step, blocking `T2-T5`.
+
+Design summary (see `10_META_PROGRESSION.md` §4 for the authoritative
+version, this is just the code-facing shape):
+
+- Each `T1-T4` ending grants a cosmetic defense perk (auto, no numeric
+  effect) + a choice of 1 of 3 not-yet-unlocked style perks for that
+  chapter (auto/investment/efficiency axes, §4.2 has the full table and
+  numbers). `T5`'s ending grants a choice of 1 of 3 permanent endgame perks
+  instead (§4.4), no defense perk.
+- All unlocked perks are **permanent and stack** — need a per-chapter,
+  per-slot unlock-flag store in meta save state (something like
+  `meta.archiveRecall.<chapterId>.<slot>.unlocked`), not a single numeric
+  multiplier field.
+- Perks apply wherever their target range/milestone recurs across Act 1
+  *and* Act 2, not just their own chapter — the effect-application layer
+  needs to key off content (range/milestone), not off "current chapter."
+- `T5`'s 3 endgame perks stack independently of the `T1-T4` pattern, and
+  once all 3 are unlocked, further `T5` completions increase their
+  numeric magnitude instead of granting anything new (soft cap per
+  `10_META_PROGRESSION.md` §7 — exact curve not designed yet).
+- Archive-mode (§4.6): a parallel replay entry point for Act 1, freely
+  switchable with the main Act 3+ run, granting zero currency (there is
+  none) — only perk progress, applied live to whatever run is currently
+  active.
+- **AF removed entirely from Act 1-2.** `ENDING_BLIGHT` currently grants a
+  flat 3 AF (`domain/commands.js` `ENDING_RESET_PROFILES`, added in the
+  "T1 retrofit: Мор collapse" work above) — this reward must be replaced
+  with the perk-choice grant instead of AF. `ENDING_ASH`'s existing 14-18
+  AF formula must also be replaced the same way once `T5` exists as its
+  own chapter (currently `ENDING_ASH` is still reached via the old
+  single-run route in `tests/domain/spec.js`, unaffected by `T1`'s Мор
+  retrofit — that full-Ash route needs the same AF-removal treatment when
+  it's reframed as `T5`, not before).
+
+Concrete code TODO (none started):
+
+- [ ] Design the actual save-state schema for per-chapter perk-slot
+  unlocks (see bullet above) — needs its own pass in
+  `docs/technical/03_GAME_STATE.md` / `04_SAVE_ARCHITECTURE.md`, which
+  still describe the old single-AF-reward transaction shape and were not
+  rewritten in this docs pass (deliberately — the real schema should come
+  from the implementation, not be guessed here).
+- [ ] Remove/replace the AF grant in `ENDING_RESET_PROFILES`
+  (`domain/commands.js`) for `ENDING_BLIGHT` (and, later, `ENDING_ASH` once
+  reframed as `T5`) with a perk-choice-grant effect.
+- [ ] Decide whether `state.js`'s `archiveFragments` field stays (zeroed,
+  unused until Act 3) or is removed until Act 3 systems are built —
+  either is fine, just needs a decision before touching that file.
+- [ ] Implement the `T1-T4` defense-perk auto-grant (cosmetic, no numeric
+  hook needed) and the 1-of-3 style-perk choice UI/effect wiring.
+- [ ] Implement the two `T4` "Быстрое обучение" effects concretely:
+  Cognition (`config/goals.js` `G011_COGNITION_TRACK`'s
+  `cognition_at_least` condition — auto-credit `B04`+`N05` contributions)
+  and Writing (`config/nodes.js` `T09`/`T10` — ×0.55 cost multiplier on
+  both, not a skip of either node).
+- [ ] Implement `T5`'s 3-perk stacking + post-unlock numeric-scaling
+  mechanic, applied live across the parallel Act 1/2 ↔ Act 3+ switch.
+- [ ] Implement Archive-mode as an entry point (available after first Act
+  1 completion) — no currency grant, only perk progress, live-applies to
+  the concurrently active Act 3+ run.
+- [ ] Balance pass on every number in this design (45% Cognition split,
+  ×0.55 Writing, all the ×1.25/×0.75/-90%/-45% values in the `T1-T4`
+  table, `T5`'s scaling curve) — same "provisional until playtest" status
+  as every other number in `10_META_PROGRESSION.md`.
 
 ---
 

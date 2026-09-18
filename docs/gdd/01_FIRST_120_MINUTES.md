@@ -260,8 +260,10 @@ scenario/04_STORY_EVENTS.md` §T5-DECK.
 ## 7.5 Ash / Archive (без изменений)
 
 Все Last Protocol variants converge to `ENDING_ASH`. После cinematic —
-Timeline Summary всей Act 1 (не только `T5`), Archive Fragments,
-Chronicle всех пяти глав, Meta Tree, переход в Act 2 (`P1`) teaser.
+Timeline Summary всей Act 1 (не только `T5`), выбор 1 из 3 постоянных
+`T5` endgame-перков (без AF/валюты — `docs/gdd/10_META_PROGRESSION.md`
+§4.4, скорректировано 2026-09-18), Chronicle всех пяти глав, Meta Tree,
+переход в Act 2 (`P1`) teaser.
 
 Reset остаётся окончанием истории цивилизации, не failure screen — как и
 `Мор`/`Катаклизм`/`Раскол`/`Авария` до него.
